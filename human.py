@@ -1,0 +1,153 @@
+import random # Keep random here for randomize_starting_statistics
+
+class Human:
+    def __init__(self, species, first_name, last_name, sex, gender, birth_year, birth_month=1):
+        self.species = species
+        self.first_name = first_name
+        self.last_name = last_name
+        self.sex = sex
+        self.gender = gender
+        self.birth_year = birth_year
+        self.birth_month = birth_month
+        self.stats = {
+            "health": 100, # Default values, will be randomized for player
+            "happiness": 100, # Default values
+            "intelligence": 50 # Default values
+        }
+        self.money = 0
+        self.current_place_id = None
+        self.residence_place_id = None
+
+    def get_full_name(self):
+        """Derives and returns the full name of the human."""
+        return f"{self.first_name} {self.last_name}".strip()
+
+    def randomize_starting_statistics(self):
+        """Randomizes health, happiness, and intelligence for a new human infant."""
+        self.stats["health"] = random.randint(85, 100) # Tighter range for human infant
+        self.stats["happiness"] = random.randint(80, 100) # Tighter range for human infant
+        self.stats["intelligence"] = random.randint(45, 60) # Tighter range for human infant
+        self.money = 0 # Money remains fixed at 0
+
+    def get_lifecycle_state(self, current_year, current_month):
+        """
+        Provides a structured dictionary of derived lifecycle state for the human.
+        This is the formal access boundary for lifecycle facts.
+        """
+        age_years_calc = current_year - self.birth_year
+        if current_month < self.birth_month:
+            age_years_calc -= 1
+        age_years_calc = max(0, age_years_calc)
+
+        total_months_current = (current_year * 12) + current_month
+        total_months_birth = (self.birth_year * 12) + self.birth_month
+        age_months_calc = max(0, total_months_current - total_months_birth)
+
+        if age_years_calc < 3: # 0-2
+            life_stage_calc = "Infant"
+        elif age_years_calc < 10: # 3-9
+            life_stage_calc = "Child"
+        elif age_years_calc < 18: # 10-17
+            life_stage_calc = "Teenager"
+        elif age_years_calc < 25: # 18-24
+            life_stage_calc = "Young Adult"
+        elif age_years_calc < 65: # 25-64
+            life_stage_calc = "Adult"
+        else: # 65+
+            life_stage_calc = "Elder"
+
+        return {
+            "age_years": age_years_calc,
+            "age_months": age_months_calc,
+            "life_stage": life_stage_calc,
+            "life_stage_model": "human_default"
+        }
+
+    def get_age(self, current_year, current_month):
+        """Calculates the current age of the human based on year and month."""
+        lifecycle = self.get_lifecycle_state(current_year, current_month)
+        return lifecycle["age_years"]
+
+    def get_age_in_months(self, current_year, current_month):
+        """Calculates the current age of the human in months."""
+        lifecycle = self.get_lifecycle_state(current_year, current_month)
+        return lifecycle["age_months"]
+
+    def get_human_life_stage(self, current_year, current_month):
+        """Determines the human-default life stage based on age."""
+        lifecycle = self.get_lifecycle_state(current_year, current_month)
+        return lifecycle["life_stage"]
+
+    def get_spatial_state(self, world):
+        """Provides a structured, read-only view of current and residence place identity."""
+        current_place_name = world.get_place_name(self.current_place_id)
+        residence_place_name = world.get_place_name(self.residence_place_id)
+
+        return {
+            "current_place_id": self.current_place_id,
+            "current_place_name": current_place_name,
+            "residence_place_id": self.residence_place_id,
+            "residence_place_name": residence_place_name,
+        }
+
+    def get_snapshot_data(self, current_year, current_month, world, actor_id):
+        """Returns the current human snapshot as structured shell-renderable data."""
+        lifecycle = self.get_lifecycle_state(current_year, current_month)
+        spatial_state = self.get_spatial_state(world)
+        parent_ids = world.get_parent_ids_for(actor_id)
+
+        mother_id = parent_ids["mother_id"]
+        father_id = parent_ids["father_id"]
+
+        mother_name = "Unknown"
+        if mother_id:
+            mother = world.get_actor(mother_id)
+            if mother is not None:
+                mother_name = mother.get_full_name()
+
+        father_name = "Unknown"
+        if father_id:
+            father = world.get_actor(father_id)
+            if father is not None:
+                father_name = father.get_full_name()
+
+        return {
+            "identity": {
+                "full_name": self.get_full_name(),
+                "species": self.species,
+                "sex": self.sex,
+                "gender": self.gender,
+            },
+            "time": {
+                "age": lifecycle["age_years"],
+                "life_stage": lifecycle["life_stage"],
+                "year": current_year,
+                "month": current_month,
+            },
+            "location": {
+                "world_body_name": spatial_state["current_place_name"] or "Unknown",
+            },
+            "statistics": {
+                "health": self.stats["health"],
+                "happiness": self.stats["happiness"],
+                "intelligence": self.stats["intelligence"],
+                "money": self.money,
+            },
+            "relationships": {
+                "mother_name": mother_name,
+                "father_name": father_name,
+            },
+        }
+
+    # --- Stat Management Helper Methods ---
+    def modify_stat(self, stat_name, change):
+        """Modifies a specified stat, clamping between 0 and 100 if applicable."""
+        if stat_name in self.stats:
+            current_value = self.stats[stat_name]
+            new_value = current_value + change
+            self.stats[stat_name] = min(100, max(0, new_value))
+        elif stat_name == "money":
+            self.money += change
+        else:
+            raise ValueError(f"modify_stat: unknown stat_name '{stat_name}'")
+    # --- End Stat Management Helper Methods ---
