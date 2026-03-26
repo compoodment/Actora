@@ -1,5 +1,12 @@
 # CompLife Changelog
 
+## Version 0.26.0 (Patch) - 2026-03-26
+- **CLI Input Boundary Hardening:**
+    - Added a narrow shared input boundary helper in `main.py` so interactive CLI input exits cleanly on `EOFError` and `KeyboardInterrupt` instead of crashing with a traceback.
+    - Covered character creation prompts and the main loop advance/quit prompt through the same clean-exit path.
+    - Preserved current prompt wording, validation behavior, typed `quit` behavior, startup flow, snapshot rendering, simulation flow, and event rendering.
+    - Did not introduce broader CLI redesign, identity changes, lifecycle changes, or unrelated architecture work.
+
 ## Version 0.25.0 (Patch) - 2026-03-25
 - **Unknown-Stat Mutation Hardening:**
     - Hardened `Human.modify_stat(...)` so unsupported stat names now fail explicitly instead of being silently ignored.

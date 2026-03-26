@@ -7,6 +7,17 @@ from identity import prepare_parent_identity_context, generate_parent_identity_f
 EVENT_DETAIL_THRESHOLD = 8
 EVENT_RECENT_DISPLAY_LIMIT = 5
 
+INPUT_INTERRUPTED_MESSAGE = "Input interrupted. Exiting CompLife."
+
+
+def safe_input(prompt):
+    """Reads one input value and exits cleanly on interruption/EOF."""
+    try:
+        return input(prompt)
+    except (EOFError, KeyboardInterrupt):
+        print(f"\n{INPUT_INTERRUPTED_MESSAGE}")
+        raise SystemExit(0)
+
 
 def render_snapshot(snapshot_data):
     """Renders one structured current-state snapshot to the terminal."""
@@ -51,12 +62,12 @@ def create_character():
     print("\n--- Character Creation ---")
 
     while True:
-        player_first_name = input("Enter your character's first name: ").strip()
+        player_first_name = safe_input("Enter your character's first name: ").strip()
         if player_first_name:
             break
         print("First name cannot be empty. Please enter a name.")
 
-    player_last_name = input("Enter your character's last name (optional): ").strip()
+    player_last_name = safe_input("Enter your character's last name (optional): ").strip()
 
     sex_options = ["Male", "Female"]
     print("\nSelect biological sex:")
@@ -64,7 +75,7 @@ def create_character():
         print(f"  {i}) {option}")
     while True:
         try:
-            choice = int(input(f"Enter choice (1-{len(sex_options)}): ").strip())
+            choice = int(safe_input(f"Enter choice (1-{len(sex_options)}): ").strip())
             if 1 <= choice <= len(sex_options):
                 player_sex = sex_options[choice - 1]
                 break
@@ -79,7 +90,7 @@ def create_character():
         print(f"  {i}) {option}")
     while True:
         try:
-            choice = int(input(f"Enter choice (1-{len(gender_options)}): ").strip())
+            choice = int(safe_input(f"Enter choice (1-{len(gender_options)}): ").strip())
             if 1 <= choice <= len(gender_options):
                 player_gender = gender_options[choice - 1]
                 break
@@ -173,7 +184,7 @@ def game_loop(world, player_id, player):
     while True:
         months_to_advance = 0
         while True: # Input validation loop
-            choice_raw = input("Press Enter for the next month, type a number to skip months, or type 'quit': ").strip().lower()
+            choice_raw = safe_input("Press Enter for the next month, type a number to skip months, or type 'quit': ").strip().lower()
 
             if choice_raw == '': # Empty input -> 1 month
                 months_to_advance = 1
