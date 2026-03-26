@@ -1,4 +1,4 @@
-CompLife Working Ideas Register v30
+CompLife Working Ideas Register v31
 
 Date: 2026-03-26
 Role: flexible idea intake, staging, parking, and rewrite-pressure tracking for CompLife
@@ -8,7 +8,7 @@ Interpretation rule: stable source docs win over this file; verified repo truth 
 
 === CURRENT WORKING READ ===
 
-Verified repo truth is currently through v0.26.0, including:
+Verified repo truth is currently through v0.27.0, including:
 - world-owned actor registry
 - world-owned structured place registry
 - world-owned link truth
@@ -19,7 +19,7 @@ Verified repo truth is currently through v0.26.0, including:
 - world-owned record query helpers
 - internal record-shape normalization
 - explicitly human-backed world-owned constructor seam (`create_human_actor(...)`)
-- repo-local architecture/changelog sync through v0.26.0
+- repo-local architecture/changelog sync through v0.27.1
 - structured snapshot data assembly through `Human.get_snapshot_data(...)`
 - shell-owned snapshot rendering in `main.py`
 - cleaned monthly event result contract with `outcome.stat_changes` as the authoritative mutation payload and no redundant top-level `stat_changes`
@@ -37,31 +37,33 @@ Verified repo truth is currently through v0.26.0, including:
 - explicit invalid-actor guard on the world-owned simulation-step boundary, raising `ValueError` instead of failing later with implicit `AttributeError`
 - explicit unknown-stat guard in `Human.modify_stat(...)`, raising `ValueError` instead of silently swallowing unsupported stat mutations
 - a narrow shared CLI input boundary helper in `main.py` that exits cleanly on `EOFError` and `KeyboardInterrupt` instead of surfacing a traceback
-- verified/tagged v0.26.0 after VPS compile, CLI interruption checks, runtime checks, and git checks
+- startup actor IDs now generated through `generate_startup_actor_id(...)` instead of fixed singleton IDs for mother, father, and player
+- verified/tagged v0.27.0 after compile/runtime/git checks, followed by v0.27.1 doc/planning sync
 
 The backbone is materially stronger and more honest than it was at the start of this patch run.
-The constructor seam, snapshot/output seam, event-result contract seam, later-life human event coverage gap, startup-family origin/care semantic collapse, event-boundary honesty pressure, identity-generation context-prep pressure, simulation-step ownership seam, silent unknown-stat mutation risk, and rough CLI interruption boundary have all been cleaned up enough to move out of the active top slot.
+The constructor seam, snapshot/output seam, event-result contract seam, later-life human event coverage gap, startup-family origin/care semantic collapse, event-boundary honesty pressure, identity-generation context-prep pressure, simulation-step ownership seam, silent unknown-stat mutation risk, rough CLI interruption boundary, and singleton startup actor ID future-footgun have all been cleaned up enough to move out of the active top slot.
 
 The current pressure is still not “foundation complete.”
-But the strongest recent small correctness seam has now also been landed.
+But the strongest recent small correctness seam is no longer waiting in the queue.
 
 The active near-term read is therefore:
 - the major recent backbone clarifications are now in a substantially better place
 - there is still no single screamingly obvious structural patch of the same caliber as v0.24.0
-- the strongest recently visible runtime-boundary rough edge has already been cleaned up
-- current remaining near-term pressures are now mostly future-expansion footguns, planning ambiguity, and guardrail-sensitive later candidates
-- **singleton startup actor IDs** are now the strongest visible narrow implementation candidate
+- the strongest recently visible small implementation seam has already been cleaned up
+- current remaining near-term pressures are now mostly planning ambiguity, future guardrails, and later-candidate discipline
+- a deliberate planning checkpoint is now more honest than pretending IDEA-098 is still next
 - entity registry vs actor view layering remains a long-term architectural guardrail, not an automatic next implementation target
 - broader lineage / care / relationship systems remain only partially prepared and should not be overclaimed
 - identity realism/context richness remains visibly placeholder-level beneath the cleaner seam, but still should not jump the dependency queue
 
 WIR housekeeping note:
-- completed CLI input hardening should no longer sit in the active slot after v0.26.0
+- completed singleton startup actor ID cleanup should no longer sit in the active slot after v0.27.0
+- completed CLI input hardening should remain out of the active slot after v0.26.0
 - completed unknown-stat hardening should remain out of the active slot after v0.25.0
 - historical-only clutter should not be kept active once it stops affecting planning
 - the absence of one loud runtime gap does not mean the foundation is finished
 - do not let “the current prototype runs fine” quietly turn into premature education/work/health/property/travel expansion
-- do not revise stable docs or the roadmap from this post-v0.26.0 sync alone unless durable baseline truth or dependency order actually changes
+- do not revise stable docs or the roadmap from this post-v0.27.0 sync alone unless durable baseline truth or dependency order actually changes
 
 
 === ACTIVE NEAR-TERM ARCHITECTURE / GAMEPLAY PRESSURES ===
@@ -69,48 +71,18 @@ WIR housekeeping note:
 ID: IDEA-101
 Created: 2026-03-26
 Last Reviewed: 2026-03-26
-Title: Post-v0.26.0 next-step ambiguity persists after the runtime-boundary fix
+Title: Post-v0.27.0 next-step ambiguity after the startup-ID cleanup
 Status: Active planning pressure
 Priority: P1
 Roadmap fit: near-term planning / sequencing hygiene
 Immediate roadmap-layer fit: yes, as a fresh decision pass rather than an already-locked patch title
-Summary: After v0.26.0, there is still no equally obvious next backbone seam. The immediate need is to decide whether the next move should be a small future-footgun patch, or whether the project should deliberately pause rather than spending versions on weak momentum.
+Summary: After v0.27.0, there is still no equally obvious next backbone seam. The immediate need is to decide whether the next move should be a deliberate planning checkpoint or a newly justified narrow patch rather than pretending the old candidate is still pending.
 Why it matters: The project has moved beyond the loudest recent runtime/correctness cleanup and now needs stronger prioritization discipline, not patch-number chasing.
-Dependencies: verified repo truth through v0.26.0, stable baseline, current roadmap order
+Dependencies: verified repo truth through v0.27.0, stable baseline, current roadmap order
 Risks: forcing another patch for momentum, inflating low-grade residue into architecture work, or promoting broad systems too early
 Suggested timing: immediate planning use
-Next action: run a fresh post-v0.26.0 decision pass
+Next action: run a fresh post-v0.27.0 decision pass
 Notes: this is a planning-pressure entry, not a stable-doc revision trigger by itself
-
-ID: IDEA-098
-Created: 2026-03-25
-Last Reviewed: 2026-03-26
-Title: Singleton startup actor IDs
-Status: Strong small future-footgun candidate / not yet auto-locked
-Priority: P1
-Roadmap fit: startup bootstrap limitations
-Immediate roadmap-layer fit: maybe
-Summary: Startup still uses singleton actor IDs like "mother" and "father", which is fine for one family bootstrap but will become a collision point once siblings or multiple households exist.
-Why it matters: This is the strongest visible narrow implementation candidate now that the rough CLI boundary has already been cleaned up.
-Dependencies: current startup flow, current startup-family assumptions, future broader family/household work
-Risks: over-fixing too early, or letting the patch grow into broader family/bootstrap redesign
-Suggested timing: near-term candidate if the next patch stays small and narrowly scoped
-Next action: evaluate as the strongest visible small candidate
-
-ID: IDEA-100
-Created: 2026-03-25
-Last Reviewed: 2026-03-26
-Title: Runtime-boundary grouping discipline
-Status: Completed shaping note / retain only as a guardrail pattern
-Priority: P3
-Roadmap fit: patch-shape discipline
-Immediate roadmap-layer fit: no
-Summary: This note mattered while CLI input hardening was still pending. With v0.26.0 landed, it no longer belongs in the active candidate slot, but the lesson still matters: tiny runtime fixes should stay tiny.
-Why it matters: The project should keep the patch-shape discipline lesson even after the specific runtime patch is done.
-Dependencies: Operator Guide preservation rules
-Risks: forgetting the lesson and bundling unrelated work in future small patches
-Suggested timing: background guardrail only
-Next action: keep as a remembered discipline, not an active patch title
 
 ID: IDEA-077
 Created: 2026-03-17
@@ -140,7 +112,7 @@ Why it matters: The current names work for prototype startup, but they remain a 
 Dependencies: current identity module, later place/world/era context
 Risks: polishing names too early or turning this into broad culture/era/world simulation before surrounding context systems exist
 Suggested timing: only if chosen deliberately as a narrow realism patch
-Next action: keep visible; do not promote over narrower future-footgun work
+Next action: keep visible; do not promote over stronger sequencing discipline
 
 ID: IDEA-076
 Created: 2026-03-17
@@ -159,6 +131,17 @@ Next action: retain as a guardrail for future link/family expansion
 
 
 === COMPLETED / MOVED-OUT PRESSURES ===
+
+ID: IDEA-098
+Created: 2026-03-25
+Last Reviewed: 2026-03-26
+Title: Singleton startup actor IDs
+Status: Completed in v0.27.0
+Priority: P1
+Roadmap fit: startup bootstrap limitations
+Summary: Startup used singleton actor IDs like `mother`, `father`, and `player`, which would become a collision point once broader bootstrap scenarios arrived.
+Result: v0.27.0 replaced those fixed startup IDs with the narrow `generate_startup_actor_id(...)` helper in `main.py`, producing `startup_<role>_<suffix>` IDs while preserving current one-family startup behavior, lookup behavior, snapshot behavior, event flow, and terminal flow.
+Next action: keep only as completed history, not an active candidate
 
 ID: IDEA-097
 Created: 2026-03-25
@@ -212,21 +195,21 @@ Next action: do not promote on its own
 
 === DOCUMENT-SYSTEM RESULT OF THIS SYNC ===
 
-- stable docs still do not need revision from this post-v0.26.0 sync alone
+- stable docs still do not need revision from this post-v0.27.0 sync alone
 - Source Index still does not need revision
-- WIR now reflects repo truth through v0.26.0
+- WIR now reflects repo truth through v0.27.0
 - repo docs/changelog remain the implementation-history layer, not the planning layer
 - roadmap sequencing still has not changed enough from this sync alone to justify a roadmap revision
 
 
 === NEXT BEST USE ===
 
-1. Run a fresh post-v0.26.0 decision pass before drafting another implementation patch.
-2. Evaluate singleton startup actor IDs as the strongest visible narrow candidate.
+1. Run a fresh post-v0.27.0 decision pass before drafting another implementation patch.
+2. Treat a deliberate planning checkpoint as the default honest next move unless a new narrow candidate clearly wins.
 3. Keep domain-system expansion, broad entity-layer implementation, identity-realism expansion, and full species-general event architecture out of the next patch unless deliberately chosen later.
 4. Leave Master Context, Operator Guide, Roadmap, and Source Index unchanged for now.
 
 
 === ONE-LINE SUMMARY ===
 
-CompLife is now through v0.26.0, and the next honest move is a fresh decision pass focused on choosing between a narrow future-footgun cleanup and a deliberate pause rather than forcing another weak patch.
+CompLife is now through v0.27.0, and the next honest move after this docs sync is a fresh decision pass rather than pretending the old singleton-ID candidate is still pending.

@@ -1,5 +1,12 @@
 # CompLife Changelog
 
+## Version 0.27.1 (Patch) - 2026-03-26
+- **Post-v0.27.0 Docs / Planning Sync:**
+    - Synced repo-local architecture and planning docs to the already-landed v0.27.0 startup actor ID cleanup.
+    - Updated architecture notes to reflect the narrow `generate_startup_actor_id(...)` helper and the removal of fixed startup singleton IDs.
+    - Updated planning docs so singleton startup actor IDs are no longer treated as pending work and the next-step read is based on v0.27.0 repo truth.
+    - Did not change runtime behavior beyond the already-implemented v0.27.0 code state.
+
 ## Version 0.27.0 (Patch) - 2026-03-26
 - **Singleton Startup Actor ID Cleanup:**
     - Replaced the hardcoded singleton startup actor IDs (`"mother"`, `"father"`, `"player"`) with a narrow startup-only ID generation helper in `main.py`.

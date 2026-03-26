@@ -1,6 +1,6 @@
 # CompLife Architecture Summary
 
-**Version:** 0.26.0
+**Version:** 0.27.1
 **Last Updated:** 2026-03-26
 
 This document summarizes the currently implemented structure and behavior of the CompLife repository.
@@ -122,8 +122,8 @@ Current startup parent records still use directional family roles (`mother`, `fa
 - `bootstrap_source="startup_family"` — marks that the link came from the current startup family bootstrap path
 
 Current startup examples therefore look like:
-- `{"source_id": "player", "target_id": "mother", "type": "family", "role": "mother", "metadata": {"is_origin_family": True, "is_caregiver_family": True, "bootstrap_source": "startup_family"}}`
-- `{"source_id": "mother", "target_id": "player", "type": "family", "role": "child", "metadata": {"is_origin_family": True, "is_caregiver_family": True, "bootstrap_source": "startup_family"}}`
+- `{"source_id": "startup_player_ab12cd34", "target_id": "startup_mother_ef56gh78", "type": "family", "role": "mother", "metadata": {"is_origin_family": True, "is_caregiver_family": True, "bootstrap_source": "startup_family"}}`
+- `{"source_id": "startup_mother_ef56gh78", "target_id": "startup_player_ab12cd34", "type": "family", "role": "child", "metadata": {"is_origin_family": True, "is_caregiver_family": True, "bootstrap_source": "startup_family"}}`
 
 Reverse family links are still stored explicitly, link records still reference entity IDs present in `World.actors`, and this remains a narrow startup-family semantic clarification rather than a broader relationship framework. It does not implement adoption, guardianship, household simulation, or species-general relationship architecture.
 
@@ -235,7 +235,7 @@ Current shell-level functions:
 - `game_loop(...)` — main input/advancement/display loop
 - `start_game()` — top-level orchestration (banner, then delegates to the above)
 
-Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player.
+Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`.
 
 ### `identity.py`
 Responsible for:
@@ -355,7 +355,8 @@ Current initialization behavior:
 - parent first names are randomized from approved internal mother/father pools
 - parent last names inherit the player last name when provided
 - if player last name is blank, parent last names use a random fallback from `FALLBACK_LAST_NAME_POOL`
-- mother, father, and player each receive `current_place_id = "earth"` and `residence_place_id = "earth"` during setup
+- startup mother, startup father, and startup player each receive `current_place_id = "earth"` and `residence_place_id = "earth"` during setup
+- startup actor IDs now follow the `startup_<role>_<suffix>` pattern instead of fixed singleton IDs, while preserving the current one-family startup shape and parent/player lookup behavior
 - parent birth months are randomized from 1-12
 
 ### Time Advancement
