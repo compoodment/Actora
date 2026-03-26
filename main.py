@@ -1,4 +1,5 @@
 import random
+from uuid import uuid4
 
 from world import World
 from banners import COMPLIFE_TITLE_BANNER, TIME_ADVANCED_BANNER, QUIT_BANNER
@@ -8,6 +9,11 @@ EVENT_DETAIL_THRESHOLD = 8
 EVENT_RECENT_DISPLAY_LIMIT = 5
 
 INPUT_INTERRUPTED_MESSAGE = "Input interrupted. Exiting CompLife."
+
+
+def generate_startup_actor_id(role):
+    """Builds one narrow startup actor id without hardcoded singleton values."""
+    return f"startup_{role}_{uuid4().hex[:8]}"
 
 
 def safe_input(prompt):
@@ -132,8 +138,8 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
     mother_identity = generate_parent_identity_from_context(mother_identity_context)
     father_identity = generate_parent_identity_from_context(father_identity_context)
 
-    mother_id = "mother"
-    father_id = "father"
+    mother_id = generate_startup_actor_id("mother")
+    father_id = generate_startup_actor_id("father")
     world.create_human_actor(
         actor_id=mother_id,
         species="Human",
@@ -159,7 +165,7 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         residence_place_id="earth",
     )
 
-    player_id = "player"
+    player_id = generate_startup_actor_id("player")
     player = world.create_human_child_with_parents(
         child_id=player_id,
         first_name=player_first_name,

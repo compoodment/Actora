@@ -1,5 +1,11 @@
 # CompLife Changelog
 
+## Version 0.27.0 (Patch) - 2026-03-26
+- **Singleton Startup Actor ID Cleanup:**
+    - Replaced the hardcoded singleton startup actor IDs (`"mother"`, `"father"`, `"player"`) with a narrow startup-only ID generation helper in `main.py`.
+    - Preserved current one-family startup behavior, startup family link wiring, parent/player visible behavior, snapshot behavior, event flow, and terminal flow.
+    - Did not introduce broader family bootstrap redesign, sibling support, persistence work, or a generic global ID framework.
+
 ## Version 0.26.0 (Patch) - 2026-03-26
 - **CLI Input Boundary Hardening:**
     - Added a narrow shared input boundary helper in `main.py` so interactive CLI input exits cleanly on `EOFError` and `KeyboardInterrupt` instead of crashing with a traceback.
