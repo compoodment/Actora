@@ -1,12 +1,12 @@
-Actionable Ideas Summary — Rev17
-Date: 2026-03-25
+Actionable Ideas Summary — Rev18
+Date: 2026-03-26
 Role: temporary near-term planning snapshot for CompLife
 Authority: non-authoritative; stable docs win, repo truth wins on implementation
 
 
 === CURRENT WORKING POSITION ===
 
-CompLife now has a materially stronger early backbone, and verified repo truth is through v0.25.0:
+CompLife now has a materially stronger early backbone, and verified repo truth is through v0.26.0:
 - world-owned actor registry
 - world-owned links
 - structured place registry
@@ -27,6 +27,7 @@ CompLife now has a materially stronger early backbone, and verified repo truth i
 - a world-owned authoritative simulation-step boundary through `World.simulate_advance_turn(...)`
 - explicit invalid-actor boundary guarding on the world-owned simulation-step boundary
 - explicit unknown-stat mutation guarding in `Human.modify_stat(...)`
+- a narrow shared CLI input boundary helper in `main.py` that cleanly exits on `EOFError` and `KeyboardInterrupt`
 
 That means the project is no longer mainly fighting:
 - for basic structural honesty in the early backbone,
@@ -34,51 +35,44 @@ That means the project is no longer mainly fighting:
 - for startup-family semantic collapse,
 - for the event seam sounding broader than current repo truth,
 - for identity generation being only a loose-argument call path with no context-shaped seam at all,
-- for the simulation-step boundary being only half-owned, or
-- for silent swallowing of unsupported stat mutations.
+- for the simulation-step boundary being only half-owned,
+- for silent swallowing of unsupported stat mutations, or
+- for ugly CLI interruption tracebacks on non-happy-path terminal exits.
 
 
 === CURRENT PLANNING READ ===
 
-There is no equally obvious backbone patch after v0.25.0.
+There is still no equally obvious backbone patch after v0.26.0.
 
 The right next move is:
-**a deliberate v0.26.0 decision pass**
+**a deliberate post-v0.26.0 decision pass**
 
 Why:
-- the last cluster of loud, narrow backbone/event/family/identity/step-boundary/mutation fixes is now landed
-- nothing of equal architectural weight has replaced them yet
-- the strongest visible remaining pressures are now runtime/input hardening and future-expansion footgun candidates
-- blindly inventing another broad patch would be weaker than choosing deliberately
+- the last cluster of loud, narrow backbone/event/family/identity/step-boundary/mutation fixes is already landed
+- the strongest visible runtime-boundary rough edge has now also been cleaned up
+- nothing of equal architectural weight has replaced those fixes yet
+- the remaining visible pressures are now mostly future-expansion footguns, planning ambiguity, and later-stage architecture guardrails
+- blindly forcing another patch would now be even weaker than before
 
 So the current question is no longer:
-- “what is the next major foundation seam?”
-
-The current question is:
 - “is v0.26.0 a tiny runtime-boundary patch, or should the project deliberately pause and keep planning?”
 
+The current question is:
+- “what is the strongest honest next move after v0.26.0, now that the small CLI hardening patch is already done?”
 
-=== LEADING CANDIDATE BUCKETS FOR V0.26.0 DECISION PASS ===
 
-1. CLI input boundary hardening
+=== LEADING CANDIDATE BUCKETS FOR THE NEXT DECISION PASS ===
+
+1. Singleton startup actor IDs
 Read:
-- raw `input()` paths still fail noisily on `EOFError` / `KeyboardInterrupt`
-- interactive happy-path works, but non-happy-path exits are still rough
+- startup still uses hardcoded singleton IDs like "mother" and "father"
+- not a current runtime failure, but a clear future expansion tripwire
 
 Use:
-- strongest current small candidate if v0.26.0 stays tiny and runtime-focused
-- do not let it broaden into general shell cleanup
+- strongest visible narrow implementation candidate if the next patch stays small and future-footgun-focused
+- keep it narrow; do not let it grow into broader family/household redesign
 
-2. Singleton startup actor IDs
-Read:
-- startup still uses hardcoded singleton IDs like `"mother"` and `"father"`
-- not a current problem, but a future expansion tripwire
-
-Use:
-- keep parked unless startup scope broadens
-- do not promote early
-
-3. Entity registry vs actor view layering
+2. Entity registry vs actor view layering
 Read:
 - still a real long-term guardrail
 - still too easy to promote too early
@@ -87,25 +81,40 @@ Use:
 - keep parked unless a sharply bounded seam appears
 - do not promote just because it sounds important
 
-4. Identity generation realism / context-awareness
+3. Identity generation realism / context-awareness
 Read:
-- seam is better after v0.23.0
+- seam is cleaner after v0.23.0
 - actual realism is still blocked by missing place/era/context maturity
 
 Use:
 - keep parked unless deliberately chosen later
 - do not build fake context sophistication
 
+4. Deliberate pause / planning checkpoint
+Read:
+- after v0.26.0, the project may benefit more from choosing carefully than from spending another version immediately
+
+Use:
+- valid if no candidate clearly beats the others
+- do not treat silence as failure; weak patch momentum is worse
+
 
 === THINGS NOW DONE ENOUGH THAT THEY SHOULD NOT STAY IN THE ACTIVE SLOT ===
 
-1. Unknown-Stat Mutation Hardening
+1. CLI Input Boundary Hardening
+Result:
+- v0.26.0 added a narrow shared input boundary helper in `main.py`
+- interactive CLI input now exits cleanly on `EOFError` and `KeyboardInterrupt`
+- ordinary prompt wording, validation behavior, typed `quit`, startup flow, snapshot flow, and event flow were preserved
+- no longer the main next pressure
+
+2. Unknown-Stat Mutation Hardening
 Result:
 - v0.25.0 hardened `Human.modify_stat(...)` so unsupported stat names now fail explicitly
 - supported stat clamping and money mutation remain intact
 - no longer the main next pressure
 
-2. Simulation Step Ownership / Boundary Foundation
+3. Simulation Step Ownership / Boundary Foundation
 Result:
 - v0.24.0 moved the authoritative simulation-step boundary into `World`
 - `main.py` now calls the world-owned boundary directly
@@ -113,83 +122,60 @@ Result:
 - invalid actor IDs now fail with clear `ValueError`
 - no longer the main next pressure
 
-3. Identity Generation Context Prep
+4. Identity Generation Context Prep
 Result:
 - v0.23.0 added a structured identity-generation context seam
 - startup parent generation now routes through that seam
 - compatibility helper remains intact
 - no longer the main next pressure
 
-4. Event Boundary Honesty Foundation
+5. Event Boundary Honesty Foundation
 Result:
 - v0.22.0 made the monthly event seam more honest about current human-only scope
 - event selection now works through a lifecycle-derived human-scoped helper seam
 - compatibility wrapper and event contract remain intact
 - no longer the main next pressure
 
-5. Startup-family origin / care semantic clarification
+6. Startup-family origin / care semantic clarification
 Result:
 - v0.21.0 added explicit startup-family link metadata for origin, caregiving, and bootstrap provenance
 - narrow origin/caregiver helpers exist in `world.py`
 - compatibility lookup and visible snapshot behavior remain intact
 - no longer the main next pressure
 
-6. Later-life human event coverage gap
+7. Later-life human event coverage gap
 Result:
 - v0.20.0 expanded practical human event coverage through Teenager, Young Adult, Adult, and Elder
 - ordinary play no longer goes quiet simply because the event pool stops after Child
 - no longer the main next pressure
 
-7. Event result contract cleanup
-Result:
-- v0.19.0 removed the redundant top-level `stat_changes` field from structured event results
-- `outcome.stat_changes` is now the single authoritative mutation payload
-- no longer the main next pressure
-
-8. Human actor construction naming honesty
-Result:
-- the misleading broad constructor name is gone
-- `World.create_human_actor(...)` now tells the truth about the implemented seam
-- no longer the main next pressure
-
-9. Snapshot output contract foundation
-Result:
-- `Human.get_snapshot_data(...)` returns structured current-state data
-- terminal snapshot rendering lives in `main.py`
-- no longer the main next pressure
-
-10. Records / history foundation and record helpers
-Result:
-- world-owned record storage, query helpers, and normalization are in place
-- no longer the main next pressure
-
 
 === NEW / REVISED FLEXIBLE-LAYER NOTES ===
 
-- The most important shift in this sync is that **CLI input boundary hardening** has moved into the strongest visible small-candidate slot now that unknown-stat hardening is done.
-- Added **runtime-boundary grouping discipline** as an explicit WIR guardrail so CLI changes do not get bundled with unrelated simulation work.
-- Reframed controlled state mutation as materially stronger again after v0.25.0 without pretending it is already mature end-state simulation architecture.
-- Kept singleton startup actor IDs parked as a future footgun, not a current patch title.
+- The most important shift in this sync is that **CLI input boundary hardening is no longer pending; it is now landed in v0.26.0**.
+- The project is now in an even stronger position to avoid weak momentum patches and choose the next step deliberately.
+- **Singleton startup actor IDs** are now the strongest visible narrow implementation candidate, but still not an auto-lock if a planning pause proves smarter.
+- Controlled state mutation remains materially stronger without pretending it is already mature end-state architecture.
+- Identity realism/context richness remains visibly placeholder-level beneath the cleaner seam, but still should not jump the dependency queue.
 
 
 === DOCUMENT-SYSTEM RESULT OF THIS SYNC ===
 
-- stable docs still do not need revision from this post-v0.25 sync alone
+- stable docs still do not need revision from this post-v0.26.0 sync alone
 - Source Index still does not need revision
-- repo docs/changelog still carry implementation history, not planning truth
+- repo docs/changelog now carry implementation history through v0.26.0
 - roadmap sequencing still does not need revision from this sync alone
-- flexible docs should now reflect repo truth through v0.25.0 and the smaller-scale nature of the next decision
+- flexible docs should now reflect repo truth through v0.26.0 and the more open-ended nature of the next decision
 
 
 === NEXT BEST USE ===
 
-1. Swap the revised WIR into the source stack.
-2. Swap this revised Actionable Summary into the source stack.
-3. Leave Master Context, Operator Guide, Roadmap, and Source Index unchanged for now.
-4. Run a deliberate v0.26.0 decision pass before drafting another patch prompt.
-5. Keep domain-system expansion, broad entity-layer implementation, identity-realism expansion, and full species-general event architecture out of the next patch unless intentionally chosen later.
+1. Run a fresh post-v0.26.0 decision pass before drafting another implementation patch prompt.
+2. Evaluate singleton startup actor IDs as the strongest visible narrow implementation candidate.
+3. Keep entity-layer broadening, identity-realism expansion, and full species-general architecture work out of the next patch unless deliberately chosen later.
+4. Leave Master Context, Operator Guide, Roadmap, and Source Index unchanged for now.
 
 
 === ONE-LINE SUMMARY ===
 
-CompLife is now through v0.25.0, and the next honest move is a deliberate v0.26.0 decision pass focused on tiny runtime/correctness candidates rather than another broad architectural leap.
+CompLife is now through v0.26.0, and the next honest move is a fresh decision pass focused on choosing between a narrow future-footgun cleanup and a deliberate pause rather than forcing another weak patch.

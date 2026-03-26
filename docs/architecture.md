@@ -1,7 +1,7 @@
 # CompLife Architecture Summary
 
-**Version:** 0.25.0
-**Last Updated:** 2026-03-25
+**Version:** 0.26.0
+**Last Updated:** 2026-03-26
 
 This document summarizes the currently implemented structure and behavior of the CompLife repository.
 It is intended to support safe patching, review, and manual verification.
@@ -229,12 +229,13 @@ Responsible for:
 
 Current shell-level functions:
 - `render_snapshot(...)` — terminal rendering of the structured current-state snapshot returned by `Human.get_snapshot_data(...)`
+- `safe_input(prompt)` — narrow shared CLI input boundary helper that exits cleanly on `EOFError` and `KeyboardInterrupt`
 - `create_character()` — character creation prompts and input validation
 - `setup_initial_world(...)` — World creation, parent identity generation, and startup actor entry delegation through world-owned helpers (`create_human_actor(...)` and `create_human_child_with_parents(...)`)
 - `game_loop(...)` — main input/advancement/display loop
 - `start_game()` — top-level orchestration (banner, then delegates to the above)
 
-Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter.
+Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback.
 
 ### `identity.py`
 Responsible for:
