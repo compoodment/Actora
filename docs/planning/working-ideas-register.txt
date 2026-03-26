@@ -1,0 +1,234 @@
+CompLife Working Ideas Register v29
+
+Date: 2026-03-25
+Role: flexible idea intake, staging, parking, and rewrite-pressure tracking for CompLife
+Authority level: flexible working layer, not durable architecture truth
+Interpretation rule: stable source docs win over this file; verified repo truth wins on what is already implemented
+
+
+=== CURRENT WORKING READ ===
+
+Verified repo truth is currently through v0.25.0, including:
+- world-owned actor registry
+- world-owned structured place registry
+- world-owned link truth
+- actor-level current place and residence
+- dedicated identity-generation layer
+- centralized event outcome application
+- world-owned record storage
+- world-owned record query helpers
+- internal record-shape normalization
+- explicitly human-backed world-owned constructor seam (`create_human_actor(...)`)
+- repo-local architecture/changelog sync through v0.25.0
+- structured snapshot data assembly through `Human.get_snapshot_data(...)`
+- shell-owned snapshot rendering in `main.py`
+- cleaned monthly event result contract with `outcome.stat_changes` as the authoritative mutation payload and no redundant top-level `stat_changes`
+- grounded human-only monthly event coverage across Infant, Child, Teenager, Young Adult, Adult, and Elder
+- explicit startup-family link semantics for origin, caregiving, and bootstrap provenance on `World.links`
+- narrow world helper access for semantic family lookup (`get_family_link_target_ids(...)`, `get_origin_parent_ids_for(...)`, `get_caregiver_parent_ids_for(...)`)
+- preserved compatibility parent lookup through `get_parent_ids_for(...)`
+- an event seam that is now more honest about current repo truth through `HUMAN_MONTHLY_EVENTS`, `_get_human_eligible_events(...)`, and `get_human_monthly_event_from_lifecycle(...)`
+- preserved `get_monthly_event(...)` as a compatibility wrapper over the human-scoped lifecycle-derived event seam
+- a structured identity-generation context seam through `prepare_parent_identity_context(...)` and `generate_parent_identity_from_context(...)`
+- preserved compatibility parent identity generation through `generate_parent_identity(...)`
+- startup parent generation in `main.py` now flows through the structured identity context seam while retaining current placeholder/global-pool behavior
+- world-owned authoritative simulation-step boundary through `World.simulate_advance_turn(...)`
+- preserved thin module-level compatibility wrapper `simulate_advance_turn(world, ...)`
+- explicit invalid-actor guard on the world-owned simulation-step boundary, raising `ValueError` instead of failing later with implicit `AttributeError`
+- explicit unknown-stat guard in `Human.modify_stat(...)`, raising `ValueError` instead of silently swallowing unsupported stat mutations
+- verified/tagged v0.25.0 after VPS compile, supported-stat clamp, money-path, unknown-stat-guard, runtime, and git checks
+
+The backbone is materially stronger and more honest than it was at the start of this patch run.
+The constructor seam, snapshot/output seam, event-result contract seam, later-life human event coverage gap, startup-family origin/care semantic collapse, event-boundary honesty pressure, identity-generation context-prep pressure, simulation-step ownership seam, and silent unknown-stat mutation risk have all been cleaned up enough to move out of the active top slot.
+
+The current pressure is still not “foundation complete.”
+But the strongest recent correctness hardening seam has now also been landed.
+
+The active near-term read is therefore:
+- the major recent backbone clarifications are now in a substantially better place
+- there is no single screamingly obvious structural patch of the same caliber as v0.24.0
+- current remaining near-term pressures are mostly runtime/input and future-expansion footgun candidates
+- the strongest visible next candidate is now CLI input boundary hardening, but it still does not auto-promote itself to a forced patch
+- entity registry vs actor view layering remains a long-term architectural guardrail, not an automatic next implementation target
+- broader lineage / care / relationship systems remain only partially prepared and should not be overclaimed
+- identity realism/context richness remains visibly placeholder-level beneath the new seam, but still should not jump the dependency queue
+
+WIR housekeeping note:
+- completed unknown-stat hardening should no longer sit in the active slot after v0.25.0
+- historical-only clutter should not be kept active once it stops affecting planning
+- the absence of one loud runtime gap does not mean the foundation is finished
+- do not let “the current prototype runs fine” quietly turn into premature education/work/health/property/travel expansion
+- do not revise stable docs or the roadmap from this post-v0.25 sync alone unless durable baseline truth or dependency order actually changes
+
+
+=== ACTIVE NEAR-TERM ARCHITECTURE / GAMEPLAY PRESSURES ===
+
+ID: IDEA-099
+Created: 2026-03-25
+Last Reviewed: 2026-03-25
+Title: Post-v0.25 next-step ambiguity persists at small-patch scale
+Status: Active planning pressure
+Priority: P1
+Roadmap fit: near-term planning / sequencing hygiene
+Immediate roadmap-layer fit: yes, as a deliberate v0.26.0 decision pass rather than an already-locked patch title
+Summary: After v0.25.0, there is still no equally obvious next backbone seam. The immediate need is to decide whether the next patch should be a small runtime/input hardening patch, or whether the project should deliberately pause rather than spending versions on weak momentum.
+Why it matters: The project has moved from loud structural cleanup into small-scale correctness and UX-safety territory where weak prioritization can waste versions or quietly drift scope.
+Dependencies: verified repo truth through v0.25.0, stable baseline, current roadmap order
+Risks: patch-number chasing, inflating low-grade residue into architecture work, or promoting broad systems too early
+Suggested timing: immediate planning use
+Next action: run a deliberate v0.26.0 decision pass
+Notes: this is a planning-pressure entry, not a stable-doc revision trigger by itself
+
+ID: IDEA-097
+Created: 2026-03-25
+Last Reviewed: 2026-03-25
+Title: CLI input boundary hardening
+Status: Strong small fix candidate / not yet auto-locked
+Priority: P1
+Roadmap fit: runtime hygiene / caller robustness
+Immediate roadmap-layer fit: maybe
+Summary: `create_character()` and the interactive input loop still rely on raw `input()` calls with no clean handling for `EOFError` or `KeyboardInterrupt`.
+Why it matters: Interactive happy-path play works, but awkward input exits still crash noisily instead of failing cleanly.
+Dependencies: current CLI flow in `main.py`, current terminal shell behavior
+Risks: spending a version on low-impact UX hardening if the patch broadens past a tiny runtime-boundary fix; accidentally drifting prompt ordering or validation feel
+Suggested timing: near-term candidate if v0.26.0 stays very small and runtime-focused
+Next action: evaluate as the current strongest small-patch candidate
+
+ID: IDEA-100
+Created: 2026-03-25
+Last Reviewed: 2026-03-25
+Title: Runtime-boundary grouping discipline
+Status: Small planning guardrail
+Priority: P2
+Roadmap fit: patch-shape discipline
+Immediate roadmap-layer fit: maybe
+Summary: If CLI input hardening is ever promoted, it should stay grouped strictly inside a tiny terminal/runtime-boundary patch and not be bundled with unrelated simulation, identity, or stat changes.
+Why it matters: The interactive shell is behavior-sensitive, and small “helpful” changes there can quietly alter validation, output order, or perceived flow.
+Dependencies: current CLI loop in `main.py`, Operator Guide preservation rules
+Risks: bundling unrelated fixes into one noisy patch and making verification harder than the change deserves
+Suggested timing: immediate guardrail use
+Next action: keep active as a shaping note if IDEA-097 is promoted
+
+ID: IDEA-077
+Created: 2026-03-17
+Last Reviewed: 2026-03-25
+Title: Entity registry vs actor view layering
+Status: Parked conceptual guardrail / possible future candidate
+Priority: P2
+Roadmap fit: registry architecture pressure
+Immediate roadmap-layer fit: no automatic promotion
+Summary: Long-term direction should distinguish a broad entity registry from narrower actor-oriented access/view layers instead of using actor-safe names as if the full layered model were already implemented.
+Why it matters: Stable docs already anchor Entity as the broad tracked layer and Actor as the behaving/playable layer.
+Dependencies: stable baseline, later broader architecture work
+Risks: either forgetting the broader model entirely or trying to fully implement it too early
+Suggested timing: later than any sharply bounded runtime/correctness patch unless a truly narrow seam appears
+Next action: keep as a guardrail and possible later candidate, not the current patch title
+
+ID: IDEA-091
+Created: 2026-03-23
+Last Reviewed: 2026-03-25
+Title: Identity generation realism / context-awareness
+Status: Visible later seam / candidate for future narrow improvement
+Priority: P2
+Roadmap fit: realism / context seam
+Immediate roadmap-layer fit: no automatic promotion
+Summary: Parent identity generation now has a dedicated structured seam, but it still uses global pools and is not world-aware, place-aware, era-aware, or context-sensitive in any meaningful way.
+Why it matters: The current names work for prototype startup, but they remain a realism seam that will become more obvious as world depth grows.
+Dependencies: current identity module, later place/world/era context
+Risks: polishing names too early or turning this into broad culture/era/world simulation before surrounding context systems exist
+Suggested timing: only if chosen deliberately as a narrow realism patch
+Next action: keep visible; do not promote over narrow runtime/correctness work
+
+ID: IDEA-076
+Created: 2026-03-17
+Last Reviewed: 2026-03-25
+Title: Origin / lineage / care semantic separation
+Status: Materially realized enough to move past as primary pressure, but still a guardrail
+Priority: P1
+Roadmap fit: actor-safe link semantics pressure
+Immediate roadmap-layer fit: no longer the active next step
+Summary: v0.21.0 made startup-family origin/care/bootstrap meaning explicit on current family links and added narrow helper access on top of `World.links`, which is enough to move the immediate semantic collapse out of the active slot.
+Why it matters: The conceptual warning still matters because the current implementation is only a narrow startup-family foundation, not full support for lineage, adoption, guardianship, or broader care systems.
+Dependencies: current links model, stable non-human-first baseline
+Risks: overreading current startup-family seams as if broader family/origin systems are now implemented
+Suggested timing: keep as background protection, not the next patch title
+Next action: retain as a guardrail for future link/family expansion
+
+
+=== ACTIVE SUPPORTING / PARKED ARCHITECTURE ITEMS ===
+
+ID: IDEA-093
+Created: 2026-03-23
+Last Reviewed: 2026-03-25
+Title: Repo-local tiny residue after v0.22-v0.25
+Status: Minor residue / not a patch title by itself
+Priority: P3
+Roadmap fit: repo hygiene only
+Immediate roadmap-layer fit: no
+Summary: The repo-local docs still contain tiny wording residue and historical wording that should not be mistaken for active architecture risk.
+Why it matters: These are not architecture blockers, but they can create false urgency if over-read.
+Dependencies: repo-local docs
+Risks: wasting a version number on trivia
+Suggested timing: only absorb into a future closely related patch if touched anyway
+Next action: do not promote on its own
+
+ID: IDEA-098
+Created: 2026-03-25
+Last Reviewed: 2026-03-25
+Title: Singleton startup actor IDs
+Status: Small future footgun / not a current patch title
+Priority: P3
+Roadmap fit: startup bootstrap limitations
+Immediate roadmap-layer fit: no
+Summary: Startup still uses singleton actor IDs like `"mother"` and `"father"`, which is fine for one family bootstrap but will become a collision point once siblings or multiple households exist.
+Why it matters: This is a real future expansion constraint, but current repo truth still only bootstraps one family.
+Dependencies: current startup flow, future broader family/household work
+Risks: over-fixing too early for a capability the prototype does not yet support
+Suggested timing: revisit only when startup scope broadens
+Next action: keep parked
+
+ID: IDEA-045
+Created: 2026-03-16
+Last Reviewed: 2026-03-25
+Title: Controlled state mutation foundation
+Status: Materially stronger after v0.25.0, but still only early-foundation scale
+Priority: P1
+Roadmap fit: backbone layer completed enough for now
+Immediate roadmap-layer fit: no longer the active next step
+Summary: Structured event outcomes, central mutation application, a world-owned simulation-step boundary, and explicit unknown-stat mutation failure now exist together. This is much closer to the intended foundation truth than before, but still not the same thing as a mature multi-system simulation architecture.
+Why it matters: The project no longer needs to keep this in the active slot, but also should not overclaim it as finished-end-state architecture.
+Dependencies: current world-owned step boundary, current event seam, current stat mutation path
+Risks: swinging from underclaim to overclaim
+Suggested timing: carry as a guardrail, not a patch target
+Next action: keep as background protection, not the next main task
+
+
+=== PROTECTED LATER-IDEA / REVIEW DISCIPLINE NOTES ===
+
+- Brainstorms and protected later ideas still belong in the flexible layer unless they become durable enough to promote.
+- External reviewer usage is still best reserved for source-document contradiction checks and sequencing critique, not as a substitute for repo/VPS truth on code.
+- Do not let the roadmap become a patch tracker just because current planning feels open-ended.
+- Do not promote ideas into stable docs just because a patch landed cleanly.
+
+
+=== DOCUMENT-SYSTEM RESULT OF THIS SYNC ===
+
+- stable docs still do not need revision from this post-v0.25 sync alone
+- Source Index still does not need revision
+- WIR should now reflect repo truth through v0.25.0
+- repo docs/changelog still remain the implementation-history layer, not the planning layer
+- roadmap sequencing still has not changed enough from this sync alone to justify a roadmap revision
+
+
+=== NEXT BEST USE ===
+
+1. Swap the revised WIR into the source stack.
+2. Swap the revised Actionable Summary into the source stack.
+3. Leave Master Context, Operator Guide, Roadmap, and Source Index unchanged for now.
+4. Run a deliberate v0.26.0 decision pass before drafting another patch prompt.
+5. Keep domain-system expansion, broad entity-layer implementation, identity-realism expansion, and full species-general event architecture out of the next patch unless deliberately chosen later.
+
+
+=== ONE-LINE SUMMARY ===
+
+CompLife is now through v0.25.0, and the next honest move is a deliberate v0.26.0 decision pass focused on small runtime/correctness candidates rather than another broad architectural leap.

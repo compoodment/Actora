@@ -1,0 +1,471 @@
+CompLife Source Index v9
+
+Purpose
+
+This document explains the role of each CompLife document, how the source system
+should be used, and which layer of documentation should answer which kind of
+question.
+
+This file is the navigation layer for the CompLife document system.
+
+It should help answer:
+- which document to check first
+- which document is stable vs flexible
+- which document defines durable architecture truth
+- which document defines workflow rules
+- which document defines roadmap sequencing
+- which document captures active ideas
+- where implementation truth actually lives
+
+
+Core document model
+
+CompLife uses a four-layer documentation model, plus this Source Index as the
+navigation and precedence guide.
+
+Layer 1 — Core architecture and workflow anchors
+These are the most durable documents. They define what CompLife is and how
+CompLife work is done.
+
+Layer 2 — Structural direction
+This defines dependency order and what must come before what.
+
+Layer 3 — Flexible working layer
+This captures ideas, pressures, staging notes, and temporary planning summaries
+without pretending they are durable truth.
+
+Layer 4 — Implementation history and repo truth
+This records what was actually built and verified in the repository.
+
+The Source Index itself exists to explain how these layers interact and how to
+route information correctly.
+
+
+Authority and truth rules
+
+There are two different questions:
+
+1. What is the approved durable direction?
+Use the source documents in this order:
+- Master Context
+- Operator Guide
+- Roadmap
+- Source Index
+- Working Ideas Register
+- Actionable Ideas Summary
+
+2. What is actually implemented right now?
+Use repo truth:
+- codebase
+- repo documentation
+- repo changelog
+- VPS/runtime/manual verification
+
+Do not collapse these questions together.
+
+Source docs do not automatically update repo docs.
+Repo docs do not automatically update source docs.
+When either side changes meaningfully, update the correct layer deliberately.
+
+
+Layer 1 — Core architecture and workflow anchors
+
+1. CompLife Master Context
+
+Role
+The durable identity and architecture anchor for CompLife.
+
+Use it for:
+- what CompLife fundamentally is
+- long-term architecture direction
+- major project truths that should carry across chats
+- baseline conceptual framing
+- structural decisions that should be relied on by default
+
+Should contain:
+- durable project identity
+- major architecture principles
+- high-value baseline truths
+
+Should not contain:
+- speculative idea parking
+- temporary brainstorms
+- patch-level implementation chatter
+
+Stability
+High stability.
+Only revise when project identity or core architecture truly changes.
+
+
+2. CompLife Operator Guide
+
+Role
+The workflow and execution discipline anchor.
+
+Use it for:
+- how work should be done
+- patch guardrails
+- review/apply discipline
+- verification expectations
+- source usage rules
+- versioning behavior
+- how to distinguish implemented truth from proposals
+- workflow roles and responsibilities
+- source document revision workflow
+
+Should contain:
+- workflow rules
+- review standards
+- patch constraints
+- documentation discipline
+- implementation/reporting expectations
+- named workflow roles
+
+Should not contain:
+- project identity as the primary focus
+- broad idea parking
+- speculative architecture not tied to workflow
+
+Stability
+High stability.
+Revise when the working method or guardrails genuinely change.
+
+
+Layer 2 — Structural direction
+
+3. CompLife Roadmap
+
+Role
+The sequencing and dependency-order anchor.
+
+Use it for:
+- what comes before what
+- what must wait
+- what foundations should come before others
+- whether a proposal fits the immediate roadmap layer or belongs later
+
+Should contain:
+- dependency order
+- major structural layers
+- long-term progression structure
+- protected future layers that matter for sequencing
+- major not-yet boundaries
+
+Should not contain:
+- patch-by-patch progress tracking
+- implementation history
+- active brainstorming clutter
+- temporary arguments that do not affect sequencing
+
+Stability
+High stability, but somewhat more revision-friendly than Master Context and
+Operator Guide.
+Revise when sequencing or architectural dependency order changes meaningfully.
+
+Important rule
+The Roadmap is not the place to keep a running “where we are right now” patch
+counter.
+Actual implementation progress belongs in repo history and current planning
+discussion, not in the roadmap text itself.
+
+
+Layer 3 — Flexible working layer
+
+4. CompLife Working Ideas Register
+
+Role
+The flexible intake, filtering, parking, and staging document for ideas.
+
+Use it for:
+- new idea capture
+- rough future architecture thoughts
+- things that might later change the stable docs
+- things that do not fit the immediate roadmap layer
+- pre-rewrite consolidation
+
+Should contain:
+- active idea entries
+- parked ideas
+- rewrite candidates
+- rough priorities, statuses, and timing
+
+Should not contain:
+- automatic current truth
+- claims that an idea is implemented when it is not
+- the primary authoritative version of project identity
+
+Stability
+Low to moderate stability.
+This is expected to change more often than the stable source documents.
+
+
+5. Actionable Ideas Summary
+
+Role
+A supplemental working summary for near-term planning and handoff efficiency.
+
+Use it for:
+- compact summaries of the current planning stage
+- short lists of actionable or parked ideas
+- temporary planning snapshots between larger source revisions
+
+Should contain:
+- concise working summaries
+- near-term planning notes
+- non-authoritative synthesis from the stable docs and WIR
+
+Should not contain:
+- durable architecture truth by itself
+- implementation history
+- patch-level repo truth
+
+Stability
+Low stability.
+This document is allowed to age faster than the main source stack.
+
+Important rule
+If the Actionable Ideas Summary and the stable docs disagree, the stable docs
+win.
+If it disagrees with verified repo implementation truth about what is already
+built, repo truth wins.
+
+
+Layer 4 — Implementation history and repo truth
+
+6. Repo documentation and changelog
+
+Role
+The record of implemented and verified changes in the repository.
+
+Use it for:
+- what was actually changed
+- when it was changed
+- version history
+- milestone/tag trail
+- practical implementation history
+- current repo-local contracts and file behavior
+
+Should contain:
+- applied version entries
+- changed files
+- summaries of implemented behavior
+- implementation history only
+
+Should not contain:
+- roadmap speculation
+- broad architecture theory not tied to repo truth
+- flexible idea parking
+
+Stability
+Stable as history, but updated whenever verified implementation changes are
+committed or repo docs are deliberately revised.
+
+
+7. CompLife Source Index
+
+Role
+The navigation and precedence guide for the whole document system.
+
+Use it for:
+- understanding what each document is for
+- deciding where a new idea belongs
+- resolving confusion about source roles
+- keeping the document system itself organized
+- determining which documents to load for different session types
+
+Should contain:
+- source roles
+- authority order
+- stability layers
+- promotion rules
+- maintenance rules for the document system
+- session loading guidance
+
+Should not contain:
+- giant architecture detail dumps
+- large brainstorm collections
+- implementation history
+
+Stability
+Moderate stability.
+Revise when the document system changes or new important document types are
+added.
+
+
+How to route information
+
+When a new idea appears
+
+Ask:
+- is this durable architecture truth?
+- is this a workflow rule?
+- is this sequencing logic?
+- is this still only an idea?
+- is this already implemented?
+
+Then route it accordingly:
+- durable architecture truth -> Master Context
+- workflow/process rule -> Operator Guide
+- sequencing/dependency truth -> Roadmap
+- still an idea / needs filtering -> Working Ideas Register
+- compact near-term planning snapshot -> Actionable Ideas Summary
+- already built and verified -> repo docs / changelog
+
+This prevents every document from trying to be everything at once.
+
+
+When stable docs should be revised
+
+Revise stable docs when:
+- project identity changes meaningfully
+- architectural baseline changes meaningfully
+- workflow rules change meaningfully
+- roadmap sequencing changes meaningfully
+- stable docs no longer match the approved baseline
+
+Do not revise stable docs just because:
+- a new idea sounds cool
+- a brainstorm happened
+- wording can be polished endlessly
+- flexible working notes got longer
+- a code patch landed that did not change durable truth
+
+Common maintenance rule
+If a patch lands and only implementation history changed, update repo history
+and repo docs, not the stable source stack.
+
+
+New document creation rule
+
+New source documents require explicit approval before creation and should be
+added to this index if they become part of the maintained source system.
+
+Do not create new source documents just because a topic feels important enough
+to have its own file. If the content fits an existing document, it should go
+there. If a genuinely new document type is needed, approve it first, define its
+role and stability level, and add it to the Source Index before treating it as
+part of the system.
+
+
+Promotion rule
+
+An idea should move from the Working Ideas Register into a stable source
+document only when it is:
+- durable
+- approved clearly enough to rely on by default
+- relevant to identity, architecture, workflow, or sequencing
+- no longer just an exploratory thought
+
+This prevents the stable docs from becoming giant parking lots.
+
+
+Session loading strategy
+
+Not every session needs every document loaded. As the project grows, loading all
+source documents plus codebase plus changelog into a single session will become
+impractical. Use the following guidance to decide what to load for different
+session types.
+
+Spec session (drafting or reviewing a patch spec)
+- Always load: Master Context, Roadmap
+- Load if relevant: Working Ideas Register, Actionable Ideas Summary
+- Usually skip: full Operator Guide (unless workflow questions arise), full repo
+  history
+
+Review and apply session (reviewing a draft, applying a patch, verifying)
+- Always load: Operator Guide, relevant repo docs/changelog, relevant code files
+- Load if relevant: Roadmap (to confirm scope), Master Context (if architecture
+  alignment is in question)
+- Usually skip: Working Ideas Register, Actionable Ideas Summary, Source Index
+
+Doc revision session (updating source documents)
+- Always load: Source Index, Master Context, target document being revised
+- Load if relevant: Operator Guide (if workflow content is being revised),
+  Roadmap (if sequencing is being revised), Working Ideas Register (if idea
+  promotion is involved)
+- Usually skip: full codebase unless implementation truth is needed
+
+Roadmap or planning session (evaluating what comes next, milestone planning)
+- Always load: Master Context, Roadmap, Working Ideas Register
+- Load if relevant: Actionable Ideas Summary, Source Index
+- Usually skip: full Operator Guide unless process changes are on the table
+
+General working session (mixed tasks, conversation, quick questions)
+- Always load: Master Context, Roadmap
+- Load if relevant: whichever document the conversation touches
+- Usually skip: everything not immediately relevant
+
+These are guidelines, not rigid rules. When in doubt, load more rather than
+less. The point is to avoid context bloat as the project scales, not to create
+bureaucracy about which documents are open.
+
+
+Current document set
+
+Core architecture/workflow anchors
+- CompLife Master Context
+- CompLife Operator Guide
+
+Structural direction
+- CompLife Roadmap
+
+Flexible working layer
+- CompLife Working Ideas Register
+- Actionable Ideas Summary
+
+Navigation layer
+- CompLife Source Index
+
+Implementation history / repo truth
+- repo documentation
+- repo changelog
+- codebase
+- VPS/runtime verification
+
+
+Current recommended maintenance behavior
+
+- keep stable docs relatively compact
+- keep flexible documents more update-friendly
+- avoid stuffing every idea into the stable docs
+- periodically check whether the stable docs still match the approved baseline
+- revise deliberately, not automatically
+- do not let chat drift override the source system
+- do not let roadmap text become a patch tracker
+- do not let repo truth and source truth silently contradict each other
+
+
+Current durable baseline reminders
+
+Use Master Context first for reminders about:
+- the approved conceptual skeleton
+- non-human-first architecture direction
+- layered simulation depth
+- one shared universe timeline
+- galaxy-level hierarchy protection
+- ownership / residence / current location / occupancy separation
+- era/timeline availability context
+- Type and Scope as foundational cross-cutting layers
+- controlled state mutation direction
+
+Use Roadmap for reminders about:
+- dependency order
+- what layer must come before what
+- what should remain deferred even if it is attractive
+
+Use Operator Guide for reminders about:
+- build-before-apply discipline
+- review / verification expectations
+- source-vs-repo truth separation
+- when stable docs should actually be revised
+
+
+Compact rule set
+
+- Master Context = what CompLife is
+- Operator Guide = how CompLife work is done
+- Roadmap = dependency order
+- Working Ideas Register = where active ideas live
+- Actionable Ideas Summary = temporary planning snapshot
+- Source Index = how the document system is organized
+- repo docs/changelog = what was actually implemented
