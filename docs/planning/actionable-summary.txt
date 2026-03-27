@@ -1,4 +1,4 @@
-Actionable Ideas Summary — Rev22
+Actionable Ideas Summary — Rev23
 Date: 2026-03-27
 Role: temporary near-term planning snapshot for Actora
 Authority: non-authoritative; stable docs win, repo truth wins on implementation
@@ -6,10 +6,10 @@ Authority: non-authoritative; stable docs win, repo truth wins on implementation
 
 === CURRENT WORKING POSITION ===
 
-Actora now has a materially stronger early backbone, and verified repo truth is through v0.30.0, with source-stack sync carried through:
+Actora now has a materially stronger early backbone, and verified repo truth is through v0.31.0, with source-stack sync carried through:
 - Master Context v9
 - Roadmap v10
-- planning clarification preserved in WIR v33
+- planning clarification preserved in WIR v34
 - world-owned actor registry
 - world-owned links
 - structured place registry
@@ -35,6 +35,7 @@ Actora now has a materially stronger early backbone, and verified repo truth is 
 - structural death / continuity foundation through `structural_status`, `World.mark_actor_dead(...)`, `get_continuity_candidates_for(...)`, `build_continuity_state_for(...)`, and continuity-ready turn result fields
 - current-facing project/repo rename to Actora, including repo path rename, current-facing doc/runtime naming updates, roadmap filename rename, and README cleanup
 - first playable continuity handoff flow through deterministic continuity candidate refinement, dead-focus advancement blocking, world-owned continuation handoff validation, and shell-level continuation choice / clean dead-end handling
+- link foundation strengthening through normalized `_build_link_record(...)`, small general `get_links(...)` query access, thinner compatibility link helpers, continuity candidate gathering routed through the generic link seam, and one startup parent-to-parent `association/coparent` proof link
 
 
 === CURRENT CLARIFIED DESIGN READ ===
@@ -68,21 +69,24 @@ That sequence was:
 - v0.28.0 — death / continuity structural transition foundation
 - v0.29.0 — Actora rename milestone
 - v0.30.0 — first playable continuity handoff flow
+- v0.31.0 — link foundation strengthening
 
 So the immediate next move is no longer:
 - “we still need to choose whether to follow through on continuity or keep hovering in planning limbo”
+- or “the link layer still needs its first honest strengthening pass before downstream systems can trust it”
 
 The immediate next move is now:
-- choose the next honest structural implementation or planning move after the first playable continuity handoff, without inflating every testing/tooling thought into an immediate build target
+- choose the next honest structural implementation or planning move after link-foundation strengthening, without inflating every testing/tooling thought into an immediate build target
 
 Why:
 - continuity is now materially more real than it was during the earlier planning ambiguity
+- the link layer is now more honest and less startup-family-trapped than it was before `v0.31.0`
 - the source stack is still aligned enough to support deliberate next-step choice
 - stable docs already protect the larger vision
 - forcing momentum now would be weaker than making the next choice deliberately again
 
 So the current question is now:
-- “given repo truth through the first playable continuity handoff, what is the strongest honest next structural move that still respects roadmap order?”
+- “given repo truth through `v0.31.0`, what is the strongest honest next structural move that still respects roadmap order?”
 
 
 === WHAT THE RECENT SEQUENCE ACHIEVED ===
@@ -99,7 +103,7 @@ So the current question is now:
 
 4. The next planning checkpoint is now different in shape.
 - the current pressure is no longer “pick any next patch after v0.27.0 cleanup”
-- it is now “what comes after the first playable continuity handoff without jumping the roadmap?”
+- it is now “what comes after link-foundation strengthening without jumping the roadmap?”
 
 
 === MAIN THINGS THIS CURRENT POSITION NOW PROTECTS ===
@@ -194,19 +198,20 @@ Use:
 === DOCUMENT-SYSTEM RESULT OF THIS SYNC ===
 
 - stable docs still do not need a forced revision from the recent repo milestones alone
-- planning now better reflects repo truth through v0.30.0
-- the current planning checkpoint is now about what follows first playable continuity, not about pre-v0.28 ambiguity
+- planning now better reflects repo truth through v0.31.0
+- the current planning checkpoint is now about what follows link-foundation strengthening, not about pre-v0.28 ambiguity
 - operator/dev tooling is now preserved as a planning thought without being falsely promoted into the next build target
 
 
 === NEXT BEST USE ===
 
-1. Use the aligned source stack plus repo truth through v0.30.0 to choose the next real structural target.
-2. Keep continuity follow-through honest: the first playable handoff exists, but broader continuity systems remain later work.
-3. Keep operator tooling visible as a later support seam, not as an excuse to build fluff before more systems exist.
-4. Do not force another doc-heavy cycle unless a real contradiction appears.
+1. Use the aligned source stack plus repo truth through v0.31.0 to choose the next real structural target.
+2. Keep continuity follow-through honest: the first playable handoff exists, and the link layer is now materially stronger, but broader continuity systems remain later work.
+3. Treat structured place / place-hierarchy strengthening as the leading roadmap-faithful next candidate unless a better same-layer target clearly beats it.
+4. Keep operator tooling visible as a later support seam, not as an excuse to build fluff before more systems exist.
+5. Do not force another doc-heavy cycle unless a real contradiction appears.
 
 
 === ONE-LINE SUMMARY ===
 
-Actora now has verified repo truth through the first playable continuity handoff, and the next honest move is to choose what follows that milestone deliberately rather than drifting into either fake momentum or premature tooling fluff.
+Actora now has verified repo truth through link-foundation strengthening, and the next honest move is to choose what follows that milestone deliberately rather than drifting into either fake momentum or premature tooling fluff.

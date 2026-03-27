@@ -1,4 +1,4 @@
-Actora Working Ideas Register v34
+Actora Working Ideas Register v35
 
 Date: 2026-03-27
 Role: flexible idea intake, staging, parking, and rewrite-pressure tracking for Actora
@@ -8,7 +8,7 @@ Interpretation rule: stable source docs win over this file; verified repo truth 
 
 === CURRENT WORKING READ ===
 
-Verified repo truth is currently through v0.30.0, including:
+Verified repo truth is currently through v0.31.0, including:
 - world-owned actor registry
 - world-owned structured place registry
 - world-owned link truth
@@ -19,7 +19,7 @@ Verified repo truth is currently through v0.30.0, including:
 - world-owned record query helpers
 - internal record-shape normalization
 - explicitly human-backed world-owned constructor seam (`create_human_actor(...)`)
-- repo-local architecture/changelog sync through v0.30.0
+- repo-local architecture/changelog sync through v0.31.0
 - structured snapshot data assembly through `Human.get_snapshot_data(...)`
 - shell-owned snapshot rendering in `main.py`
 - cleaned monthly event result contract with `outcome.stat_changes` as the authoritative mutation payload and no redundant top-level `stat_changes`
@@ -41,6 +41,7 @@ Verified repo truth is currently through v0.30.0, including:
 - structural death / continuity foundation through `structural_status`, `World.mark_actor_dead(...)`, `get_continuity_candidates_for(...)`, `build_continuity_state_for(...)`, and continuity-ready turn-result fields
 - current-facing project/repo rename to Actora, including repo path rename, current-facing docs/runtime naming updates, roadmap filename rename, and README cleanup
 - first playable continuity handoff flow through deterministic continuity candidate refinement, dead-focus advancement blocking, world-owned continuation handoff validation, and shell-level continuation choice / clean dead-end handling
+- link foundation strengthening through normalized `_build_link_record(...)`, small general `get_links(...)` query access, thinner compatibility link helpers, continuity candidate gathering routed through the generic link seam, and one startup parent-to-parent `association/coparent` proof link
 
 The backbone is materially stronger and more honest than it was at the start of this patch run.
 The constructor seam, snapshot/output seam, event-result contract seam, later-life human event coverage gap, startup-family origin/care semantic collapse, event-boundary honesty pressure, identity-generation context-prep pressure, simulation-step ownership seam, silent unknown-stat mutation risk, rough CLI interruption boundary, singleton startup actor ID future-footgun, structural death/continuity foundation gap, current-facing naming inconsistency, and first playable continuity handoff gap have all been moved materially forward.
@@ -52,7 +53,7 @@ The active near-term read is therefore:
 - the major recent backbone clarifications are now in a substantially better place
 - continuity is now more real than it was before, but still not broad/deep continuity-complete
 - the source stack is now materially more aligned on what Actora is supposed to be
-- the next-step question is now “what follows first playable continuity?” rather than “is there any real next move at all?”
+- the next-step question is now “what follows link-foundation strengthening?” rather than “is there any real next move at all?”
 - entity registry vs actor view layering remains a long-term architectural guardrail, not an automatic next implementation target
 - broader lineage / care / relationship systems remain only partially prepared and should not be overclaimed
 - identity realism/context richness remains visibly placeholder-level beneath the cleaner seam, but still should not jump the dependency queue
@@ -119,18 +120,18 @@ Next action: preserve as a tooling pressure only; do not treat it as the automat
 ID: IDEA-101
 Created: 2026-03-26
 Last Reviewed: 2026-03-27
-Title: Post-v0.30.0 next-step selection after first playable continuity handoff
+Title: Post-v0.31.0 next-step selection after link foundation strengthening
 Status: Active planning pressure
 Priority: P1
 Roadmap fit: near-term planning / sequencing hygiene
 Immediate roadmap-layer fit: yes, as a fresh decision pass rather than an already-locked patch title
-Summary: The earlier post-v0.27.0 ambiguity was real, but it has now been materially resolved by the v0.28.0 -> v0.30.0 sequence. The current need is not to pretend there is no next move at all; it is to choose carefully what follows first playable continuity without forcing momentum or jumping the roadmap.
-Why it matters: The project has moved beyond the earlier small-backbone cleanup ambiguity and now needs another honest prioritization pass grounded in repo truth through the first playable continuity handoff.
-Dependencies: verified repo truth through v0.30.0, aligned source stack, current roadmap order
-Risks: forcing another patch for momentum, overclaiming continuity as “done,” promoting support tooling too early, or jumping to broader downstream systems before the next honest foundation choice is clear
+Summary: The earlier post-v0.27.0 ambiguity was real, but it has now been materially resolved by the v0.28.0 -> v0.31.0 sequence. The current need is not to pretend there is no next move at all; it is to choose carefully what follows link-foundation strengthening without forcing momentum or jumping the roadmap.
+Why it matters: The project has moved beyond the earlier small-backbone cleanup ambiguity and now needs another honest prioritization pass grounded in repo truth through v0.31.0.
+Dependencies: verified repo truth through v0.31.0, aligned source stack, current roadmap order
+Risks: forcing another patch for momentum, overclaiming continuity or links as “done,” promoting support tooling too early, or jumping to broader downstream systems before the next honest foundation choice is clear
 Suggested timing: immediate planning use
-Next action: choose the next real implementation/planning target from the aligned source stack after v0.30.0, rather than reusing stale pre-v0.28 ambiguity language
-Notes: this remains real, but it now refers to the post-v0.30.0 decision point rather than the old post-v0.27.0 one
+Next action: choose the next real implementation/planning target from the aligned source stack after v0.31.0, rather than reusing stale pre-v0.28 ambiguity language
+Notes: this remains real, but it now refers to the post-v0.31.0 decision point rather than the old post-v0.27.0 one
 
 ID: IDEA-077
 Created: 2026-03-17
@@ -207,6 +208,21 @@ Actora should not quietly collapse back into “deeper BitLife,” “detached g
 
 
 === COMPLETED / MOVED-OUT PRESSURES ===
+
+ID: IDEA-105
+Created: 2026-03-27
+Last Reviewed: 2026-03-27
+Title: Structured place / place-hierarchy strengthening after v0.31.0
+Status: Leading next-step candidate
+Priority: P1
+Roadmap fit: structured place foundation / sequencing-faithful next layer
+Immediate roadmap-layer fit: yes, likely strongest current candidate
+Summary: With continuity materially real and the link layer now stronger and less family-trapped, the next likely honest structural move is to make the place layer less flat and more truthful without jumping to travel, property, or politics. The current repo already has a structured place registry and parent-place field, but startup still effectively treats place as a single `earth` node.
+Why it matters: The roadmap explicitly puts structured place after stronger actor/link foundations. The repo now looks mature enough for a narrow place-strengthening pass, and a better place hierarchy would give later residence, movement, jurisdiction, property, and world-scope work a less fake base.
+Dependencies: current structured place registry, stronger link model through v0.31.0, current snapshot/output seams, roadmap order
+Risks: jumping too far into country/city simulation, building travel systems too early, overbuilding place abstraction, or confusing place hierarchy work with full spatial-identity separation
+Suggested timing: immediate candidate for the next deliberate spec pass
+Next action: pressure-test a narrow v0.32.0 place-strengthening spec against the roadmap before implementation
 
 ID: IDEA-100
 Created: 2026-03-27
@@ -312,4 +328,4 @@ Next action: do not promote on its own
 
 === ONE-LINE SUMMARY ===
 
-The project now has preserved wording for the actor-anchored, zoomable, continuous-universe vision, verified repo truth through the first playable continuity handoff, and a cleaner planning position for choosing what should come next without drifting into either fake momentum or premature tooling fluff.
+The project now has preserved wording for the actor-anchored, zoomable, continuous-universe vision, verified repo truth through link-foundation strengthening, and a cleaner planning position for choosing what should come next without drifting into either fake momentum or premature tooling fluff.
