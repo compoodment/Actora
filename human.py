@@ -17,6 +17,8 @@ class Human:
         self.money = 0
         self.current_place_id = None
         self.residence_place_id = None
+        self.jurisdiction_place_id = None
+        self.temporary_occupancy_place_id = None
         self.structural_status = "active"
         self.death_year = None
         self.death_month = None
@@ -83,13 +85,17 @@ class Human:
         return lifecycle["life_stage"]
 
     def get_spatial_state(self, world):
-        """Provides a structured, read-only view of current and residence place identity."""
+        """Provides a structured, read-only view of actor place identity and context."""
         current_place = world.get_place(self.current_place_id)
         residence_place = world.get_place(self.residence_place_id)
+        jurisdiction_place = world.get_place(self.jurisdiction_place_id)
+        temporary_occupancy_place = world.get_place(self.temporary_occupancy_place_id)
         current_world_body = world.get_nearest_place_of_kind(self.current_place_id, "world_body")
 
         current_place_name = world.get_place_name(self.current_place_id)
         residence_place_name = world.get_place_name(self.residence_place_id)
+        jurisdiction_place_name = world.get_place_name(self.jurisdiction_place_id)
+        temporary_occupancy_place_name = world.get_place_name(self.temporary_occupancy_place_id)
 
         return {
             "current_place_id": self.current_place_id,
@@ -98,6 +104,14 @@ class Human:
             "residence_place_id": self.residence_place_id,
             "residence_place_name": residence_place_name,
             "residence_place_kind": residence_place["kind"] if residence_place else None,
+            "jurisdiction_place_id": self.jurisdiction_place_id,
+            "jurisdiction_place_name": jurisdiction_place_name,
+            "jurisdiction_place_kind": jurisdiction_place["kind"] if jurisdiction_place else None,
+            "temporary_occupancy_place_id": self.temporary_occupancy_place_id,
+            "temporary_occupancy_place_name": temporary_occupancy_place_name,
+            "temporary_occupancy_place_kind": (
+                temporary_occupancy_place["kind"] if temporary_occupancy_place else None
+            ),
             "current_world_body_id": current_world_body["place_id"] if current_world_body else None,
             "current_world_body_name": current_world_body["name"] if current_world_body else None,
         }
@@ -155,6 +169,8 @@ class Human:
                 "world_body_name": spatial_state["current_world_body_name"] or "Unknown",
                 "current_place_name": spatial_state["current_place_name"] or "Unknown",
                 "current_place_kind": spatial_state["current_place_kind"],
+                "jurisdiction_place_name": spatial_state["jurisdiction_place_name"] or "Unknown",
+                "jurisdiction_place_kind": spatial_state["jurisdiction_place_kind"],
             },
             "statistics": {
                 "health": self.stats["health"],

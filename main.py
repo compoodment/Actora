@@ -51,6 +51,7 @@ def render_snapshot(snapshot_data):
     print("\n--- Location ---")
     print(f"  World Body: {location['world_body_name']}")
     print(f"  Current Place: {location['current_place_name']}")
+    print(f"  Jurisdiction: {location['jurisdiction_place_name']}")
 
     print("\n--- Statistics ---")
     print(f"  Health: {statistics['health']}")
@@ -267,6 +268,7 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
     )
 
     startup_place_id = "earth_city_01"
+    startup_jurisdiction_place_id = "earth_country_01"
 
     mother_identity_context = prepare_parent_identity_context(
         role="mother",
@@ -299,6 +301,7 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         birth_month=random.randint(1, 12),
         current_place_id=startup_place_id,
         residence_place_id=startup_place_id,
+        jurisdiction_place_id=startup_jurisdiction_place_id,
     )
     world.create_human_actor(
         actor_id=father_id,
@@ -311,6 +314,7 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         birth_month=random.randint(1, 12),
         current_place_id=startup_place_id,
         residence_place_id=startup_place_id,
+        jurisdiction_place_id=startup_jurisdiction_place_id,
     )
     world.add_link_pair(
         source_id=mother_id,
@@ -335,6 +339,7 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         birth_year=world.current_year,
         birth_month=1,
         place_id=startup_place_id,
+        jurisdiction_place_id=startup_jurisdiction_place_id,
         randomize_stats=True,
     )
     world.set_focused_actor(player_id)

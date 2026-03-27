@@ -194,6 +194,8 @@ class World:
         birth_month,
         current_place_id=None,
         residence_place_id=None,
+        jurisdiction_place_id=None,
+        temporary_occupancy_place_id=None,
         randomize_stats=False,
     ):
         """Creates and registers a Human actor in the world."""
@@ -212,6 +214,10 @@ class World:
             actor.current_place_id = current_place_id
         if residence_place_id is not None:
             actor.residence_place_id = residence_place_id
+        if jurisdiction_place_id is not None:
+            actor.jurisdiction_place_id = jurisdiction_place_id
+        if temporary_occupancy_place_id is not None:
+            actor.temporary_occupancy_place_id = temporary_occupancy_place_id
         self.add_actor(actor_id, actor)
         self.add_record(
             record_type="actor_entry",
@@ -240,6 +246,8 @@ class World:
         birth_year,
         birth_month,
         place_id,
+        jurisdiction_place_id=None,
+        temporary_occupancy_place_id=None,
         randomize_stats=False,
     ):
         """Creates a human child actor and optional mother/father family links."""
@@ -254,6 +262,8 @@ class World:
             birth_month=birth_month,
             current_place_id=place_id,
             residence_place_id=place_id,
+            jurisdiction_place_id=jurisdiction_place_id,
+            temporary_occupancy_place_id=temporary_occupancy_place_id,
             randomize_stats=randomize_stats,
         )
 

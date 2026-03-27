@@ -1,6 +1,6 @@
 # Actora Architecture Summary
 
-**Version:** 0.32.0
+**Version:** 0.33.0
 **Last Updated:** 2026-03-27
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
@@ -51,8 +51,8 @@ Current methods:
 - `get_actor_records(actor_id, record_type=None)`
 - `get_latest_record(actor_id=None, record_type=None)`
 - `get_records_by_tag(tag, actor_id=None)`
-- `create_human_actor(actor_id, species, first_name, last_name, sex, gender, birth_year, birth_month, current_place_id=None, residence_place_id=None, randomize_stats=False)`
-- `create_human_child_with_parents(child_id, first_name, last_name, sex, gender, mother_id, father_id, birth_year, birth_month, place_id, randomize_stats=False)`
+- `create_human_actor(actor_id, species, first_name, last_name, sex, gender, birth_year, birth_month, current_place_id=None, residence_place_id=None, jurisdiction_place_id=None, temporary_occupancy_place_id=None, randomize_stats=False)`
+- `create_human_child_with_parents(child_id, first_name, last_name, sex, gender, mother_id, father_id, birth_year, birth_month, place_id, jurisdiction_place_id=None, temporary_occupancy_place_id=None, randomize_stats=False)`
 - `get_actor(actor_id)`
 - `_build_link_record(source_id, target_id, link_type, role, metadata=None)`
 - `advance_months(months)`
@@ -97,6 +97,8 @@ Current stored fields:
 - `money`
 - `current_place_id`
 - `residence_place_id`
+- `jurisdiction_place_id`
+- `temporary_occupancy_place_id`
 - `structural_status`
 - `death_year`
 - `death_month`
@@ -196,8 +198,8 @@ Current structural-death record details:
 
 Actor entry helpers:
 
-- `create_human_actor(...)` is the current world-owned actor creation/registration path for startup actors, and it is explicitly human-backed. It directly constructs a `Human`, optionally randomizes starting stats, optionally applies current/residence place IDs, registers the actor via `add_actor(...)`, writes an `actor_entry` record with `entry_method="create_human_actor"`, and returns the created actor.
-- `create_human_child_with_parents(...)` remains a narrow human-startup helper layered on top of `create_human_actor(...)`. It creates the child in the provided place, adds startup family link pairs for mother/father when IDs are provided, writes explicit origin/care/bootstrap metadata onto those directional links, and writes a `family_bootstrap` record for the current startup family-link bootstrap. No generic actor constructor, species framework, adoption system, guardianship system, or broader origin framework is currently implemented.
+- `create_human_actor(...)` is the current world-owned actor creation/registration path for startup actors, and it is explicitly human-backed. It directly constructs a `Human`, optionally randomizes starting stats, optionally applies current/residence/jurisdiction/temporary-occupancy place IDs, registers the actor via `add_actor(...)`, writes an `actor_entry` record with `entry_method="create_human_actor"`, and returns the created actor.
+- `create_human_child_with_parents(...)` remains a narrow human-startup helper layered on top of `create_human_actor(...)`. It creates the child in the provided place, currently assigns the same startup place as both current and residence, optionally assigns separate jurisdiction and temporary occupancy context, adds startup family link pairs for mother/father when IDs are provided, writes explicit origin/care/bootstrap metadata onto those directional links, and writes a `family_bootstrap` record for the current startup family-link bootstrap. No generic actor constructor, species framework, adoption system, guardianship system, or broader origin framework is currently implemented.
 
 Basic world link helper contract:
 
@@ -254,10 +256,16 @@ Spatial access/query is formalized through `Human.get_spatial_state(world)`, whi
 - `residence_place_id`
 - `residence_place_name`
 - `residence_place_kind`
+- `jurisdiction_place_id`
+- `jurisdiction_place_name`
+- `jurisdiction_place_kind`
+- `temporary_occupancy_place_id`
+- `temporary_occupancy_place_name`
+- `temporary_occupancy_place_kind`
 - `current_world_body_id`
 - `current_world_body_name`
 
-This helper is read-only and does not mutate human or world state.
+This helper is read-only and does not mutate human or world state. It keeps current location, residence, governing jurisdiction, and temporary occupancy separate without introducing travel, property, or politics simulation behavior.
 
 Current structural-state access is formalized through `Human.get_structural_state()`, which returns a dictionary containing:
 
@@ -271,12 +279,12 @@ Current snapshot access is formalized through `Human.get_snapshot_data(current_y
 
 - `identity` (`full_name`, `species`, `sex`, `gender`)
 - `time` (`age`, `life_stage`, `year`, `month`)
-- `location` (`world_body_name`, `current_place_name`, `current_place_kind`)
+- `location` (`world_body_name`, `current_place_name`, `current_place_kind`, `jurisdiction_place_name`, `jurisdiction_place_kind`)
 - `statistics` (`health`, `happiness`, `intelligence`, `money`)
 - `relationships` (`mother_name`, `father_name`)
 - `structural` (`structural_status`, `is_alive`, `death_year`, `death_month`, `death_reason`)
 
-This helper is read-only, resolves parent names through world semantic link/actor lookup helpers, resolves `world_body_name` through place ancestry rather than assuming the current place is itself a world body, and preserves the current `"Unknown"` fallback for unresolved parents and unresolved place names.
+This helper is read-only, resolves parent names through world semantic link/actor lookup helpers, resolves `world_body_name` through place ancestry rather than assuming the current place is itself a world body, and preserves the current `"Unknown"` fallback for unresolved parents and unresolved place names. The shell currently renders one added `Jurisdiction` line from this expanded spatial state so snapshot output stays narrow.
 
 ## 6. Module Responsibilities
 
@@ -304,7 +312,7 @@ Current shell-level functions:
 - `game_loop(...)` — main input/advancement/display loop
 - `start_game()` — top-level orchestration (banner, then delegates to the above)
 
-Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. The current shell also now renders a narrow structural-state section in snapshots, renders both ancestry-resolved world body and current place, and is capable of rendering structural transition / continuity result blocks when those keys are present.
+Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. The current shell also now renders a narrow structural-state section in snapshots, renders ancestry-resolved world body plus current place plus one clean jurisdiction line, and is capable of rendering structural transition / continuity result blocks when those keys are present.
 
 ### `identity.py`
 Responsible for:
@@ -449,6 +457,7 @@ Current initialization behavior:
 - parent last names inherit the player last name when provided
 - if player last name is blank, parent last names use a random fallback from `FALLBACK_LAST_NAME_POOL`
 - startup mother, startup father, and startup player each receive `current_place_id = "earth_city_01"` and `residence_place_id = "earth_city_01"` during setup
+- those same startup actors also receive `jurisdiction_place_id = "earth_country_01"` during setup while `temporary_occupancy_place_id` remains unset (`None`)
 - startup actor IDs now follow the `startup_<role>_<suffix>` pattern instead of fixed singleton IDs, while preserving the current one-family startup shape and parent/player lookup behavior
 - parent birth months are randomized from 1-12
 - the startup player is set as the current world-owned focused actor
@@ -484,8 +493,9 @@ Current event behavior:
 Current snapshots display:
 - identity (full name, species, sex, gender)
 - time (age, life stage, year, month)
-- location (ancestry-resolved world body plus current place, resolved through `Human.get_snapshot_data(...)`, which currently reads `Human.get_spatial_state(world)` and world place helpers)
+- location (ancestry-resolved world body plus current place plus one clean jurisdiction line, resolved through `Human.get_snapshot_data(...)`, which currently reads `Human.get_spatial_state(world)` and world place helpers)
 - residence remains internal and is not rendered in the snapshot yet
+- temporary occupancy remains internal and is not rendered in the snapshot yet
 - statistics (health, happiness, intelligence, money)
 - family references (mother, father), still resolved from the world layer
 - structural state (`status`, optional death date, optional death reason)

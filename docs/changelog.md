@@ -1,5 +1,14 @@
 # Actora Changelog
 
+## Version 0.33.0 (Minor) - 2026-03-27
+- **Spatial Identity Separation Strengthening:**
+    - Added explicit actor-level `jurisdiction_place_id` and `temporary_occupancy_place_id` storage alongside the existing `current_place_id` and `residence_place_id`.
+    - Extended `World.create_human_actor(...)` and `World.create_human_child_with_parents(...)` so jurisdiction and temporary occupancy can be set at creation time without changing the broader place architecture.
+    - Updated startup world setup so startup mother, startup father, and startup player still live in `"earth_city_01"` while now also explicitly carrying `jurisdiction_place_id = "earth_country_01"` and leaving temporary occupancy unset.
+    - Extended `Human.get_spatial_state(...)` to return separate structured current-place, residence-place, jurisdiction-place, temporary-occupancy, and ancestry-resolved current-world-body values.
+    - Updated snapshot data/rendering so the shell still shows `World Body` and `Current Place`, and now also shows one clean `Jurisdiction` line.
+    - Preserved current startup flow, place hierarchy, link foundation, continuity handoff behavior, and the absence of travel, property, and politics simulation systems.
+
 ## Version 0.32.0 (Minor) - 2026-03-27
 - **Structured Place / Place-Hierarchy Strengthening:**
     - Added a small world-owned place query seam in `world.py` with `get_child_places(...)`, `get_place_lineage(...)`, and `get_nearest_place_of_kind(...)`.
