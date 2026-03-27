@@ -1,6 +1,6 @@
 # Actora Architecture Summary
 
-**Version:** 0.28.0
+**Version:** 0.30.0
 **Last Updated:** 2026-03-27
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
@@ -73,6 +73,7 @@ Current methods:
 - `apply_outcome(actor_id, outcome)`
 - `get_continuity_candidates_for(actor_id)`
 - `build_continuity_state_for(actor_id)`
+- `handoff_focus_to_continuation(from_actor_id, successor_actor_id)`
 - `mark_actor_dead(actor_id, year=None, month=None, reason=None)`
 - `simulate_advance_turn(player_id, months_to_advance)`
 
@@ -148,9 +149,11 @@ Reverse family links are still stored explicitly, link records still reference e
 
 Current continuity-candidate boundary:
 - `get_continuity_candidates_for(actor_id)` scans current related links, resolves the linked living actors, excludes the actor itself, dedupes candidates, and returns small structured candidate objects
-- current candidate objects contain `actor_id`, `full_name`, `link_type`, and `link_role`
+- current candidate objects contain `actor_id`, `full_name`, `link_type`, `link_role`, `relationship_label`, `structural_status`, and `is_alive`
+- current candidate labeling and ordering are deterministic: candidate-defining link context is chosen by a stable link sort key, and final candidate ordering uses (`full_name`, `link_type`, `link_role`, `actor_id`) rather than relying on incidental link iteration order
 - because current repo truth only has startup family links, continuity candidates are effectively drawn from the current narrow family-connected link graph
-- this does not yet implement continuation choice UI, weighting, succession rules, archive state, lineage systems, or a broader connected-actor prioritization framework
+- `handoff_focus_to_continuation(...)` is the current world-owned validation/mutation seam for switching focus after the focused actor is dead
+- this still does not implement weighting, succession rules, archive state, lineage systems, or a broader connected-actor prioritization framework
 
 Record storage truth is owned by `World.records`.
 
@@ -270,6 +273,10 @@ Responsible for:
 
 Current shell-level functions:
 - `render_snapshot(...)` — terminal rendering of the structured current-state snapshot returned by `Human.get_snapshot_data(...)`
+- `render_turn_events(...)` — terminal rendering of one structured turn’s event output with the current detail/summary thresholds
+- `render_continuity_state(...)` — terminal rendering of the current dead-focus continuity state and available continuation options
+- `prompt_for_continuation_choice(...)` — validated continuation-target input helper for the shell layer
+- `resolve_dead_focus(...)` — shell-owned continuation orchestration that renders dead-focus state, prompts for successor selection, delegates the actual focus mutation to `World.handoff_focus_to_continuation(...)`, and cleanly ends the run when no valid continuation target exists
 - `safe_input(prompt)` — narrow shared CLI input boundary helper that exits cleanly on `EOFError` and `KeyboardInterrupt`
 - `create_character()` — character creation prompts and input validation
 - `setup_initial_world(...)` — World creation, parent identity generation, startup actor entry delegation through world-owned helpers (`create_human_actor(...)` and `create_human_child_with_parents(...)`), and initial focused-actor assignment through `World.set_focused_actor(...)`
@@ -305,7 +312,7 @@ Responsible for:
 - centralized application of event stat outcomes (`World.apply_outcome(...)`)
 - world-owned continuity candidate resolution from the current link graph
 - world-owned structural death transition handling (`World.mark_actor_dead(...)`)
-- world-owned authoritative simulation-step boundary via `World.simulate_advance_turn(...)`, which advances month-by-month, derives lifecycle state from the current player, requests monthly event data through the current human-scoped event seam, applies outcomes centrally, writes event records, and assembles the structured turn result
+- world-owned authoritative simulation-step boundary via `World.simulate_advance_turn(...)`, which advances month-by-month for the current living focused actor, requests monthly event data through the current human-scoped event seam, applies outcomes centrally, writes event records, and assembles the structured turn result
 
 ### `human.py`
 Responsible for:
@@ -347,13 +354,13 @@ A thin module-level `simulate_advance_turn(world, player_id, months_to_advance)`
 Current behavior:
 - advances time month-by-month
 - ensures the current focused actor ID is available for turn-result reporting
-- retrieves the current player from the world
+- uses the current focused actor as the event/snapshot advancement subject once focus exists
 - requests monthly structured event data from `events.py`
 - applies each returned event outcome centrally through `World.apply_outcome(...)`
 - writes one preserved world-owned `event` record for each triggered monthly event after outcome application
 - collects complete structured event results returned by `events.py`
 - returns a structured result dictionary
-- returns continuity-ready keys even when no structural transition occurred during the turn
+- refuses ordinary advancement when the current focused actor is already dead and instead returns continuity-ready blocked-turn state
 
 Current return keys:
 - `months_advanced`
@@ -363,11 +370,14 @@ Current return keys:
 - `focused_actor_alive`
 - `structural_transition`
 - `continuity_state`
+- `advancement_blocked`
+- `advancement_block_reason`
 
 Current return-contract notes:
 - `structural_transition` is currently `None` during ordinary advancement because this patch does not yet introduce automatic mortality rules
-- `continuity_state` is currently `None` during ordinary advancement unless the focused actor is already dead when the turn result is assembled
-- this patch prepares the turn-result contract for structural death/continuity handling without pretending full death gameplay is already implemented
+- `continuity_state` is currently present when advancement is blocked because the focused actor is dead
+- `advancement_block_reason` is currently `"focused_actor_dead"` for the dead-focus blocked path
+- this patch now supports narrow playable continuation handoff without introducing automatic mortality, archive behavior, or broader continuity systems
 
 This function does not perform terminal input, output, or presentation formatting. Terminal presentation remains in `main.py` and consumes the returned structured result.
 
@@ -391,7 +401,8 @@ This function does not perform terminal input, output, or presentation formattin
     - Large event counts are summarized with a total count, a recent-event subset, and an omitted-older-events line.
     - Triggered monthly events are also preserved as structured world-owned records in addition to current terminal rendering.
 15. If present, render structural transition / continuity output.
-16. Return to step 7.
+16. If the focused actor is dead, resolve continuation handoff or end the run cleanly.
+17. Return to step 7.
 
 ## 9. Current Gameplay Behavior
 
@@ -462,15 +473,16 @@ Current structural-transition behavior:
 - `World.mark_actor_dead(...)` provides a controlled world-owned death transition path
 - the actor remains in `World.actors` after death
 - the world does not end when an actor dies
-- focus does not auto-switch during the death transition
+- focus does not auto-switch during the death transition itself
 - a preserved `death` record is written for the actor
 - continuity state can be built from the current linked living actors through `World.build_continuity_state_for(...)`
-- current continuity candidates are returned as small structured objects with `actor_id`, `full_name`, `link_type`, and `link_role`
-- current terminal rendering can display continuity information if a turn result contains it
+- current continuity candidates are returned in deterministic order with display-ready relationship metadata
+- ordinary month advancement does not proceed once the focused actor is dead
+- `main.py` now renders the dead-focus structural transition state, allows the player to choose a living continuation target, and switches focus through the world-owned handoff method
+- if no valid continuation candidates exist, the shell reports that cleanly and ends the current run without fake continuation
 
 Current limitations:
 - no automatic mortality system yet
-- no continuation chooser UI yet
 - no archive behavior yet
 - no inheritance/estate consequences yet
 - no lineage browser yet

@@ -487,19 +487,64 @@ class World:
         for stat_name, change_value in stat_changes.items():
             actor_obj.modify_stat(stat_name, change_value)
 
+    def _get_continuity_link_sort_key(self, link):
+        """Returns the deterministic current ordering key for candidate-defining links."""
+        return (
+            link.get("type") or "",
+            link.get("role") or "",
+            link.get("source_id") or "",
+            link.get("target_id") or "",
+        )
+
+    def _build_continuity_candidate(self, actor_id, candidate_actor_id, links):
+        """Builds one normalized continuity-candidate object from deterministic link context."""
+        if candidate_actor_id is None or candidate_actor_id == actor_id:
+            return None
+
+        candidate_actor = self.get_actor(candidate_actor_id)
+        if candidate_actor is None or not candidate_actor.is_alive():
+            return None
+        if not links:
+            return None
+
+        actor_perspective_links = [
+            link for link in links
+            if link.get("source_id") == actor_id and link.get("target_id") == candidate_actor_id
+        ]
+        defining_link_pool = actor_perspective_links or links
+        defining_link = sorted(defining_link_pool, key=self._get_continuity_link_sort_key)[0]
+        link_type = defining_link.get("type")
+        link_role = defining_link.get("role")
+        relationship_label = f"{link_type}/{link_role}" if link_role else str(link_type)
+        return {
+            "actor_id": candidate_actor_id,
+            "full_name": candidate_actor.get_full_name(),
+            "link_type": link_type,
+            "link_role": link_role,
+            "relationship_label": relationship_label,
+            "structural_status": candidate_actor.structural_status,
+            "is_alive": True,
+        }
+
+    def _get_continuity_candidate_sort_key(self, candidate):
+        """Returns the deterministic current ordering key for continuity candidates."""
+        return (
+            candidate.get("full_name", "").casefold(),
+            candidate.get("link_type") or "",
+            candidate.get("link_role") or "",
+            candidate.get("actor_id") or "",
+        )
+
     def get_continuity_candidates_for(self, actor_id):
         """Returns structured living linked-actor continuity candidates for one actor."""
         if actor_id not in self.actors:
             raise ValueError(f"get_continuity_candidates_for: unknown actor_id '{actor_id}'")
 
-        candidates = []
-        seen_actor_ids = set()
+        candidate_links = {}
         related_links = self.get_related_links(actor_id)
 
         for link in related_links:
             candidate_actor_id = None
-            link_role = link.get("role")
-            link_type = link.get("type")
 
             if link.get("source_id") == actor_id:
                 candidate_actor_id = link.get("target_id")
@@ -508,22 +553,16 @@ class World:
 
             if candidate_actor_id is None or candidate_actor_id == actor_id:
                 continue
-            if candidate_actor_id in seen_actor_ids:
-                continue
 
-            candidate_actor = self.get_actor(candidate_actor_id)
-            if candidate_actor is None or not candidate_actor.is_alive():
-                continue
+            candidate_links.setdefault(candidate_actor_id, []).append(link)
 
-            seen_actor_ids.add(candidate_actor_id)
-            candidates.append({
-                "actor_id": candidate_actor_id,
-                "full_name": candidate_actor.get_full_name(),
-                "link_type": link_type,
-                "link_role": link_role,
-            })
+        candidates = []
+        for candidate_actor_id, links in candidate_links.items():
+            candidate = self._build_continuity_candidate(actor_id, candidate_actor_id, links)
+            if candidate is not None:
+                candidates.append(candidate)
 
-        return candidates
+        return sorted(candidates, key=self._get_continuity_candidate_sort_key)
 
     def build_continuity_state_for(self, actor_id):
         """Builds a structured continuity-state snapshot for one actor."""
@@ -534,11 +573,51 @@ class World:
         continuity_candidates = self.get_continuity_candidates_for(actor_id)
         return {
             "actor_id": actor_id,
+            "focus_actor_name": actor.get_full_name(),
+            "focus_actor_structural_status": actor.structural_status,
+            "focus_actor_death_year": actor.death_year,
+            "focus_actor_death_month": actor.death_month,
+            "focus_actor_death_reason": actor.death_reason,
             "is_dead": not actor.is_alive(),
             "universe_continues": True,
             "continuity_candidates": continuity_candidates,
             "continuity_candidate_ids": [candidate["actor_id"] for candidate in continuity_candidates],
             "had_continuity_candidates": bool(continuity_candidates),
+        }
+
+    def handoff_focus_to_continuation(self, from_actor_id, successor_actor_id):
+        """Validates and switches focus from one dead actor to one living continuation target."""
+        actor = self.get_actor(from_actor_id)
+        if actor is None:
+            raise ValueError(f"handoff_focus_to_continuation: unknown from_actor_id '{from_actor_id}'")
+        if actor.is_alive():
+            raise ValueError(
+                f"handoff_focus_to_continuation: actor_id '{from_actor_id}' is not dead"
+            )
+
+        successor_actor = self.get_actor(successor_actor_id)
+        if successor_actor is None:
+            raise ValueError(
+                f"handoff_focus_to_continuation: unknown successor_actor_id '{successor_actor_id}'"
+            )
+        if not successor_actor.is_alive():
+            raise ValueError(
+                f"handoff_focus_to_continuation: successor_actor_id '{successor_actor_id}' is not alive"
+            )
+
+        continuity_state = self.build_continuity_state_for(from_actor_id)
+        if successor_actor_id not in continuity_state["continuity_candidate_ids"]:
+            raise ValueError(
+                "handoff_focus_to_continuation: successor_actor_id "
+                f"'{successor_actor_id}' is not a valid continuity candidate for '{from_actor_id}'"
+            )
+
+        self.set_focused_actor(successor_actor_id)
+        return {
+            "previous_actor_id": from_actor_id,
+            "previous_actor_name": actor.get_full_name(),
+            "new_focused_actor_id": successor_actor_id,
+            "new_focused_actor_name": successor_actor.get_full_name(),
         }
 
     def mark_actor_dead(self, actor_id, year=None, month=None, reason=None):
@@ -591,16 +670,30 @@ class World:
         focused_actor_id = self.get_focused_actor_id() or player_id
         if self.get_focused_actor_id() is None and focused_actor_id in self.actors:
             self.set_focused_actor(focused_actor_id)
+        if focused_actor_id not in self.actors:
+            raise ValueError(f"simulate_advance_turn: unknown actor_id '{focused_actor_id}'")
 
         structural_transition = None
         continuity_state = None
+        focused_actor = self.get_actor(focused_actor_id)
+
+        if focused_actor is not None and not focused_actor.is_alive():
+            continuity_state = self.build_continuity_state_for(focused_actor_id)
+            return {
+                "months_advanced": 0,
+                "events": collected_structured_events,
+                "had_any_events": False,
+                "focused_actor_id": focused_actor_id,
+                "focused_actor_alive": False,
+                "structural_transition": structural_transition,
+                "continuity_state": continuity_state,
+                "advancement_blocked": True,
+                "advancement_block_reason": "focused_actor_dead",
+            }
 
         for _ in range(months_to_advance):
             self.advance_months(1)
-            current_player_for_event = self.get_actor(player_id)
-            if current_player_for_event is None:
-                raise ValueError(f"simulate_advance_turn: unknown actor_id '{player_id}'")
-            lifecycle_state_for_event = current_player_for_event.get_lifecycle_state(
+            lifecycle_state_for_event = focused_actor.get_lifecycle_state(
                 self.current_year,
                 self.current_month,
             )
@@ -610,14 +703,14 @@ class World:
                 self.current_month,
             )
             if structured_event_for_month:
-                self.apply_outcome(player_id, structured_event_for_month.get("outcome"))
+                self.apply_outcome(focused_actor_id, structured_event_for_month.get("outcome"))
                 self.add_record(
                     record_type="event",
                     scope="actor",
                     text=structured_event_for_month.get("text"),
                     year=structured_event_for_month.get("year"),
                     month=structured_event_for_month.get("month"),
-                    actor_ids=[player_id],
+                    actor_ids=[focused_actor_id],
                     tags=structured_event_for_month.get("tags") or [],
                     metadata={
                         "event_id": structured_event_for_month.get("event_id"),
@@ -639,6 +732,8 @@ class World:
             "focused_actor_alive": focused_actor_alive,
             "structural_transition": structural_transition,
             "continuity_state": continuity_state,
+            "advancement_blocked": False,
+            "advancement_block_reason": None,
         }
 
 def simulate_advance_turn(world, player_id: str, months_to_advance: int) -> dict:

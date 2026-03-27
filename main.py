@@ -71,6 +71,129 @@ def render_snapshot(snapshot_data):
     print("--------------------")
 
 
+def render_turn_events(turn_result):
+    """Renders structured event output for one simulated turn."""
+    print("\n--- Events ---")
+    if not turn_result["had_any_events"]:
+        print("  - No notable events occurred during this period.")
+        return
+
+    total_events = len(turn_result["events"])
+    if total_events <= EVENT_DETAIL_THRESHOLD:
+        for structured_event in turn_result["events"]:
+            print(
+                f"  - [Year {structured_event['year']}, Month {structured_event['month']}] "
+                f"{structured_event['text']}"
+            )
+        return
+
+    recent_events = turn_result["events"][-EVENT_RECENT_DISPLAY_LIMIT:]
+    omitted_count = total_events - len(recent_events)
+
+    print(f"  - {total_events} notable events occurred during this period.")
+    print(f"  - Showing the most recent {len(recent_events)} events:")
+    for structured_event in recent_events:
+        print(
+            f"    - [Year {structured_event['year']}, Month {structured_event['month']}] "
+            f"{structured_event['text']}"
+        )
+
+    if omitted_count > 0:
+        print(f"  - ... {omitted_count} older events omitted.")
+
+
+def render_continuity_state(continuity_state):
+    """Renders the current dead-focus continuity state."""
+    print("\n--- Continuity ---")
+    print("  - Structural Transition: Focus is currently dead.")
+    print(f"  - Previous Focus: {continuity_state['focus_actor_name']}")
+
+    death_year = continuity_state["focus_actor_death_year"]
+    death_month = continuity_state["focus_actor_death_month"]
+    if death_year is not None and death_month is not None:
+        print(f"  - Death: Year {death_year}, Month {death_month}")
+    if continuity_state["focus_actor_death_reason"]:
+        print(f"  - Death Reason: {continuity_state['focus_actor_death_reason']}")
+
+    print("  - The universe continues.")
+    if continuity_state["had_continuity_candidates"]:
+        print("  - Select a living connected actor to continue:")
+        for index, candidate in enumerate(continuity_state["continuity_candidates"], 1):
+            print(
+                f"    {index}) {candidate['full_name']} "
+                f"[{candidate['relationship_label']}]"
+            )
+    else:
+        print("  - No living connected continuation candidates were found.")
+    print("--------------------")
+
+
+def prompt_for_continuation_choice(continuity_state):
+    """Prompts for one valid continuation target index or clean quit."""
+    candidate_count = len(continuity_state["continuity_candidates"])
+    while True:
+        choice_raw = safe_input(
+            f"Choose a continuation target (1-{candidate_count}) or type 'quit': "
+        ).strip().lower()
+        if choice_raw == "quit":
+            return None
+
+        try:
+            selected_index = int(choice_raw)
+        except ValueError:
+            print("Invalid input: Please enter a number or 'quit'.")
+            continue
+
+        if 1 <= selected_index <= candidate_count:
+            return continuity_state["continuity_candidates"][selected_index - 1]["actor_id"]
+
+        print("Invalid input: Please choose one of the listed continuation options.")
+
+
+def resolve_dead_focus(world):
+    """Handles continuation handoff or clean run end when the focused actor is dead."""
+    focused_actor_id = world.get_focused_actor_id()
+    if focused_actor_id is None:
+        return True
+
+    focused_actor = world.get_actor(focused_actor_id)
+    if focused_actor is None or focused_actor.is_alive():
+        return True
+
+    continuity_state = world.build_continuity_state_for(focused_actor_id)
+    render_continuity_state(continuity_state)
+
+    if not continuity_state["had_continuity_candidates"]:
+        print("This run has ended because no valid continuation target exists.")
+        return False
+
+    successor_actor_id = prompt_for_continuation_choice(continuity_state)
+    if successor_actor_id is None:
+        print(QUIT_BANNER)
+        return False
+
+    handoff_result = world.handoff_focus_to_continuation(
+        focused_actor_id,
+        successor_actor_id,
+    )
+    print(
+        f"Focus moved from {handoff_result['previous_actor_name']} "
+        f"to {handoff_result['new_focused_actor_name']}."
+    )
+
+    new_focused_actor_id = handoff_result["new_focused_actor_id"]
+    new_focused_actor = world.get_actor(new_focused_actor_id)
+    render_snapshot(
+        new_focused_actor.get_snapshot_data(
+            world.current_year,
+            world.current_month,
+            world,
+            new_focused_actor_id,
+        )
+    )
+    return True
+
+
 def create_character():
     """Handles the character creation flow and returns player details."""
     print("\n--- Character Creation ---")
@@ -199,6 +322,9 @@ def game_loop(world, player_id, player):
     render_snapshot(focused_actor.get_snapshot_data(world.current_year, world.current_month, world, focused_actor_id))
 
     while True:
+        if not resolve_dead_focus(world):
+            return
+
         months_to_advance = 0
         while True: # Input validation loop
             choice_raw = safe_input("Press Enter for the next month, type a number to skip months, or type 'quit': ").strip().lower()
@@ -226,30 +352,14 @@ def game_loop(world, player_id, player):
         focused_actor_id = turn_result["focused_actor_id"]
         final_player_state = world.get_actor(focused_actor_id)
         render_snapshot(
-            final_player_state.get_snapshot_data(world.current_year, world.current_month, world, focused_actor_id)
+            final_player_state.get_snapshot_data(
+                world.current_year,
+                world.current_month,
+                world,
+                focused_actor_id,
+            )
         )
-
-        print("\n--- Events ---")
-        if not turn_result["had_any_events"]:
-            print("  - No notable events occurred during this period.")
-        else:
-            total_events = len(turn_result["events"])
-
-            if total_events <= EVENT_DETAIL_THRESHOLD:
-                for structured_event in turn_result["events"]:
-                    # Main.py renders terminal event lines by combining structured year, month, raw event text
-                    print(f"  - [Year {structured_event['year']}, Month {structured_event['month']}] {structured_event['text']}")
-            else:
-                recent_events = turn_result["events"][-EVENT_RECENT_DISPLAY_LIMIT:]
-                omitted_count = total_events - len(recent_events)
-
-                print(f"  - {total_events} notable events occurred during this period.")
-                print(f"  - Showing the most recent {len(recent_events)} events:")
-                for structured_event in recent_events:
-                    print(f"    - [Year {structured_event['year']}, Month {structured_event['month']}] {structured_event['text']}")
-
-                if omitted_count > 0:
-                    print(f"  - ... {omitted_count} older events omitted.")
+        render_turn_events(turn_result)
 
         if turn_result["structural_transition"] is not None:
             transition = turn_result["structural_transition"]
@@ -259,20 +369,12 @@ def game_loop(world, player_id, player):
                     f"Year {transition['year']}, Month {transition['month']}."
                 )
 
-        if turn_result["continuity_state"] is not None:
-            continuity_state = turn_result["continuity_state"]
-            print("\n--- Continuity ---")
-            print("  - The universe continues.")
-            if continuity_state["had_continuity_candidates"]:
-                print("  - Connected continuation candidates:")
-                for candidate in continuity_state["continuity_candidates"]:
-                    print(
-                        f"    - {candidate['full_name']} "
-                        f"[{candidate['link_type']}/{candidate['link_role']}]"
-                    )
-            else:
-                print("  - No living connected continuation candidates were found.")
-        print("--------------------")
+        if turn_result["continuity_state"] is not None and not turn_result["advancement_blocked"]:
+            render_continuity_state(turn_result["continuity_state"])
+
+        if turn_result["advancement_blocked"]:
+            if not resolve_dead_focus(world):
+                return
 
 
 def start_game():

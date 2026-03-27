@@ -1,5 +1,14 @@
 # Actora Changelog
 
+## Version 0.30.0 (Minor) - 2026-03-27
+- **Continuation Handoff Flow / Continuity Link Refinement:**
+    - Tightened continuity candidate data in `world.py` so candidates now carry deterministic display-ready fields including `relationship_label`, `structural_status`, and `is_alive`.
+    - Made continuity candidate ordering deterministic instead of relying on incidental link iteration order.
+    - Added world-owned continuation handoff validation through `World.handoff_focus_to_continuation(...)`, which only accepts living existing actors that are valid current continuity candidates for the dead focused actor.
+    - Hardened `World.simulate_advance_turn(...)` so ordinary advancement no longer proceeds as if nothing happened when the focused actor is already dead; it now returns a blocked turn result with continuity state instead of advancing time or faking normal play.
+    - Updated `main.py` to render dead-focus continuity state clearly, show deterministic numbered continuation options, allow successor selection, switch focus cleanly inside the same world state, and end the run cleanly when no valid continuation candidates exist.
+    - Preserved startup flow, character creation flow, living focused-actor month advancement behavior, current event generation flow, current event record-writing flow, world-owned stores, and the absence of automatic mortality, archive, inheritance, or lineage systems.
+
 ## Version 0.28.0 (Minor) - 2026-03-27
 - **Death / Continuity Structural Transition Foundation:**
     - Added narrow structural actor-state storage in `human.py` through `structural_status`, `death_year`, `death_month`, and `death_reason`.
