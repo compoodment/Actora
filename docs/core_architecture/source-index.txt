@@ -1,12 +1,12 @@
-CompLife Source Index v9
+Actora Source Index v9
 
 Purpose
 
-This document explains the role of each CompLife document, how the source system
+This document explains the role of each Actora document, how the source system
 should be used, and which layer of documentation should answer which kind of
 question.
 
-This file is the navigation layer for the CompLife document system.
+This file is the navigation layer for the Actora document system.
 
 It should help answer:
 - which document to check first
@@ -20,12 +20,12 @@ It should help answer:
 
 Core document model
 
-CompLife uses a four-layer documentation model, plus this Source Index as the
+Actora uses a four-layer documentation model, plus this Source Index as the
 navigation and precedence guide.
 
 Layer 1 — Core architecture and workflow anchors
-These are the most durable documents. They define what CompLife is and how
-CompLife work is done.
+These are the most durable documents. They define what Actora is and how
+Actora work is done.
 
 Layer 2 — Structural direction
 This defines dependency order and what must come before what.
@@ -70,13 +70,13 @@ When either side changes meaningfully, update the correct layer deliberately.
 
 Layer 1 — Core architecture and workflow anchors
 
-1. CompLife Master Context
+1. Actora Master Context
 
 Role
-The durable identity and architecture anchor for CompLife.
+The durable identity and architecture anchor for Actora.
 
 Use it for:
-- what CompLife fundamentally is
+- what Actora fundamentally is
 - long-term architecture direction
 - major project truths that should carry across chats
 - baseline conceptual framing
@@ -97,7 +97,7 @@ High stability.
 Only revise when project identity or core architecture truly changes.
 
 
-2. CompLife Operator Guide
+2. Actora Operator Guide
 
 Role
 The workflow and execution discipline anchor.
@@ -133,7 +133,7 @@ Revise when the working method or guardrails genuinely change.
 
 Layer 2 — Structural direction
 
-3. CompLife Roadmap
+3. Actora Roadmap
 
 Role
 The sequencing and dependency-order anchor.
@@ -171,7 +171,7 @@ discussion, not in the roadmap text itself.
 
 Layer 3 — Flexible working layer
 
-4. CompLife Working Ideas Register
+4. Actora Working Ideas Register
 
 Role
 The flexible intake, filtering, parking, and staging document for ideas.
@@ -261,7 +261,7 @@ Stable as history, but updated whenever verified implementation changes are
 committed or repo docs are deliberately revised.
 
 
-7. CompLife Source Index
+7. Actora Source Index
 
 Role
 The navigation and precedence guide for the whole document system.
@@ -403,18 +403,18 @@ bureaucracy about which documents are open.
 Current document set
 
 Core architecture/workflow anchors
-- CompLife Master Context
-- CompLife Operator Guide
+- Actora Master Context
+- Actora Operator Guide
 
 Structural direction
-- CompLife Roadmap
+- Actora Roadmap
 
 Flexible working layer
-- CompLife Working Ideas Register
+- Actora Working Ideas Register
 - Actionable Ideas Summary
 
 Navigation layer
-- CompLife Source Index
+- Actora Source Index
 
 Implementation history / repo truth
 - repo documentation
@@ -462,8 +462,8 @@ Use Operator Guide for reminders about:
 
 Compact rule set
 
-- Master Context = what CompLife is
-- Operator Guide = how CompLife work is done
+- Master Context = what Actora is
+- Operator Guide = how Actora work is done
 - Roadmap = dependency order
 - Working Ideas Register = where active ideas live
 - Actionable Ideas Summary = temporary planning snapshot

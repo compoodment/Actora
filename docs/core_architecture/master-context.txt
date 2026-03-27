@@ -1,10 +1,10 @@
-CompLife Master Context v9
+Actora Master Context v9
 
 Purpose
 
-This document is the durable identity and architecture anchor for CompLife.
+This document is the durable identity and architecture anchor for Actora.
 
-It defines what CompLife fundamentally is, what the project is trying to become, and which approved architectural truths should guide future planning, review, and implementation.
+It defines what Actora fundamentally is, what the project is trying to become, and which approved architectural truths should guide future planning, review, and implementation.
 
 This is a stable source document.
 It should stay focused on durable truth rather than temporary brainstorming or patch-level chatter.
@@ -12,7 +12,7 @@ It should stay focused on durable truth rather than temporary brainstorming or p
 
 1. Project identity
 
-CompLife is an actor-anchored simulation framework built inside the broader Compverse direction.
+Actora is an actor-anchored simulation framework built inside the broader Compverse direction.
 
 It is not just a narrow human life simulator, and it is not just a detached world-management sandbox.
 It is a continuous universe simulation designed to support focused actor play inside a larger world and universe-scale model.
@@ -20,7 +20,7 @@ It is a continuous universe simulation designed to support focused actor play in
 Early implementations may remain grounded, simplified, and example-driven.
 However, the architecture should be built to support the broader future product rather than forcing the project to escape a narrow prototype later.
 
-CompLife should be understood as:
+Actora should be understood as:
 - actor-anchored
 - player-centered through the current focused actor
 - universe-scale in architectural direction
@@ -34,7 +34,7 @@ The player primarily experiences the simulation through a current actor, but tha
 
 2. Core framing
 
-CompLife is centered on the idea that a player primarily lives through a current actor within a much larger simulation container.
+Actora is centered on the idea that a player primarily lives through a current actor within a much larger simulation container.
 
 The current actor matters.
 Their history matters.
@@ -93,7 +93,7 @@ The universe persists beyond one life, one line, or one moment of play focus.
 
 4. Core conceptual skeleton
 
-The approved main conceptual skeleton for CompLife is:
+The approved main conceptual skeleton for Actora is:
 
 - Universe
 - Entity
@@ -172,7 +172,7 @@ This is not a full ontology. It is a baseline orientation to prevent different s
 
 5. Actor-centered but not human-first
 
-CompLife should not be framed as human-first in architecture.
+Actora should not be framed as human-first in architecture.
 
 Human-focused early examples or demo content are acceptable.
 Human-only current implementation truth may also be acceptable at specific phases.
@@ -193,7 +193,7 @@ The architecture should remain safe for broader actor types even when early cont
 
 Layered simulation depth is a hard principle.
 
-CompLife should not assume that every actor, entity, or system must be simulated at the same level of detail.
+Actora should not assume that every actor, entity, or system must be simulated at the same level of detail.
 
 The long-term model should support at least the idea of:
 - higher-detail simulation for the currently focused or directly relevant actor layer
@@ -202,7 +202,7 @@ The long-term model should support at least the idea of:
 
 This is necessary for feasibility, scale, and coherence.
 
-CompLife should pursue believable and internally coherent simulation, not brute-force total-detail realism.
+Actora should pursue believable and internally coherent simulation, not brute-force total-detail realism.
 The project should avoid architectural choices that assume universal full-detail simulation for everything.
 
 
@@ -244,7 +244,7 @@ Protected long-term hierarchy direction includes:
 This does not mean all such layers must be implemented early.
 It means the architecture must not casually trap the project in a single-planet, single-country, or purely local location model.
 
-CompLife should preserve the ability for universe simulation to operate across multiple spatial scales and contexts.
+Actora should preserve the ability for universe simulation to operate across multiple spatial scales and contexts.
 
 
 9. Ownership, residence, and location separation
@@ -266,7 +266,7 @@ Inventory, ownership, and property are protected future architecture concerns ev
 
 10. Records, links, and history
 
-CompLife must treat history as structurally important.
+Actora must treat history as structurally important.
 
 Records should not be reduced to disposable UI text.
 Important changes, transitions, and simulation-relevant history should be able to exist as preserved records.
@@ -295,7 +295,7 @@ History should also be allowed to exist at multiple scopes later, such as:
 
 11. Major structural transitions
 
-CompLife should treat major actor transitions as structural transitions, not throwaway flavor.
+Actora should treat major actor transitions as structural transitions, not throwaway flavor.
 
 This includes long-term support for transitions such as:
 - birth
@@ -341,7 +341,7 @@ Context also means that different kinds of actors may not share the same exact m
 
 13. Multiple future interaction styles
 
-CompLife should remain compatible with multiple future interaction styles within one continuous simulation.
+Actora should remain compatible with multiple future interaction styles within one continuous simulation.
 
 Protected future possibilities include:
 - direct actor play
@@ -355,7 +355,7 @@ Protected future possibilities include:
 
 The simulation core should not be built in a way that requires a rewrite for each future interaction style.
 
-CompLife should preserve the ability to support different presentation, focus, and control styles over time without assuming that actor play, broader observation, and larger-scope interaction must become hard-separated boxed modes or separate games.
+Actora should preserve the ability to support different presentation, focus, and control styles over time without assuming that actor play, broader observation, and larger-scope interaction must become hard-separated boxed modes or separate games.
 
 
 14. Presentation direction
@@ -366,7 +366,7 @@ That is a practical implementation choice, not the final intended presentation.
 The core simulation should remain UI-agnostic.
 The terminal should be treated as a temporary shell rather than the permanent form of the product.
 
-CompLife should remain compatible with future presentation forms such as:
+Actora should remain compatible with future presentation forms such as:
 - text-first interaction
 - panel-based UI
 - visual actor/world views
@@ -379,7 +379,7 @@ The architecture should not hard-code presentation restrictions into the simulat
 
 15. Feasible simulation over brute-force realism
 
-CompLife should aim for simulation that is:
+Actora should aim for simulation that is:
 - coherent
 - believable
 - layered
@@ -404,7 +404,7 @@ over:
 
 16. Stable baseline summary
 
-CompLife is an actor-anchored simulation within a layered, continuous, universe-scale framework.
+Actora is an actor-anchored simulation within a layered, continuous, universe-scale framework.
 
 Its stable architecture should protect for:
 - a universe-based save model
@@ -436,7 +436,7 @@ This document should not become:
 
 18. Controlled State Mutation and Simulation Boundaries
 
-CompLife should avoid broad, scattered direct mutation of actor and world state across many subsystems.
+Actora should avoid broad, scattered direct mutation of actor and world state across many subsystems.
 
 Core rule
 - subsystems should prefer producing structured outcomes over performing broad direct state mutation
@@ -453,13 +453,13 @@ Universe simulation step boundary
 - only the Universe simulation step may advance simulation time, apply authoritative shared state mutation, create structural records, and finalize system effects
 
 Direction of travel
-- as CompLife grows, state mutation should become increasingly centralized by domain
+- as Actora grows, state mutation should become increasingly centralized by domain
 - stats should move toward controlled stat-application paths
 - relationships should move toward controlled link or relationship mutation paths
 - record creation should move toward controlled record-writing paths
 - money and other resource-like values should move toward controlled domain application rather than scattered edits
 
-This does not mean CompLife should build a giant mutation engine immediately.
+This does not mean Actora should build a giant mutation engine immediately.
 It means future foundations should be shaped so that:
 - systems return structured outcomes cleanly
 - hidden side effects are reduced
@@ -471,7 +471,7 @@ Anti-pattern to avoid
 
 Connection to existing architecture philosophy
 - this reinforces output contracts over direct printing
-- it matches the broader CompLife preference for structured representations over loose, ambiguous state handling
+- it matches the broader Actora preference for structured representations over loose, ambiguous state handling
 - it supports layered simulation depth by making system interaction more legible and less chaotic
 
 It should stay focused on durable identity and architecture truth.

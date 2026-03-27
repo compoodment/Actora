@@ -1,9 +1,9 @@
-# CompLife Architecture Summary
+# Actora Architecture Summary
 
 **Version:** 0.28.0
 **Last Updated:** 2026-03-27
 
-This document summarizes the currently implemented structure and behavior of the CompLife repository.
+This document summarizes the currently implemented structure and behavior of the Actora repository.
 It is intended to support safe patching, review, and manual verification.
 
 ## 1. Stack
@@ -334,7 +334,7 @@ Current event boundary truth:
 
 ### `banners.py`
 Responsible for:
-- `COMPLIFE_TITLE_BANNER`
+- `ACTORA_TITLE_BANNER`
 - `TIME_ADVANCED_BANNER`
 - `QUIT_BANNER`
 

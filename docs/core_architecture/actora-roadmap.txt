@@ -1,12 +1,12 @@
-CompLife Roadmap v10
+Actora Roadmap v10
 
 1. Roadmap framing
 
-CompLife is an actor-anchored, continuous universe simulation being built foundation-first inside the broader Compverse direction.
+Actora is an actor-anchored, continuous universe simulation being built foundation-first inside the broader Compverse direction.
 
 The prototype may remain simple, terminal-first, and example-driven for now, but the roadmap should follow the architecture of the intended product rather than hard-baking a narrow prototype shape that must later be escaped.
 
-CompLife is not only a grounded life simulator and not only a detached world-management sandbox.
+Actora is not only a grounded life simulator and not only a detached world-management sandbox.
 It is a layered simulation framework intended to support focused actor play inside a larger world and universe-scale model, while remaining compatible with broader same-save scope shifting over time.
 
 The roadmap is organized around four principles:
@@ -23,7 +23,7 @@ Early implementation should avoid assumptions that would block later growth, con
 4. Current truth over hype
 The project should not pretend future ideas are already implemented, and should not let temporary presentation convenience define the architecture.
 
-This roadmap is not trying to turn CompLife into a pile of disconnected sub-games.
+This roadmap is not trying to turn Actora into a pile of disconnected sub-games.
 It exists to preserve a coherent path toward one continuous simulation where actor life remains the emotional anchor even as broader scope becomes relevant.
 
 
@@ -86,12 +86,12 @@ Minor and patch-level cleanup versions may occur between larger roadmap layers w
 Not every cleanup version requires a roadmap revision.
 
 The roadmap should be read in light of the approved product identity:
-CompLife is one continuing simulation, not a pile of disconnected actor, world, and macro systems stitched together after the fact.
+Actora is one continuing simulation, not a pile of disconnected actor, world, and macro systems stitched together after the fact.
 
 
 4. Backbone sequence
 
-The backbone sequence is the durable dependency ladder for CompLife.
+The backbone sequence is the durable dependency ladder for Actora.
 Earlier layers may already exist in the repo. Later layers may still be pending.
 That does not change the order.
 
@@ -114,7 +114,7 @@ Purpose
 Return structured outcomes from simulation work instead of embedding presentation logic into lower-level systems.
 
 Why it belongs early
-CompLife should be able to render results differently across terminal and future interfaces without changing simulation truth.
+Actora should be able to render results differently across terminal and future interfaces without changing simulation truth.
 
 Should protect
 - structured result shapes
@@ -170,7 +170,7 @@ Purpose
 Expand from a narrow relationship foundation into a broader link model capable of supporting non-family and nontrivial structural connections.
 
 Why it belongs here
-A lot of future simulation depends on links between things rather than isolated object attributes. CompLife is actor-anchored, but not actor-isolated. A stronger link layer should exist before deeper household, property, organizational, and social systems are attempted.
+A lot of future simulation depends on links between things rather than isolated object attributes. Actora is actor-anchored, but not actor-isolated. A stronger link layer should exist before deeper household, property, organizational, and social systems are attempted.
 
 Depends on
 - event foundation
@@ -306,7 +306,7 @@ Work / Role Foundation
 Add jobs, roles, income, and work-state logic only after education/training or equivalent readiness rules can exist cleanly.
 
 Economic / Market / Organization Foundation
-Add firms, organizations, markets, investment structures, and broader economic interaction only after work/role, links, records, place, and state-mutation foundations are strong enough to support them without fake spreadsheet theater. Economy is a real future pillar of CompLife, but it should not be smuggled in before its structural prerequisites exist.
+Add firms, organizations, markets, investment structures, and broader economic interaction only after work/role, links, records, place, and state-mutation foundations are strong enough to support them without fake spreadsheet theater. Economy is a real future pillar of Actora, but it should not be smuggled in before its structural prerequisites exist.
 
 Health / Condition Foundation
 Add health and illness as real systems only after lifecycle derivation, events, links, and controlled state change are strong enough to carry them.
@@ -356,7 +356,7 @@ Third: clean up the actor model
 Before links, places, and domain systems start depending on actor state, the actor model internals should use proper data structures with validated access rather than fragile string-based patterns.
 
 Fourth: strengthen links between things
-CompLife is actor-anchored, but future realism depends heavily on structured links such as family, ownership, residence, organization, obligation, and other connections. A stronger link foundation should exist before deeper downstream systems.
+Actora is actor-anchored, but future realism depends heavily on structured links such as family, ownership, residence, organization, obligation, and other connections. A stronger link foundation should exist before deeper downstream systems.
 
 Fifth: make place real, then separate spatial identity
 Once places exist as data, the project must distinguish being somewhere, residing somewhere, owning somewhere, politically belonging somewhere, and temporarily occupying somewhere before deeper travel, property, or politics are added.
@@ -367,7 +367,7 @@ When several foundational systems exist together, the project needs a cleaner wa
 Seventh: expand into domain systems
 Only after the above foundations are sufficiently established should the project add education, work, economy, health, property, travel, political/world systems, social perception systems, and later exceptional cross-context mechanics.
 
-CompLife is intended to support broader same-save scope shifting over time, but that should not be used as an excuse to build macro systems before their prerequisites exist.
+Actora is intended to support broader same-save scope shifting over time, but that should not be used as an excuse to build macro systems before their prerequisites exist.
 The correct path is still: foundation first, then domain layers, then larger-scope richness.
 
 Foundation being “sufficiently established” should not be treated as “frozen forever.”
@@ -516,7 +516,7 @@ The roadmap preserves these as later possibilities without allowing them to dist
 
 9. How to use this roadmap
 
-Use this roadmap as the sequencing anchor for CompLife.
+Use this roadmap as the sequencing anchor for Actora.
 
 It should answer:
 - what comes next structurally

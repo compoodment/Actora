@@ -8,7 +8,7 @@ The Lifecycle System handles the derivation of actor lifecycle states, including
 ## Development Goals
 
 1. **Dependency-Safe Development**
-   - Preserve alignment with the CompLife roadmap’s dependency order.
+   - Preserve alignment with the Actora roadmap’s dependency order.
    - Avoid introducing lifecycle details ahead of their prerequisite systems (e.g., external events or unprocessed actor links).
 
 2. **Controlled Mutations**

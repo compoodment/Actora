@@ -1,8 +1,8 @@
-CompLife Operator Guide v6
+Actora Operator Guide v6
 
 Purpose
 
-This document defines the working method, workflow roles, patch discipline, review rules, and verification expectations for CompLife.
+This document defines the working method, workflow roles, patch discipline, review rules, and verification expectations for Actora.
 
 It is the workflow anchor for the project.
 It does not define the main project identity or milestone sequencing by itself.
@@ -17,7 +17,7 @@ This document should be used whenever work is being proposed, reviewed, patched,
 
 1. Core workflow
 
-CompLife work should follow this order:
+Actora work should follow this order:
 
 source alignment -> spec -> OpenClaw draft/build/show -> review -> approve -> apply -> VPS verification -> documentation update -> commit/tag if appropriate
 
@@ -25,9 +25,9 @@ This order exists to protect the project from scope drift, silent regressions, f
 
 1.1 Workflow roles
 
-ChatGPT is the planning, specification, synthesis, review, and source-alignment partner. It holds project context through the source documents loaded in the CompLife project space and drives milestone shaping, guardrails, rewrite-risk spotting, patch review, and source-doc alignment.
+ChatGPT is the planning, specification, synthesis, review, and source-alignment partner. It holds project context through the source documents loaded in the Actora project space and drives milestone shaping, guardrails, rewrite-risk spotting, patch review, and source-doc alignment.
 
-OpenClaw is the primary automated patch worker for CompLife code changes and repo-document edits. It should receive repo-grounded implementation prompts only. Do not load OpenClaw prompts with unnecessary chat drift, vague philosophy, or source-doc lore unless that information directly affects the patch.
+OpenClaw is the primary automated patch worker for Actora code changes and repo-document edits. It should receive repo-grounded implementation prompts only. Do not load OpenClaw prompts with unnecessary chat drift, vague philosophy, or source-doc lore unless that information directly affects the patch.
 
 The user remains the final decision-maker and middleman. The user reviews outputs, chooses what gets applied, committed, tagged, deferred, or discarded, and relays material between tools when needed.
 
@@ -39,7 +39,7 @@ The VPS is the final reality check for:
 
 1.2 Standard implementation path
 
-CompLife uses one standard automated implementation path:
+Actora uses one standard automated implementation path:
 
 scoped OpenClaw task -> build/show or patch output -> review -> explicit approval -> apply -> pull/check on VPS if relevant -> compile/runtime verification -> documentation update -> commit/tag if appropriate
 
@@ -89,7 +89,7 @@ This workflow avoids silent drift and error-prone piecemeal edits.
 
 2. Source-first working method
 
-CompLife should be worked on through the source system rather than through drifting chat assumptions.
+Actora should be worked on through the source system rather than through drifting chat assumptions.
 
 Use source documents in this priority order:
 	1.	Master Context
@@ -174,7 +174,7 @@ If the requested change risks regression, stop and report the conflict instead o
 
 5. Scope discipline
 
-CompLife should remain foundation-first.
+Actora should remain foundation-first.
 
 Do not:
 	•	broaden a patch just because related ideas are tempting
@@ -271,7 +271,7 @@ A change should not be treated as fully verified until VPS truth matches the cla
 
 9. Documentation discipline
 
-CompLife uses separate documentation layers.
+Actora uses separate documentation layers.
 Do not collapse them into one blob.
 
 Stable source docs should remain durable and relatively compact.
@@ -321,7 +321,7 @@ Do not revise stable docs just because:
 	•	a temporary discussion happened
 	•	a patch landed that only changed implementation history
 
-CompLife should periodically check whether stable docs still match the evolving approved baseline before major rewrites or milestone planning.
+Actora should periodically check whether stable docs still match the evolving approved baseline before major rewrites or milestone planning.
 
 ⸻
 
@@ -356,7 +356,7 @@ Do not treat “tool said done” as a release condition.
 
 12. Naming and architecture caution
 
-CompLife should not let temporary implementation naming harden into permanent architecture truth.
+Actora should not let temporary implementation naming harden into permanent architecture truth.
 
 Current implementation may sometimes remain narrower than the long-term baseline, but review work should check for:
 	•	misleading human-only assumptions
@@ -447,7 +447,7 @@ Do not claim broad completion beyond the approved scope.
 
 17. Final discipline rule
 
-CompLife should be worked on with:
+Actora should be worked on with:
 	•	source alignment
 	•	explicit scope control
 	•	preserved validated behavior

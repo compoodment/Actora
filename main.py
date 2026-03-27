@@ -2,13 +2,13 @@ import random
 from uuid import uuid4
 
 from world import World
-from banners import COMPLIFE_TITLE_BANNER, TIME_ADVANCED_BANNER, QUIT_BANNER
+from banners import ACTORA_TITLE_BANNER, TIME_ADVANCED_BANNER, QUIT_BANNER
 from identity import prepare_parent_identity_context, generate_parent_identity_from_context
 
 EVENT_DETAIL_THRESHOLD = 8
 EVENT_RECENT_DISPLAY_LIMIT = 5
 
-INPUT_INTERRUPTED_MESSAGE = "Input interrupted. Exiting CompLife."
+INPUT_INTERRUPTED_MESSAGE = "Input interrupted. Exiting Actora."
 
 
 def generate_startup_actor_id(role):
@@ -276,7 +276,7 @@ def game_loop(world, player_id, player):
 
 
 def start_game():
-    print(COMPLIFE_TITLE_BANNER)
+    print(ACTORA_TITLE_BANNER)
 
     player_first_name, player_last_name, player_sex, player_gender = create_character()
     world, player_id, player = setup_initial_world(player_first_name, player_last_name, player_sex, player_gender)

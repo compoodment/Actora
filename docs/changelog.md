@@ -1,4 +1,4 @@
-# CompLife Changelog
+# Actora Changelog
 
 ## Version 0.28.0 (Minor) - 2026-03-27
 - **Death / Continuity Structural Transition Foundation:**

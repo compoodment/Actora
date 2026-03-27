@@ -1,6 +1,6 @@
-# CompLife Docs
+# Actora Docs
 
-This `docs/` directory now separates **source truth**, **planning**, and **repo truth** so the project does not turn into one giant markdown landfill.
+This `docs/` directory separates stable source truth, flexible planning, workflow rules, and repo-local implementation truth so the project does not collapse into one giant markdown swamp.
 
 ## Structure
 
@@ -9,15 +9,15 @@ Stable source documents.
 Use these first when the question is about durable project truth.
 
 Files:
-- `master-context.txt` — what CompLife is
-- `comp_life-roadmap.txt` — dependency order and what should come before what
+- `master-context.txt` — what Actora is
+- `actora-roadmap.txt` — dependency order and what should come before what
 - `source-index.txt` — how the document system works
 
 ### `workflow/`
 Workflow and execution discipline.
 
 Files:
-- `operator-guide.txt` — how CompLife work should be done
+- `operator-guide.txt` — how Actora work should be done
 
 ### `planning/`
 Flexible working layer.
@@ -49,7 +49,7 @@ Files:
 
 - Architecture question -> `master-context.txt`
 - Workflow / review / patch-discipline question -> `operator-guide.txt`
-- "What should come next?" -> `comp_life-roadmap.txt` + planning docs
+- "What should come next?" -> `actora-roadmap.txt` + planning docs
 - "Where does this idea belong?" -> `source-index.txt`
 - "What changed in code?" -> repo docs + codebase + git
 

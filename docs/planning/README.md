@@ -1,6 +1,6 @@
 # Planning
 
-Flexible working layer for CompLife.
+Flexible working layer for Actora.
 
 Use this folder for:
 - active idea intake

@@ -1,6 +1,6 @@
 # Workflow
 
-Workflow and execution-discipline documents for CompLife.
+Workflow and execution-discipline documents for Actora.
 
 Use this folder for:
 - patch discipline

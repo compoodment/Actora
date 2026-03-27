@@ -1,7 +1,7 @@
-CompLife Working Ideas Register v33
+Actora Working Ideas Register v33
 
 Date: 2026-03-27
-Role: flexible idea intake, staging, parking, and rewrite-pressure tracking for CompLife
+Role: flexible idea intake, staging, parking, and rewrite-pressure tracking for Actora
 Authority level: flexible working layer, not durable architecture truth
 Interpretation rule: stable source docs win over this file; verified repo truth wins on what is already implemented
 
@@ -48,7 +48,7 @@ But the strongest recent small correctness seam is no longer waiting in the queu
 
 The active near-term read is therefore:
 - the major recent backbone clarifications are now in a substantially better place
-- the source stack is now materially more aligned on what CompLife is supposed to be
+- the source stack is now materially more aligned on what Actora is supposed to be
 - there is still no single screamingly obvious structural patch of the same caliber as v0.24.0
 - current remaining near-term pressures are now mostly next-step selection, future guardrails, and later-candidate discipline
 - a deliberate planning checkpoint remains more honest than pretending another tiny patch is obviously next
@@ -77,7 +77,7 @@ Status: Active anti-drift planning pressure
 Priority: P1
 Roadmap fit: identity protection / anti-drift guardrail
 Immediate roadmap-layer fit: yes, as preserved wording and alignment guardrail rather than a fresh doc-crisis trigger
-Summary: The project now has a much sharper read of what CompLife is supposed to feel like: one continuous universe simulation, primarily lived through the current actor, with same-save zoom across actor/city/country/world/star-system/galaxy/universe scope, full custom sandbox setup by default, and continuity through connected actors rather than hard fail-state philosophy.
+Summary: The project now has a much sharper read of what Actora is supposed to feel like: one continuous universe simulation, primarily lived through the current actor, with same-save zoom across actor/city/country/world/star-system/galaxy/universe scope, full custom sandbox setup by default, and continuity through connected actors rather than hard fail-state philosophy.
 Why it matters: This wording is important enough that losing it would cause future drift, but it no longer means the stable docs are still missing the basic identity sync. The wording now serves mainly as anti-drift protection and a planning reference point.
 Dependencies: stable baseline, roadmap sequencing, clarified design pass conclusions, Master Context v9, Roadmap v10
 Risks: reopening the same clarification loop forever instead of using the aligned docs to make real next-step choices
@@ -92,7 +92,7 @@ Status: Active later-layer design pressure
 Priority: P2
 Roadmap fit: later social/context layer after stronger foundations
 Immediate roadmap-layer fit: no immediate promotion to implementation
-Summary: CompLife should eventually support a multi-axis social perception system rather than a dumb single karma meter. Reputation/perception should exist at actor, group, local/public, and later wider institutional scopes; should depend on discovery, rumor, proof, and misinformation; and should materially shape opportunities, trust, recruitment, social access, and barriers.
+Summary: Actora should eventually support a multi-axis social perception system rather than a dumb single karma meter. Reputation/perception should exist at actor, group, local/public, and later wider institutional scopes; should depend on discovery, rumor, proof, and misinformation; and should materially shape opportunities, trust, recruitment, social access, and barriers.
 Why it matters: This is part of the real intended experience and should not be lost under vague “social stuff later” wording.
 Dependencies: stronger actor/context/social foundations, record/link maturity, later opportunity-generation systems
 Risks: collapsing it into one fake moral score, promoting it too early into foundation work, or forgetting it entirely until the game has already hardened around weaker assumptions
@@ -163,7 +163,7 @@ Next action: retain as a guardrail for future link/family expansion
 
 === CLARIFIED DESIGN READ (PRESERVED WORDING LAYER) ===
 
-CompLife is a single continuous universe simulation where the player primarily lives as the current actor, but can zoom across scopes, continue through connected lives, and interact with real economic, political, spatial, and later social systems inside the same save.
+Actora is a single continuous universe simulation where the player primarily lives as the current actor, but can zoom across scopes, continue through connected lives, and interact with real economic, political, spatial, and later social systems inside the same save.
 
 Core clarified points:
 - one save = one universe simulation
@@ -186,7 +186,7 @@ Core clarified points:
 - later social systems should use multiple perception axes rather than a dumb single karma meter
 
 Anti-drift read:
-CompLife should not quietly collapse back into “deeper BitLife,” “detached god sim,” “spreadsheet world sim with humans taped on,” or vague universe-scale handwaving. The intended shape is actor-anchored, zoomable, continuous, and simulation-real.
+Actora should not quietly collapse back into “deeper BitLife,” “detached god sim,” “spreadsheet world sim with humans taped on,” or vague universe-scale handwaving. The intended shape is actor-anchored, zoomable, continuous, and simulation-real.
 
 
 === COMPLETED / MOVED-OUT PRESSURES ===
@@ -264,7 +264,7 @@ Next action: do not promote on its own
 
 === NEXT BEST USE ===
 
-1. Use IDEA-102 and the preserved clarified-design section to keep future sessions aligned on what CompLife is actually supposed to be.
+1. Use IDEA-102 and the preserved clarified-design section to keep future sessions aligned on what Actora is actually supposed to be.
 2. Choose the next real implementation/planning target from the aligned source stack instead of reopening the same doc loop.
 3. Keep IDEA-103 visible as a later layer, not an immediate patch title.
 4. Do not force an implementation patch until the next target actually earns its place.

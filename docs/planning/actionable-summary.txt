@@ -1,12 +1,12 @@
 Actionable Ideas Summary — Rev21
 Date: 2026-03-27
-Role: temporary near-term planning snapshot for CompLife
+Role: temporary near-term planning snapshot for Actora
 Authority: non-authoritative; stable docs win, repo truth wins on implementation
 
 
 === CURRENT WORKING POSITION ===
 
-CompLife now has a materially stronger early backbone, and verified repo truth is through v0.27.0, with source-stack sync carried through:
+Actora now has a materially stronger early backbone, and verified repo truth is through v0.27.0, with source-stack sync carried through:
 - Master Context v9
 - Roadmap v10
 - planning clarification preserved in WIR v32
@@ -36,7 +36,7 @@ CompLife now has a materially stronger early backbone, and verified repo truth i
 
 === CURRENT CLARIFIED DESIGN READ ===
 
-CompLife is now more clearly understood as:
+Actora is now more clearly understood as:
 - one continuous universe simulation per save
 - primarily actor-played rather than detached-overseer-first
 - full custom sandbox setup by default, followed by emergent simulation
@@ -53,7 +53,7 @@ CompLife is now more clearly understood as:
 - social perception as a later but important multi-axis layer rather than a dumb single karma score
 
 Cleanest one-line read:
-CompLife is a single continuous universe simulation where the player primarily lives as the current actor, but can zoom across scopes, continue through connected lives, and interact with real economic, political, spatial, and later social systems inside the same save.
+Actora is a single continuous universe simulation where the player primarily lives as the current actor, but can zoom across scopes, continue through connected lives, and interact with real economic, political, spatial, and later social systems inside the same save.
 
 
 === CURRENT PLANNING READ ===
@@ -187,4 +187,4 @@ Use:
 
 === ONE-LINE SUMMARY ===
 
-The source stack is now aligned enough that the honest next move is to stop polishing the docs and return to choosing the next real implementation/planning target from the clarified CompLife vision.
+The source stack is now aligned enough that the honest next move is to stop polishing the docs and return to choosing the next real implementation/planning target from the clarified Actora vision.
