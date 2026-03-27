@@ -1,8 +1,8 @@
-Actora Operator Guide v6
+Actora Operator Guide v7
 
 Purpose
 
-This document defines the working method, workflow roles, patch discipline, review rules, and verification expectations for Actora.
+This document defines the working method, workflow roles, patch discipline, review rules, verification expectations, and tool-selection rules for Actora.
 
 It is the workflow anchor for the project.
 It does not define the main project identity or milestone sequencing by itself.
@@ -11,7 +11,7 @@ Those belong to the Master Context and Roadmap.
 It also does not replace repo-local implementation history.
 Repo docs and changelog track what was actually changed in code.
 
-This document should be used whenever work is being proposed, reviewed, patched, applied, verified, committed, or documented.
+This document should be used whenever work is being proposed, reviewed, patched, applied, verified, committed, tagged, or documented.
 
 ⸻
 
@@ -19,15 +19,19 @@ This document should be used whenever work is being proposed, reviewed, patched,
 
 Actora work should follow this order:
 
-source alignment -> spec -> OpenClaw draft/build/show -> review -> approve -> apply -> VPS verification -> documentation update -> commit/tag if appropriate
+source alignment -> spec -> execution-path selection -> draft/build/show when appropriate -> review -> approve -> apply -> VPS verification -> documentation update -> commit/tag if appropriate
 
 This order exists to protect the project from scope drift, silent regressions, false completion claims, and tool-driven confusion.
 
 1.1 Workflow roles
 
-ChatGPT is the planning, specification, synthesis, review, and source-alignment partner. It holds project context through the source documents loaded in the Actora project space and drives milestone shaping, guardrails, rewrite-risk spotting, patch review, and source-doc alignment.
+The assistant operating through OpenClaw is the planning, specification, synthesis, review, and source-alignment partner. It holds project context through the source documents loaded in the Actora project space and drives milestone shaping, guardrails, rewrite-risk spotting, patch review, workflow choice, and source-doc alignment.
 
-OpenClaw is the primary automated patch worker for Actora code changes and repo-document edits. It should receive repo-grounded implementation prompts only. Do not load OpenClaw prompts with unnecessary chat drift, vague philosophy, or source-doc lore unless that information directly affects the patch.
+Codex CLI is the default heavy implementation worker for Actora when the task is a real coding task rather than a tiny surgical fix. It is appropriate for multi-file feature work, refactors, larger implementation passes, and repository exploration that would otherwise waste chat tokens on repetitive patch labor.
+
+OpenClaw remains a valid implementation worker for repo work when its workflow is the better fit for the task, especially for controlled patch/show cycles, repo-document work, or cases where the operator intentionally chooses it.
+
+Direct manual edits remain appropriate for tiny, low-risk, clearly bounded fixes where spawning an automated coding worker would add more friction than value.
 
 The user remains the final decision-maker and middleman. The user reviews outputs, chooses what gets applied, committed, tagged, deferred, or discarded, and relays material between tools when needed.
 
@@ -36,12 +40,20 @@ The VPS is the final reality check for:
 	•	compile truth
 	•	runtime truth
 	•	git truth
+	•	actual tool-auth / environment truth
 
-1.2 Standard implementation path
+1.2 Standard implementation paths
 
-Actora uses one standard automated implementation path:
+Actora has three normal implementation paths:
 
-scoped OpenClaw task -> build/show or patch output -> review -> explicit approval -> apply -> pull/check on VPS if relevant -> compile/runtime verification -> documentation update -> commit/tag if appropriate
+A. Direct edit path
+scoped tiny fix -> edit -> verify -> docs update if needed -> commit if appropriate
+
+B. Codex path
+scoped Codex task -> Codex implementation pass -> review -> explicit approval if needed -> verify on VPS -> docs update -> commit/tag if appropriate
+
+C. OpenClaw path
+scoped OpenClaw task -> build/show or patch output -> review -> explicit approval -> apply -> verify on VPS -> docs update -> commit/tag if appropriate
 
 Important rule:
 not every issue mentioned in the moment should be treated as an immediate fix request.
@@ -53,7 +65,28 @@ A discussed issue may be:
 	•	Working Ideas Register material
 	•	simply a note
 
-1.3 OpenClaw workflow rules
+1.3 Execution-path selection rule
+
+Use the lightest path that still fits the job.
+
+Default selection rule for Actora:
+	•	tiny surgical fix -> direct edit is allowed
+	•	real feature, refactor, or multi-file coding task -> default to Codex CLI
+	•	repo-doc workflow, controlled patch/show flow, or explicitly chosen OpenClaw task -> use OpenClaw
+
+Do not spawn Codex just to change one obvious string, one tiny conditional, one import, or one comment block.
+Do not keep hand-editing a messy multi-file task just because the first file looked small.
+Use judgment, not ritual.
+
+Selection should consider:
+	•	number of files likely touched
+	•	need for repo exploration
+	•	risk of drift or hidden coupling
+	•	how much reviewable output is needed before apply
+	•	whether token savings matter enough to justify agent orchestration
+	•	whether the task is code-heavy or doc-heavy
+
+1.4 OpenClaw workflow rules
 
 When opening an OpenClaw task for code or repo-doc work:
 	•	keep the prompt grounded in actual repo truth and exact target behavior
@@ -72,7 +105,35 @@ Keep the old safety rule:
 
 If OpenClaw applies meaningful code changes without a separate review step, treat the result as unverified until it is properly checked.
 
-1.4 Source document revision workflow
+1.5 Codex CLI workflow rules
+
+When using Codex CLI for Actora:
+	•	run it inside the actual repo or a deliberate scratch/worktree location
+	•	keep the prompt repo-grounded and scope-bounded
+	•	say what must change, what must stay unchanged, and how success will be verified
+	•	prefer one coherent task over a rambling prompt with mixed goals
+	•	make Codex do the implementation labor, not the decision-making about project truth
+
+Codex is the default worker for feature/refactor/multi-file coding work, not an excuse to skip specification.
+A bad prompt still makes bad code. The robot is not a priest.
+
+Codex output must still be reviewed for:
+	•	scope control
+	•	preserved behavior
+	•	structural fit with stable docs
+	•	verification completeness
+	•	weird opportunistic rewrites
+	•	confident nonsense
+
+Do not silently accept Codex changes just because they compile.
+Compilation is one gate, not the throne of truth.
+
+When Codex is used in the background or on a longer task:
+	•	report that it was started
+	•	report again only when a milestone, blocker, question, failure, or completion happens
+	•	avoid dead silent tool labor if the user is waiting on live work
+
+1.6 Source document revision workflow
 
 When a source document needs revision, the workflow is:
 	1.	Changes are proposed and discussed.
@@ -146,13 +207,13 @@ Do not assume repo docs automatically update source docs or vice versa.
 
 4. Patch approval rules
 
-Do not apply changes until they are explicitly approved.
+Do not apply changes until they are explicitly approved, unless the chosen workflow is intentionally using a pre-approved low-risk direct edit path.
 
 4.1 Required patch spec fields
 
 Every meaningful patch spec should include the following before apply is considered:
 	•	Target description: what the patch is trying to accomplish
-	•	Execution path: OpenClaw task, manual edit, or other approved path
+	•	Execution path: direct edit, Codex task, OpenClaw task, or other approved path
 	•	Files touched: which files will be created, modified, moved, or renamed
 	•	Behavior changed: what will be different after the patch
 	•	Behavior preserved: what must remain exactly the same
@@ -220,34 +281,35 @@ If formatting itself is behaviorally important, preserve it exactly.
 7.1 General review order
 	1.	source alignment
 	2.	spec clarity
-	3.	OpenClaw task framing
-	4.	draft review / diff review
-	5.	preservation review
-	6.	approval to apply
-	7.	VPS verification after apply
-	8.	verification against the approved spec
-	9.	documentation update
-	10.	commit/tag if appropriate
+	3.	execution-path choice
+	4.	worker/task framing
+	5.	draft review / diff review / resulting change review
+	6.	preservation review
+	7.	approval to apply when the workflow requires it
+	8.	VPS verification after apply
+	9.	verification against the approved spec
+	10.	documentation update
+	11.	commit/tag if appropriate
 
 This order matters.
 Do not treat broad “looks complete” claims as primary truth.
 Do not skip the review step just because a tool sounds confident.
 
-7.2 OpenClaw pre-apply gate
+7.2 Automated-worker pre-acceptance gate
 
-Before applying an OpenClaw-produced code patch, confirm all of the following:
+Before accepting an OpenClaw-produced or Codex-produced meaningful code patch, confirm all of the following:
 	1.	Does the patch spec exist? (yes/no)
 	2.	Does it list files touched? (yes/no)
 	3.	Does it list behavior changed? (yes/no)
 	4.	Does it list behavior preserved? (yes/no)
-	5.	Has the draft/build output been reviewed? (yes/no)
+	5.	Has the output, diff, or changed result been reviewed? (yes/no)
 	6.	Have regression risks been identified? (yes/no)
-	7.	If OpenClaw was supposed to build/show first, did it do that without applying? (yes/no)
-	8.	Has the result been approved before apply? (yes/no)
+	7.	If a build/show-first path was intended, was that respected? (yes/no)
+	8.	Has the result been approved before final apply when approval was required? (yes/no)
 	9.	Is the VPS verification plan clear? (yes/no)
-	10.	Are there any obvious efficiency or scaling issues in the changed code? (yes/no — if yes, flag and evaluate before apply)
+	10.	Are there any obvious efficiency, scaling, or architecture-fit issues in the changed code? (yes/no — if yes, flag and evaluate before acceptance)
 
-If any answer is no, stop and resolve before apply.
+If any answer is no, stop and resolve before treating the patch as accepted.
 
 ⸻
 
@@ -255,12 +317,13 @@ If any answer is no, stop and resolve before apply.
 
 Manual verification matters, and the VPS is the final reality check.
 
-When a patch changes visible behavior, simulation flow, prompts, output order, data structures, file layout, or user-facing logic:
+When a patch changes visible behavior, simulation flow, prompts, output order, data structures, file layout, naming, tool wiring, or user-facing logic:
 	•	check git truth
 	•	run compile checks if the language/runtime supports them
 	•	test the changed path directly
 	•	test key preserved behaviors too
 	•	confirm exact important outputs when formatting matters
+	•	confirm worker/auth/environment assumptions when the patch depends on them
 
 Do not rely only on tool-generated success claims.
 Do not assume claimed completion means real completion.
@@ -337,6 +400,7 @@ General interpretation:
 For code:
 	•	commits happen after apply and verification
 	•	tags may be used for known-good milestone restore points
+	•	meaningful milestones should prefer plain version tags rather than descriptive sentence tags
 
 For docs:
 	•	stable docs should be versioned when their durable content changes meaningfully
@@ -345,9 +409,9 @@ For docs:
 
 11.1 Patch lifecycle rule
 
-Use this default lifecycle for OpenClaw-driven patch work:
+Use this default lifecycle for automated patch work:
 
-open patch -> define spec -> run OpenClaw task -> review output -> approve -> apply -> verify on VPS -> update docs if needed -> commit -> tag if appropriate
+open patch -> define spec -> choose execution path -> run worker or direct edit -> review -> approve when required -> verify on VPS -> update docs if needed -> commit -> tag if appropriate
 
 Do not tag unverified work.
 Do not treat “tool said done” as a release condition.
@@ -439,6 +503,7 @@ After an applied patch, report only what matters:
 	•	VPS verification status if relevant
 	•	documentation updates performed or still needed
 	•	readiness for commit, tag, or follow-up review if relevant
+	•	which execution path was used if that matters for trust or review depth
 
 Do not inflate reports with vague victory language.
 Do not claim broad completion beyond the approved scope.
@@ -450,8 +515,9 @@ Do not claim broad completion beyond the approved scope.
 Actora should be worked on with:
 	•	source alignment
 	•	explicit scope control
+	•	intentional execution-path choice
 	•	preserved validated behavior
-	•	real review before apply
+	•	real review before acceptance
 	•	VPS-grounded verification
 	•	deliberate documentation updates
 	•	honest distinction between what exists, what is approved, and what is only being explored
