@@ -1,12 +1,15 @@
-Actionable Ideas Summary — Rev19
-Date: 2026-03-26
+Actionable Ideas Summary — Rev21
+Date: 2026-03-27
 Role: temporary near-term planning snapshot for CompLife
 Authority: non-authoritative; stable docs win, repo truth wins on implementation
 
 
 === CURRENT WORKING POSITION ===
 
-CompLife now has a materially stronger early backbone, and verified repo truth is through v0.27.0:
+CompLife now has a materially stronger early backbone, and verified repo truth is through v0.27.0, with source-stack sync carried through:
+- Master Context v9
+- Roadmap v10
+- planning clarification preserved in WIR v32
 - world-owned actor registry
 - world-owned links
 - structured place registry
@@ -30,149 +33,158 @@ CompLife now has a materially stronger early backbone, and verified repo truth i
 - a narrow shared CLI input boundary helper in `main.py` that cleanly exits on `EOFError` and `KeyboardInterrupt`
 - startup actor IDs generated through `generate_startup_actor_id(...)` instead of fixed singleton IDs for mother, father, and player
 
-That means the project is no longer mainly fighting:
-- for basic structural honesty in the early backbone,
-- for the obvious practical event-silence gap after Child,
-- for startup-family semantic collapse,
-- for the event seam sounding broader than current repo truth,
-- for identity generation being only a loose-argument call path with no context-shaped seam at all,
-- for the simulation-step boundary being only half-owned,
-- for silent swallowing of unsupported stat mutations,
-- for ugly CLI interruption tracebacks on non-happy-path terminal exits, or
-- for fixed singleton startup actor IDs that would collide with broader bootstrap expansion.
+
+=== CURRENT CLARIFIED DESIGN READ ===
+
+CompLife is now more clearly understood as:
+- one continuous universe simulation per save
+- primarily actor-played rather than detached-overseer-first
+- full custom sandbox setup by default, followed by emergent simulation
+- same-save scope zoom from actor -> city -> country -> world -> star system -> galaxy -> universe
+- one game rather than a pile of hard-separated “modes”
+- exact inspectable information available throughout the simulation
+- actor switching allowed through relevant connected actors rather than forced child-only continuation
+- death as a structural transition, not a fail-state philosophy
+- economy as a pillar, not garnish
+- politics/world conditions as a pillar, not garnish
+- companies as eventual real hybrid simulation objects, especially when player-owned or player-relevant
+- modern + near-future as the earliest practical era target
+- world / country / city as the earliest practical place target
+- social perception as a later but important multi-axis layer rather than a dumb single karma score
+
+Cleanest one-line read:
+CompLife is a single continuous universe simulation where the player primarily lives as the current actor, but can zoom across scopes, continue through connected lives, and interact with real economic, political, spatial, and later social systems inside the same save.
 
 
 === CURRENT PLANNING READ ===
 
-There is still no equally obvious backbone patch after v0.27.0.
+The document-alignment loop is now substantially closed.
+The immediate next move is no longer “preserve the clarified wording before stable docs catch up,” because that catch-up has now been done.
 
-The right immediate move after the implementation patch is:
-**this docs/planning sync, followed by a fresh post-v0.27.0 decision pass**
+The immediate next move is now:
+**return from doc alignment to actual implementation/planning choice from the now-aligned source stack**
 
 Why:
-- the singleton startup actor ID future-footgun has already been cleaned up in code
-- the remaining visible pressures are now mostly planning ambiguity, future guardrails, and later-stage architecture choices
-- forcing another implementation patch immediately would be weaker than admitting the queue is less obvious now
-- the planning layer should stop pretending IDEA-098 is still pending when repo truth already moved past it
+- the clarified actor-anchored, continuous-universe design read is now preserved in planning
+- Master Context v9 now carries the tighter identity/core-framing/continuity truth
+- Roadmap v10 now carries the matching dependency/guardrail framing
+- Source Index still correctly describes document roles
+- continuing to rewrite docs by default would now be weaker than using them
 
 So the current question is now:
-- “what is the strongest honest next move after v0.27.0, once the docs stop lagging the code?”
+- “given the aligned source stack and clarified product identity, what is the strongest honest next implementation or planning move?”
 
 
-=== LEADING CANDIDATE BUCKETS FOR THE NEXT DECISION PASS ===
+=== WHAT THIS DOC SYNC ACHIEVED ===
 
-1. Deliberate pause / planning checkpoint
-Read:
-- after v0.27.0, the project may benefit more from choosing carefully than from spending another version immediately
-- there is no equally loud narrow seam right now
+1. Stable identity sync
+- Master Context now preserves actor-anchored play, one continuous universe play space, continuity beyond a single actor life, and interaction styles inside one continuing simulation.
 
+2. Structural direction sync
+- Roadmap now preserves the continuous-universe product framing, continuity beyond one life, same-save scope breadth as protected direction, and economy/politics/social perception as real later layers that still obey dependency order.
+
+3. Planning preservation
+- WIR now explicitly preserves the clarified design wording so future sessions do not drift by compaction/reset.
+
+4. Anti-drift result
+- The source stack no longer subtly pulls in different directions on the core vision.
+
+
+=== MAIN THINGS THIS CLARIFICATION PASS RESOLVED ===
+
+1. Player contract
+- The default fantasy is still “I am this actor right now.”
+- The player is not tightly restricted; full sandbox authorship is the default start.
+- The sim then runs emergently rather than requiring constant micromanagement.
+
+2. Scope identity
+- Scope zoom is core identity, not decorative future garnish.
+- The intended ladder is actor -> city -> country -> world -> star system -> galaxy -> universe.
+- Zoomed-out views should still act through real entities/systems where possible, not detached fake god buttons.
+
+3. Continuity philosophy
+- Death is a transition, not a hard fail state.
+- Lines can be archived.
+- The universe persists.
+- Continuity can move through relevant connected actors rather than strict child-or-game-over logic.
+
+4. Economy/business importance
+- Economy is a pillar.
+- Politics/world conditions are a pillar.
+- Business/company/investment play is not side garnish and should eventually matter materially.
+
+5. Era/place practicality
+- Earliest practical era target: modern + near future.
+- Earliest practical place target: world / country / city.
+- Household/property depth should not jump the queue just because the long-term fantasy is larger.
+
+6. Social-perception direction
+- Later social systems should use multiple perception axes, not one karma number.
+- Knowledge, rumor, proof, and misinformation should matter.
+- Social perception should shape opportunities and access.
+
+
+=== REAL TENSIONS STILL PRESENT ===
+
+1. Actor-primary fantasy + exact inspectable info everywhere
+This remains a valid but unusual combination. It leans toward a playable simulation interface rather than strict in-character uncertainty.
+
+2. Full sandbox default + “real life” fantasy
+This is coherent, but only if the game stays emotionally anchored in actor life instead of collapsing into abstract god-sim behavior.
+
+3. Broad continuity after death lowers punishment stakes
+This appears intentional. Weight should come from records, continuity, lineage, archive meaning, and universe persistence rather than fail-state drama.
+
+4. Scope remains huge
+The vision is coherent, but the execution risk is still “feature landfill with delusions of grandeur” if sequencing discipline slips.
+
+
+=== LEADING PLANNING BUCKETS NOW ===
+
+1. Next real implementation/planning move after doc sync
 Use:
-- valid if no candidate clearly beats the others
-- do not treat silence as failure; weak patch momentum is worse
+- decide what actually deserves implementation attention next from the aligned source stack
+- avoid replacing code planning with endless documentation self-licking
 
-2. Entity registry vs actor view layering
-Read:
-- still a real long-term guardrail
-- still too easy to promote too early
-
+2. Multi-axis social perception / opportunity layer
 Use:
-- keep parked unless a sharply bounded seam appears
-- do not promote just because it sounds important
+- keep visible as a real later vision component
+- do not let it vanish into vague “social stuff later” mush
+- also do not promote it into immediate foundation work
 
-3. Identity generation realism / context-awareness
-Read:
-- seam is cleaner after v0.23.0
-- actual realism is still blocked by missing place/era/context maturity
-
+3. Entity registry vs actor view layering
 Use:
-- keep parked unless deliberately chosen later
-- do not build fake context sophistication
+- still a real architectural guardrail
+- still not the next code patch automatically
 
+4. Identity generation realism / context-awareness
+Use:
+- still visible later
+- still blocked by stronger context/place/era maturity
 
-=== THINGS NOW DONE ENOUGH THAT THEY SHOULD NOT STAY IN THE ACTIVE SLOT ===
-
-1. Singleton Startup Actor ID Cleanup
-Result:
-- v0.27.0 replaced fixed startup singleton IDs with `generate_startup_actor_id(...)` in `main.py`
-- startup IDs now follow the `startup_<role>_<suffix>` pattern
-- one-family startup shape, parent lookup behavior, snapshot rendering, event flow, and terminal flow were preserved
-- no longer the main next pressure
-
-2. CLI Input Boundary Hardening
-Result:
-- v0.26.0 added a narrow shared input boundary helper in `main.py`
-- interactive CLI input now exits cleanly on `EOFError` and `KeyboardInterrupt`
-- ordinary prompt wording, validation behavior, typed `quit`, startup flow, snapshot flow, and event flow were preserved
-- no longer the main next pressure
-
-3. Unknown-Stat Mutation Hardening
-Result:
-- v0.25.0 hardened `Human.modify_stat(...)` so unsupported stat names now fail explicitly
-- supported stat clamping and money mutation remain intact
-- no longer the main next pressure
-
-4. Simulation Step Ownership / Boundary Foundation
-Result:
-- v0.24.0 moved the authoritative simulation-step boundary into `World`
-- `main.py` now calls the world-owned boundary directly
-- a thin compatibility wrapper remains
-- invalid actor IDs now fail with clear `ValueError`
-- no longer the main next pressure
-
-5. Identity Generation Context Prep
-Result:
-- v0.23.0 added a structured identity-generation context seam
-- startup parent generation now routes through that seam
-- compatibility helper remains intact
-- no longer the main next pressure
-
-6. Event Boundary Honesty Foundation
-Result:
-- v0.22.0 made the monthly event seam more honest about current human-only scope
-- event selection now works through a lifecycle-derived human-scoped helper seam
-- compatibility wrapper and event contract remain intact
-- no longer the main next pressure
-
-7. Startup-family origin / care semantic clarification
-Result:
-- v0.21.0 added explicit startup-family link metadata for origin, caregiving, and bootstrap provenance
-- narrow origin/caregiver helpers exist in `world.py`
-- compatibility lookup and visible snapshot behavior remain intact
-- no longer the main next pressure
-
-8. Later-life human event coverage gap
-Result:
-- v0.20.0 expanded practical human event coverage through Teenager, Young Adult, Adult, and Elder
-- ordinary play no longer goes quiet simply because the event pool stops after Child
-- no longer the main next pressure
-
-
-=== NEW / REVISED FLEXIBLE-LAYER NOTES ===
-
-- The most important shift in this sync is that **singleton startup actor IDs are no longer pending; they landed in v0.27.0**.
-- This v0.27.1 patch is documentation/planning cleanup only; it does not introduce new runtime behavior.
-- The project is now in an even stronger position to avoid weak momentum patches and choose the next step deliberately.
-- A deliberate planning checkpoint is now more defensible than pretending another implementation patch is obviously ready.
-- Identity realism/context richness remains visibly placeholder-level beneath the cleaner seam, but still should not jump the dependency queue.
+5. Continuity / lineage / archive maturation
+Use:
+- stable docs now protect continuity truth more clearly
+- implementation reality is still much narrower and should not be overclaimed
 
 
 === DOCUMENT-SYSTEM RESULT OF THIS SYNC ===
 
-- stable docs still do not need revision from this post-v0.27.0 sync alone
+- stable docs now reflect the clarified vision materially better than before
+- planning still carries finer-grained wording for sandbox-default freedom and later social-perception detail
 - Source Index still does not need revision
-- repo docs/changelog now carry implementation history through v0.27.1
-- roadmap sequencing still does not need revision from this sync alone
-- flexible docs should now reflect repo truth through v0.27.0 and the more open-ended nature of the next decision
+- repo docs/changelog do not need changes from this source-stack sync alone
+- the source stack is aligned enough to stop defaulting to document surgery and return to actual work
 
 
 === NEXT BEST USE ===
 
-1. Run a fresh post-v0.27.0 decision pass before drafting another implementation patch prompt.
-2. Treat the immediate next move as a choice between a deliberate planning checkpoint and a genuinely narrow, clearly justified new candidate.
-3. Keep entity-layer broadening, identity-realism expansion, and full species-general architecture work out of the next patch unless deliberately chosen later.
-4. Leave Master Context, Operator Guide, Roadmap, and Source Index unchanged for now.
+1. Use the aligned source stack as the basis for choosing the next real implementation or planning target.
+2. Keep IDEA-102 as anti-drift protection, not as an excuse to reopen the same clarification loop forever.
+3. Keep IDEA-103 visible as a later layer, not an immediate patch title.
+4. Do not force another doc-heavy cycle unless a real contradiction appears.
 
 
 === ONE-LINE SUMMARY ===
 
-CompLife is now through v0.27.0, and the honest next move after this v0.27.1 docs sync is a fresh decision pass instead of pretending the next implementation patch is already obvious.
+The source stack is now aligned enough that the honest next move is to stop polishing the docs and return to choosing the next real implementation/planning target from the clarified CompLife vision.

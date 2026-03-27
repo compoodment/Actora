@@ -1,6 +1,6 @@
-CompLife Working Ideas Register v31
+CompLife Working Ideas Register v33
 
-Date: 2026-03-26
+Date: 2026-03-27
 Role: flexible idea intake, staging, parking, and rewrite-pressure tracking for CompLife
 Authority level: flexible working layer, not durable architecture truth
 Interpretation rule: stable source docs win over this file; verified repo truth wins on what is already implemented
@@ -38,7 +38,7 @@ Verified repo truth is currently through v0.27.0, including:
 - explicit unknown-stat guard in `Human.modify_stat(...)`, raising `ValueError` instead of silently swallowing unsupported stat mutations
 - a narrow shared CLI input boundary helper in `main.py` that exits cleanly on `EOFError` and `KeyboardInterrupt` instead of surfacing a traceback
 - startup actor IDs now generated through `generate_startup_actor_id(...)` instead of fixed singleton IDs for mother, father, and player
-- verified/tagged v0.27.0 after compile/runtime/git checks, followed by v0.27.1 doc/planning sync
+- verified/tagged v0.27.0 after compile/runtime/git checks, followed by v0.27.1 repo-doc sync and later stable-source sync through Master Context v9 / Roadmap v10
 
 The backbone is materially stronger and more honest than it was at the start of this patch run.
 The constructor seam, snapshot/output seam, event-result contract seam, later-life human event coverage gap, startup-family origin/care semantic collapse, event-boundary honesty pressure, identity-generation context-prep pressure, simulation-step ownership seam, silent unknown-stat mutation risk, rough CLI interruption boundary, and singleton startup actor ID future-footgun have all been cleaned up enough to move out of the active top slot.
@@ -48,10 +48,10 @@ But the strongest recent small correctness seam is no longer waiting in the queu
 
 The active near-term read is therefore:
 - the major recent backbone clarifications are now in a substantially better place
+- the source stack is now materially more aligned on what CompLife is supposed to be
 - there is still no single screamingly obvious structural patch of the same caliber as v0.24.0
-- the strongest recently visible small implementation seam has already been cleaned up
-- current remaining near-term pressures are now mostly planning ambiguity, future guardrails, and later-candidate discipline
-- a deliberate planning checkpoint is now more honest than pretending IDEA-098 is still next
+- current remaining near-term pressures are now mostly next-step selection, future guardrails, and later-candidate discipline
+- a deliberate planning checkpoint remains more honest than pretending another tiny patch is obviously next
 - entity registry vs actor view layering remains a long-term architectural guardrail, not an automatic next implementation target
 - broader lineage / care / relationship systems remain only partially prepared and should not be overclaimed
 - identity realism/context richness remains visibly placeholder-level beneath the cleaner seam, but still should not jump the dependency queue
@@ -60,33 +60,64 @@ WIR housekeeping note:
 - completed singleton startup actor ID cleanup should no longer sit in the active slot after v0.27.0
 - completed CLI input hardening should remain out of the active slot after v0.26.0
 - completed unknown-stat hardening should remain out of the active slot after v0.25.0
+- clarified design wording is now preserved here and partly promoted into stable docs, so the project should drift less across compaction/reset
 - historical-only clutter should not be kept active once it stops affecting planning
 - the absence of one loud runtime gap does not mean the foundation is finished
 - do not let “the current prototype runs fine” quietly turn into premature education/work/health/property/travel expansion
-- do not revise stable docs or the roadmap from this post-v0.27.0 sync alone unless durable baseline truth or dependency order actually changes
+- do not reopen the same doc loop by default once the source stack is aligned enough to move forward
 
 
 === ACTIVE NEAR-TERM ARCHITECTURE / GAMEPLAY PRESSURES ===
 
+ID: IDEA-102
+Created: 2026-03-27
+Last Reviewed: 2026-03-27
+Title: Preserve clarified actor-anchored / zoomable-universe player contract
+Status: Active anti-drift planning pressure
+Priority: P1
+Roadmap fit: identity protection / anti-drift guardrail
+Immediate roadmap-layer fit: yes, as preserved wording and alignment guardrail rather than a fresh doc-crisis trigger
+Summary: The project now has a much sharper read of what CompLife is supposed to feel like: one continuous universe simulation, primarily lived through the current actor, with same-save zoom across actor/city/country/world/star-system/galaxy/universe scope, full custom sandbox setup by default, and continuity through connected actors rather than hard fail-state philosophy.
+Why it matters: This wording is important enough that losing it would cause future drift, but it no longer means the stable docs are still missing the basic identity sync. The wording now serves mainly as anti-drift protection and a planning reference point.
+Dependencies: stable baseline, roadmap sequencing, clarified design pass conclusions, Master Context v9, Roadmap v10
+Risks: reopening the same clarification loop forever instead of using the aligned docs to make real next-step choices
+Suggested timing: immediate planning/document use as guardrail, not repeated doc-churn fuel
+Next action: keep preserved and use it to test future proposals, not to endlessly relitigate the same identity pass
+
+ID: IDEA-103
+Created: 2026-03-27
+Last Reviewed: 2026-03-27
+Title: Multi-axis social perception / reputation / opportunity layer
+Status: Active later-layer design pressure
+Priority: P2
+Roadmap fit: later social/context layer after stronger foundations
+Immediate roadmap-layer fit: no immediate promotion to implementation
+Summary: CompLife should eventually support a multi-axis social perception system rather than a dumb single karma meter. Reputation/perception should exist at actor, group, local/public, and later wider institutional scopes; should depend on discovery, rumor, proof, and misinformation; and should materially shape opportunities, trust, recruitment, social access, and barriers.
+Why it matters: This is part of the real intended experience and should not be lost under vague “social stuff later” wording.
+Dependencies: stronger actor/context/social foundations, record/link maturity, later opportunity-generation systems
+Risks: collapsing it into one fake moral score, promoting it too early into foundation work, or forgetting it entirely until the game has already hardened around weaker assumptions
+Suggested timing: keep visible as later design pressure, not the next patch title
+Next action: preserve as a named future layer and pressure-test stable docs later if it becomes durable enough
+
 ID: IDEA-101
 Created: 2026-03-26
-Last Reviewed: 2026-03-26
+Last Reviewed: 2026-03-27
 Title: Post-v0.27.0 next-step ambiguity after the startup-ID cleanup
 Status: Active planning pressure
 Priority: P1
 Roadmap fit: near-term planning / sequencing hygiene
 Immediate roadmap-layer fit: yes, as a fresh decision pass rather than an already-locked patch title
-Summary: After v0.27.0, there is still no equally obvious next backbone seam. The immediate need is to decide whether the next move should be a deliberate planning checkpoint or a newly justified narrow patch rather than pretending the old candidate is still pending.
+Summary: After v0.27.0, there is still no equally obvious next backbone seam. The immediate need is to avoid fake momentum and choose carefully between newly justified implementation work and honest deliberate pause.
 Why it matters: The project has moved beyond the loudest recent runtime/correctness cleanup and now needs stronger prioritization discipline, not patch-number chasing.
-Dependencies: verified repo truth through v0.27.0, stable baseline, current roadmap order
+Dependencies: verified repo truth through v0.27.0, aligned source stack, current roadmap order
 Risks: forcing another patch for momentum, inflating low-grade residue into architecture work, or promoting broad systems too early
 Suggested timing: immediate planning use
-Next action: run a fresh post-v0.27.0 decision pass
-Notes: this is a planning-pressure entry, not a stable-doc revision trigger by itself
+Next action: choose the next real implementation/planning target from the aligned source stack
+Notes: this remains real, but it should now operate from the synced stable/planning docs rather than from doc-misalignment pressure
 
 ID: IDEA-077
 Created: 2026-03-17
-Last Reviewed: 2026-03-26
+Last Reviewed: 2026-03-27
 Title: Entity registry vs actor view layering
 Status: Parked conceptual guardrail / possible future candidate
 Priority: P2
@@ -101,7 +132,7 @@ Next action: keep as a guardrail and possible later candidate, not the current p
 
 ID: IDEA-091
 Created: 2026-03-23
-Last Reviewed: 2026-03-26
+Last Reviewed: 2026-03-27
 Title: Identity generation realism / context-awareness
 Status: Visible later seam / candidate for future narrow improvement
 Priority: P2
@@ -116,7 +147,7 @@ Next action: keep visible; do not promote over stronger sequencing discipline
 
 ID: IDEA-076
 Created: 2026-03-17
-Last Reviewed: 2026-03-26
+Last Reviewed: 2026-03-27
 Title: Origin / lineage / care semantic separation
 Status: Materially realized enough to move past as primary pressure, but still a guardrail
 Priority: P1
@@ -128,6 +159,34 @@ Dependencies: current links model, stable non-human-first baseline
 Risks: overreading current startup-family seams as if broader family/origin systems are now implemented
 Suggested timing: keep as background protection, not the next patch title
 Next action: retain as a guardrail for future link/family expansion
+
+
+=== CLARIFIED DESIGN READ (PRESERVED WORDING LAYER) ===
+
+CompLife is a single continuous universe simulation where the player primarily lives as the current actor, but can zoom across scopes, continue through connected lives, and interact with real economic, political, spatial, and later social systems inside the same save.
+
+Core clarified points:
+- one save = one universe simulation
+- actor life is still the emotional anchor
+- full custom sandbox setup is the default start
+- setup is authored, then the simulation runs emergently
+- the intended zoom ladder is actor -> city -> country -> world -> star system -> galaxy -> universe
+- zoomed-out scopes should still expose actions through real entities/systems where possible rather than detached fake god buttons
+- exact inspectable information is allowed throughout the simulation
+- the game is one continuous simulation rather than a pile of hard-separated modes
+- the focused actor should still progress semi-autonomously when time is skipped
+- death is a structural transition, not a fail-state philosophy
+- a line can be archived without ending the universe
+- continuity can continue through relevant connected actors rather than strict child-only succession
+- economy is a pillar
+- politics/world conditions are a pillar
+- companies should eventually exist as real hybrid simulation things, especially when player-owned or player-relevant
+- earliest practical era target is modern + near future
+- earliest practical place target is world / country / city
+- later social systems should use multiple perception axes rather than a dumb single karma meter
+
+Anti-drift read:
+CompLife should not quietly collapse back into “deeper BitLife,” “detached god sim,” “spreadsheet world sim with humans taped on,” or vague universe-scale handwaving. The intended shape is actor-anchored, zoomable, continuous, and simulation-real.
 
 
 === COMPLETED / MOVED-OUT PRESSURES ===
@@ -191,25 +250,26 @@ Next action: do not promote on its own
 - External reviewer usage is still best reserved for source-document contradiction checks and sequencing critique, not as a substitute for repo/VPS truth on code.
 - Do not let the roadmap become a patch tracker just because current planning feels open-ended.
 - Do not promote ideas into stable docs just because a patch landed cleanly.
+- Preserve important clarified wording somewhere explicit before chats compact, or the project will drift by compression rather than by real decision.
 
 
-=== DOCUMENT-SYSTEM RESULT OF THIS SYNC ===
+=== DOCUMENT-SYSTEM RESULT OF THIS CLARIFICATION PASS ===
 
-- stable docs still do not need revision from this post-v0.27.0 sync alone
-- Source Index still does not need revision
-- WIR now reflects repo truth through v0.27.0
-- repo docs/changelog remain the implementation-history layer, not the planning layer
-- roadmap sequencing still has not changed enough from this sync alone to justify a roadmap revision
+- stable docs now reflect the clarified vision materially better than before
+- planning still carries finer-grained wording for sandbox-default freedom and later social-perception detail
+- WIR now preserves the clarified wording explicitly so the concept is not lost between sessions
+- roadmap sequencing is now synced materially better with the clarified identity
+- repo docs/changelog do not need changes from this source-stack sync alone
 
 
 === NEXT BEST USE ===
 
-1. Run a fresh post-v0.27.0 decision pass before drafting another implementation patch.
-2. Treat a deliberate planning checkpoint as the default honest next move unless a new narrow candidate clearly wins.
-3. Keep domain-system expansion, broad entity-layer implementation, identity-realism expansion, and full species-general event architecture out of the next patch unless deliberately chosen later.
-4. Leave Master Context, Operator Guide, Roadmap, and Source Index unchanged for now.
+1. Use IDEA-102 and the preserved clarified-design section to keep future sessions aligned on what CompLife is actually supposed to be.
+2. Choose the next real implementation/planning target from the aligned source stack instead of reopening the same doc loop.
+3. Keep IDEA-103 visible as a later layer, not an immediate patch title.
+4. Do not force an implementation patch until the next target actually earns its place.
 
 
 === ONE-LINE SUMMARY ===
 
-CompLife is now through v0.27.0, and the next honest move after this docs sync is a fresh decision pass rather than pretending the old singleton-ID candidate is still pending.
+The project now has preserved wording for the actor-anchored, zoomable, continuous-universe vision, and the source stack is aligned enough to move forward without relitigating the same identity pass every session.

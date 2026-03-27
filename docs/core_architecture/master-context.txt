@@ -1,4 +1,4 @@
-CompLife Master Context v8
+CompLife Master Context v9
 
 Purpose
 
@@ -12,30 +12,33 @@ It should stay focused on durable truth rather than temporary brainstorming or p
 
 1. Project identity
 
-CompLife is a player-centered simulation framework built inside the broader Compverse direction.
+CompLife is an actor-anchored simulation framework built inside the broader Compverse direction.
 
-It is not just a narrow human life simulator, and it is not just a world-management sandbox.
-It is a layered simulation framework designed to support focused actor play inside a larger universe-scale simulation model.
+It is not just a narrow human life simulator, and it is not just a detached world-management sandbox.
+It is a continuous universe simulation designed to support focused actor play inside a larger world and universe-scale model.
 
 Early implementations may remain grounded, simplified, and example-driven.
 However, the architecture should be built to support the broader future product rather than forcing the project to escape a narrow prototype later.
 
 CompLife should be understood as:
-- player-centered
-- actor-oriented
+- actor-anchored
+- player-centered through the current focused actor
 - universe-scale in architectural direction
+- continuous within one save/universe
 - layered in simulation depth
 - context-sensitive in rules and meaning
-- flexible in future presentation and interaction modes
+- flexible in future presentation, scope, and interaction styles
+
+The player primarily experiences the simulation through a current actor, but that actor always exists inside a larger continuous universe state that does not stop being real just because attention is focused locally.
 
 
 2. Core framing
 
-CompLife is centered on the idea that a player may follow, play, or otherwise focus on one actor within a much larger simulation container.
+CompLife is centered on the idea that a player primarily lives through a current actor within a much larger simulation container.
 
-The player-facing actor matters.
+The current actor matters.
 Their history matters.
-Their relationships, possessions, context, and life path matter.
+Their relationships, possessions, context, opportunities, and life path matter.
 
 At the same time, that actor exists inside a broader universe that also contains:
 - other actors
@@ -48,10 +51,12 @@ At the same time, that actor exists inside a broader universe that also contains
 - major timeline and structural transitions
 
 The project therefore must support both:
-- intimate actor-centered simulation
+- intimate actor-anchored simulation
 - broader world/universe-scale simulation structure
 
-The world is bigger than the focused actor, but the focused actor still matters.
+The player should be able to remain inside one continuous universe save while shifting attention across different scopes of the same simulation rather than treating actor play and broader observation as separate unrelated games.
+
+The world is bigger than the focused actor, but the focused actor still matters most as the primary emotional anchor of play.
 
 
 3. Universe model
@@ -63,9 +68,10 @@ A Universe is:
 - one shared simulation history
 - one shared current universe time
 - the container for all actors, entities, systems, metrics, records, links, and context belonging to that save
+- the continuous play space in which actor lives, line continuation, archive history, and broader-scope observation all occur
 
 A Universe is not just a file.
-It is the active simulation container.
+It is the active simulation container and the continuing play-space context.
 
 One universe should have one shared advancing timeline.
 Advancing time advances that universe as a whole.
@@ -80,6 +86,9 @@ A universe may later contain:
 - wider spatial hierarchy above ordinary world scale
 
 But those all still belong to the same universe if they share the same continuing simulation state and time progression.
+
+The death of a currently focused actor should not be treated as automatic universe termination.
+The universe persists beyond one life, one line, or one moment of play focus.
 
 
 4. Core conceptual skeleton
@@ -294,14 +303,18 @@ This includes long-term support for transitions such as:
 - death
 - archive status
 - lineage continuation
+- continuity through other relevant connected actors
 - major status changes affecting playability or simulation role
 
 Death in particular should not be treated as just another event line.
-It affects actor state, record layers, links, ownership consequences later, and potentially lineage or archive status.
+It affects actor state, record layers, links, ownership consequences later, and potentially lineage, archive status, or future continuity of play within the same universe.
 
-Birth/death/archive/lineage are major simulation transitions.
+Birth, death, archive, continuity, and lineage are major simulation transitions.
 
 Major structural transitions should eventually produce or alter Records, Links, and related state depending on context. This is a structural expectation, not an immediate implementation requirement.
+
+The end of one actor’s life should not automatically mean the end of the universe save.
+Actor lines may be archived, continuity may move through relevant connected actors, and the larger universe should remain capable of continuing beyond a single life.
 
 
 12. Context-sensitive behavior
@@ -326,21 +339,23 @@ It does imply that future actor behavior should remain compatible with bounded, 
 Context also means that different kinds of actors may not share the same exact meaning for skills, traits, life histories, pressures, or opportunities.
 
 
-13. Multiple future interaction modes
+13. Multiple future interaction styles
 
-CompLife should remain compatible with multiple future interaction modes.
+CompLife should remain compatible with multiple future interaction styles within one continuous simulation.
 
 Protected future possibilities include:
 - direct actor play
 - guided or lightly influenced actor play
-- observer/follow mode
+- observer/follow play
 - actor switching at the current universe time
 - broader system observation
 - broader system influence at later stages
-- different information-density or immersion modes in the UI
+- different information-density or immersion styles in the UI
+- scope shifting between local actor life and broader world/universe views inside the same save
 
 The simulation core should not be built in a way that requires a rewrite for each future interaction style.
-The project should preserve the ability to support different presentation and control styles over time.
+
+CompLife should preserve the ability to support different presentation, focus, and control styles over time without assuming that actor play, broader observation, and larger-scope interaction must become hard-separated boxed modes or separate games.
 
 
 14. Presentation direction
@@ -389,12 +404,14 @@ over:
 
 16. Stable baseline summary
 
-CompLife is a player-centered actor simulation within a layered, universe-scale framework.
+CompLife is an actor-anchored simulation within a layered, continuous, universe-scale framework.
 
 Its stable architecture should protect for:
 - a universe-based save model
+- one continuous universe play space per save
 - a non-human-first conceptual skeleton
-- actor-centered play inside broader simulation
+- actor-anchored play inside broader simulation
+- continuity beyond a single actor life
 - layered simulation depth
 - one universe with one shared advancing timeline
 - explicit timeline/era context
@@ -402,9 +419,9 @@ Its stable architecture should protect for:
 - separation of ownership from residence, current location, and occupancy
 - records and links as structural concepts
 - Type and Scope as foundational cross-cutting layers
-- major lifecycle and archive transitions
+- major lifecycle, archive, and continuity transitions
 - UI-agnostic simulation foundations
-- future interaction flexibility
+- future interaction flexibility within the same continuing simulation
 - feasible simulation rather than brute-force realism
 
 
