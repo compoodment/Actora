@@ -1,4 +1,4 @@
-Actora Working Ideas Register v33
+Actora Working Ideas Register v34
 
 Date: 2026-03-27
 Role: flexible idea intake, staging, parking, and rewrite-pressure tracking for Actora
@@ -8,7 +8,7 @@ Interpretation rule: stable source docs win over this file; verified repo truth 
 
 === CURRENT WORKING READ ===
 
-Verified repo truth is currently through v0.27.0, including:
+Verified repo truth is currently through v0.30.0, including:
 - world-owned actor registry
 - world-owned structured place registry
 - world-owned link truth
@@ -19,7 +19,7 @@ Verified repo truth is currently through v0.27.0, including:
 - world-owned record query helpers
 - internal record-shape normalization
 - explicitly human-backed world-owned constructor seam (`create_human_actor(...)`)
-- repo-local architecture/changelog sync through v0.27.1
+- repo-local architecture/changelog sync through v0.30.0
 - structured snapshot data assembly through `Human.get_snapshot_data(...)`
 - shell-owned snapshot rendering in `main.py`
 - cleaned monthly event result contract with `outcome.stat_changes` as the authoritative mutation payload and no redundant top-level `stat_changes`
@@ -38,23 +38,25 @@ Verified repo truth is currently through v0.27.0, including:
 - explicit unknown-stat guard in `Human.modify_stat(...)`, raising `ValueError` instead of silently swallowing unsupported stat mutations
 - a narrow shared CLI input boundary helper in `main.py` that exits cleanly on `EOFError` and `KeyboardInterrupt` instead of surfacing a traceback
 - startup actor IDs now generated through `generate_startup_actor_id(...)` instead of fixed singleton IDs for mother, father, and player
-- verified/tagged v0.27.0 after compile/runtime/git checks, followed by v0.27.1 repo-doc sync and later stable-source sync through Master Context v9 / Roadmap v10
+- structural death / continuity foundation through `structural_status`, `World.mark_actor_dead(...)`, `get_continuity_candidates_for(...)`, `build_continuity_state_for(...)`, and continuity-ready turn-result fields
+- current-facing project/repo rename to Actora, including repo path rename, current-facing docs/runtime naming updates, roadmap filename rename, and README cleanup
+- first playable continuity handoff flow through deterministic continuity candidate refinement, dead-focus advancement blocking, world-owned continuation handoff validation, and shell-level continuation choice / clean dead-end handling
 
 The backbone is materially stronger and more honest than it was at the start of this patch run.
-The constructor seam, snapshot/output seam, event-result contract seam, later-life human event coverage gap, startup-family origin/care semantic collapse, event-boundary honesty pressure, identity-generation context-prep pressure, simulation-step ownership seam, silent unknown-stat mutation risk, rough CLI interruption boundary, and singleton startup actor ID future-footgun have all been cleaned up enough to move out of the active top slot.
+The constructor seam, snapshot/output seam, event-result contract seam, later-life human event coverage gap, startup-family origin/care semantic collapse, event-boundary honesty pressure, identity-generation context-prep pressure, simulation-step ownership seam, silent unknown-stat mutation risk, rough CLI interruption boundary, singleton startup actor ID future-footgun, structural death/continuity foundation gap, current-facing naming inconsistency, and first playable continuity handoff gap have all been moved materially forward.
 
 The current pressure is still not “foundation complete.”
-But the strongest recent small correctness seam is no longer waiting in the queue.
+But the planning position is no longer the old post-v0.27.0 ambiguity state.
 
 The active near-term read is therefore:
 - the major recent backbone clarifications are now in a substantially better place
+- continuity is now more real than it was before, but still not broad/deep continuity-complete
 - the source stack is now materially more aligned on what Actora is supposed to be
-- there is still no single screamingly obvious structural patch of the same caliber as v0.24.0
-- current remaining near-term pressures are now mostly next-step selection, future guardrails, and later-candidate discipline
-- a deliberate planning checkpoint remains more honest than pretending another tiny patch is obviously next
+- the next-step question is now “what follows first playable continuity?” rather than “is there any real next move at all?”
 - entity registry vs actor view layering remains a long-term architectural guardrail, not an automatic next implementation target
 - broader lineage / care / relationship systems remain only partially prepared and should not be overclaimed
 - identity realism/context richness remains visibly placeholder-level beneath the cleaner seam, but still should not jump the dependency queue
+- operator/dev tooling pressure is real, but full dev mode right now would risk becoming premature support-fluff unless enough repeated testing pain across real systems justifies it
 
 WIR housekeeping note:
 - completed singleton startup actor ID cleanup should no longer sit in the active slot after v0.27.0
@@ -99,21 +101,36 @@ Risks: collapsing it into one fake moral score, promoting it too early into foun
 Suggested timing: keep visible as later design pressure, not the next patch title
 Next action: preserve as a named future layer and pressure-test stable docs later if it becomes durable enough
 
+ID: IDEA-104
+Created: 2026-03-27
+Last Reviewed: 2026-03-27
+Title: Operator tooling / scenario testing seam
+Status: Active later support/tooling pressure
+Priority: P2
+Roadmap fit: support/tooling layer that should follow enough real system growth to justify reuse
+Immediate roadmap-layer fit: no immediate promotion to implementation
+Summary: As Actora gains more structural systems, repeated testing pain will increasingly justify reusable operator tooling for inspection, controlled mutation, and scenario setup. This is a real future seam, but a full dev mode too early would risk becoming premature support-fluff or patch-specific debug junk.
+Why it matters: Better operator tooling will eventually help test continuity, links, records, place/state interactions, and later domain systems without relying on one-off hacks or waiting through irrelevant normal play every time.
+Dependencies: enough repeated testing pain across multiple real systems, cleaner world-owned mutation/inspection seams, stronger justification than one patch’s convenience
+Risks: building a flashy dev mode before enough systems exist, mixing debug hacks into normal player flow, or letting operator tooling substitute for real gameplay/system design
+Suggested timing: later, when multiple real systems are expensive to test without reusable tooling
+Next action: preserve as a tooling pressure only; do not treat it as the automatic next patch title
+
 ID: IDEA-101
 Created: 2026-03-26
 Last Reviewed: 2026-03-27
-Title: Post-v0.27.0 next-step ambiguity after the startup-ID cleanup
+Title: Post-v0.30.0 next-step selection after first playable continuity handoff
 Status: Active planning pressure
 Priority: P1
 Roadmap fit: near-term planning / sequencing hygiene
 Immediate roadmap-layer fit: yes, as a fresh decision pass rather than an already-locked patch title
-Summary: After v0.27.0, there is still no equally obvious next backbone seam. The immediate need is to avoid fake momentum and choose carefully between newly justified implementation work and honest deliberate pause.
-Why it matters: The project has moved beyond the loudest recent runtime/correctness cleanup and now needs stronger prioritization discipline, not patch-number chasing.
-Dependencies: verified repo truth through v0.27.0, aligned source stack, current roadmap order
-Risks: forcing another patch for momentum, inflating low-grade residue into architecture work, or promoting broad systems too early
+Summary: The earlier post-v0.27.0 ambiguity was real, but it has now been materially resolved by the v0.28.0 -> v0.30.0 sequence. The current need is not to pretend there is no next move at all; it is to choose carefully what follows first playable continuity without forcing momentum or jumping the roadmap.
+Why it matters: The project has moved beyond the earlier small-backbone cleanup ambiguity and now needs another honest prioritization pass grounded in repo truth through the first playable continuity handoff.
+Dependencies: verified repo truth through v0.30.0, aligned source stack, current roadmap order
+Risks: forcing another patch for momentum, overclaiming continuity as “done,” promoting support tooling too early, or jumping to broader downstream systems before the next honest foundation choice is clear
 Suggested timing: immediate planning use
-Next action: choose the next real implementation/planning target from the aligned source stack
-Notes: this remains real, but it should now operate from the synced stable/planning docs rather than from doc-misalignment pressure
+Next action: choose the next real implementation/planning target from the aligned source stack after v0.30.0, rather than reusing stale pre-v0.28 ambiguity language
+Notes: this remains real, but it now refers to the post-v0.30.0 decision point rather than the old post-v0.27.0 one
 
 ID: IDEA-077
 Created: 2026-03-17
@@ -191,6 +208,28 @@ Actora should not quietly collapse back into “deeper BitLife,” “detached g
 
 === COMPLETED / MOVED-OUT PRESSURES ===
 
+ID: IDEA-100
+Created: 2026-03-27
+Last Reviewed: 2026-03-27
+Title: First playable continuity handoff flow
+Status: Completed in v0.30.0
+Priority: P1
+Roadmap fit: narrow continuity follow-through after structural death foundation
+Summary: After v0.28.0, the repo had structural death/continuity groundwork but no real continuation choice flow. The missing seam was the first playable handoff path that would let the player continue through a living connected actor once the focused actor was dead.
+Result: v0.30.0 added deterministic continuity candidate refinement, world-owned continuation handoff validation, dead-focus advancement blocking, shell-level continuation selection, and clean no-candidate end handling while preserving the absence of automatic mortality, archive, inheritance, or lineage systems.
+Next action: keep only as completed history, not an active candidate
+
+ID: IDEA-099
+Created: 2026-03-27
+Last Reviewed: 2026-03-27
+Title: Current-facing Actora rename milestone
+Status: Completed in v0.29.0
+Priority: P1
+Roadmap fit: repo/current-facing identity alignment
+Summary: The repo still carried AutoCompLife/CompLife naming in current-facing paths, docs, and runtime strings after the project name decision had already moved to Actora.
+Result: v0.29.0 renamed the working repo path, updated current-facing docs/runtime naming, renamed the roadmap file to `actora-roadmap.txt`, cleaned up the README stack, and preserved historical changelog truth instead of rewriting history.
+Next action: keep only as completed history, not an active candidate
+
 ID: IDEA-098
 Created: 2026-03-25
 Last Reviewed: 2026-03-26
@@ -267,9 +306,10 @@ Next action: do not promote on its own
 1. Use IDEA-102 and the preserved clarified-design section to keep future sessions aligned on what Actora is actually supposed to be.
 2. Choose the next real implementation/planning target from the aligned source stack instead of reopening the same doc loop.
 3. Keep IDEA-103 visible as a later layer, not an immediate patch title.
-4. Do not force an implementation patch until the next target actually earns its place.
+4. Keep IDEA-104 visible as a later tooling pressure, not an immediate build excuse.
+5. Do not force an implementation patch until the next target actually earns its place.
 
 
 === ONE-LINE SUMMARY ===
 
-The project now has preserved wording for the actor-anchored, zoomable, continuous-universe vision, and the source stack is aligned enough to move forward without relitigating the same identity pass every session.
+The project now has preserved wording for the actor-anchored, zoomable, continuous-universe vision, verified repo truth through the first playable continuity handoff, and a cleaner planning position for choosing what should come next without drifting into either fake momentum or premature tooling fluff.

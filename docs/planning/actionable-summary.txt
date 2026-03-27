@@ -1,4 +1,4 @@
-Actionable Ideas Summary — Rev21
+Actionable Ideas Summary — Rev22
 Date: 2026-03-27
 Role: temporary near-term planning snapshot for Actora
 Authority: non-authoritative; stable docs win, repo truth wins on implementation
@@ -6,10 +6,10 @@ Authority: non-authoritative; stable docs win, repo truth wins on implementation
 
 === CURRENT WORKING POSITION ===
 
-Actora now has a materially stronger early backbone, and verified repo truth is through v0.27.0, with source-stack sync carried through:
+Actora now has a materially stronger early backbone, and verified repo truth is through v0.30.0, with source-stack sync carried through:
 - Master Context v9
 - Roadmap v10
-- planning clarification preserved in WIR v32
+- planning clarification preserved in WIR v33
 - world-owned actor registry
 - world-owned links
 - structured place registry
@@ -32,6 +32,9 @@ Actora now has a materially stronger early backbone, and verified repo truth is 
 - explicit unknown-stat mutation guarding in `Human.modify_stat(...)`
 - a narrow shared CLI input boundary helper in `main.py` that cleanly exits on `EOFError` and `KeyboardInterrupt`
 - startup actor IDs generated through `generate_startup_actor_id(...)` instead of fixed singleton IDs for mother, father, and player
+- structural death / continuity foundation through `structural_status`, `World.mark_actor_dead(...)`, `get_continuity_candidates_for(...)`, `build_continuity_state_for(...)`, and continuity-ready turn result fields
+- current-facing project/repo rename to Actora, including repo path rename, current-facing doc/runtime naming updates, roadmap filename rename, and README cleanup
+- first playable continuity handoff flow through deterministic continuity candidate refinement, dead-focus advancement blocking, world-owned continuation handoff validation, and shell-level continuation choice / clean dead-end handling
 
 
 === CURRENT CLARIFIED DESIGN READ ===
@@ -59,43 +62,53 @@ Actora is a single continuous universe simulation where the player primarily liv
 === CURRENT PLANNING READ ===
 
 The document-alignment loop is now substantially closed.
-The immediate next move is no longer “preserve the clarified wording before stable docs catch up,” because that catch-up has now been done.
+The earlier post-v0.27.0 next-step ambiguity was real, but it is no longer the same open question it was before: the project did choose and land a real follow-through sequence.
+
+That sequence was:
+- v0.28.0 — death / continuity structural transition foundation
+- v0.29.0 — Actora rename milestone
+- v0.30.0 — first playable continuity handoff flow
+
+So the immediate next move is no longer:
+- “we still need to choose whether to follow through on continuity or keep hovering in planning limbo”
 
 The immediate next move is now:
-**return from doc alignment to actual implementation/planning choice from the now-aligned source stack**
+- choose the next honest structural implementation or planning move after the first playable continuity handoff, without inflating every testing/tooling thought into an immediate build target
 
 Why:
-- the clarified actor-anchored, continuous-universe design read is now preserved in planning
-- Master Context v9 now carries the tighter identity/core-framing/continuity truth
-- Roadmap v10 now carries the matching dependency/guardrail framing
-- Source Index still correctly describes document roles
-- continuing to rewrite docs by default would now be weaker than using them
+- continuity is now materially more real than it was during the earlier planning ambiguity
+- the source stack is still aligned enough to support deliberate next-step choice
+- stable docs already protect the larger vision
+- forcing momentum now would be weaker than making the next choice deliberately again
 
 So the current question is now:
-- “given the aligned source stack and clarified product identity, what is the strongest honest next implementation or planning move?”
+- “given repo truth through the first playable continuity handoff, what is the strongest honest next structural move that still respects roadmap order?”
 
 
-=== WHAT THIS DOC SYNC ACHIEVED ===
+=== WHAT THE RECENT SEQUENCE ACHIEVED ===
 
-1. Stable identity sync
-- Master Context now preserves actor-anchored play, one continuous universe play space, continuity beyond a single actor life, and interaction styles inside one continuing simulation.
+1. Structural continuity truth moved from abstract protection to first playable handoff.
+- death is now both a preserved structural transition and a state that can trigger continuation choice rather than passive dead-end text only
 
-2. Structural direction sync
-- Roadmap now preserves the continuous-universe product framing, continuity beyond one life, same-save scope breadth as protected direction, and economy/politics/social perception as real later layers that still obey dependency order.
+2. Current-facing project identity is now coherent.
+- the repo, docs, runtime naming, and current-facing materials now consistently use Actora without rewriting historical changelog truth
 
-3. Planning preservation
-- WIR now explicitly preserves the clarified design wording so future sessions do not drift by compaction/reset.
+3. The planning checkpoint after the earlier small backbone cleanup was actually used.
+- the project did not stay trapped in fake ambiguity forever
+- a real follow-through patch sequence was chosen and landed
 
-4. Anti-drift result
-- The source stack no longer subtly pulls in different directions on the core vision.
+4. The next planning checkpoint is now different in shape.
+- the current pressure is no longer “pick any next patch after v0.27.0 cleanup”
+- it is now “what comes after the first playable continuity handoff without jumping the roadmap?”
 
 
-=== MAIN THINGS THIS CLARIFICATION PASS RESOLVED ===
+=== MAIN THINGS THIS CURRENT POSITION NOW PROTECTS ===
 
 1. Player contract
 - The default fantasy is still “I am this actor right now.”
 - The player is not tightly restricted; full sandbox authorship is the default start.
 - The sim then runs emergently rather than requiring constant micromanagement.
+- death can now hand play forward through connected actors in a real, though still narrow, implemented way.
 
 2. Scope identity
 - Scope zoom is core identity, not decorative future garnish.
@@ -104,9 +117,9 @@ So the current question is now:
 
 3. Continuity philosophy
 - Death is a transition, not a hard fail state.
-- Lines can be archived.
+- Lines can be archived later.
 - The universe persists.
-- Continuity can move through relevant connected actors rather than strict child-or-game-over logic.
+- Continuity can now move through relevant connected actors in a first playable implementation, while broader continuity systems remain later work.
 
 4. Economy/business importance
 - Economy is a pillar.
@@ -138,13 +151,17 @@ This appears intentional. Weight should come from records, continuity, lineage, 
 4. Scope remains huge
 The vision is coherent, but the execution risk is still “feature landfill with delusions of grandeur” if sequencing discipline slips.
 
+5. Operator/dev tooling temptation is rising before enough systems exist
+This is a real pressure, but a full dev mode right now could become premature tooling fluff if it gets built before enough repeated testing pain justifies a reusable operator layer.
+
 
 === LEADING PLANNING BUCKETS NOW ===
 
-1. Next real implementation/planning move after doc sync
+1. Next real implementation/planning move after v0.30.0
 Use:
-- decide what actually deserves implementation attention next from the aligned source stack
-- avoid replacing code planning with endless documentation self-licking
+- choose the next honest structural move after the first playable continuity handoff
+- avoid patch-number momentum theater
+- do not treat every new thought as an automatic next implementation target
 
 2. Multi-axis social perception / opportunity layer
 Use:
@@ -164,27 +181,32 @@ Use:
 
 5. Continuity / lineage / archive maturation
 Use:
-- stable docs now protect continuity truth more clearly
-- implementation reality is still much narrower and should not be overclaimed
+- continuity is now more real in implementation than before
+- archive/lineage/succession depth are still not ready to be overclaimed or automatically promoted
+
+6. Operator tooling / scenario testing seam
+Use:
+- preserve as a valid future support/tooling pressure
+- do not let it jump ahead of real simulation/system growth
+- only promote it when repeated testing pain across multiple real systems justifies reusable operator infrastructure rather than patch-specific debug hacks
 
 
 === DOCUMENT-SYSTEM RESULT OF THIS SYNC ===
 
-- stable docs now reflect the clarified vision materially better than before
-- planning still carries finer-grained wording for sandbox-default freedom and later social-perception detail
-- Source Index still does not need revision
-- repo docs/changelog do not need changes from this source-stack sync alone
-- the source stack is aligned enough to stop defaulting to document surgery and return to actual work
+- stable docs still do not need a forced revision from the recent repo milestones alone
+- planning now better reflects repo truth through v0.30.0
+- the current planning checkpoint is now about what follows first playable continuity, not about pre-v0.28 ambiguity
+- operator/dev tooling is now preserved as a planning thought without being falsely promoted into the next build target
 
 
 === NEXT BEST USE ===
 
-1. Use the aligned source stack as the basis for choosing the next real implementation or planning target.
-2. Keep IDEA-102 as anti-drift protection, not as an excuse to reopen the same clarification loop forever.
-3. Keep IDEA-103 visible as a later layer, not an immediate patch title.
+1. Use the aligned source stack plus repo truth through v0.30.0 to choose the next real structural target.
+2. Keep continuity follow-through honest: the first playable handoff exists, but broader continuity systems remain later work.
+3. Keep operator tooling visible as a later support seam, not as an excuse to build fluff before more systems exist.
 4. Do not force another doc-heavy cycle unless a real contradiction appears.
 
 
 === ONE-LINE SUMMARY ===
 
-The source stack is now aligned enough that the honest next move is to stop polishing the docs and return to choosing the next real implementation/planning target from the clarified Actora vision.
+Actora now has verified repo truth through the first playable continuity handoff, and the next honest move is to choose what follows that milestone deliberately rather than drifting into either fake momentum or premature tooling fluff.
