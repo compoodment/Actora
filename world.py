@@ -36,6 +36,44 @@ class World:
         place = self.get_place(place_id)
         return place["kind"] if place else None
 
+    def get_child_places(self, parent_place_id):
+        """Returns direct child place records for one parent place ID."""
+        return [
+            place
+            for place in self.places.values()
+            if place.get("parent_place_id") == parent_place_id
+        ]
+
+    def get_place_lineage(self, place_id, include_self=True):
+        """Returns the current parent chain from a place upward through its ancestors."""
+        if place_id is None:
+            return []
+
+        if include_self:
+            current_place = self.get_place(place_id)
+        else:
+            current_place = self.get_place(place_id)
+            current_place = self.get_place(current_place["parent_place_id"]) if current_place else None
+
+        lineage = []
+        visited_place_ids = set()
+        while current_place is not None:
+            current_place_id = current_place.get("place_id")
+            if current_place_id in visited_place_ids:
+                break
+            visited_place_ids.add(current_place_id)
+            lineage.append(current_place)
+            parent_place_id = current_place.get("parent_place_id")
+            current_place = self.get_place(parent_place_id) if parent_place_id is not None else None
+        return lineage
+
+    def get_nearest_place_of_kind(self, place_id, kind, include_self=True):
+        """Returns the nearest place in the lineage matching the requested kind."""
+        for place in self.get_place_lineage(place_id, include_self=include_self):
+            if place.get("kind") == kind:
+                return place
+        return None
+
     def add_actor(self, actor_id, actor_obj):
         """Adds an actor to the world."""
         self.actors[actor_id] = actor_obj

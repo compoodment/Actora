@@ -1,5 +1,14 @@
 # Actora Changelog
 
+## Version 0.32.0 (Minor) - 2026-03-27
+- **Structured Place / Place-Hierarchy Strengthening:**
+    - Added a small world-owned place query seam in `world.py` with `get_child_places(...)`, `get_place_lineage(...)`, and `get_nearest_place_of_kind(...)`.
+    - Updated startup world setup in `main.py` to create a minimal honest place hierarchy: one `world_body`, one `country`, and one `city`, wired through `parent_place_id`.
+    - Reassigned startup mother, father, and player `current_place_id` / `residence_place_id` values to the startup city rather than the world body.
+    - Updated `Human.get_spatial_state(...)` and `Human.get_snapshot_data(...)` so snapshot `World Body` display resolves through place ancestry when the current place is lower-level, and added one explicit `Current Place` display line in the shell snapshot.
+    - Preserved startup flow, continuity handoff flow, existing link behavior, and the current shell loop.
+    - Did not introduce travel, movement simulation, property/household systems, country-depth simulation, politics/jurisdiction systems, spatial-identity expansion, or map UI.
+
 ## Version 0.31.0 (Minor) - 2026-03-27
 - **Link Foundation Strengthening:**
     - Added `_build_link_record(...)` in `world.py` so world-owned links are normalized at creation time and always store `metadata` as a dictionary.

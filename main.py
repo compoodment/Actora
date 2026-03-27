@@ -50,6 +50,7 @@ def render_snapshot(snapshot_data):
 
     print("\n--- Location ---")
     print(f"  World Body: {location['world_body_name']}")
+    print(f"  Current Place: {location['current_place_name']}")
 
     print("\n--- Statistics ---")
     print(f"  Health: {statistics['health']}")
@@ -250,11 +251,27 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         parent_place_id=None,
         metadata={},
     )
+    world.add_place(
+        place_id="earth_country_01",
+        name="Starter Country",
+        kind="country",
+        parent_place_id="earth",
+        metadata={},
+    )
+    world.add_place(
+        place_id="earth_city_01",
+        name="Starter City",
+        kind="city",
+        parent_place_id="earth_country_01",
+        metadata={},
+    )
+
+    startup_place_id = "earth_city_01"
 
     mother_identity_context = prepare_parent_identity_context(
         role="mother",
         player_last_name=player_last_name,
-        place_id="earth",
+        place_id=startup_place_id,
         world=world,
     )
     family_last_name = mother_identity_context["family_last_name"]
@@ -262,7 +279,7 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         role="father",
         family_last_name=family_last_name,
         player_last_name=player_last_name,
-        place_id="earth",
+        place_id=startup_place_id,
         world=world,
     )
 
@@ -280,8 +297,8 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         gender=mother_identity["gender"],
         birth_year=world.current_year - 25,
         birth_month=random.randint(1, 12),
-        current_place_id="earth",
-        residence_place_id="earth",
+        current_place_id=startup_place_id,
+        residence_place_id=startup_place_id,
     )
     world.create_human_actor(
         actor_id=father_id,
@@ -292,8 +309,8 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         gender=father_identity["gender"],
         birth_year=world.current_year - 27,
         birth_month=random.randint(1, 12),
-        current_place_id="earth",
-        residence_place_id="earth",
+        current_place_id=startup_place_id,
+        residence_place_id=startup_place_id,
     )
     world.add_link_pair(
         source_id=mother_id,
@@ -317,7 +334,7 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         father_id=father_id,
         birth_year=world.current_year,
         birth_month=1,
-        place_id="earth",
+        place_id=startup_place_id,
         randomize_stats=True,
     )
     world.set_focused_actor(player_id)

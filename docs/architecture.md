@@ -1,6 +1,6 @@
 # Actora Architecture Summary
 
-**Version:** 0.31.0
+**Version:** 0.32.0
 **Last Updated:** 2026-03-27
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
@@ -72,6 +72,9 @@ Current methods:
 - `get_place(place_id)`
 - `get_place_name(place_id)`
 - `get_place_kind(place_id)`
+- `get_child_places(parent_place_id)`
+- `get_place_lineage(place_id, include_self=True)`
+- `get_nearest_place_of_kind(place_id, kind, include_self=True)`
 - `apply_outcome(actor_id, outcome)`
 - `get_continuity_candidates_for(actor_id)`
 - `build_continuity_state_for(actor_id)`
@@ -209,6 +212,15 @@ Basic world link helper contract:
 - `get_caregiver_parent_ids_for(entity_id)` resolves caregiver-marked mother/father links from outgoing family links.
 - `get_parent_ids_for(entity_id)` remains the compatibility wrapper for current mother/father access and falls back to bare family roles when explicit origin metadata is absent.
 
+Basic world place helper contract:
+
+- `add_place(...)` stores place records in the world-owned registry with explicit `parent_place_id`.
+- `get_place(...)`, `get_place_name(...)`, and `get_place_kind(...)` remain the narrow direct lookup helpers.
+- `get_child_places(parent_place_id)` returns the current direct child place records for one parent.
+- `get_place_lineage(place_id, include_self=True)` walks from a place upward through its parent chain and returns that current lineage.
+- `get_nearest_place_of_kind(place_id, kind, include_self=True)` resolves the closest matching place in that lineage and is the current ancestry-aware lookup seam.
+- This remains intentionally small and does not introduce travel, property, jurisdiction, movement, or map systems.
+
 ## 5. Derived State
 
 The following values are derived rather than persistently stored:
@@ -238,8 +250,12 @@ Spatial access/query is formalized through `Human.get_spatial_state(world)`, whi
 
 - `current_place_id`
 - `current_place_name`
+- `current_place_kind`
 - `residence_place_id`
 - `residence_place_name`
+- `residence_place_kind`
+- `current_world_body_id`
+- `current_world_body_name`
 
 This helper is read-only and does not mutate human or world state.
 
@@ -255,12 +271,12 @@ Current snapshot access is formalized through `Human.get_snapshot_data(current_y
 
 - `identity` (`full_name`, `species`, `sex`, `gender`)
 - `time` (`age`, `life_stage`, `year`, `month`)
-- `location` (`world_body_name`)
+- `location` (`world_body_name`, `current_place_name`, `current_place_kind`)
 - `statistics` (`health`, `happiness`, `intelligence`, `money`)
 - `relationships` (`mother_name`, `father_name`)
 - `structural` (`structural_status`, `is_alive`, `death_year`, `death_month`, `death_reason`)
 
-This helper is read-only, resolves parent names through world semantic link/actor lookup helpers, and preserves the current `"Unknown"` fallback for unresolved parents and unresolved current place names.
+This helper is read-only, resolves parent names through world semantic link/actor lookup helpers, resolves `world_body_name` through place ancestry rather than assuming the current place is itself a world body, and preserves the current `"Unknown"` fallback for unresolved parents and unresolved place names.
 
 ## 6. Module Responsibilities
 
@@ -288,7 +304,7 @@ Current shell-level functions:
 - `game_loop(...)` — main input/advancement/display loop
 - `start_game()` — top-level orchestration (banner, then delegates to the above)
 
-Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. The current shell also now renders a narrow structural-state section in snapshots and is capable of rendering structural transition / continuity result blocks when those keys are present.
+Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. The current shell also now renders a narrow structural-state section in snapshots, renders both ancestry-resolved world body and current place, and is capable of rendering structural transition / continuity result blocks when those keys are present.
 
 ### `identity.py`
 Responsible for:
@@ -313,6 +329,7 @@ Responsible for:
 - shared world state
 - world-owned focused actor tracking (`focused_actor_id` plus focus helper methods)
 - world-owned link storage and retrieval helpers (`World.links` and link helper/query methods), including narrow origin/caregiver access layered on the current family link metadata
+- world-owned place storage and minimal hierarchy/query helpers (`World.places` plus direct lookup, child lookup, lineage, and nearest-kind resolution)
 - month advancement
 - centralized application of event stat outcomes (`World.apply_outcome(...)`)
 - world-owned continuity candidate resolution from the current link graph
@@ -420,7 +437,7 @@ Current player creation includes:
 
 ### Initial World Setup
 Current initialization behavior:
-- initial world setup creates starter place `"earth"` (`name="Earth"`, `kind="world_body"`)
+- initial world setup creates a minimal startup place hierarchy: `"earth"` (`name="Earth"`, `kind="world_body"`) -> `"earth_country_01"` (`name="Starter Country"`, `kind="country"`) -> `"earth_city_01"` (`name="Starter City"`, `kind="city"`)
 - player is created in Year 1, Month 1 with randomized starting stats
 - two parent records are created through `World.create_human_actor(...)`
 - current actor entry through `create_human_actor(...)` writes preserved `actor_entry` records with `entry_method="create_human_actor"`
@@ -431,7 +448,7 @@ Current initialization behavior:
 - parent first names are randomized from approved internal mother/father pools
 - parent last names inherit the player last name when provided
 - if player last name is blank, parent last names use a random fallback from `FALLBACK_LAST_NAME_POOL`
-- startup mother, startup father, and startup player each receive `current_place_id = "earth"` and `residence_place_id = "earth"` during setup
+- startup mother, startup father, and startup player each receive `current_place_id = "earth_city_01"` and `residence_place_id = "earth_city_01"` during setup
 - startup actor IDs now follow the `startup_<role>_<suffix>` pattern instead of fixed singleton IDs, while preserving the current one-family startup shape and parent/player lookup behavior
 - parent birth months are randomized from 1-12
 - the startup player is set as the current world-owned focused actor
@@ -467,7 +484,7 @@ Current event behavior:
 Current snapshots display:
 - identity (full name, species, sex, gender)
 - time (age, life stage, year, month)
-- location (current world body only, resolved through `Human.get_snapshot_data(...)`, which currently reads `Human.get_spatial_state(world)` and world place helpers)
+- location (ancestry-resolved world body plus current place, resolved through `Human.get_snapshot_data(...)`, which currently reads `Human.get_spatial_state(world)` and world place helpers)
 - residence remains internal and is not rendered in the snapshot yet
 - statistics (health, happiness, intelligence, money)
 - family references (mother, father), still resolved from the world layer

@@ -84,14 +84,22 @@ class Human:
 
     def get_spatial_state(self, world):
         """Provides a structured, read-only view of current and residence place identity."""
+        current_place = world.get_place(self.current_place_id)
+        residence_place = world.get_place(self.residence_place_id)
+        current_world_body = world.get_nearest_place_of_kind(self.current_place_id, "world_body")
+
         current_place_name = world.get_place_name(self.current_place_id)
         residence_place_name = world.get_place_name(self.residence_place_id)
 
         return {
             "current_place_id": self.current_place_id,
             "current_place_name": current_place_name,
+            "current_place_kind": current_place["kind"] if current_place else None,
             "residence_place_id": self.residence_place_id,
             "residence_place_name": residence_place_name,
+            "residence_place_kind": residence_place["kind"] if residence_place else None,
+            "current_world_body_id": current_world_body["place_id"] if current_world_body else None,
+            "current_world_body_name": current_world_body["name"] if current_world_body else None,
         }
 
     def is_alive(self):
@@ -144,7 +152,9 @@ class Human:
                 "month": current_month,
             },
             "location": {
-                "world_body_name": spatial_state["current_place_name"] or "Unknown",
+                "world_body_name": spatial_state["current_world_body_name"] or "Unknown",
+                "current_place_name": spatial_state["current_place_name"] or "Unknown",
+                "current_place_kind": spatial_state["current_place_kind"],
             },
             "statistics": {
                 "health": self.stats["health"],
