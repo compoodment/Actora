@@ -1,8 +1,5 @@
 # Actora
 
-Actora is an actor-anchored continuous-universe simulation project.
-
-This repository contains the current automated working codebase, source-document stack, planning layer, and repo-local implementation history for Actora.
 
 ## What this repo contains
 
