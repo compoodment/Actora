@@ -1,19 +1,18 @@
-Actionable Ideas Summary — Rev23
-Date: 2026-03-27
+Actionable Ideas Summary — Rev24
+Date: 2026-03-28
 Role: temporary near-term planning snapshot for Actora
 Authority: non-authoritative; stable docs win, repo truth wins on implementation
 
 
 === CURRENT WORKING POSITION ===
 
-Actora now has a materially stronger early backbone, and verified repo truth is through v0.31.0, with source-stack sync carried through:
+Actora now has a materially stronger early backbone, and verified repo truth is through v0.33.0, with source-stack sync carried through:
 - Master Context v9
 - Roadmap v10
-- planning clarification preserved in WIR v34
 - world-owned actor registry
 - world-owned links
-- structured place registry
-- current place and residence separation
+- structured place registry with parent-place hierarchy
+- actor-level separation between current place, residence, jurisdiction, and temporary occupancy context
 - dedicated identity-generation layer
 - centralized event outcome application
 - world-owned record storage
@@ -33,9 +32,10 @@ Actora now has a materially stronger early backbone, and verified repo truth is 
 - a narrow shared CLI input boundary helper in `main.py` that cleanly exits on `EOFError` and `KeyboardInterrupt`
 - startup actor IDs generated through `generate_startup_actor_id(...)` instead of fixed singleton IDs for mother, father, and player
 - structural death / continuity foundation through `structural_status`, `World.mark_actor_dead(...)`, `get_continuity_candidates_for(...)`, `build_continuity_state_for(...)`, and continuity-ready turn result fields
-- current-facing project/repo rename to Actora, including repo path rename, current-facing doc/runtime naming updates, roadmap filename rename, and README cleanup
 - first playable continuity handoff flow through deterministic continuity candidate refinement, dead-focus advancement blocking, world-owned continuation handoff validation, and shell-level continuation choice / clean dead-end handling
 - link foundation strengthening through normalized `_build_link_record(...)`, small general `get_links(...)` query access, thinner compatibility link helpers, continuity candidate gathering routed through the generic link seam, and one startup parent-to-parent `association/coparent` proof link
+- structured place / place-hierarchy strengthening through ancestry-aware place lookup, startup `world_body -> country -> city` hierarchy, and cleaner current-place snapshot truth
+- spatial identity separation strengthening through explicit `jurisdiction_place_id` and `temporary_occupancy_place_id`, with startup actors now structurally living in the startup city while jurisdictionally belonging to the startup country
 
 
 === CURRENT CLARIFIED DESIGN READ ===
@@ -62,48 +62,56 @@ Actora is a single continuous universe simulation where the player primarily liv
 
 === CURRENT PLANNING READ ===
 
-The document-alignment loop is now substantially closed.
-The earlier post-v0.27.0 next-step ambiguity was real, but it is no longer the same open question it was before: the project did choose and land a real follow-through sequence.
+The old post-v0.31.0 decision point is now dead.
+It served its purpose, then the repo moved.
 
-That sequence was:
+The recent verified sequence is now:
 - v0.28.0 — death / continuity structural transition foundation
 - v0.29.0 — Actora rename milestone
 - v0.30.0 — first playable continuity handoff flow
 - v0.31.0 — link foundation strengthening
+- v0.32.0 — structured place / place-hierarchy strengthening
+- v0.33.0 — spatial identity separation strengthening
 
 So the immediate next move is no longer:
-- “we still need to choose whether to follow through on continuity or keep hovering in planning limbo”
-- or “the link layer still needs its first honest strengthening pass before downstream systems can trust it”
+- “what follows link-foundation strengthening?”
+- or “is structured place the next honest candidate?”
+- or “should spatial identity separation happen now?”
+
+Those questions have been answered already.
 
 The immediate next move is now:
-- choose the next honest structural implementation or planning move after link-foundation strengthening, without inflating every testing/tooling thought into an immediate build target
+- choose the strongest honest controlled-state-mutation follow-through after spatial identity separation, without jumping into travel, property, politics, or operator-tooling fluff
 
 Why:
-- continuity is now materially more real than it was during the earlier planning ambiguity
-- the link layer is now more honest and less startup-family-trapped than it was before `v0.31.0`
-- the source stack is still aligned enough to support deliberate next-step choice
-- stable docs already protect the larger vision
-- forcing momentum now would be weaker than making the next choice deliberately again
+- the place layer is now materially more truthful than it was before `v0.32.0`
+- spatial identity is now structurally separated enough to matter after `v0.33.0`
+- those extra spatial fields are still mostly assigned directly rather than through a stronger world-owned mutation boundary
+- the roadmap puts controlled state mutation after structured place and spatial identity separation
+- forcing downstream expansion now would be weaker than tightening the mutation boundary first
 
 So the current question is now:
-- “given repo truth through `v0.31.0`, what is the strongest honest next structural move that still respects roadmap order?”
+- “given repo truth through `v0.33.0`, what is the strongest honest controlled-state-mutation move before broader spatial/domain expansion?”
 
 
 === WHAT THE RECENT SEQUENCE ACHIEVED ===
 
-1. Structural continuity truth moved from abstract protection to first playable handoff.
-- death is now both a preserved structural transition and a state that can trigger continuation choice rather than passive dead-end text only
+1. Spatial truth is now less fake.
+- startup place is no longer just one flattened `earth` node
+- world body, country, and city now exist in a real small hierarchy
+- snapshot output is more honest about where the actor is
 
-2. Current-facing project identity is now coherent.
-- the repo, docs, runtime naming, and current-facing materials now consistently use Actora without rewriting historical changelog truth
+2. Spatial identity is now less collapsed.
+- current place, residence, jurisdiction, and temporary occupancy no longer have to be mentally treated as one generic location blob
+- the repo now preserves the distinction structurally even though behavior around those distinctions is still minimal
 
-3. The planning checkpoint after the earlier small backbone cleanup was actually used.
-- the project did not stay trapped in fake ambiguity forever
-- a real follow-through patch sequence was chosen and landed
+3. Continuity and link truth remain materially more real than earlier prototype phases.
+- the project still has a real playable continuity handoff path
+- continuity candidates still route through the stronger world-owned link seam
 
-4. The next planning checkpoint is now different in shape.
-- the current pressure is no longer “pick any next patch after v0.27.0 cleanup”
-- it is now “what comes after link-foundation strengthening without jumping the roadmap?”
+4. The planning checkpoint changed shape again.
+- the project is no longer deciding whether place/separation should happen
+- it is deciding how to follow that work with a stronger mutation boundary rather than careless downstream expansion
 
 
 === MAIN THINGS THIS CURRENT POSITION NOW PROTECTS ===
@@ -119,11 +127,12 @@ So the current question is now:
 - The intended ladder is actor -> city -> country -> world -> star system -> galaxy -> universe.
 - Zoomed-out views should still act through real entities/systems where possible, not detached fake god buttons.
 
-3. Continuity philosophy
-- Death is a transition, not a hard fail state.
-- Lines can be archived later.
-- The universe persists.
-- Continuity can now move through relevant connected actors in a first playable implementation, while broader continuity systems remain later work.
+3. Spatial model honesty
+- The project now has a more honest early spatial spine.
+- place hierarchy exists
+- current location is distinct from residence
+- jurisdiction exists as a separate structural field
+- temporary occupancy exists as a separate structural field, even though it is not used yet
 
 4. Economy/business importance
 - Economy is a pillar.
@@ -155,40 +164,51 @@ This appears intentional. Weight should come from records, continuity, lineage, 
 4. Scope remains huge
 The vision is coherent, but the execution risk is still “feature landfill with delusions of grandeur” if sequencing discipline slips.
 
-5. Operator/dev tooling temptation is rising before enough systems exist
+5. Operator/dev tooling temptation is still rising before enough systems exist
 This is a real pressure, but a full dev mode right now could become premature tooling fluff if it gets built before enough repeated testing pain justifies a reusable operator layer.
+
+6. The spatial model is ahead of the spatial mutation boundary
+The repo now stores more honest spatial identity, but future systems would still be too tempted to poke actor fields directly unless a cleaner world-owned mutation seam arrives soon.
 
 
 === LEADING PLANNING BUCKETS NOW ===
 
-1. Next real implementation/planning move after v0.30.0
+1. Next real implementation/planning move after v0.33.0
 Use:
-- choose the next honest structural move after the first playable continuity handoff
+- choose the next honest structural move after spatial identity separation
 - avoid patch-number momentum theater
-- do not treat every new thought as an automatic next implementation target
+- do not treat every newly available field as a reason to force downstream systems into existence
 
-2. Multi-axis social perception / opportunity layer
+2. Controlled spatial identity mutation / controlled state mutation follow-through
+Use:
+- likely strongest roadmap-faithful next candidate
+- strengthen the world-owned mutation boundary for actor spatial identity
+- validate actor existence and referenced places cleanly
+- optionally preserve meaningful spatial-state changes as records if justified
+- do not smuggle travel/property/politics in through the back door
+
+3. Multi-axis social perception / opportunity layer
 Use:
 - keep visible as a real later vision component
 - do not let it vanish into vague “social stuff later” mush
 - also do not promote it into immediate foundation work
 
-3. Entity registry vs actor view layering
+4. Entity registry vs actor view layering
 Use:
 - still a real architectural guardrail
 - still not the next code patch automatically
 
-4. Identity generation realism / context-awareness
+5. Identity generation realism / context-awareness
 Use:
 - still visible later
-- still blocked by stronger context/place/era maturity
+- still blocked by stronger context/place/era maturity and by stronger mutation/creation discipline
 
-5. Continuity / lineage / archive maturation
+6. Continuity / lineage / archive maturation
 Use:
 - continuity is now more real in implementation than before
 - archive/lineage/succession depth are still not ready to be overclaimed or automatically promoted
 
-6. Operator tooling / scenario testing seam
+7. Operator tooling / scenario testing seam
 Use:
 - preserve as a valid future support/tooling pressure
 - do not let it jump ahead of real simulation/system growth
@@ -198,20 +218,21 @@ Use:
 === DOCUMENT-SYSTEM RESULT OF THIS SYNC ===
 
 - stable docs still do not need a forced revision from the recent repo milestones alone
-- planning now better reflects repo truth through v0.31.0
-- the current planning checkpoint is now about what follows link-foundation strengthening, not about pre-v0.28 ambiguity
-- operator/dev tooling is now preserved as a planning thought without being falsely promoted into the next build target
+- flexible planning docs are now back in sync with repo truth through `v0.33.0`
+- the current planning checkpoint is now about what follows spatial identity separation, not what follows link-foundation strengthening
+- operator/dev tooling remains preserved as a later planning pressure rather than a fake next milestone
+- identity-generation realism remains visible without being falsely promoted ahead of roadmap order
 
 
 === NEXT BEST USE ===
 
-1. Use the aligned source stack plus repo truth through v0.31.0 to choose the next real structural target.
-2. Keep continuity follow-through honest: the first playable handoff exists, and the link layer is now materially stronger, but broader continuity systems remain later work.
-3. Treat structured place / place-hierarchy strengthening as the leading roadmap-faithful next candidate unless a better same-layer target clearly beats it.
-4. Keep operator tooling visible as a later support seam, not as an excuse to build fluff before more systems exist.
-5. Do not force another doc-heavy cycle unless a real contradiction appears.
+1. Use the aligned source stack plus repo truth through `v0.33.0` to choose the next real structural target.
+2. Treat controlled spatial identity mutation / controlled state mutation follow-through as the leading next candidate unless a better same-layer target clearly beats it.
+3. Keep downstream temptations — travel, property, politics, tooling glamor, social perception — out of the immediate patch slot.
+4. Keep continuity follow-through honest: real, playable, still narrow.
+5. Do not force another stable-doc cycle unless a real contradiction appears.
 
 
 === ONE-LINE SUMMARY ===
 
-Actora now has verified repo truth through link-foundation strengthening, and the next honest move is to choose what follows that milestone deliberately rather than drifting into either fake momentum or premature tooling fluff.
+Actora now has verified repo truth through spatial identity separation strengthening, and the next honest move is probably to tighten the world-owned spatial mutation boundary before broader spatial or domain systems start spraying state around like idiots.
