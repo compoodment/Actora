@@ -1,4 +1,4 @@
-Actora Operator Guide v7
+Actora Operator Guide v8
 
 Purpose
 
@@ -71,8 +71,17 @@ Use the lightest path that still fits the job.
 
 Default selection rule for Actora:
 	•	tiny surgical fix -> direct edit is allowed
-	•	real feature, refactor, or multi-file coding task -> default to Codex CLI
+	•	medium coding task -> do a minimal grounding pass, then default to Codex CLI
+	•	real feature, refactor, or multi-file coding task -> do a minimal grounding pass, then default to Codex CLI
 	•	repo-doc workflow, controlled patch/show flow, or explicitly chosen OpenClaw task -> use OpenClaw
+
+Minimal grounding pass means:
+	•	check the actual repo state relevant to the task
+	•	read the specific docs/code needed to avoid fake assumptions
+	•	return a short grounded proposal with the recommended move, patch boundary, and key things being kept out
+
+Do not wait for the user to repeatedly say “re-read the docs” or “think properly” before doing non-trivial Actora work.
+That grounding step is part of the normal workflow, not a special extra ritual.
 
 Do not spawn Codex just to change one obvious string, one tiny conditional, one import, or one comment block.
 Do not keep hand-editing a messy multi-file task just because the first file looked small.
@@ -85,6 +94,7 @@ Selection should consider:
 	•	how much reviewable output is needed before apply
 	•	whether token savings matter enough to justify agent orchestration
 	•	whether the task is code-heavy or doc-heavy
+	•	whether Codex is the better token split even for medium work
 
 1.4 OpenClaw workflow rules
 
@@ -114,7 +124,7 @@ When using Codex CLI for Actora:
 	•	prefer one coherent task over a rambling prompt with mixed goals
 	•	make Codex do the implementation labor, not the decision-making about project truth
 
-Codex is the default worker for feature/refactor/multi-file coding work, not an excuse to skip specification.
+Codex is the default worker for medium-and-up coding work in Actora once the task has been minimally grounded.
 A bad prompt still makes bad code. The robot is not a priest.
 
 Codex output must still be reviewed for:
@@ -124,9 +134,18 @@ Codex output must still be reviewed for:
 	•	verification completeness
 	•	weird opportunistic rewrites
 	•	confident nonsense
+	•	what may have been missed
+	•	whether a tighter or clearly better within-scope revision exists
 
 Do not silently accept Codex changes just because they compile.
 Compilation is one gate, not the throne of truth.
+
+The review step is not only a correctness check.
+It should also ask:
+	•	Did the worker miss something important?
+	•	Is there a cleaner, tighter, or more honest version still within the approved scope?
+	•	Did the worker follow the letter of the task while missing the better interpretation?
+	•	Should one additional within-scope improvement or revision be made before acceptance?
 
 When Codex is used in the background or on a longer task:
 	•	report that it was started
@@ -285,15 +304,19 @@ If formatting itself is behaviorally important, preserve it exactly.
 	4.	worker/task framing
 	5.	draft review / diff review / resulting change review
 	6.	preservation review
-	7.	approval to apply when the workflow requires it
-	8.	VPS verification after apply
-	9.	verification against the approved spec
-	10.	documentation update
-	11.	commit/tag if appropriate
+	7.	gap / missed-something review
+	8.	within-scope revision opportunity review
+	9.	approval to apply when the workflow requires it
+	10.	VPS verification after apply
+	11.	verification against the approved spec
+	12.	documentation update
+	13.	commit/tag if appropriate
 
 This order matters.
 Do not treat broad “looks complete” claims as primary truth.
 Do not skip the review step just because a tool sounds confident.
+Do not treat review as only “did it technically work.”
+Review should also check whether something important was missed, whether a better within-scope revision exists, and whether the result is merely acceptable versus actually the best clean version of the approved patch.
 
 7.2 Automated-worker pre-acceptance gate
 
