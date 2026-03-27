@@ -1,6 +1,6 @@
 # Actora Architecture Summary
 
-**Version:** 0.30.0
+**Version:** 0.31.0
 **Last Updated:** 2026-03-27
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
@@ -54,9 +54,11 @@ Current methods:
 - `create_human_actor(actor_id, species, first_name, last_name, sex, gender, birth_year, birth_month, current_place_id=None, residence_place_id=None, randomize_stats=False)`
 - `create_human_child_with_parents(child_id, first_name, last_name, sex, gender, mother_id, father_id, birth_year, birth_month, place_id, randomize_stats=False)`
 - `get_actor(actor_id)`
+- `_build_link_record(source_id, target_id, link_type, role, metadata=None)`
 - `advance_months(months)`
 - `add_link(source_id, target_id, link_type, role, metadata=None)`
 - `add_link_pair(source_id, target_id, forward_type, forward_role, reverse_type, reverse_role, forward_metadata=None, reverse_metadata=None)`
+- `get_links(source_id=None, target_id=None, entity_id=None, direction="both", link_type=None, role=None, roles=None)`
 - `get_outgoing_links(source_id, link_type=None, role=None)`
 - `get_incoming_links(target_id, link_type=None, role=None)`
 - `get_related_links(entity_id, link_type=None, role=None)`
@@ -134,7 +136,7 @@ Minimal link record shape:
 }
 ```
 
-`metadata` remains optional, and `World.links` remains the storage truth for current relationship data.
+`metadata` remains an optional input when constructing links, and `World.links` remains the storage truth for current relationship data. Stored link records are now normalized so `metadata` is always present as a dictionary.
 
 Current startup parent records still use directional family roles (`mother`, `father`, and reverse `child`), but startup bootstrap links created through `create_human_child_with_parents(...)` now also carry explicit semantic metadata:
 - `is_origin_family` — marks that the startup link is expressing origin semantics
@@ -144,6 +146,7 @@ Current startup parent records still use directional family roles (`mother`, `fa
 Current startup examples therefore look like:
 - `{"source_id": "startup_player_ab12cd34", "target_id": "startup_mother_ef56gh78", "type": "family", "role": "mother", "metadata": {"is_origin_family": True, "is_caregiver_family": True, "bootstrap_source": "startup_family"}}`
 - `{"source_id": "startup_mother_ef56gh78", "target_id": "startup_player_ab12cd34", "type": "family", "role": "child", "metadata": {"is_origin_family": True, "is_caregiver_family": True, "bootstrap_source": "startup_family"}}`
+- `{"source_id": "startup_mother_ef56gh78", "target_id": "startup_father_ij90kl12", "type": "association", "role": "coparent", "metadata": {"bootstrap_source": "startup_coparent_association"}}`
 
 Reverse family links are still stored explicitly, link records still reference entity IDs present in `World.actors`, and this remains a narrow startup-family semantic clarification rather than a broader relationship framework. It does not implement adoption, guardianship, household simulation, or species-general relationship architecture.
 
@@ -151,7 +154,7 @@ Current continuity-candidate boundary:
 - `get_continuity_candidates_for(actor_id)` scans current related links, resolves the linked living actors, excludes the actor itself, dedupes candidates, and returns small structured candidate objects
 - current candidate objects contain `actor_id`, `full_name`, `link_type`, `link_role`, `relationship_label`, `structural_status`, and `is_alive`
 - current candidate labeling and ordering are deterministic: candidate-defining link context is chosen by a stable link sort key, and final candidate ordering uses (`full_name`, `link_type`, `link_role`, `actor_id`) rather than relying on incidental link iteration order
-- because current repo truth only has startup family links, continuity candidates are effectively drawn from the current narrow family-connected link graph
+- continuity candidate gathering now delegates through the generic world-owned `get_links(...)` seam, so current candidates can come from any stored link type even though startup only seeds family links plus one direct parent-to-parent `association/coparent` pair
 - `handoff_focus_to_continuation(...)` is the current world-owned validation/mutation seam for switching focus after the focused actor is dead
 - this still does not implement weighting, succession rules, archive state, lineage systems, or a broader connected-actor prioritization framework
 
@@ -195,9 +198,11 @@ Actor entry helpers:
 
 Basic world link helper contract:
 
-- `add_link(...)` appends one directional link.
-- `add_link_pair(...)` appends both forward and reverse directional links.
-- query helpers return filtered link records without mutating world state.
+- `_build_link_record(...)` is the internal normalization seam for one link dictionary. It always produces the standard shape (`source_id`, `target_id`, `type`, `role`, `metadata`) and normalizes `metadata` to a dictionary.
+- `add_link(...)` delegates through `_build_link_record(...)`, appends one normalized directional link, and returns the created link record.
+- `add_link_pair(...)` remains the explicit bidirectional helper and now naturally flows through the same normalized `add_link(...)` path for both records.
+- `get_links(...)` is the small general world-owned query seam. It filters by optional `source_id`, `target_id`, `entity_id` plus `direction`, `link_type`, `role`, or `roles` without mutating world state.
+- `get_outgoing_links(...)`, `get_incoming_links(...)`, and `get_related_links(...)` are thin wrappers over `get_links(...)`.
 - `get_link_target_ids(source_id, link_type=None, roles=None)` provides generic retrieval of linked target IDs from outgoing links with optional type/role filtering.
 - `get_family_link_target_ids(...)` adds narrow semantic filtering on top of the same `World.links` store for current family-link metadata checks.
 - `get_origin_parent_ids_for(entity_id)` resolves origin-marked mother/father links from outgoing family links.

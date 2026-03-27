@@ -1,5 +1,15 @@
 # Actora Changelog
 
+## Version 0.31.0 (Minor) - 2026-03-27
+- **Link Foundation Strengthening:**
+    - Added `_build_link_record(...)` in `world.py` so world-owned links are normalized at creation time and always store `metadata` as a dictionary.
+    - Updated `add_link(...)` to delegate through the normalized link builder and kept `add_link_pair(...)` on the same path through `add_link(...)`.
+    - Added the small general world-owned link query helper `get_links(...)` with optional filtering by source, target, entity plus direction, link type, role, and roles.
+    - Refactored existing link lookup helpers into thin wrappers where sensible on top of `get_links(...)`, and routed continuity candidate gathering through the stronger generic query seam.
+    - Updated `main.py` startup setup to add a direct parent-to-parent `association/coparent` link pair alongside the existing family links.
+    - Preserved existing startup family links, current parent snapshot rendering, `get_parent_ids_for(...)`, and current continuity handoff behavior.
+    - Did not introduce marriage, romance, org/property systems, lineage browsing, or broader social-graph expansion.
+
 ## Version 0.30.0 (Minor) - 2026-03-27
 - **Continuation Handoff Flow / Continuity Link Refinement:**
     - Tightened continuity candidate data in `world.py` so candidates now carry deterministic display-ready fields including `relationship_label`, `structural_status`, and `is_alive`.

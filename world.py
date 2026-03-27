@@ -276,17 +276,27 @@ class World:
         """Returns an actor object from the world by ID."""
         return self.actors.get(actor_id)
 
-    def add_link(self, source_id, target_id, link_type, role, metadata=None):
-        """Adds a directional link record between two entities."""
-        link_record = {
+    def _build_link_record(self, source_id, target_id, link_type, role, metadata=None):
+        """Builds one normalized directional link record without mutating the link store."""
+        return {
             "source_id": source_id,
             "target_id": target_id,
             "type": link_type,
             "role": role,
+            "metadata": dict(metadata) if metadata is not None else {},
         }
-        if metadata is not None:
-            link_record["metadata"] = metadata
+
+    def add_link(self, source_id, target_id, link_type, role, metadata=None):
+        """Adds a directional link record between two entities."""
+        link_record = self._build_link_record(
+            source_id=source_id,
+            target_id=target_id,
+            link_type=link_type,
+            role=role,
+            metadata=metadata,
+        )
         self.links.append(link_record)
+        return link_record
 
     def add_link_pair(
         self,
@@ -303,47 +313,78 @@ class World:
         self.add_link(source_id, target_id, forward_type, forward_role, forward_metadata)
         self.add_link(target_id, source_id, reverse_type, reverse_role, reverse_metadata)
 
-    def get_outgoing_links(self, source_id, link_type=None, role=None):
-        """Returns links where the specified entity is the source."""
-        filtered = [link for link in self.links if link.get("source_id") == source_id]
+    def get_links(
+        self,
+        source_id=None,
+        target_id=None,
+        entity_id=None,
+        direction="both",
+        link_type=None,
+        role=None,
+        roles=None,
+    ):
+        """Returns stored links filtered by endpoint, direction, type, and role."""
+        if entity_id is not None and direction not in ("outgoing", "incoming", "both"):
+            raise ValueError(f"get_links: unsupported direction '{direction}'")
+
+        filtered = self.links
+        if source_id is not None:
+            filtered = [link for link in filtered if link.get("source_id") == source_id]
+        if target_id is not None:
+            filtered = [link for link in filtered if link.get("target_id") == target_id]
+        if entity_id is not None:
+            if direction == "outgoing":
+                filtered = [link for link in filtered if link.get("source_id") == entity_id]
+            elif direction == "incoming":
+                filtered = [link for link in filtered if link.get("target_id") == entity_id]
+            else:
+                filtered = [
+                    link
+                    for link in filtered
+                    if link.get("source_id") == entity_id or link.get("target_id") == entity_id
+                ]
         if link_type is not None:
             filtered = [link for link in filtered if link.get("type") == link_type]
+
+        role_filter = set(roles) if roles is not None else None
         if role is not None:
             filtered = [link for link in filtered if link.get("role") == role]
+        elif role_filter is not None:
+            filtered = [link for link in filtered if link.get("role") in role_filter]
         return filtered
+
+    def get_outgoing_links(self, source_id, link_type=None, role=None):
+        """Returns links where the specified entity is the source."""
+        return self.get_links(source_id=source_id, link_type=link_type, role=role)
 
     def get_incoming_links(self, target_id, link_type=None, role=None):
         """Returns links where the specified entity is the target."""
-        filtered = [link for link in self.links if link.get("target_id") == target_id]
-        if link_type is not None:
-            filtered = [link for link in filtered if link.get("type") == link_type]
-        if role is not None:
-            filtered = [link for link in filtered if link.get("role") == role]
-        return filtered
+        return self.get_links(target_id=target_id, link_type=link_type, role=role)
 
     def get_related_links(self, entity_id, link_type=None, role=None):
         """Returns all incoming and outgoing links for an entity."""
-        related = [
-            link
-            for link in self.links
-            if link.get("source_id") == entity_id or link.get("target_id") == entity_id
-        ]
-        if link_type is not None:
-            related = [link for link in related if link.get("type") == link_type]
-        if role is not None:
-            related = [link for link in related if link.get("role") == role]
-        return related
+        return self.get_links(entity_id=entity_id, direction="both", link_type=link_type, role=role)
 
     def get_linked_ids(self, entity_id, direction="both", link_type=None, role=None):
         """Returns IDs linked to an entity based on direction and optional filters."""
         linked_ids = []
 
         if direction in ("outgoing", "both"):
-            outgoing_links = self.get_outgoing_links(entity_id, link_type=link_type, role=role)
+            outgoing_links = self.get_links(
+                entity_id=entity_id,
+                direction="outgoing",
+                link_type=link_type,
+                role=role,
+            )
             linked_ids.extend(link["target_id"] for link in outgoing_links)
 
         if direction in ("incoming", "both"):
-            incoming_links = self.get_incoming_links(entity_id, link_type=link_type, role=role)
+            incoming_links = self.get_links(
+                entity_id=entity_id,
+                direction="incoming",
+                link_type=link_type,
+                role=role,
+            )
             linked_ids.extend(link["source_id"] for link in incoming_links)
 
         deduped_linked_ids = []
@@ -357,10 +398,11 @@ class World:
 
     def get_link_target_ids(self, source_id, link_type=None, roles=None):
         """Returns target IDs from outgoing links with optional type/role filtering."""
-        role_filter = set(roles) if roles is not None else None
-        outgoing_links = self.get_outgoing_links(source_id, link_type=link_type)
-        if role_filter is not None:
-            outgoing_links = [link for link in outgoing_links if link.get("role") in role_filter]
+        outgoing_links = self.get_links(
+            source_id=source_id,
+            link_type=link_type,
+            roles=roles,
+        )
 
         deduped_target_ids = []
         seen_ids = set()
@@ -381,13 +423,11 @@ class World:
         bootstrap_source=None,
     ):
         """Returns family target IDs filtered by current optional semantic metadata."""
-        role_filter = set(roles) if roles is not None else None
-        outgoing_family_links = self.get_outgoing_links(source_id, link_type="family")
-
-        if role_filter is not None:
-            outgoing_family_links = [
-                link for link in outgoing_family_links if link.get("role") in role_filter
-            ]
+        outgoing_family_links = self.get_links(
+            source_id=source_id,
+            link_type="family",
+            roles=roles,
+        )
 
         if require_origin_family is not None:
             outgoing_family_links = [
@@ -541,7 +581,7 @@ class World:
             raise ValueError(f"get_continuity_candidates_for: unknown actor_id '{actor_id}'")
 
         candidate_links = {}
-        related_links = self.get_related_links(actor_id)
+        related_links = self.get_links(entity_id=actor_id)
 
         for link in related_links:
             candidate_actor_id = None

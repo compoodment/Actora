@@ -295,6 +295,16 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         current_place_id="earth",
         residence_place_id="earth",
     )
+    world.add_link_pair(
+        source_id=mother_id,
+        target_id=father_id,
+        forward_type="association",
+        forward_role="coparent",
+        reverse_type="association",
+        reverse_role="coparent",
+        forward_metadata={"bootstrap_source": "startup_coparent_association"},
+        reverse_metadata={"bootstrap_source": "startup_coparent_association"},
+    )
 
     player_id = generate_startup_actor_id("player")
     player = world.create_human_child_with_parents(
