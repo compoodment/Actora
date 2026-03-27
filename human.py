@@ -17,6 +17,10 @@ class Human:
         self.money = 0
         self.current_place_id = None
         self.residence_place_id = None
+        self.structural_status = "active"
+        self.death_year = None
+        self.death_month = None
+        self.death_reason = None
 
     def get_full_name(self):
         """Derives and returns the full name of the human."""
@@ -90,11 +94,26 @@ class Human:
             "residence_place_name": residence_place_name,
         }
 
+    def is_alive(self):
+        """Returns True only when the human is currently structurally active/alive."""
+        return self.structural_status == "active"
+
+    def get_structural_state(self):
+        """Returns a structured read-only view of current structural life/death state."""
+        return {
+            "structural_status": self.structural_status,
+            "is_alive": self.is_alive(),
+            "death_year": self.death_year,
+            "death_month": self.death_month,
+            "death_reason": self.death_reason,
+        }
+
     def get_snapshot_data(self, current_year, current_month, world, actor_id):
         """Returns the current human snapshot as structured shell-renderable data."""
         lifecycle = self.get_lifecycle_state(current_year, current_month)
         spatial_state = self.get_spatial_state(world)
         parent_ids = world.get_parent_ids_for(actor_id)
+        structural_state = self.get_structural_state()
 
         mother_id = parent_ids["mother_id"]
         father_id = parent_ids["father_id"]
@@ -137,6 +156,7 @@ class Human:
                 "mother_name": mother_name,
                 "father_name": father_name,
             },
+            "structural": structural_state,
         }
 
     # --- Stat Management Helper Methods ---

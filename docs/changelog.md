@@ -1,5 +1,18 @@
 # CompLife Changelog
 
+## Version 0.28.0 (Minor) - 2026-03-27
+- **Death / Continuity Structural Transition Foundation:**
+    - Added narrow structural actor-state storage in `human.py` through `structural_status`, `death_year`, `death_month`, and `death_reason`.
+    - Added `Human.is_alive()` and `Human.get_structural_state()` so living/dead state is derived cleanly from one stored structural status instead of duplicated truth.
+    - Added world-owned focused actor tracking through `focused_actor_id`, `set_focused_actor(...)`, `get_focused_actor_id()`, and `get_focused_actor()`.
+    - Added a controlled world-owned death transition path through `World.mark_actor_dead(...)`.
+    - Added structured continuity candidate resolution from living linked actors through `get_continuity_candidates_for(...)` and `build_continuity_state_for(...)`.
+    - Extended the turn result contract with `focused_actor_id`, `focused_actor_alive`, `structural_transition`, and `continuity_state`.
+    - Added narrow structural-state snapshot rendering and continuity-aware terminal rendering seams in `main.py`.
+    - Added preserved `death` records with structural-transition metadata including reason, focus state, and continuity candidate IDs.
+    - Preserved current startup flow, month advancement, event flow, and terminal-first shell behavior.
+    - Did not introduce automatic mortality, archive behavior, inheritance, lineage UI, continuation chooser UI, or broader actor/entity refactors.
+
 ## Version 0.27.1 (Patch) - 2026-03-26
 - **Post-v0.27.0 Docs / Planning Sync:**
     - Synced repo-local architecture and planning docs to the already-landed v0.27.0 startup actor ID cleanup.

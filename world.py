@@ -10,6 +10,7 @@ class World:
         self.links = []
         self.places = {}
         self.records = []
+        self.focused_actor_id = None
 
     def add_place(self, place_id, name, kind, parent_place_id=None, metadata=None):
         """Adds a place record to the world-owned place registry."""
@@ -38,6 +39,22 @@ class World:
     def add_actor(self, actor_id, actor_obj):
         """Adds an actor to the world."""
         self.actors[actor_id] = actor_obj
+
+    def set_focused_actor(self, actor_id):
+        """Sets the world-owned currently focused actor ID."""
+        if actor_id not in self.actors:
+            raise ValueError(f"set_focused_actor: unknown actor_id '{actor_id}'")
+        self.focused_actor_id = actor_id
+
+    def get_focused_actor_id(self):
+        """Returns the current world-owned focused actor ID, or None."""
+        return self.focused_actor_id
+
+    def get_focused_actor(self):
+        """Returns the current world-owned focused actor object, or None."""
+        if self.focused_actor_id is None:
+            return None
+        return self.get_actor(self.focused_actor_id)
 
     def _build_record(
         self,
@@ -470,12 +487,114 @@ class World:
         for stat_name, change_value in stat_changes.items():
             actor_obj.modify_stat(stat_name, change_value)
 
+    def get_continuity_candidates_for(self, actor_id):
+        """Returns structured living linked-actor continuity candidates for one actor."""
+        if actor_id not in self.actors:
+            raise ValueError(f"get_continuity_candidates_for: unknown actor_id '{actor_id}'")
+
+        candidates = []
+        seen_actor_ids = set()
+        related_links = self.get_related_links(actor_id)
+
+        for link in related_links:
+            candidate_actor_id = None
+            link_role = link.get("role")
+            link_type = link.get("type")
+
+            if link.get("source_id") == actor_id:
+                candidate_actor_id = link.get("target_id")
+            elif link.get("target_id") == actor_id:
+                candidate_actor_id = link.get("source_id")
+
+            if candidate_actor_id is None or candidate_actor_id == actor_id:
+                continue
+            if candidate_actor_id in seen_actor_ids:
+                continue
+
+            candidate_actor = self.get_actor(candidate_actor_id)
+            if candidate_actor is None or not candidate_actor.is_alive():
+                continue
+
+            seen_actor_ids.add(candidate_actor_id)
+            candidates.append({
+                "actor_id": candidate_actor_id,
+                "full_name": candidate_actor.get_full_name(),
+                "link_type": link_type,
+                "link_role": link_role,
+            })
+
+        return candidates
+
+    def build_continuity_state_for(self, actor_id):
+        """Builds a structured continuity-state snapshot for one actor."""
+        actor = self.get_actor(actor_id)
+        if actor is None:
+            raise ValueError(f"build_continuity_state_for: unknown actor_id '{actor_id}'")
+
+        continuity_candidates = self.get_continuity_candidates_for(actor_id)
+        return {
+            "actor_id": actor_id,
+            "is_dead": not actor.is_alive(),
+            "universe_continues": True,
+            "continuity_candidates": continuity_candidates,
+            "continuity_candidate_ids": [candidate["actor_id"] for candidate in continuity_candidates],
+            "had_continuity_candidates": bool(continuity_candidates),
+        }
+
+    def mark_actor_dead(self, actor_id, year=None, month=None, reason=None):
+        """Marks one actor dead through a controlled world-owned structural transition path."""
+        actor = self.get_actor(actor_id)
+        if actor is None:
+            raise ValueError(f"mark_actor_dead: unknown actor_id '{actor_id}'")
+        if not actor.is_alive():
+            raise ValueError(f"mark_actor_dead: actor_id '{actor_id}' is already dead")
+
+        transition_year = self.current_year if year is None else year
+        transition_month = self.current_month if month is None else month
+        transition_reason = reason or "Unspecified"
+
+        actor.structural_status = "dead"
+        actor.death_year = transition_year
+        actor.death_month = transition_month
+        actor.death_reason = transition_reason
+
+        continuity_state = self.build_continuity_state_for(actor_id)
+        self.add_record(
+            record_type="death",
+            scope="actor",
+            text=f"{actor.get_full_name()} died.",
+            year=transition_year,
+            month=transition_month,
+            actor_ids=[actor_id],
+            tags=["death", "structural_transition"],
+            metadata={
+                "reason": transition_reason,
+                "had_focus": self.focused_actor_id == actor_id,
+                "continuity_candidate_ids": continuity_state["continuity_candidate_ids"],
+                "entry_method": "World.mark_actor_dead",
+            },
+        )
+        return {
+            "type": "death",
+            "actor_id": actor_id,
+            "year": transition_year,
+            "month": transition_month,
+            "reason": transition_reason,
+        }
+
     def simulate_advance_turn(self, player_id: str, months_to_advance: int) -> dict:
         """
         World-owned authoritative simulation-step boundary.
         Advances time month-by-month, collects events, applies outcomes, and writes event records.
         """
         collected_structured_events = []
+        focused_actor_id = self.get_focused_actor_id() or player_id
+        if self.get_focused_actor_id() is None and focused_actor_id in self.actors:
+            self.set_focused_actor(focused_actor_id)
+
+        structural_transition = None
+        continuity_state = None
+
         for _ in range(months_to_advance):
             self.advance_months(1)
             current_player_for_event = self.get_actor(player_id)
@@ -507,10 +626,19 @@ class World:
                 )
                 collected_structured_events.append(structured_event_for_month)
 
+        focused_actor = self.get_actor(focused_actor_id)
+        focused_actor_alive = focused_actor.is_alive() if focused_actor is not None else False
+        if focused_actor is not None and not focused_actor_alive:
+            continuity_state = self.build_continuity_state_for(focused_actor_id)
+
         return {
             "months_advanced": months_to_advance,
             "events": collected_structured_events,
             "had_any_events": bool(collected_structured_events),
+            "focused_actor_id": focused_actor_id,
+            "focused_actor_alive": focused_actor_alive,
+            "structural_transition": structural_transition,
+            "continuity_state": continuity_state,
         }
 
 def simulate_advance_turn(world, player_id: str, months_to_advance: int) -> dict:

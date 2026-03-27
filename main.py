@@ -32,6 +32,7 @@ def render_snapshot(snapshot_data):
     location = snapshot_data["location"]
     statistics = snapshot_data["statistics"]
     relationships = snapshot_data["relationships"]
+    structural = snapshot_data["structural"]
 
     print(f"\n--- {identity['full_name']} ---")
 
@@ -60,6 +61,13 @@ def render_snapshot(snapshot_data):
     print("  Family:")
     print(f"    Mother: {relationships['mother_name']}")
     print(f"    Father: {relationships['father_name']}")
+
+    print("\n--- Structural State ---")
+    print(f"  Status: {structural['structural_status']}")
+    if structural["death_year"] is not None and structural["death_month"] is not None:
+        print(f"  Death: Year {structural['death_year']}, Month {structural['death_month']}")
+    if structural["death_reason"]:
+        print(f"  Death Reason: {structural['death_reason']}")
     print("--------------------")
 
 
@@ -179,13 +187,16 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         place_id="earth",
         randomize_stats=True,
     )
+    world.set_focused_actor(player_id)
 
     return world, player_id, player
 
 
 def game_loop(world, player_id, player):
     """Contains the main game loop for advancing time and displaying results."""
-    render_snapshot(player.get_snapshot_data(world.current_year, world.current_month, world, player_id))
+    focused_actor_id = world.get_focused_actor_id() or player_id
+    focused_actor = world.get_actor(focused_actor_id)
+    render_snapshot(focused_actor.get_snapshot_data(world.current_year, world.current_month, world, focused_actor_id))
 
     while True:
         months_to_advance = 0
@@ -212,9 +223,10 @@ def game_loop(world, player_id, player):
         turn_result = world.simulate_advance_turn(player_id, months_to_advance)
 
         print(TIME_ADVANCED_BANNER)
-        final_player_state = world.get_actor(player_id)
+        focused_actor_id = turn_result["focused_actor_id"]
+        final_player_state = world.get_actor(focused_actor_id)
         render_snapshot(
-            final_player_state.get_snapshot_data(world.current_year, world.current_month, world, player_id)
+            final_player_state.get_snapshot_data(world.current_year, world.current_month, world, focused_actor_id)
         )
 
         print("\n--- Events ---")
@@ -238,6 +250,28 @@ def game_loop(world, player_id, player):
 
                 if omitted_count > 0:
                     print(f"  - ... {omitted_count} older events omitted.")
+
+        if turn_result["structural_transition"] is not None:
+            transition = turn_result["structural_transition"]
+            if transition["type"] == "death":
+                print(
+                    f"  - Structural Transition: {final_player_state.get_full_name()} died in "
+                    f"Year {transition['year']}, Month {transition['month']}."
+                )
+
+        if turn_result["continuity_state"] is not None:
+            continuity_state = turn_result["continuity_state"]
+            print("\n--- Continuity ---")
+            print("  - The universe continues.")
+            if continuity_state["had_continuity_candidates"]:
+                print("  - Connected continuation candidates:")
+                for candidate in continuity_state["continuity_candidates"]:
+                    print(
+                        f"    - {candidate['full_name']} "
+                        f"[{candidate['link_type']}/{candidate['link_role']}]"
+                    )
+            else:
+                print("  - No living connected continuation candidates were found.")
         print("--------------------")
 
 
