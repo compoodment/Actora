@@ -1,4 +1,4 @@
-Actionable Ideas Summary — Rev24
+Actionable Ideas Summary — Rev25
 Date: 2026-03-28
 Role: temporary near-term planning snapshot for Actora
 Authority: non-authoritative; stable docs win, repo truth wins on implementation
@@ -6,7 +6,7 @@ Authority: non-authoritative; stable docs win, repo truth wins on implementation
 
 === CURRENT WORKING POSITION ===
 
-Actora now has a materially stronger early backbone, and verified repo truth is through v0.33.0, with source-stack sync carried through:
+Actora now has a materially stronger early backbone, and verified repo truth is through v0.35.0, with source-stack sync carried through:
 - Master Context v9
 - Roadmap v10
 - world-owned actor registry
@@ -36,7 +36,9 @@ Actora now has a materially stronger early backbone, and verified repo truth is 
 - link foundation strengthening through normalized `_build_link_record(...)`, small general `get_links(...)` query access, thinner compatibility link helpers, continuity candidate gathering routed through the generic link seam, and one startup parent-to-parent `association/coparent` proof link
 - structured place / place-hierarchy strengthening through ancestry-aware place lookup, startup `world_body -> country -> city` hierarchy, and cleaner current-place snapshot truth
 - spatial identity separation strengthening through explicit `jurisdiction_place_id` and `temporary_occupancy_place_id`, with startup actors now structurally living in the startup city while jurisdictionally belonging to the startup country
-- clarified terminal-UI / death-flow intent: alive-state should remain implicit during ordinary play, death should interrupt with a dedicated transition message first, continuation choices should come only after acknowledgment, archived dead actors should remain explorable/reusable later, and terminal info density/timing should be treated as a real design concern rather than hand-waved away because the UI is temporary
+- controlled spatial identity mutation through `World.update_actor_spatial_identity(...)`, with partial-update safety, place validation, and unchanged unspecified fields
+- tightened dead-focus transition flow in the terminal shell so death now lands as a dedicated interrupt led by `You are dead.`, shows current death context, and requires acknowledgment before continuation choices are shown
+- clarified terminal-UI / death-flow intent now preserved more honestly in both planning and repo behavior: alive-state stays implicit during ordinary play, death interrupts first, continuation choices come only after acknowledgment, archived dead actors should eventually remain explorable/reusable later, and terminal info density/timing should be treated as a real design concern rather than hand-waved away because the UI is temporary
 
 
 === CURRENT CLARIFIED DESIGN READ ===
@@ -63,8 +65,8 @@ Actora is a single continuous universe simulation where the player primarily liv
 
 === CURRENT PLANNING READ ===
 
-The old post-v0.31.0 decision point is now dead.
-It served its purpose, then the repo moved.
+The old post-v0.33.0 decision point is dead now too.
+It served its purpose, then the repo moved again.
 
 The recent verified sequence is now:
 - v0.28.0 — death / continuity structural transition foundation
@@ -73,26 +75,27 @@ The recent verified sequence is now:
 - v0.31.0 — link foundation strengthening
 - v0.32.0 — structured place / place-hierarchy strengthening
 - v0.33.0 — spatial identity separation strengthening
+- v0.34.0 — controlled spatial identity mutation boundary
+- v0.35.0 — dead-focus transition flow tightening
 
 So the immediate next move is no longer:
-- “what follows link-foundation strengthening?”
-- or “is structured place the next honest candidate?”
-- or “should spatial identity separation happen now?”
+- “what follows spatial identity separation?”
+- or “do we still need the world-owned spatial mutation seam?”
+- or “should the death interrupt / acknowledgment flow remain just a planning note?”
 
 Those questions have been answered already.
 
 The immediate next move is now:
-- choose the strongest honest controlled-state-mutation follow-through after spatial identity separation, without jumping into travel, property, politics, or operator-tooling fluff
+- choose the strongest honest post-`v0.35.0` follow-through without jumping into archive-browser overbuild, travel/property/politics expansion, or operator-tooling cosplay
 
 Why:
-- the place layer is now materially more truthful than it was before `v0.32.0`
-- spatial identity is now structurally separated enough to matter after `v0.33.0`
-- those extra spatial fields are still mostly assigned directly rather than through a stronger world-owned mutation boundary
-- the roadmap puts controlled state mutation after structured place and spatial identity separation
-- forcing downstream expansion now would be weaker than tightening the mutation boundary first
+- the place + spatial-identity layer is now materially more disciplined than it was before `v0.34.0`
+- the shell death flow is now materially more honest than it was before `v0.35.0`
+- but continuity browsing is still intentionally simple, dead actors are not yet archived/explorable, and time presentation is still muddier than it should be
+- that means the next checkpoint is less “missing obvious foundation seam” and more “pick the next narrow truthful follow-through without pretending the whole death/archive/time problem is solved”
 
 So the current question is now:
-- “given repo truth through `v0.33.0`, what is the strongest honest controlled-state-mutation move before broader spatial/domain expansion?”
+- “given repo truth through `v0.35.0`, what is the strongest honest next follow-through: archive/continuity maturation planning, time-presentation cleanup planning, or some other same-layer narrow move?”
 
 
 === WHAT THE RECENT SEQUENCE ACHIEVED ===
@@ -102,17 +105,18 @@ So the current question is now:
 - world body, country, and city now exist in a real small hierarchy
 - snapshot output is more honest about where the actor is
 
-2. Spatial identity is now less collapsed.
-- current place, residence, jurisdiction, and temporary occupancy no longer have to be mentally treated as one generic location blob
-- the repo now preserves the distinction structurally even though behavior around those distinctions is still minimal
+2. Spatial mutation discipline is now less sloppy.
+- current place, residence, jurisdiction, and temporary occupancy no longer have to be mutated by casual direct field pokes
+- the repo now has a narrow world-owned spatial updater with explicit actor/place validation and partial-update safety
 
-3. Continuity and link truth remain materially more real than earlier prototype phases.
+3. Continuity and death flow are more honest at the shell layer.
 - the project still has a real playable continuity handoff path
-- continuity candidates still route through the stronger world-owned link seam
+- death now lands as a dedicated interrupt instead of a flat dump of continuity state
+- continuation choices now wait behind acknowledgment instead of appearing immediately like a vending machine
 
 4. The planning checkpoint changed shape again.
-- the project is no longer deciding whether place/separation should happen
-- it is deciding how to follow that work with a stronger mutation boundary rather than careless downstream expansion
+- the project is no longer deciding whether the spatial mutation seam or the basic death interrupt should exist
+- it is deciding what the next narrow follow-through should be without overreacting into giant archive/time/UI systems
 
 
 === MAIN THINGS THIS CURRENT POSITION NOW PROTECTS ===
@@ -168,68 +172,60 @@ The vision is coherent, but the execution risk is still “feature landfill with
 5. Operator/dev tooling temptation is still rising before enough systems exist
 This is a real pressure, but a full dev mode right now could become premature tooling fluff if it gets built before enough repeated testing pain justifies a reusable operator layer.
 
-6. The spatial model is ahead of the spatial mutation boundary
-The repo now stores more honest spatial identity, but future systems would still be too tempted to poke actor fields directly unless a cleaner world-owned mutation seam arrives soon.
+6. Continuity/death presentation is cleaner than continuity/archive depth
+The repo now has a better dead-focus interrupt, but continuation browsing is still intentionally thin, archive handling is still not real, and the shell should not pretend the whole continuity experience is solved.
 
-7. Terminal UI intent is under-documented relative to its importance
-The terminal UI is not the forever final interface, but it is still the current real play surface. Reveal timing, page flow, browsing depth, and information density need to be treated as real design work now rather than ignored just because broader UI flexibility is protected in the architecture.
+7. Terminal UI intent is still under-documented relative to its importance
+The terminal UI is not the forever final interface, but it is still the current real play surface. Reveal timing, archive visibility, continuation inspectability, and time presentation clarity still need to be treated as real design work now rather than ignored just because broader UI flexibility is protected in the architecture.
 
 
 === LEADING PLANNING BUCKETS NOW ===
 
-1. Next real implementation/planning move after v0.33.0
+1. Next real implementation/planning move after v0.35.0
 Use:
-- choose the next honest structural move after spatial identity separation
+- choose the next honest same-layer follow-through after the dead-focus shell tightening
 - avoid patch-number momentum theater
-- do not treat every newly available field as a reason to force downstream systems into existence
+- do not confuse “the death flow is cleaner now” with “the continuity/archive/time layer is solved”
 
-2. Controlled spatial identity mutation / controlled state mutation follow-through
+2. Continuity / archive / lineage maturation
 Use:
-- likely strongest roadmap-faithful next candidate
-- strengthen the world-owned mutation boundary for actor spatial identity
-- validate actor existence and referenced places cleanly
-- optionally preserve meaningful spatial-state changes as records if justified
-- do not smuggle travel/property/politics in through the back door
+- continuity is now materially real in implementation and cleaner in shell presentation than before
+- archive/lineage/succession depth are still not ready to be overclaimed or blindly rushed
+- preserve the intention that dead actors should eventually become stored/archived in a way that supports later exploration and possible reuse, not just disposal
+- likely next best use is spec/planning pressure before more UI buildout
 
-3. Tiny current UI correction patch
+3. Terminal UI / information reveal flow
 Use:
-- remove the alive-play structural-state block from the ordinary snapshot UI
-- keep backend structural state untouched
-- keep death/continuity data available for later dedicated transition flow
-- do not overbuild the death UI in the same tiny patch
+- preserve that alive-state should remain implicit during ordinary play
+- preserve that death should interrupt with its own message/context before continuation options appear
+- preserve that continuation choice should eventually become more inspectable than a blind numbered list
+- preserve that archived dead actors should be explorable later rather than discarded
+- preserve that age and simulation date likely need cleaner separation in the terminal UI
+- do not force full pager/archive UI immediately just because the intent is now clearer
 
-4. Multi-axis social perception / opportunity layer
+4. Time presentation cleanup
+Use:
+- preserve the user’s correction that actor age and simulation date are currently too muddled in the terminal flow
+- treat this as a real design/UI pressure, not cosmetic garnish
+- do not quietly smuggle it into a broader unrelated milestone
+
+5. Multi-axis social perception / opportunity layer
 Use:
 - keep visible as a real later vision component
 - do not let it vanish into vague “social stuff later” mush
 - also do not promote it into immediate foundation work
 
-5. Entity registry vs actor view layering
+6. Entity registry vs actor view layering
 Use:
 - still a real architectural guardrail
 - still not the next code patch automatically
 
-6. Identity generation realism / context-awareness
+7. Identity generation realism / context-awareness
 Use:
 - still visible later
 - still blocked by stronger context/place/era maturity and by stronger mutation/creation discipline
 
-7. Continuity / lineage / archive maturation
-Use:
-- continuity is now more real in implementation than before
-- archive/lineage/succession depth are still not ready to be overclaimed or automatically promoted
-- preserve the newer intention that dead actors should eventually become stored/archived in a way that supports later exploration and possible reuse, not just disposal
-
-8. Terminal UI / information reveal flow
-Use:
-- preserve that alive-state should remain implicit during ordinary play
-- preserve that death should interrupt with its own message/context before continuation options appear
-- preserve that continuation choice should become more inspectable than a blind numbered list
-- preserve that archived dead actors should be explorable later rather than discarded
-- preserve that age and simulation date likely need cleaner separation in the terminal UI
-- do not force full pager/archive UI immediately just because the intent is now clearer
-
-9. Operator tooling / scenario testing seam
+8. Operator tooling / scenario testing seam
 Use:
 - preserve as a valid future support/tooling pressure
 - do not let it jump ahead of real simulation/system growth
@@ -239,21 +235,21 @@ Use:
 === DOCUMENT-SYSTEM RESULT OF THIS SYNC ===
 
 - stable docs still do not need a forced revision from the recent repo milestones alone
-- flexible planning docs are now back in sync with repo truth through `v0.33.0`
-- the current planning checkpoint is now about what follows spatial identity separation, not what follows link-foundation strengthening
+- flexible planning docs are now back in sync with repo truth through `v0.35.0`
+- the current planning checkpoint is now about what follows the dead-focus flow tightening, not what follows spatial identity separation
 - operator/dev tooling remains preserved as a later planning pressure rather than a fake next milestone
 - identity-generation realism remains visible without being falsely promoted ahead of roadmap order
 
 
 === NEXT BEST USE ===
 
-1. Use the aligned source stack plus repo truth through `v0.33.0` to choose the next real structural target.
-2. Treat controlled spatial identity mutation / controlled state mutation follow-through as the leading next candidate unless a better same-layer target clearly beats it.
+1. Use the aligned source stack plus repo truth through `v0.35.0` to choose the next real structural target.
+2. Treat continuity/archive/time follow-through planning as the leading current checkpoint unless a better same-layer target clearly beats it.
 3. Keep downstream temptations — travel, property, politics, tooling glamor, social perception — out of the immediate patch slot.
-4. Keep continuity follow-through honest: real, playable, still narrow.
+4. Keep continuity follow-through honest: real, playable, cleaner, still narrow.
 5. Do not force another stable-doc cycle unless a real contradiction appears.
 
 
 === ONE-LINE SUMMARY ===
 
-Actora now has verified repo truth through spatial identity separation strengthening, and the next honest move is probably to tighten the world-owned spatial mutation boundary before broader spatial or domain systems start spraying state around like idiots.
+Actora now has verified repo truth through the spatial mutation seam and dead-focus flow tightening, and the next honest move is to choose a narrow continuity/archive/time follow-through without pretending the whole death layer is finished.
