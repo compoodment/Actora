@@ -32,9 +32,10 @@
 
 The current prototype is still terminal-first and still structurally narrow, but it now has:
 - a world-owned simulation-step boundary
-- structured records, links, and places
-- focused-actor tracking
-- structural death / continuity foundation
+- structured records, links, and places, plus a small startup place hierarchy
+- focused-actor tracking and structural death / continuity foundation
+- cleaner terminal death flow and clearer age-vs-simulation-date snapshot presentation
+- expanded human character-creation options for sex and gender
 - current human-only event content
 
 This repo is the live working Actora codebase on the VPS. Historical naming may still exist in old changelog entries or older git history where preserving history is the correct move.

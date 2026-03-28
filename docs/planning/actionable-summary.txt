@@ -6,7 +6,7 @@ Authority: non-authoritative; stable docs win, repo truth wins on implementation
 
 === CURRENT WORKING POSITION ===
 
-Actora now has a materially stronger early backbone, and verified repo truth is through v0.35.0, with source-stack sync carried through:
+Actora now has a materially stronger early backbone, and verified repo truth is through v0.35.2, with source-stack sync carried through:
 - Master Context v9
 - Roadmap v10
 - world-owned actor registry
@@ -38,6 +38,8 @@ Actora now has a materially stronger early backbone, and verified repo truth is 
 - spatial identity separation strengthening through explicit `jurisdiction_place_id` and `temporary_occupancy_place_id`, with startup actors now structurally living in the startup city while jurisdictionally belonging to the startup country
 - controlled spatial identity mutation through `World.update_actor_spatial_identity(...)`, with partial-update safety, place validation, and unchanged unspecified fields
 - tightened dead-focus transition flow in the terminal shell so death now lands as a dedicated interrupt led by `You are dead.`, shows current death context, and requires acknowledgment before continuation choices are shown
+- cleaned terminal snapshot time presentation so actor age/life-stage now live under identity while shared simulation clock data is rendered separately as explicit sim date
+- expanded visible human character-creation identity options so sex now includes `Intersex`, gender now includes `Agender`, `Genderfluid`, and `Other`, and `Other` supports free-text entry
 - clarified terminal-UI / death-flow intent now preserved more honestly in both planning and repo behavior: alive-state stays implicit during ordinary play, death interrupts first, continuation choices come only after acknowledgment, archived dead actors should eventually remain explorable/reusable later, and terminal info density/timing should be treated as a real design concern rather than hand-waved away because the UI is temporary
 
 
@@ -77,6 +79,8 @@ The recent verified sequence is now:
 - v0.33.0 — spatial identity separation strengthening
 - v0.34.0 — controlled spatial identity mutation boundary
 - v0.35.0 — dead-focus transition flow tightening
+- v0.35.1 — time presentation cleanup
+- v0.35.2 — character identity options expansion
 
 So the immediate next move is no longer:
 - “what follows spatial identity separation?”
@@ -86,16 +90,17 @@ So the immediate next move is no longer:
 Those questions have been answered already.
 
 The immediate next move is now:
-- choose the strongest honest post-`v0.35.0` follow-through without jumping into archive-browser overbuild, travel/property/politics expansion, or operator-tooling cosplay
+- choose the strongest honest post-`v0.35.2` follow-through without jumping into archive-browser overbuild, travel/property/politics expansion, or operator-tooling cosplay
 
 Why:
 - the place + spatial-identity layer is now materially more disciplined than it was before `v0.34.0`
 - the shell death flow is now materially more honest than it was before `v0.35.0`
-- but continuity browsing is still intentionally simple, dead actors are not yet archived/explorable, and time presentation is still muddier than it should be
-- that means the next checkpoint is less “missing obvious foundation seam” and more “pick the next narrow truthful follow-through without pretending the whole death/archive/time problem is solved”
+- time presentation is now cleaner and character creation has a bit more visible player-facing honesty than before `v0.35.2`
+- but continuity browsing is still intentionally simple, dead actors are not yet archived/explorable, and the terminal still lacks richer inspectability around continuity/archived-state follow-through
+- that means the next checkpoint is less “missing obvious foundation seam” and more “pick the next narrow truthful follow-through without pretending the whole continuity/archive/UI problem is solved”
 
 So the current question is now:
-- “given repo truth through `v0.35.0`, what is the strongest honest next follow-through: archive/continuity maturation planning, time-presentation cleanup planning, or some other same-layer narrow move?”
+- “given repo truth through `v0.35.2`, what is the strongest honest next follow-through: archive/continuity maturation planning, continuity inspectability improvement, or some other same-layer narrow move?”
 
 
 === WHAT THE RECENT SEQUENCE ACHIEVED ===
@@ -176,16 +181,16 @@ This is a real pressure, but a full dev mode right now could become premature to
 The repo now has a better dead-focus interrupt, but continuation browsing is still intentionally thin, archive handling is still not real, and the shell should not pretend the whole continuity experience is solved.
 
 7. Terminal UI intent is still under-documented relative to its importance
-The terminal UI is not the forever final interface, but it is still the current real play surface. Reveal timing, archive visibility, continuation inspectability, and time presentation clarity still need to be treated as real design work now rather than ignored just because broader UI flexibility is protected in the architecture.
+The terminal UI is not the forever final interface, but it is still the current real play surface. Reveal timing, archive visibility, and continuation inspectability still need to be treated as real design work now rather than ignored just because broader UI flexibility is protected in the architecture.
 
 
 === LEADING PLANNING BUCKETS NOW ===
 
-1. Next real implementation/planning move after v0.35.0
+1. Next real implementation/planning move after v0.35.2
 Use:
-- choose the next honest same-layer follow-through after the dead-focus shell tightening
+- choose the next honest same-layer follow-through after the recent death-flow tightening, time cleanup, and character-creation surface improvements
 - avoid patch-number momentum theater
-- do not confuse “the death flow is cleaner now” with “the continuity/archive/time layer is solved”
+- do not confuse “the current shell is cleaner now” with “the continuity/archive layer is solved”
 
 2. Continuity / archive / lineage maturation
 Use:
@@ -200,14 +205,14 @@ Use:
 - preserve that death should interrupt with its own message/context before continuation options appear
 - preserve that continuation choice should eventually become more inspectable than a blind numbered list
 - preserve that archived dead actors should be explorable later rather than discarded
-- preserve that age and simulation date likely need cleaner separation in the terminal UI
+- preserve that the recent time/identity cleanup was only one terminal clarity improvement, not the end of terminal UI work
 - do not force full pager/archive UI immediately just because the intent is now clearer
 
-4. Time presentation cleanup
+4. Character-creation surface honesty
 Use:
-- preserve the user’s correction that actor age and simulation date are currently too muddled in the terminal flow
-- treat this as a real design/UI pressure, not cosmetic garnish
-- do not quietly smuggle it into a broader unrelated milestone
+- preserve that visible player-facing improvements matter too, not only invisible backend correctness
+- the recent sex/gender expansion is a good example of small honest surface progress without pretending a full deeper identity system exists yet
+- similar visible improvements are allowed when they stay narrow, truthful, and architecture-safe
 
 5. Multi-axis social perception / opportunity layer
 Use:
@@ -235,8 +240,8 @@ Use:
 === DOCUMENT-SYSTEM RESULT OF THIS SYNC ===
 
 - stable docs still do not need a forced revision from the recent repo milestones alone
-- flexible planning docs are now back in sync with repo truth through `v0.35.0`
-- the current planning checkpoint is now about what follows the dead-focus flow tightening, not what follows spatial identity separation
+- flexible planning docs are now back in sync with repo truth through `v0.35.2`
+- the current planning checkpoint is now about what follows the recent shell clarity / character-surface tightening, not what follows spatial identity separation
 - operator/dev tooling remains preserved as a later planning pressure rather than a fake next milestone
 - identity-generation realism remains visible without being falsely promoted ahead of roadmap order
 
@@ -252,4 +257,4 @@ Use:
 
 === ONE-LINE SUMMARY ===
 
-Actora now has verified repo truth through the spatial mutation seam and dead-focus flow tightening, and the next honest move is to choose a narrow continuity/archive/time follow-through without pretending the whole death layer is finished.
+Actora now has verified repo truth through dead-focus flow tightening, time presentation cleanup, and a small character-creation surface expansion, and the next honest move is to choose a narrow continuity/archive/inspectability follow-through without pretending the whole continuity layer is finished.

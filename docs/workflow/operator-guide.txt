@@ -46,7 +46,7 @@ The VPS is the final reality check for:
 
 1.2 Standard implementation paths
 
-Actora has three normal implementation paths:
+Actora has four normal implementation paths:
 
 A. Direct edit path
 scoped tiny fix -> edit -> verify -> docs update if needed -> commit if appropriate
