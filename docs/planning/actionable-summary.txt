@@ -100,11 +100,12 @@ Why:
 - the place + spatial-identity layer is now materially more disciplined than it was before `v0.34.0`
 - the shell death flow is now materially more honest than it was before `v0.35.0`
 - recent shell clarity work has already improved time presentation, character-creation surface honesty, continuation-choice readability, and lineage/archive inspectability through `v0.35.4`
-- but the new lineage surface is still intentionally narrow, full archive depth/search/tree browsing do not exist, and random mortality would still arrive before enough aftermath depth exists if introduced carelessly
-- that means the next checkpoint is less “should we build lineage first?” and more “what is the strongest narrow follow-through after lineage foundation: deeper lineage/archive detail, mortality pressure, or another same-layer refinement?”
+- the repo’s main friction is now less “missing lineage access” and more “the typed shell is becoming clumsy as inspectability grows”
+- roadmap + master-context already protect future panel-based / richer interaction forms, while explicitly requiring the simulation core to stay UI-agnostic
+- that means the next checkpoint is less “which other typed command should we add?” and more “should the next honest move be a narrow TUI foundation that replaces command-loop friction without infecting the simulation core?”
 
 So the current question is now:
-- “given repo truth through `v0.35.4`, what is the strongest honest next follow-through: a narrow old-age/random-mortality design path, lineage/archive depth refinement, or some other same-layer move?”
+- “given repo truth through `v0.35.4`, is the strongest next move a narrow actor-first TUI foundation, or does another same-layer follow-through beat it honestly?”
 
 
 === WHAT THE RECENT SEQUENCE ACHIEVED ===
@@ -125,7 +126,7 @@ So the current question is now:
 
 4. The planning checkpoint changed shape again.
 - the project is no longer deciding whether lineage/archive foundation should exist
-- it is deciding what the next narrow follow-through should be now that the first lineage surface is real without overreacting into giant archive/time/UI systems or premature mortality sprawl
+- it is deciding whether the next honest follow-through is a narrow actor-first TUI foundation now that the first lineage surface is real and the typed shell is starting to feel like paperwork
 
 
 === MAIN THINGS THIS CURRENT POSITION NOW PROTECTS ===
@@ -185,7 +186,7 @@ This is a real pressure, but a full dev mode right now could become premature to
 The repo now has a better dead-focus interrupt and a first lineage surface, but archive depth is still intentionally narrow, and the shell should not pretend the whole continuity/afterlife-of-history experience is solved.
 
 7. Terminal UI intent is still under-documented relative to its importance
-The terminal UI is not the forever final interface, but it is still the current real play surface. Reveal timing, archive visibility, and continuation inspectability still need to be treated as real design work now rather than ignored just because broader UI flexibility is protected in the architecture.
+The terminal UI is not the forever final interface, but it is still the current real play surface. Reveal timing, archive visibility, continuation inspectability, and navigation friction now need to be treated as real design work rather than ignored just because broader UI flexibility is protected in the architecture.
 
 
 === LEADING PLANNING BUCKETS NOW ===
@@ -196,14 +197,21 @@ Use:
 - avoid patch-number momentum theater
 - do not confuse “the repo now has a lineage surface” with “the continuity/archive layer is solved”
 
-2. Continuity / archive / lineage maturation
+2. Actor-first TUI foundation
+Use:
+- the current typed shell is becoming clumsy as inspectability and navigation paths grow
+- roadmap + master-context already allow richer panel-based interaction as long as the simulation core stays UI-agnostic
+- the strongest near-term UI move may now be a narrow TUI foundation instead of piling more typed commands onto the shell
+- preserve scope discipline: no giant ncurses cathedral, no simulation-core rewrite, no using TUI work as an excuse to smuggle in unrelated domain systems
+
+3. Continuity / archive / lineage maturation
 Use:
 - continuity is now materially real in implementation and cleaner in shell presentation than before
 - archive/lineage/succession depth are still not ready to be overclaimed or blindly rushed
 - preserve the intention that dead actors should eventually become explorable/reusable later rather than treated as disposable noise
-- the strongest current follow-through is likely lineage/archive depth refinement or a tightly bounded mortality design path, not giant archive UI buildout
+- lineage/archive depth should follow honestly after the interaction layer stops fighting the player
 
-3. Terminal UI / information reveal flow
+4. Terminal UI / information reveal flow
 Use:
 - preserve that alive-state should remain implicit during ordinary play
 - preserve that death should interrupt with its own message/context before continuation options appear
@@ -244,7 +252,7 @@ Use:
 === DOCUMENT-SYSTEM RESULT OF THIS SYNC ===
 
 - stable docs still do not need a forced revision from the recent repo milestones alone
-- flexible planning docs are now back in sync with repo truth through `v0.35.4`
+- flexible planning docs now also capture the grounded possibility that a narrow actor-first TUI foundation is the strongest next move after `v0.35.4`
 - the current planning checkpoint is now about what follows lineage foundation, not whether lineage foundation should exist
 - operator/dev tooling remains preserved as a later planning pressure rather than a fake next milestone
 - identity-generation realism remains visible without being falsely promoted ahead of roadmap order
@@ -253,12 +261,12 @@ Use:
 === NEXT BEST USE ===
 
 1. Use the aligned source stack plus repo truth through `v0.35.4` to choose the next real structural target.
-2. Treat post-lineage follow-through as the leading current checkpoint — most plausibly lineage/archive depth refinement or a narrow mortality design path.
-3. Keep downstream temptations — travel, property, politics, tooling glamor, social perception — out of the immediate patch slot.
+2. Treat a narrow actor-first TUI foundation as the leading current checkpoint unless a better same-layer target beats it honestly.
+3. Keep downstream temptations — travel, property, politics, tooling glamor, social perception, giant archive-browser sprawl — out of the immediate patch slot.
 4. Keep continuity follow-through honest: real, playable, cleaner, still narrow.
 5. Do not force another stable-doc cycle unless a real contradiction appears.
 
 
 === ONE-LINE SUMMARY ===
 
-Actora now has verified repo truth through the first lineage/archive foundation, and the next honest move is to choose a narrow post-lineage follow-through — most plausibly deeper lineage/archive detail or a tightly bounded mortality path — without pretending the whole continuity layer is finished.
+Actora now has verified repo truth through the first lineage/archive foundation, and the strongest grounded next candidate looks like a narrow actor-first TUI foundation so the interaction layer stops fighting the player without infecting the simulation core.

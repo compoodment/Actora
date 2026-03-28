@@ -69,7 +69,8 @@ The active near-term read is therefore:
 - identity realism/context richness remains visibly placeholder-level beneath the cleaner seam, but still should not jump the dependency queue
 - operator/dev tooling pressure is real, but full dev mode right now would risk becoming premature support-fluff unless enough repeated testing pain across real systems justifies it
 - the spatial layer is in a materially better place after `v0.34.0`, so the more obvious remaining near-term design pressure now sits around continuity/archive/lineage follow-through rather than another immediate spatial patch
-- terminal UI flow and information reveal still need to be treated as explicit near-term design pressure, especially around archive visibility and lineage/continuity inspectability
+- the typed shell is now starting to feel like paperwork as inspectability paths grow, which makes a narrow actor-first TUI foundation look more justified than piling on more command verbs
+- terminal UI flow, information reveal, and navigation friction now all need to be treated as explicit near-term design pressure
 
 WIR housekeeping note:
 - completed singleton startup actor ID cleanup should remain out of the active slot after v0.27.0
@@ -132,18 +133,33 @@ Next action: preserve as a named future layer and pressure-test stable docs late
 
 ID: IDEA-108
 Created: 2026-03-28
-Last Reviewed: 2026-03-28
+Last Reviewed: 2026-03-29
 Title: Terminal UI reveal flow / death-transition intent
 Status: Active near-term design pressure, partially realized in repo
 Priority: P1
 Roadmap fit: presentation / information-reveal guardrail supporting current prototype honesty
-Immediate roadmap-layer fit: yes, as an ongoing guardrail rather than a license for full interface overbuild
-Summary: The terminal UI should not constantly expose backend state just because that state exists. Alive-state should remain implicit during ordinary play; death should interrupt with a dedicated message first ("You are dead." plus when/why/context); continuation options should appear only after acknowledgment; and archived/lineage-relevant actors should remain explorable later rather than being treated as disposable noise. `v0.33.1`, `v0.35.0`, `v0.35.1`, `v0.35.3`, and `v0.35.4` moved this materially forward, but they did not finish the whole reveal-flow problem.
-Why it matters: The terminal interface is not the forever final UI, but it is still the current real play surface. If it trains bad information-reveal habits now, later interface work inherits that sludge. This also captures the user’s explicit correction that time presentation and death/continuation reveal flow need more intentional thought.
-Dependencies: current snapshot/output seam, continuity handoff seam, structural death truth, stable UI-agnostic architecture direction
-Risks: either ignoring UI intent because the terminal is “temporary,” or overreacting by building a giant pager/archive UI too early
-Suggested timing: keep active as a guardrail while choosing the next narrow follow-through honestly
-Next action: preserve this as active design pressure and use it to judge future archive/continuation/time proposals rather than treating the current shell tightening as the end of the conversation
+Immediate roadmap-layer fit: yes, as an ongoing guardrail and now also as a pressure toward a narrow actor-first TUI foundation
+Summary: The terminal UI should not constantly expose backend state just because that state exists. Alive-state should remain implicit during ordinary play; death should interrupt with a dedicated message first ("You are dead." plus when/why/context); continuation options should appear only after acknowledgment; archived/lineage-relevant actors should remain explorable later rather than being treated as disposable noise; and the interaction layer should stop forcing repetitive typed command choreography for ordinary navigation. `v0.33.1`, `v0.35.0`, `v0.35.1`, `v0.35.3`, and `v0.35.4` moved this materially forward, but they did not finish the reveal-flow or navigation-friction problem.
+Why it matters: The terminal interface is not the forever final UI, but it is still the current real play surface. If it trains bad information-reveal habits and clumsy command-loop navigation now, later interface work inherits that sludge. This also captures the user’s explicit correction that time presentation, death/continuation reveal flow, and interaction friction need more intentional thought.
+Dependencies: current snapshot/output seam, continuity handoff seam, lineage/detail surfaces, structural death truth, stable UI-agnostic architecture direction
+Risks: either ignoring UI intent because the terminal is “temporary,” or overreacting by building a giant pager/archive UI or over-scoped TUI too early
+Suggested timing: immediate guardrail while evaluating a narrow actor-first TUI foundation
+Next action: preserve this as active design pressure and use it to judge future TUI/archive/continuation proposals rather than treating the current shell tightening as the end of the conversation
+
+ID: IDEA-112
+Created: 2026-03-29
+Last Reviewed: 2026-03-29
+Title: Actor-first TUI foundation replacing typed command-loop friction
+Status: Leading next-step candidate
+Priority: P1
+Roadmap fit: presentation-layer tightening that preserves UI-agnostic simulation foundations and actor-first play
+Immediate roadmap-layer fit: yes, as the strongest grounded next implementation/spec target
+Summary: After `v0.35.4`, the biggest visible friction is no longer missing lineage access; it is that ordinary play, lineage inspection, and future archive/continuity browsing are still routed through a typed command loop that already feels clumsy. The roadmap and master-context explicitly allow richer panel-based interaction as long as the simulation core remains UI-agnostic. The strongest next move is likely a narrow actor-first TUI foundation that keeps current world-owned logic intact while replacing repetitive typed navigation with key-driven panel interaction.
+Why it matters: If the interaction layer keeps growing as a command loop, the shell will turn into fake-TUI sludge — more verbs, more `back`, more prompt ceremony, more friction every time inspectability grows. A narrow TUI foundation gives future lineage/archive/continuity surfaces somewhere sane to live without pretending the product must stay command-line shaped forever.
+Dependencies: current world-owned snapshot/output seams, current lineage/detail seams, current continuity/death flow seams, stable UI-agnostic architecture direction, disciplined scope control
+Risks: overbuilding a giant ncurses cathedral, polluting simulation logic with presentation state, using TUI work as an excuse to smuggle in archive-browser sprawl or unrelated domain systems, or prematurely treating one terminal implementation as the final product form
+Suggested timing: immediate candidate for the next deliberate spec/implementation pass
+Next action: define TUI v1 narrowly around actor-first ordinary play: persistent snapshot/context panel, visible action footer, key-driven lineage/detail navigation, clean death/continuation presentation, and shell-layer-only changes
 
 ID: IDEA-104
 Created: 2026-03-27
@@ -391,7 +407,7 @@ Next action: do not promote on its own
 === NEXT BEST USE ===
 
 1. Use IDEA-102 and the preserved clarified-design section to keep future sessions aligned on what Actora is actually supposed to be.
-2. Use IDEA-108 plus the completed IDEA-111 result to judge the strongest post-lineage next step honestly.
+2. Use IDEA-112 plus IDEA-108 to judge and scope the strongest post-lineage next step honestly.
 3. Keep IDEA-103 visible as a later layer, not an immediate patch title.
 4. Keep IDEA-104 visible as a later tooling pressure, not an immediate build excuse.
 5. Do not force an implementation patch until the next target actually earns its place.
@@ -399,4 +415,4 @@ Next action: do not promote on its own
 
 === ONE-LINE SUMMARY ===
 
-The project now has preserved wording for the actor-anchored, zoomable, continuous-universe vision, verified repo truth through the first lineage/archive foundation, and a cleaner planning position for choosing the next narrow post-lineage follow-through without drifting into either fake momentum or premature tooling fluff.
+The project now has preserved wording for the actor-anchored, zoomable, continuous-universe vision, verified repo truth through the first lineage/archive foundation, and a cleaner planning position that now treats a narrow actor-first TUI foundation as the strongest grounded post-lineage candidate without drifting into either fake momentum or premature tooling fluff.
