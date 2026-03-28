@@ -445,8 +445,9 @@ This function does not perform terminal input, output, or presentation formattin
 Current player creation includes:
 - required first name
 - optional last name
-- sex selection (numbered choice: Male/Female)
-- gender selection (numbered choice: Male/Female/Non-binary)
+- sex selection (numbered choice: Male/Female/Intersex)
+- gender selection (numbered choice: Male/Female/Non-binary/Agender/Genderfluid/Other)
+- free-text gender entry when `Other` is selected
 
 ### Initial World Setup
 Current initialization behavior:

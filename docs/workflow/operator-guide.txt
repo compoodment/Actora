@@ -167,7 +167,10 @@ When using Claude Code for Actora:
 	•	keep the prompt repo-grounded and scope-bounded
 	•	say what must change, what must stay unchanged, and how success will be verified
 	•	prefer Claude for repo understanding, planning-oriented coding work, and as the primary replacement path for multi-file implementation work after Codex access ends
-	•	use non-interactive `--print` mode when it behaves cleanly, but do not rely on `--permission-mode plan --print` until that combination is proven reliable on the current installed version
+	•	for read-only or analysis tasks, non-interactive `claude --print` is acceptable
+	•	for edit tasks from OpenClaw runtime, use `claude --permission-mode bypassPermissions --print` as the reliable non-interactive path
+	•	do not rely on `--permission-mode dontAsk --print` for edit tasks; it still stops for permission in this environment
+	•	do not rely on `--permission-mode plan --print` until that combination is proven reliable on the current installed version
 
 Claude Code should become the default worker for medium-and-up coding work in Actora after Codex access ends, and it is already a valid early choice when its workflow shape is better for the task.
 

@@ -230,7 +230,7 @@ def create_character():
 
     player_last_name = safe_input("Enter your character's last name (optional): ").strip()
 
-    sex_options = ["Male", "Female"]
+    sex_options = ["Male", "Female", "Intersex"]
     print("\nSelect biological sex:")
     for i, option in enumerate(sex_options, 1):
         print(f"  {i}) {option}")
@@ -245,7 +245,7 @@ def create_character():
         except ValueError:
             print("Invalid input. Please enter a number.")
 
-    gender_options = ["Male", "Female", "Non-binary"]
+    gender_options = ["Male", "Female", "Non-binary", "Agender", "Genderfluid", "Other"]
     print("\nSelect gender identity:")
     for i, option in enumerate(gender_options, 1):
         print(f"  {i}) {option}")
@@ -253,7 +253,16 @@ def create_character():
         try:
             choice = int(safe_input(f"Enter choice (1-{len(gender_options)}): ").strip())
             if 1 <= choice <= len(gender_options):
-                player_gender = gender_options[choice - 1]
+                selected_gender = gender_options[choice - 1]
+                if selected_gender == "Other":
+                    while True:
+                        custom_gender = safe_input("Enter your gender identity: ").strip()
+                        if custom_gender:
+                            player_gender = custom_gender
+                            break
+                        print("Gender identity cannot be empty. Please enter a value.")
+                else:
+                    player_gender = selected_gender
                 break
             else:
                 print("Invalid number. Please choose from the options.")

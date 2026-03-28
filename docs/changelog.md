@@ -1,5 +1,12 @@
 # Actora Changelog
 
+## Version 0.35.2 (Patch) - 2026-03-28
+- **Character Creation Sex / Gender Expansion:**
+    - Expanded human biological sex selection in `main.py` from `Male/Female` to `Male/Female/Intersex`.
+    - Expanded gender selection from `Male/Female/Non-binary` to `Male/Female/Non-binary/Agender/Genderfluid/Other`.
+    - Added a free-text character-creation path so selecting `Other` prompts for a custom gender identity instead of forcing a fixed label.
+    - Preserved current startup flow, actor construction shape, snapshot rendering, and the absence of deeper sex/gender gameplay systems.
+
 ## Version 0.35.1 (Patch) - 2026-03-28
 - **Time Presentation Cleanup:**
     - Moved `Age` and `Life Stage` out of the terminal snapshot `Time` section and into `Identity` so actor-derived lifecycle facts are no longer visually mixed with shared simulation clock data.
