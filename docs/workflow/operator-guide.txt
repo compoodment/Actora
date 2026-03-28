@@ -1,4 +1,4 @@
-Actora Operator Guide v8
+Actora Operator Guide v9
 
 Purpose
 
@@ -27,7 +27,9 @@ This order exists to protect the project from scope drift, silent regressions, f
 
 The assistant operating through OpenClaw is the planning, specification, synthesis, review, and source-alignment partner. It holds project context through the source documents loaded in the Actora project space and drives milestone shaping, guardrails, rewrite-risk spotting, patch review, workflow choice, and source-doc alignment.
 
-Codex CLI is the default heavy implementation worker for Actora when the task is a real coding task rather than a tiny surgical fix. It is appropriate for multi-file feature work, refactors, larger implementation passes, and repository exploration that would otherwise waste chat tokens on repetitive patch labor.
+Codex CLI is the current heavy implementation worker for Actora when the task is a real coding task rather than a tiny surgical fix, but only as a temporary worker while the user's ChatGPT-linked Codex access remains active. It is appropriate for multi-file feature work, refactors, larger implementation passes, and repository exploration that would otherwise waste chat tokens on repetitive patch labor.
+
+Claude Code CLI is the intended successor heavy implementation worker for Actora once Codex access ends. It should be treated as the main replacement path for multi-file feature work, refactors, larger implementation passes, repo understanding, and planning-oriented coding work.
 
 OpenClaw remains a valid implementation worker for repo work when its workflow is the better fit for the task, especially for controlled patch/show cycles, repo-document work, or cases where the operator intentionally chooses it.
 
@@ -52,7 +54,10 @@ scoped tiny fix -> edit -> verify -> docs update if needed -> commit if appropri
 B. Codex path
 scoped Codex task -> Codex implementation pass -> review -> explicit approval if needed -> verify on VPS -> docs update -> commit/tag if appropriate
 
-C. OpenClaw path
+C. Claude Code path
+scoped Claude Code task -> Claude implementation pass -> review -> explicit approval if needed -> verify on VPS -> docs update -> commit/tag if appropriate
+
+D. OpenClaw path
 scoped OpenClaw task -> build/show or patch output -> review -> explicit approval -> apply -> verify on VPS -> docs update -> commit/tag if appropriate
 
 Important rule:
@@ -71,9 +76,11 @@ Use the lightest path that still fits the job.
 
 Default selection rule for Actora:
 	•	tiny surgical fix -> direct edit is allowed
-	•	medium coding task -> do a minimal grounding pass, then default to Codex CLI
-	•	real feature, refactor, or multi-file coding task -> do a minimal grounding pass, then default to Codex CLI
+	•	medium coding task -> do a minimal grounding pass, then default to the current primary coding worker (Codex CLI while available, Claude Code CLI after Codex access ends)
+	•	real feature, refactor, or multi-file coding task -> do a minimal grounding pass, then default to the current primary coding worker (Codex CLI while available, Claude Code CLI after Codex access ends)
+	•	planning-oriented repo work or repo understanding where Claude is the better fit -> Claude Code is allowed even before the Codex cutoff
 	•	repo-doc workflow, controlled patch/show flow, or explicitly chosen OpenClaw task -> use OpenClaw
+	•	GitHub-native review/meta tasks may use Copilot CLI selectively, but Copilot CLI is not the default heavy implementation worker
 
 Minimal grounding pass means:
 	•	check the actual repo state relevant to the task
@@ -123,8 +130,9 @@ When using Codex CLI for Actora:
 	•	say what must change, what must stay unchanged, and how success will be verified
 	•	prefer one coherent task over a rambling prompt with mixed goals
 	•	make Codex do the implementation labor, not the decision-making about project truth
+	•	prefer Codex for implementation-heavy work while access remains available, not for fluff or repetitive low-value repo summarization
 
-Codex is the default worker for medium-and-up coding work in Actora once the task has been minimally grounded.
+Codex is the temporary default worker for medium-and-up coding work in Actora while the user's ChatGPT-linked access remains active.
 A bad prompt still makes bad code. The robot is not a priest.
 
 Codex output must still be reviewed for:
@@ -151,6 +159,38 @@ When Codex is used in the background or on a longer task:
 	•	report that it was started
 	•	report again only when a milestone, blocker, question, failure, or completion happens
 	•	avoid dead silent tool labor if the user is waiting on live work
+
+1.5.1 Claude Code workflow rules
+
+When using Claude Code for Actora:
+	•	run it inside the actual repo or a deliberate scratch/worktree location
+	•	keep the prompt repo-grounded and scope-bounded
+	•	say what must change, what must stay unchanged, and how success will be verified
+	•	prefer Claude for repo understanding, planning-oriented coding work, and as the primary replacement path for multi-file implementation work after Codex access ends
+	•	use non-interactive `--print` mode when it behaves cleanly, but do not rely on `--permission-mode plan --print` until that combination is proven reliable on the current installed version
+
+Claude Code should become the default worker for medium-and-up coding work in Actora after Codex access ends, and it is already a valid early choice when its workflow shape is better for the task.
+
+Claude output must still be reviewed for:
+	•	scope control
+	•	preserved behavior
+	•	structural fit with stable docs
+	•	verification completeness
+	•	weird opportunistic rewrites
+	•	confident nonsense
+	•	what may have been missed
+	•	whether a tighter or clearly better within-scope revision exists
+
+1.5.2 Copilot CLI workflow rules
+
+Copilot CLI is available for selective GitHub-native or review/meta work, but it is not the default heavy implementation worker for Actora.
+
+Use Copilot CLI selectively for:
+	•	GitHub-aware review or repository meta tasks
+	•	roadmap digestion or ranked next-step suggestions when that extra context is worth the spend
+	•	PR/review-style critique where its workflow is the better fit
+
+Do not default to Copilot CLI for ordinary implementation work unless there is a specific reason to spend premium usage there.
 
 1.6 Source document revision workflow
 
