@@ -1,5 +1,15 @@
 # Actora Changelog
 
+## Version 0.36.0 (Minor) - 2026-03-29
+- **Actor-First TUI Foundation:**
+    - Replaced the ordinary typed play loop in `main.py` with a narrow curses-based TUI shell for ordinary play.
+    - Added a persistent actor-first main screen showing the current focused actor snapshot plus recent activity and a visible footer hint strip.
+    - Moved ordinary advancement, lineage opening, lineage back-navigation, and quit flow onto keys so normal play no longer depends on typed `lineage`, `back`, or `quit` command words.
+    - Added key-driven lineage browsing with highlighted selection, detail opening on `Enter`, and clean return via `Esc` / `Backspace` / `q`.
+    - Preserved the important reveal flow so alive-state still does not expose the structural-state block, death still interrupts first, and continuation choices still appear only after acknowledgment.
+    - Kept continuity validation, lineage/detail data access, and simulation-step ownership world-owned rather than pushing terminal concerns into `world.py` or `human.py`.
+    - Did not introduce a full-screen window manager, archive-browser sprawl, new simulation systems, random mortality, or external dependencies.
+
 ## Version 0.35.4 (Patch) - 2026-03-28
 - **Family Lineage / Archive Foundation v1:**
     - Added world-owned lineage access through `get_lineage_entries_for(...)` and `get_lineage_detail_for(...)`, backed by the current actor/link/record stores without introducing separate physical archive storage.

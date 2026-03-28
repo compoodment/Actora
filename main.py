@@ -1,14 +1,21 @@
+import curses
 import random
+import textwrap
 from uuid import uuid4
 
-from world import World
-from banners import ACTORA_TITLE_BANNER, TIME_ADVANCED_BANNER, QUIT_BANNER
+from banners import ACTORA_TITLE_BANNER, QUIT_BANNER
 from identity import prepare_parent_identity_context, generate_parent_identity_from_context
+from world import World
 
 EVENT_DETAIL_THRESHOLD = 8
 EVENT_RECENT_DISPLAY_LIMIT = 5
-
 INPUT_INTERRUPTED_MESSAGE = "Input interrupted. Exiting Actora."
+BACK_KEYS = {
+    27,
+    curses.KEY_BACKSPACE,
+    127,
+    8,
+}
 
 
 def generate_startup_actor_id(role):
@@ -25,81 +32,101 @@ def safe_input(prompt):
         raise SystemExit(0)
 
 
-def render_snapshot(snapshot_data):
-    """Renders one structured current-state snapshot to the terminal."""
+def build_snapshot_sections(snapshot_data):
+    """Builds shell-owned snapshot sections from structured actor snapshot data."""
     identity = snapshot_data["identity"]
     time_state = snapshot_data["time"]
     location = snapshot_data["location"]
     statistics = snapshot_data["statistics"]
     relationships = snapshot_data["relationships"]
 
-    print(f"\n--- {identity['full_name']} ---")
+    return [
+        (
+            "Identity",
+            [
+                f"Name: {identity['full_name']}",
+                f"Species: {identity['species']}",
+                f"Sex: {identity['sex']}",
+                f"Gender: {identity['gender']}",
+                f"Age: {identity['age']}",
+                f"Life Stage: {identity['life_stage']}",
+            ],
+        ),
+        (
+            "Time",
+            [
+                f"Sim Date: Year {time_state['year']}, Month {time_state['month']}",
+            ],
+        ),
+        (
+            "Location",
+            [
+                f"World Body: {location['world_body_name']}",
+                f"Current Place: {location['current_place_name']}",
+                f"Jurisdiction: {location['jurisdiction_place_name']}",
+            ],
+        ),
+        (
+            "Statistics",
+            [
+                f"Health: {statistics['health']}",
+                f"Happiness: {statistics['happiness']}",
+                f"Intelligence: {statistics['intelligence']}",
+                f"Money: ${statistics['money']}",
+            ],
+        ),
+        (
+            "Relationships",
+            [
+                f"Mother: {relationships['mother_name']}",
+                f"Father: {relationships['father_name']}",
+            ],
+        ),
+    ]
 
-    print("\n--- Identity ---")
-    print(f"  Full Name: {identity['full_name']}")
-    print(f"  Species: {identity['species']}")
-    print(f"  Sex: {identity['sex']}")
-    print(f"  Gender: {identity['gender']}")
-    print(f"  Age: {identity['age']}")
-    print(f"  Life Stage: {identity['life_stage']}")
 
-    print("\n--- Time ---")
-    print(f"  Sim Date: Year {time_state['year']}, Month {time_state['month']}")
-
-    print("\n--- Location ---")
-    print(f"  World Body: {location['world_body_name']}")
-    print(f"  Current Place: {location['current_place_name']}")
-    print(f"  Jurisdiction: {location['jurisdiction_place_name']}")
-
-    print("\n--- Statistics ---")
-    print(f"  Health: {statistics['health']}")
-    print(f"  Happiness: {statistics['happiness']}")
-    print(f"  Intelligence: {statistics['intelligence']}")
-    print(f"  Money: ${statistics['money']}")
-
-    print("\n--- Relationships ---")
-    print("  Family:")
-    print(f"    Mother: {relationships['mother_name']}")
-    print(f"    Father: {relationships['father_name']}")
-    print("--------------------")
-
-
-def render_turn_events(turn_result):
-    """Renders structured event output for one simulated turn."""
-    print("\n--- Events ---")
+def build_event_lines(turn_result):
+    """Builds shell-owned event summary lines for the current turn result."""
     if not turn_result["had_any_events"]:
-        print("  - No notable events occurred during this period.")
-        return
+        return [
+            "Recent Activity",
+            "No notable events occurred during this period.",
+        ]
 
     total_events = len(turn_result["events"])
     if total_events <= EVENT_DETAIL_THRESHOLD:
+        lines = ["Recent Activity"]
         for structured_event in turn_result["events"]:
-            print(
-                f"  - [Year {structured_event['year']}, Month {structured_event['month']}] "
+            lines.append(
+                f"[Year {structured_event['year']}, Month {structured_event['month']}] "
                 f"{structured_event['text']}"
             )
-        return
+        return lines
 
     recent_events = turn_result["events"][-EVENT_RECENT_DISPLAY_LIMIT:]
     omitted_count = total_events - len(recent_events)
-
-    print(f"  - {total_events} notable events occurred during this period.")
-    print(f"  - Showing the most recent {len(recent_events)} events:")
+    lines = [
+        "Recent Activity",
+        f"{total_events} notable events occurred.",
+        f"Showing the most recent {len(recent_events)}:",
+    ]
     for structured_event in recent_events:
-        print(
-            f"    - [Year {structured_event['year']}, Month {structured_event['month']}] "
+        lines.append(
+            f"[Year {structured_event['year']}, Month {structured_event['month']}] "
             f"{structured_event['text']}"
         )
-
     if omitted_count > 0:
-        print(f"  - ... {omitted_count} older events omitted.")
+        lines.append(f"... {omitted_count} older events omitted.")
+    return lines
 
 
-def render_death_interrupt(continuity_state):
-    """Renders the shell-owned dead-focus interrupt before continuation choices."""
-    print("\n--- Death ---")
-    print("You are dead.")
-    print(f"  {continuity_state['focus_actor_name']}")
+def build_death_lines(continuity_state):
+    """Builds the dead-focus interrupt copy for the TUI shell."""
+    lines = [
+        "Death",
+        "You are dead.",
+        continuity_state["focus_actor_name"],
+    ]
 
     death_year = continuity_state["focus_actor_death_year"]
     death_month = continuity_state["focus_actor_death_month"]
@@ -112,219 +139,386 @@ def render_death_interrupt(continuity_state):
         death_context_parts.append(death_reason)
 
     if death_context_parts:
-        print(f"  {' | '.join(death_context_parts)}")
-
-    print("  The universe continues.")
-    print("--------------------")
-
-
-def prompt_for_death_acknowledgment():
-    """Requires a deliberate acknowledgment before showing continuation options."""
-    while True:
-        choice_raw = safe_input(
-            "Press Enter to acknowledge, or type 'quit': "
-        ).strip().lower()
-        if choice_raw == "":
-            return True
-        if choice_raw == "quit":
-            return False
-        print("Invalid input: Press Enter to continue or type 'quit'.")
+        lines.append(" | ".join(death_context_parts))
+    lines.append("The universe continues.")
+    return lines
 
 
-def render_continuation_choices(continuity_state):
-    """Renders continuation options only after the death interrupt is acknowledged."""
-    print("\n--- Continuation ---")
-    if continuity_state["had_continuity_candidates"]:
-        print("Select a living connected actor to continue:")
-        for index, candidate in enumerate(continuity_state["continuity_candidates"], 1):
-            place_label = candidate.get("current_place_name") or "Unknown"
-            print(
-                f"  {index}) {candidate['full_name']} "
-                f"[{candidate['relationship_label']}] — "
-                f"Age {candidate['age']} ({candidate['life_stage']}) — "
-                f"{place_label}"
-            )
-    else:
-        print("No living connected continuation candidates were found.")
-    print("--------------------")
+def wrap_text_line(text, width):
+    """Wraps one line of text to the available width while preserving blank lines."""
+    if width <= 1:
+        return [text[:1]]
+    if text == "":
+        return [""]
+    return textwrap.wrap(text, width=width) or [""]
 
 
-def prompt_for_continuation_choice(continuity_state):
-    """Prompts for one valid continuation target index or clean quit."""
-    candidate_count = len(continuity_state["continuity_candidates"])
-    while True:
-        choice_raw = safe_input(
-            f"Choose a continuation target (1-{candidate_count}) or type 'quit': "
-        ).strip().lower()
-        if choice_raw == "quit":
-            return None
-
-        try:
-            selected_index = int(choice_raw)
-        except ValueError:
-            print("Invalid input: Please enter a number or 'quit'.")
-            continue
-
-        if 1 <= selected_index <= candidate_count:
-            return continuity_state["continuity_candidates"][selected_index - 1]["actor_id"]
-
-        print("Invalid input: Please choose one of the listed continuation options.")
+def draw_text_block(stdscr, start_y, start_x, width, height, lines, *, highlight_index=None):
+    """Draws a wrapped block of text inside the provided bounds."""
+    y = start_y
+    for index, raw_line in enumerate(lines):
+        wrapped_lines = wrap_text_line(raw_line, width)
+        attr = curses.A_REVERSE if highlight_index == index else curses.A_NORMAL
+        for wrapped_line in wrapped_lines:
+            if y >= start_y + height:
+                return y
+            stdscr.addnstr(y, start_x, wrapped_line, width, attr)
+            y += 1
+    return y
 
 
-def render_lineage_list(lineage_entries):
-    """Renders the current lineage list for the focused actor context."""
-    print("\n--- Lineage ---")
-    if not lineage_entries:
-        print("No family-linked lineage entries were found.")
-        print("--------------------")
-        return
+class ActoraTUI:
+    """Small actor-first curses shell layered on top of the existing world seams."""
 
-    print("Select an actor to inspect:")
-    for index, entry in enumerate(lineage_entries, 1):
-        if entry["is_alive"]:
-            print(
-                f"  {index}) {entry['full_name']} [{entry['relationship_label']}] — "
-                f"Age {entry['age']} — {entry['current_place_name']}"
-            )
-        else:
-            life_span = f"{entry['birth_date']} / {entry['death_date']}"
-            print(
-                f"  {index}) {entry['full_name']} [{entry['relationship_label']}] — "
-                f"{life_span} — {entry['death_reason']} — {entry['current_place_name']}"
-            )
-    print("--------------------")
+    def __init__(self, world, player_id):
+        self.world = world
+        self.player_id = player_id
+        self.screen_name = "main"
+        self.running = True
+        self.lineage_selection = 0
+        self.continuation_selection = 0
+        self.selected_lineage_actor_id = None
+        self.last_message = "A/Enter advances one month."
+        self.last_event_lines = [
+            "Recent Activity",
+            "No time has passed yet.",
+        ]
 
+    def get_focused_actor_id(self):
+        return self.world.get_focused_actor_id() or self.player_id
 
-def render_lineage_detail(lineage_detail):
-    """Renders one lineage detail view with summary and recent records."""
-    summary = lineage_detail["summary"]
-    records = lineage_detail["records"]
+    def get_focused_actor(self):
+        return self.world.get_actor(self.get_focused_actor_id())
 
-    print(f"\n--- Lineage Detail: {summary['full_name']} ---")
-    print(f"  Relationship: {summary['relationship_label']}")
-    print(f"  Species: {summary['species']}")
-    print(f"  Sex: {summary['sex']}")
-    print(f"  Gender: {summary['gender']}")
-    print(f"  Status: {summary['structural_status'].title()}")
-    if summary["death_date"] is not None:
-        print(f"  Age at Death: {summary['age']}")
-    else:
-        print(f"  Age: {summary['age']}")
-    print(f"  Life Stage: {summary['life_stage']}")
-    print(f"  Born: {summary['birth_date']}")
-    if summary["death_date"] is not None:
-        print(f"  Died: {summary['death_date']}")
-        print(f"  Cause of Death: {summary['death_reason']}")
-    print(f"  Place: {summary['current_place_name']}")
-    print("\n  Core Statistics:")
-    print(f"    Health: {summary['health']}")
-    print(f"    Happiness: {summary['happiness']}")
-    print(f"    Intelligence: {summary['intelligence']}")
-    print(f"    Money: ${summary['money']}")
+    def get_snapshot_data(self):
+        focused_actor_id = self.get_focused_actor_id()
+        focused_actor = self.world.get_actor(focused_actor_id)
+        return focused_actor.get_snapshot_data(
+            self.world.current_year,
+            self.world.current_month,
+            self.world,
+            focused_actor_id,
+        )
 
-    print("\n  Recent Records:")
-    if not records:
-        print("    No records found.")
-    else:
-        for record in records:
-            print(
-                f"    - [{record['year']:04d}-{record['month']:02d}] "
-                f"({record['record_type']}) {record['text']}"
-            )
-    print("--------------------")
-
-
-def prompt_for_lineage_selection(lineage_entries):
-    """Prompts for one lineage actor selection or a clean return."""
-    entry_count = len(lineage_entries)
-    while True:
-        choice_raw = safe_input(
-            f"Choose a lineage actor (1-{entry_count}) or type 'back': "
-        ).strip().lower()
-        if choice_raw == "back":
-            return None
-
-        try:
-            selected_index = int(choice_raw)
-        except ValueError:
-            print("Invalid input: Please enter a number or 'back'.")
-            continue
-
-        if 1 <= selected_index <= entry_count:
-            return lineage_entries[selected_index - 1]["actor_id"]
-
-        print("Invalid input: Please choose one of the listed lineage entries.")
-
-
-def open_lineage_view(world, actor_id):
-    """Opens the current lineage list/detail flow for one actor context."""
-    lineage_entries = world.get_lineage_entries_for(actor_id)
-    render_lineage_list(lineage_entries)
-    if not lineage_entries:
-        return
-
-    while True:
-        selected_actor_id = prompt_for_lineage_selection(lineage_entries)
-        if selected_actor_id is None:
+    def sync_focus_state(self):
+        """Applies shell-level dead-focus flow selection before rendering."""
+        focused_actor = self.get_focused_actor()
+        if focused_actor is None or focused_actor.is_alive():
+            if self.screen_name in {"death_ack", "continuation"}:
+                self.screen_name = "main"
             return
 
-        render_lineage_detail(world.get_lineage_detail_for(actor_id, selected_actor_id))
-        while True:
-            choice_raw = safe_input("Type 'back' to return to lineage list: ").strip().lower()
-            if choice_raw == "back":
-                render_lineage_list(lineage_entries)
-                break
-            print("Invalid input: Type 'back' to return to the lineage list.")
+        if self.screen_name not in {"death_ack", "continuation"}:
+            self.screen_name = "death_ack"
 
+    def get_lineage_entries(self):
+        return self.world.get_lineage_entries_for(self.get_focused_actor_id())
 
-def resolve_dead_focus(world):
-    """Handles continuation handoff or clean run end when the focused actor is dead."""
-    focused_actor_id = world.get_focused_actor_id()
-    if focused_actor_id is None:
-        return True
-
-    focused_actor = world.get_actor(focused_actor_id)
-    if focused_actor is None or focused_actor.is_alive():
-        return True
-
-    continuity_state = world.build_continuity_state_for(focused_actor_id)
-    render_death_interrupt(continuity_state)
-
-    if not prompt_for_death_acknowledgment():
-        print(QUIT_BANNER)
-        return False
-
-    render_continuation_choices(continuity_state)
-
-    if not continuity_state["had_continuity_candidates"]:
-        print("This run has ended because no valid continuation target exists.")
-        return False
-
-    successor_actor_id = prompt_for_continuation_choice(continuity_state)
-    if successor_actor_id is None:
-        print(QUIT_BANNER)
-        return False
-
-    handoff_result = world.handoff_focus_to_continuation(
-        focused_actor_id,
-        successor_actor_id,
-    )
-    print(
-        f"Focus moved from {handoff_result['previous_actor_name']} "
-        f"to {handoff_result['new_focused_actor_name']}."
-    )
-
-    new_focused_actor_id = handoff_result["new_focused_actor_id"]
-    new_focused_actor = world.get_actor(new_focused_actor_id)
-    render_snapshot(
-        new_focused_actor.get_snapshot_data(
-            world.current_year,
-            world.current_month,
-            world,
-            new_focused_actor_id,
+    def get_lineage_detail(self):
+        if self.selected_lineage_actor_id is None:
+            return None
+        return self.world.get_lineage_detail_for(
+            self.get_focused_actor_id(),
+            self.selected_lineage_actor_id,
         )
-    )
-    return True
+
+    def get_continuity_state(self):
+        return self.world.build_continuity_state_for(self.get_focused_actor_id())
+
+    def advance_one_month(self):
+        """Advances time using the existing world-owned simulation seam."""
+        turn_result = self.world.simulate_advance_turn(self.player_id, 1)
+        self.last_event_lines = build_event_lines(turn_result)
+        self.last_message = "Advanced 1 month."
+        if turn_result["continuity_state"] is not None and not turn_result["focused_actor_alive"]:
+            self.screen_name = "death_ack"
+
+    def open_lineage(self):
+        self.lineage_selection = 0
+        self.selected_lineage_actor_id = None
+        self.screen_name = "lineage"
+        self.last_message = "Browsing lineage."
+
+    def open_lineage_detail(self):
+        lineage_entries = self.get_lineage_entries()
+        if not lineage_entries:
+            self.last_message = "No family-linked lineage entries were found."
+            return
+        self.lineage_selection = max(0, min(self.lineage_selection, len(lineage_entries) - 1))
+        self.selected_lineage_actor_id = lineage_entries[self.lineage_selection]["actor_id"]
+        self.screen_name = "lineage_detail"
+
+    def acknowledge_death(self):
+        continuity_state = self.get_continuity_state()
+        self.continuation_selection = 0
+        self.screen_name = "continuation"
+        if continuity_state["had_continuity_candidates"]:
+            self.last_message = "Choose a continuation target."
+        else:
+            self.last_message = "No valid continuation target exists."
+
+    def choose_continuation(self):
+        continuity_state = self.get_continuity_state()
+        candidates = continuity_state["continuity_candidates"]
+        if not candidates:
+            self.running = False
+            return
+
+        self.continuation_selection = max(
+            0,
+            min(self.continuation_selection, len(candidates) - 1),
+        )
+        successor_actor_id = candidates[self.continuation_selection]["actor_id"]
+        handoff_result = self.world.handoff_focus_to_continuation(
+            self.get_focused_actor_id(),
+            successor_actor_id,
+        )
+        self.screen_name = "main"
+        self.last_message = (
+            f"Focus moved from {handoff_result['previous_actor_name']} "
+            f"to {handoff_result['new_focused_actor_name']}."
+        )
+        self.last_event_lines = [
+            "Recent Activity",
+            self.last_message,
+        ]
+
+    def handle_main_key(self, key):
+        if key in (ord("q"), ord("Q")):
+            self.running = False
+        elif key in (curses.KEY_ENTER, 10, 13, ord("a"), ord("A")):
+            self.advance_one_month()
+        elif key in (ord("l"), ord("L")):
+            self.open_lineage()
+
+    def handle_lineage_key(self, key):
+        lineage_entries = self.get_lineage_entries()
+        if key in BACK_KEYS or key in (ord("q"), ord("Q")):
+            self.screen_name = "main"
+            self.last_message = "Returned to actor view."
+            return
+        if not lineage_entries:
+            return
+        if key == curses.KEY_UP:
+            self.lineage_selection = max(0, self.lineage_selection - 1)
+        elif key == curses.KEY_DOWN:
+            self.lineage_selection = min(len(lineage_entries) - 1, self.lineage_selection + 1)
+        elif key in (curses.KEY_ENTER, 10, 13):
+            self.open_lineage_detail()
+
+    def handle_lineage_detail_key(self, key):
+        if key in BACK_KEYS or key in (ord("q"), ord("Q")):
+            self.screen_name = "lineage"
+            self.last_message = "Returned to lineage list."
+
+    def handle_death_ack_key(self, key):
+        if key in (ord("q"), ord("Q")):
+            self.running = False
+        elif key in (curses.KEY_ENTER, 10, 13):
+            self.acknowledge_death()
+
+    def handle_continuation_key(self, key):
+        continuity_state = self.get_continuity_state()
+        candidates = continuity_state["continuity_candidates"]
+        if key in (ord("q"), ord("Q")):
+            self.running = False
+            return
+        if not candidates:
+            return
+        if key == curses.KEY_UP:
+            self.continuation_selection = max(0, self.continuation_selection - 1)
+        elif key == curses.KEY_DOWN:
+            self.continuation_selection = min(
+                len(candidates) - 1,
+                self.continuation_selection + 1,
+            )
+        elif key in (curses.KEY_ENTER, 10, 13):
+            self.choose_continuation()
+
+    def handle_key(self, key):
+        self.sync_focus_state()
+        if self.screen_name == "main":
+            self.handle_main_key(key)
+        elif self.screen_name == "lineage":
+            self.handle_lineage_key(key)
+        elif self.screen_name == "lineage_detail":
+            self.handle_lineage_detail_key(key)
+        elif self.screen_name == "death_ack":
+            self.handle_death_ack_key(key)
+        elif self.screen_name == "continuation":
+            self.handle_continuation_key(key)
+
+    def render_footer(self, stdscr, height, width):
+        footer_hints = {
+            "main": "A/Enter advance   L lineage   Q quit",
+            "lineage": "Up/Down move   Enter inspect   Esc/Backspace/Q back",
+            "lineage_detail": "Esc/Backspace/Q back",
+            "death_ack": "Enter acknowledge   Q quit",
+            "continuation": "Up/Down move   Enter continue   Q quit",
+        }
+        footer_text = footer_hints.get(self.screen_name, "")
+        stdscr.hline(height - 2, 0, curses.ACS_HLINE, width)
+        stdscr.addnstr(height - 1, 0, footer_text.ljust(width), width, curses.A_REVERSE)
+
+    def render_main(self, stdscr, height, width):
+        snapshot_data = self.get_snapshot_data()
+        snapshot_sections = build_snapshot_sections(snapshot_data)
+        identity_name = snapshot_data["identity"]["full_name"]
+
+        lines = [f"Actora | {identity_name}", self.last_message, ""]
+        for section_title, section_lines in snapshot_sections:
+            lines.append(section_title)
+            lines.extend(f"  {line}" for line in section_lines)
+            lines.append("")
+        lines.extend(self.last_event_lines)
+        draw_text_block(stdscr, 0, 0, width, height - 2, lines)
+
+    def render_lineage(self, stdscr, height, width):
+        lineage_entries = self.get_lineage_entries()
+        lines = ["Lineage", self.last_message, ""]
+        highlight_index = None
+
+        if not lineage_entries:
+            lines.append("No family-linked lineage entries were found.")
+        else:
+            self.lineage_selection = max(0, min(self.lineage_selection, len(lineage_entries) - 1))
+            for entry in lineage_entries:
+                if entry["is_alive"]:
+                    line = (
+                        f"{entry['full_name']} [{entry['relationship_label']}] "
+                        f"- Age {entry['age']} - {entry['current_place_name']}"
+                    )
+                else:
+                    line = (
+                        f"{entry['full_name']} [{entry['relationship_label']}] "
+                        f"- {entry['birth_date']} / {entry['death_date']} "
+                        f"- {entry['death_reason']} - {entry['current_place_name']}"
+                    )
+                if len(lines) == 3 + self.lineage_selection:
+                    highlight_index = len(lines)
+                lines.append(line)
+
+        draw_text_block(stdscr, 0, 0, width, height - 2, lines, highlight_index=highlight_index)
+
+    def render_lineage_detail(self, stdscr, height, width):
+        lineage_detail = self.get_lineage_detail()
+        if lineage_detail is None:
+            self.screen_name = "lineage"
+            self.render_lineage(stdscr, height, width)
+            return
+
+        summary = lineage_detail["summary"]
+        records = lineage_detail["records"]
+        lines = [
+            f"Lineage Detail | {summary['full_name']}",
+            "",
+            f"Relationship: {summary['relationship_label']}",
+            f"Species: {summary['species']}",
+            f"Sex: {summary['sex']}",
+            f"Gender: {summary['gender']}",
+            f"Status: {summary['structural_status'].title()}",
+            (
+                f"Age at Death: {summary['age']}"
+                if summary["death_date"] is not None
+                else f"Age: {summary['age']}"
+            ),
+            f"Life Stage: {summary['life_stage']}",
+            f"Born: {summary['birth_date']}",
+        ]
+        if summary["death_date"] is not None:
+            lines.append(f"Died: {summary['death_date']}")
+            lines.append(f"Cause of Death: {summary['death_reason']}")
+        lines.extend(
+            [
+                f"Place: {summary['current_place_name']}",
+                "",
+                "Core Statistics",
+                f"  Health: {summary['health']}",
+                f"  Happiness: {summary['happiness']}",
+                f"  Intelligence: {summary['intelligence']}",
+                f"  Money: ${summary['money']}",
+                "",
+                "Recent Records",
+            ]
+        )
+        if not records:
+            lines.append("  No records found.")
+        else:
+            for record in records:
+                lines.append(
+                    f"  [{record['year']:04d}-{record['month']:02d}] "
+                    f"({record['record_type']}) {record['text']}"
+                )
+        draw_text_block(stdscr, 0, 0, width, height - 2, lines)
+
+    def render_death_ack(self, stdscr, height, width):
+        continuity_state = self.get_continuity_state()
+        draw_text_block(
+            stdscr,
+            0,
+            0,
+            width,
+            height - 2,
+            build_death_lines(continuity_state),
+        )
+
+    def render_continuation(self, stdscr, height, width):
+        continuity_state = self.get_continuity_state()
+        candidates = continuity_state["continuity_candidates"]
+        lines = ["Continuation", self.last_message, ""]
+        highlight_index = None
+
+        if not candidates:
+            lines.append("No living connected continuation candidates were found.")
+            lines.append("Press Q to quit this run.")
+        else:
+            self.continuation_selection = max(
+                0,
+                min(self.continuation_selection, len(candidates) - 1),
+            )
+            for candidate in candidates:
+                line = (
+                    f"{candidate['full_name']} [{candidate['relationship_label']}] "
+                    f"- Age {candidate['age']} ({candidate['life_stage']}) "
+                    f"- {candidate['current_place_name'] or 'Unknown'}"
+                )
+                if len(lines) == 3 + self.continuation_selection:
+                    highlight_index = len(lines)
+                lines.append(line)
+
+        draw_text_block(stdscr, 0, 0, width, height - 2, lines, highlight_index=highlight_index)
+
+    def render(self, stdscr):
+        stdscr.erase()
+        height, width = stdscr.getmaxyx()
+        if height < 12 or width < 50:
+            stdscr.addnstr(0, 0, "Terminal too small for Actora TUI. Resize and try again.", width - 1)
+            return
+
+        if self.screen_name == "main":
+            self.render_main(stdscr, height, width)
+        elif self.screen_name == "lineage":
+            self.render_lineage(stdscr, height, width)
+        elif self.screen_name == "lineage_detail":
+            self.render_lineage_detail(stdscr, height, width)
+        elif self.screen_name == "death_ack":
+            self.render_death_ack(stdscr, height, width)
+        elif self.screen_name == "continuation":
+            self.render_continuation(stdscr, height, width)
+
+        self.render_footer(stdscr, height, width)
+        stdscr.refresh()
+
+    def run(self, stdscr):
+        """Runs the narrow curses shell until the user quits or the run ends."""
+        curses.curs_set(0)
+        stdscr.keypad(True)
+
+        while self.running:
+            self.sync_focus_state()
+            self.render(stdscr)
+            key = stdscr.getch()
+            self.handle_key(key)
 
 
 def create_character():
@@ -349,8 +543,7 @@ def create_character():
             if 1 <= choice <= len(sex_options):
                 player_sex = sex_options[choice - 1]
                 break
-            else:
-                print("Invalid number. Please choose from the options.")
+            print("Invalid number. Please choose from the options.")
         except ValueError:
             print("Invalid input. Please enter a number.")
 
@@ -373,8 +566,7 @@ def create_character():
                 else:
                     player_gender = selected_gender
                 break
-            else:
-                print("Invalid number. Please choose from the options.")
+            print("Invalid number. Please choose from the options.")
         except ValueError:
             print("Invalid input. Please enter a number.")
 
@@ -468,7 +660,7 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
     )
 
     player_id = generate_startup_actor_id("player")
-    player = world.create_human_child_with_parents(
+    world.create_human_child_with_parents(
         child_id=player_id,
         first_name=player_first_name,
         last_name=player_last_name,
@@ -484,69 +676,30 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
     )
     world.set_focused_actor(player_id)
 
-    return world, player_id, player
+    return world, player_id
 
 
-def game_loop(world, player_id, player):
-    """Contains the main game loop for advancing time and displaying results."""
-    focused_actor_id = world.get_focused_actor_id() or player_id
-    focused_actor = world.get_actor(focused_actor_id)
-    render_snapshot(focused_actor.get_snapshot_data(world.current_year, world.current_month, world, focused_actor_id))
-
-    while True:
-        if not resolve_dead_focus(world):
-            return
-
-        months_to_advance = 0
-        while True: # Input validation loop
-            choice_raw = safe_input("Press Enter for the next month, type a number to skip months, or type 'lineage' or 'quit': ").strip().lower()
-
-            if choice_raw == '': # Empty input -> 1 month
-                months_to_advance = 1
-                break
-            elif choice_raw == 'lineage':
-                current_focus_id = world.get_focused_actor_id() or player_id
-                open_lineage_view(world, current_focus_id)
-            elif choice_raw == 'quit': # Exact 'quit' -> exit game
-                print(QUIT_BANNER)
-                return # Use return to terminate
-            else:
-                try:
-                    num_months = int(choice_raw)
-                    if num_months > 0: # Positive integers > 0 -> advance that many months
-                        months_to_advance = num_months
-                        break
-                    else: # 0 or negative integers -> invalid
-                        print("Invalid input: Please enter a positive number greater than 0.")
-                except ValueError: # Non-numeric input (floats, mixed text, other non-numeric) -> invalid
-                    print("Invalid input: Please enter a number, 'lineage', or 'quit'.")
-
-        turn_result = world.simulate_advance_turn(player_id, months_to_advance)
-
-        print(TIME_ADVANCED_BANNER)
-        focused_actor_id = turn_result["focused_actor_id"]
-        final_player_state = world.get_actor(focused_actor_id)
-        render_snapshot(
-            final_player_state.get_snapshot_data(
-                world.current_year,
-                world.current_month,
-                world,
-                focused_actor_id,
-            )
-        )
-        render_turn_events(turn_result)
-
-        if turn_result["continuity_state"] is not None:
-            if not resolve_dead_focus(world):
-                return
+def run_game_tui(world, player_id):
+    """Runs the actor-first curses shell for ordinary play."""
+    tui = ActoraTUI(world, player_id)
+    try:
+        curses.wrapper(tui.run)
+    except KeyboardInterrupt:
+        pass
+    print(QUIT_BANNER)
 
 
 def start_game():
     print(ACTORA_TITLE_BANNER)
 
     player_first_name, player_last_name, player_sex, player_gender = create_character()
-    world, player_id, player = setup_initial_world(player_first_name, player_last_name, player_sex, player_gender)
-    game_loop(world, player_id, player)
+    world, player_id = setup_initial_world(
+        player_first_name,
+        player_last_name,
+        player_sex,
+        player_gender,
+    )
+    run_game_tui(world, player_id)
 
 
 if __name__ == "__main__":

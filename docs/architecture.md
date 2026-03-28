@@ -1,7 +1,7 @@
 # Actora Architecture Summary
 
-**Version:** 0.35.0
-**Last Updated:** 2026-03-28
+**Version:** 0.36.0
+**Last Updated:** 2026-03-29
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
 It is intended to support safe patching, review, and manual verification.
@@ -9,7 +9,7 @@ It is intended to support safe patching, review, and manual verification.
 ## 1. Stack
 
 - **Language:** Python
-- **Interface:** Terminal
+- **Interface:** Terminal with a narrow curses TUI shell for ordinary play
 - **Structure:** Small modular prototype with separated simulation and rendering responsibilities
 
 ## 2. Current File Structure
@@ -297,27 +297,26 @@ Responsible for:
 - terminal shell orchestration
 - character creation flow
 - initial world setup flow
-- main input loop
+- curses-driven actor-first play flow
 - post-turn rendering orchestration
-- rendering terminal snapshots from structured snapshot data
+- rendering TUI snapshots from structured snapshot data
 - converting structured event results into display text
 - rendering the shell-owned dead-focus interrupt and continuation handoff flow when present
+- rendering lineage list/detail browsing without typed command words
 
 Current shell-level functions:
-- `render_snapshot(...)` — terminal rendering of the structured current-state snapshot returned by `Human.get_snapshot_data(...)`
-- `render_turn_events(...)` — terminal rendering of one structured turn’s event output with the current detail/summary thresholds
-- `render_death_interrupt(...)` — terminal rendering of the dedicated dead-focus interrupt before continuation choices are shown
-- `prompt_for_death_acknowledgment(...)` — shell-level acknowledgment gate before continuation choices are revealed
-- `render_continuation_choices(...)` — terminal rendering of current continuation candidates after acknowledgment
-- `prompt_for_continuation_choice(...)` — validated continuation-target input helper for the shell layer
-- `resolve_dead_focus(...)` — shell-owned continuation orchestration that renders the death interrupt, requires acknowledgment, then renders continuation choices, delegates the actual focus mutation to `World.handoff_focus_to_continuation(...)`, and cleanly ends the run when no valid continuation target exists
+- `build_snapshot_sections(...)` — shell-owned transformation from structured snapshot data into TUI-ready section lines
+- `build_event_lines(...)` — shell-owned event summary formatting with the current detail/summary thresholds
+- `build_death_lines(...)` — shell-owned dead-focus interrupt copy assembly
+- `draw_text_block(...)` — small curses text rendering helper with wrapping support
+- `ActoraTUI` — narrow curses shell object managing the main actor view, lineage list/detail, death acknowledgment, and continuation selection
 - `safe_input(prompt)` — narrow shared CLI input boundary helper that exits cleanly on `EOFError` and `KeyboardInterrupt`
 - `create_character()` — character creation prompts and input validation
 - `setup_initial_world(...)` — World creation, parent identity generation, startup actor entry delegation through world-owned helpers (`create_human_actor(...)` and `create_human_child_with_parents(...)`), and initial focused-actor assignment through `World.set_focused_actor(...)`
-- `game_loop(...)` — main input/advancement/display loop
+- `run_game_tui(...)` — curses wrapper entry point for ordinary play
 - `start_game()` — top-level orchestration (banner, then delegates to the above)
 
-Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Ordinary alive-play snapshots still stay narrow and do not expose the structural-state block, while dead focus is now presented as a dedicated shell interrupt before any continuation choices are shown.
+Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Once startup completes, ordinary play now lives inside a narrow curses shell: the main actor screen stays visible, `A`/`Enter` advances one month, `L` opens lineage browsing, and alive-state snapshot rendering still stays narrow without exposing the structural-state block. Dead focus is still presented first as a dedicated shell interrupt before any continuation choices are shown.
 
 ### `identity.py`
 Responsible for:
@@ -377,7 +376,6 @@ Current event boundary truth:
 ### `banners.py`
 Responsible for:
 - `ACTORA_TITLE_BANNER`
-- `TIME_ADVANCED_BANNER`
 - `QUIT_BANNER`
 
 ## 7. Simulation Boundary
@@ -422,15 +420,15 @@ This function does not perform terminal input, output, or presentation formattin
 2. Run character creation (`create_character()`).
 3. Set up initial world state (`setup_initial_world(...)`).
 4. Set the startup player as the world-owned focused actor.
-5. Display the initial focused-actor snapshot.
-6. Enter the game loop (`game_loop(...)`).
-7. Read player input.
-8. Resolve months to advance (or quit).
-9. Call `World.simulate_advance_turn(...)`.
+5. Enter the curses shell (`run_game_tui(...)` / `ActoraTUI.run(...)`).
+6. Render the initial focused-actor snapshot screen.
+7. Read one key-driven TUI action.
+8. Resolve advance, lineage browse, continuation selection, back, or quit.
+9. Call `World.simulate_advance_turn(...)` when advancing.
 10. Advance time internally month-by-month.
 11. Apply triggered event outcomes through `World.apply_outcome(...)`.
 12. Collect triggered structured events.
-13. Render updated focused-actor snapshot.
+13. Re-render the updated focused-actor snapshot screen.
 14. Render event output by combining structured `year`, `month`, and raw event `text`.
     - Small event counts are shown as full dated lines.
     - Large event counts are summarized with a total count, a recent-event subset, and an omitted-older-events line.
@@ -472,10 +470,10 @@ Current initialization behavior:
 
 ### Time Advancement
 Current advancement behavior:
-- Enter advances 1 month
-- positive integer advances that many months
-- `quit` exits (via `return` from `game_loop`)
-- invalid input reprompts safely
+- `A` or `Enter` advances 1 month from the persistent actor screen
+- `L` opens lineage browsing from the persistent actor screen
+- `Q` exits the run from the TUI
+- ordinary play no longer requires typed `lineage`, `back`, or `quit` command words
 
 ### Events
 Current event behavior:
@@ -519,14 +517,13 @@ Current structural-transition behavior:
 - current continuity candidates are returned in deterministic order with display-ready relationship metadata
 - ordinary month advancement does not proceed once the focused actor is dead
 - `main.py` now renders a dedicated dead-focus interrupt led by `You are dead.`, shows current death context when available, requires acknowledgment before showing continuation choices, and renders each continuation candidate with relationship label, age, life stage, and current place before switching focus through the world-owned handoff method
-- `main.py` now also exposes a first `lineage` command during ordinary play so family-linked alive/dead actors can be inspected through a list + detail flow backed by current actors/links/records
-- if no valid continuation candidates exist, the shell reports that cleanly and ends the current run without fake continuation
+- `main.py` now exposes lineage browsing through the curses shell so family-linked alive/dead actors can be inspected through a highlighted list + detail flow backed by current actors/links/records
+- if no valid continuation candidates exist, the shell reports that cleanly and leaves the run only through explicit quit
 
 Current limitations:
 - no automatic mortality system yet
 - no archive behavior yet
 - no inheritance/estate consequences yet
-- no lineage browser yet
 - no broader connected-actor prioritization system yet
 
 ## 10. Event Foundation
@@ -557,11 +554,12 @@ When patching this repository:
 After patching, verify:
 - startup still works
 - character creation still works
-- advancement input still works
+- TUI advancement input still works
 - quit still works
-- snapshot output still renders correctly
+- snapshot output still renders correctly in the curses shell
 - origin/care/bootstrap family-link semantics remain explicit in `World.links` without implying broader relationship systems
 - events still trigger and display correctly (with correct date prefixes rendered by main.py)
 - month-by-month advancement still behaves correctly
 - focused actor assignment works correctly at startup
+- lineage browsing still works through the shell without typed command words
 - direct structural death transition testing correctly updates actor state, preserves the actor in `World.actors`, writes a `death` record, and returns sensible continuity candidates from living linked actors
