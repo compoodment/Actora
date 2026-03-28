@@ -1,5 +1,12 @@
 # Actora Changelog
 
+## Version 0.36.1 (Patch) - 2026-03-29
+- **Curses Footer Render Fix:**
+    - Fixed a terminal-edge rendering bug in the new curses shell where drawing the footer to the full terminal width could raise `_curses.error: addnwstr() returned ERR` on startup in real terminals.
+    - Tightened footer rendering in `main.py` to reserve the last column safely instead of writing to the full reported width.
+    - Added a safe horizontal-line fallback so footer rendering does not rely on `curses.ACS_HLINE` always being present outside fully initialized curses contexts.
+    - Preserved the `v0.36.0` actor-first TUI behavior, keybindings, lineage browsing, and continuity/death flow.
+
 ## Version 0.36.0 (Minor) - 2026-03-29
 - **Actor-First TUI Foundation:**
     - Replaced the ordinary typed play loop in `main.py` with a narrow curses-based TUI shell for ordinary play.

@@ -309,7 +309,7 @@ Current shell-level functions:
 - `build_event_lines(...)` — shell-owned event summary formatting with the current detail/summary thresholds
 - `build_death_lines(...)` — shell-owned dead-focus interrupt copy assembly
 - `draw_text_block(...)` — small curses text rendering helper with wrapping support
-- `ActoraTUI` — narrow curses shell object managing the main actor view, lineage list/detail, death acknowledgment, and continuation selection
+- `ActoraTUI` — narrow curses shell object managing the main actor view, lineage list/detail, death acknowledgment, continuation selection, and safe footer rendering that avoids writing into the terminal’s last column
 - `safe_input(prompt)` — narrow shared CLI input boundary helper that exits cleanly on `EOFError` and `KeyboardInterrupt`
 - `create_character()` — character creation prompts and input validation
 - `setup_initial_world(...)` — World creation, parent identity generation, startup actor entry delegation through world-owned helpers (`create_human_actor(...)` and `create_human_child_with_parents(...)`), and initial focused-actor assignment through `World.set_focused_actor(...)`

@@ -357,8 +357,16 @@ class ActoraTUI:
             "continuation": "Up/Down move   Enter continue   Q quit",
         }
         footer_text = footer_hints.get(self.screen_name, "")
-        stdscr.hline(height - 2, 0, curses.ACS_HLINE, width)
-        stdscr.addnstr(height - 1, 0, footer_text.ljust(width), width, curses.A_REVERSE)
+        content_width = max(1, width - 1)
+        hline_char = getattr(curses, "ACS_HLINE", ord("-"))
+        stdscr.hline(height - 2, 0, hline_char, content_width)
+        stdscr.addnstr(
+            height - 1,
+            0,
+            footer_text.ljust(content_width),
+            content_width,
+            curses.A_REVERSE,
+        )
 
     def render_main(self, stdscr, height, width):
         snapshot_data = self.get_snapshot_data()
