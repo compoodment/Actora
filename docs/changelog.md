@@ -1,5 +1,14 @@
 # Actora Changelog
 
+## Version 0.35.4 (Patch) - 2026-03-28
+- **Family Lineage / Archive Foundation v1:**
+    - Added world-owned lineage access through `get_lineage_entries_for(...)` and `get_lineage_detail_for(...)`, backed by the current actor/link/record stores without introducing separate physical archive storage.
+    - Added a `lineage` command to the ordinary terminal loop in `main.py` so the current focused actor context can inspect family-linked alive/dead actors through a numbered list.
+    - Added a lineage detail view showing summary information plus the latest few records for the selected actor.
+    - Kept alive lineage rows unmarked by default while dead rows show lifespan-style date context plus cause of death and place.
+    - Preserved current death/continuity flow, current record truth, current family-link semantics, and current world-owned continuation validation.
+    - Did not introduce full family-tree rendering, archive-browser overbuild, search/filter/paging systems, inheritance/funeral systems, accomplishment summarization, or random mortality.
+
 ## Version 0.35.3 (Patch) - 2026-03-28
 - **Continuation Choice Inspectability Improvement:**
     - Expanded structured continuity-candidate data in `world.py` to include `age`, `life_stage`, and `current_place_name` for each living continuation target.

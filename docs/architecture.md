@@ -162,6 +162,7 @@ Current continuity-candidate boundary:
 - current candidate labeling and ordering are deterministic: candidate-defining link context is chosen by a stable link sort key, and final candidate ordering uses (`full_name`, `link_type`, `link_role`, `actor_id`) rather than relying on incidental link iteration order
 - continuity candidate gathering now delegates through the generic world-owned `get_links(...)` seam, so current candidates can come from any stored link type even though startup only seeds family links plus one direct parent-to-parent `association/coparent` pair
 - `handoff_focus_to_continuation(...)` is the current world-owned validation/mutation seam for switching focus after the focused actor is dead
+- `get_lineage_entries_for(actor_id)` and `get_lineage_detail_for(actor_id, linked_actor_id, recent_record_limit=5)` now provide the first logical lineage/archive access seam on top of the current actor/link/record truth without splitting dead actors into a separate physical archive store
 - this still does not implement weighting, succession rules, archive state, lineage systems, or a broader connected-actor prioritization framework
 
 Record storage truth is owned by `World.records`.
@@ -518,6 +519,7 @@ Current structural-transition behavior:
 - current continuity candidates are returned in deterministic order with display-ready relationship metadata
 - ordinary month advancement does not proceed once the focused actor is dead
 - `main.py` now renders a dedicated dead-focus interrupt led by `You are dead.`, shows current death context when available, requires acknowledgment before showing continuation choices, and renders each continuation candidate with relationship label, age, life stage, and current place before switching focus through the world-owned handoff method
+- `main.py` now also exposes a first `lineage` command during ordinary play so family-linked alive/dead actors can be inspected through a list + detail flow backed by current actors/links/records
 - if no valid continuation candidates exist, the shell reports that cleanly and ends the current run without fake continuation
 
 Current limitations:

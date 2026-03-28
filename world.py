@@ -615,6 +615,141 @@ class World:
             self.current_year -= 1
             self.current_month += 12
 
+    def _format_year_month(self, year, month):
+        """Formats a year/month pair as a compact lineage-friendly date string."""
+        if year is None or month is None:
+            return None
+        year_prefix = "-" if year < 0 else ""
+        year_body = f"{abs(year):04d}"
+        return f"{year_prefix}{year_body}-{month:02d}"
+
+    def _build_lineage_relationship_label(self, actor_id, linked_actor_id, links):
+        """Builds one display-ready relationship label for lineage surfaces."""
+        actor_perspective_links = [
+            link for link in links
+            if link.get("source_id") == actor_id and link.get("target_id") == linked_actor_id
+        ]
+        defining_link_pool = actor_perspective_links or links
+        defining_link = sorted(defining_link_pool, key=self._get_continuity_link_sort_key)[0]
+        link_role = defining_link.get("role")
+        if link_role:
+            return str(link_role).replace("_", " ").title()
+        link_type = defining_link.get("type")
+        return str(link_type).replace("_", " ").title() if link_type else "Connected"
+
+    def _build_lineage_entry(self, actor_id, linked_actor_id, links):
+        """Builds one lineage entry for a family-linked actor connected to the current actor."""
+        linked_actor = self.get_actor(linked_actor_id)
+        if linked_actor is None or not links:
+            return None
+
+        lifecycle = linked_actor.get_lifecycle_state(self.current_year, self.current_month)
+        current_place_name = self.get_place_name(linked_actor.current_place_id) or "Unknown"
+        birth_date = self._format_year_month(linked_actor.birth_year, linked_actor.birth_month)
+        death_date = self._format_year_month(linked_actor.death_year, linked_actor.death_month)
+
+        return {
+            "actor_id": linked_actor_id,
+            "full_name": linked_actor.get_full_name(),
+            "relationship_label": self._build_lineage_relationship_label(actor_id, linked_actor_id, links),
+            "is_alive": linked_actor.is_alive(),
+            "structural_status": linked_actor.structural_status,
+            "age": lifecycle["age_years"],
+            "life_stage": lifecycle["life_stage"],
+            "birth_date": birth_date,
+            "death_date": death_date,
+            "death_reason": linked_actor.death_reason,
+            "current_place_name": current_place_name,
+        }
+
+    def get_lineage_entries_for(self, actor_id):
+        """Returns family-linked lineage entries for one actor, including alive and dead actors."""
+        if actor_id not in self.actors:
+            raise ValueError(f"get_lineage_entries_for: unknown actor_id '{actor_id}'")
+
+        lineage_links = {}
+        for link in self.get_links(entity_id=actor_id):
+            if link.get("type") != "family":
+                continue
+
+            linked_actor_id = None
+            if link.get("source_id") == actor_id:
+                linked_actor_id = link.get("target_id")
+            elif link.get("target_id") == actor_id:
+                linked_actor_id = link.get("source_id")
+
+            if linked_actor_id is None or linked_actor_id == actor_id:
+                continue
+
+            lineage_links.setdefault(linked_actor_id, []).append(link)
+
+        lineage_entries = []
+        for linked_actor_id, links in lineage_links.items():
+            lineage_entry = self._build_lineage_entry(actor_id, linked_actor_id, links)
+            if lineage_entry is not None:
+                lineage_entries.append(lineage_entry)
+
+        return sorted(
+            lineage_entries,
+            key=lambda entry: (
+                entry.get("full_name", "").casefold(),
+                entry.get("relationship_label", ""),
+                entry.get("actor_id", ""),
+            ),
+        )
+
+    def get_lineage_detail_for(self, actor_id, linked_actor_id, recent_record_limit=5):
+        """Returns one lineage detail payload backed by the current actor/link/record truth."""
+        if actor_id not in self.actors:
+            raise ValueError(f"get_lineage_detail_for: unknown actor_id '{actor_id}'")
+
+        lineage_entries = self.get_lineage_entries_for(actor_id)
+        selected_entry = next(
+            (entry for entry in lineage_entries if entry["actor_id"] == linked_actor_id),
+            None,
+        )
+        if selected_entry is None:
+            raise ValueError(
+                f"get_lineage_detail_for: actor_id '{linked_actor_id}' is not a lineage entry for '{actor_id}'"
+            )
+
+        linked_actor = self.get_actor(linked_actor_id)
+        actor_records = self.get_actor_records(linked_actor_id)
+        recent_records = actor_records[-recent_record_limit:]
+        record_summaries = [
+            {
+                "year": record.get("year"),
+                "month": record.get("month"),
+                "record_type": record.get("record_type"),
+                "text": record.get("text"),
+            }
+            for record in reversed(recent_records)
+        ]
+
+        return {
+            "summary": {
+                "actor_id": linked_actor_id,
+                "full_name": linked_actor.get_full_name(),
+                "relationship_label": selected_entry["relationship_label"],
+                "species": linked_actor.species,
+                "sex": linked_actor.sex,
+                "gender": linked_actor.gender,
+                "is_alive": linked_actor.is_alive(),
+                "structural_status": linked_actor.structural_status,
+                "age": selected_entry["age"],
+                "life_stage": selected_entry["life_stage"],
+                "birth_date": selected_entry["birth_date"],
+                "death_date": selected_entry["death_date"],
+                "death_reason": selected_entry["death_reason"],
+                "current_place_name": selected_entry["current_place_name"],
+                "health": linked_actor.stats["health"],
+                "happiness": linked_actor.stats["happiness"],
+                "intelligence": linked_actor.stats["intelligence"],
+                "money": linked_actor.money,
+            },
+            "records": record_summaries,
+        }
+
     def apply_outcome(self, actor_id, outcome):
         """Applies event outcome stat changes to the target actor, if found."""
         actor_obj = self.get_actor(actor_id)

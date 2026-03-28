@@ -171,6 +171,112 @@ def prompt_for_continuation_choice(continuity_state):
         print("Invalid input: Please choose one of the listed continuation options.")
 
 
+def render_lineage_list(lineage_entries):
+    """Renders the current lineage list for the focused actor context."""
+    print("\n--- Lineage ---")
+    if not lineage_entries:
+        print("No family-linked lineage entries were found.")
+        print("--------------------")
+        return
+
+    print("Select an actor to inspect:")
+    for index, entry in enumerate(lineage_entries, 1):
+        if entry["is_alive"]:
+            print(
+                f"  {index}) {entry['full_name']} [{entry['relationship_label']}] — "
+                f"Age {entry['age']} — {entry['current_place_name']}"
+            )
+        else:
+            life_span = f"{entry['birth_date']} / {entry['death_date']}"
+            print(
+                f"  {index}) {entry['full_name']} [{entry['relationship_label']}] — "
+                f"{life_span} — {entry['death_reason']} — {entry['current_place_name']}"
+            )
+    print("--------------------")
+
+
+def render_lineage_detail(lineage_detail):
+    """Renders one lineage detail view with summary and recent records."""
+    summary = lineage_detail["summary"]
+    records = lineage_detail["records"]
+
+    print(f"\n--- Lineage Detail: {summary['full_name']} ---")
+    print(f"  Relationship: {summary['relationship_label']}")
+    print(f"  Species: {summary['species']}")
+    print(f"  Sex: {summary['sex']}")
+    print(f"  Gender: {summary['gender']}")
+    print(f"  Status: {summary['structural_status'].title()}")
+    if summary["death_date"] is not None:
+        print(f"  Age at Death: {summary['age']}")
+    else:
+        print(f"  Age: {summary['age']}")
+    print(f"  Life Stage: {summary['life_stage']}")
+    print(f"  Born: {summary['birth_date']}")
+    if summary["death_date"] is not None:
+        print(f"  Died: {summary['death_date']}")
+        print(f"  Cause of Death: {summary['death_reason']}")
+    print(f"  Place: {summary['current_place_name']}")
+    print("\n  Core Statistics:")
+    print(f"    Health: {summary['health']}")
+    print(f"    Happiness: {summary['happiness']}")
+    print(f"    Intelligence: {summary['intelligence']}")
+    print(f"    Money: ${summary['money']}")
+
+    print("\n  Recent Records:")
+    if not records:
+        print("    No records found.")
+    else:
+        for record in records:
+            print(
+                f"    - [{record['year']:04d}-{record['month']:02d}] "
+                f"({record['record_type']}) {record['text']}"
+            )
+    print("--------------------")
+
+
+def prompt_for_lineage_selection(lineage_entries):
+    """Prompts for one lineage actor selection or a clean return."""
+    entry_count = len(lineage_entries)
+    while True:
+        choice_raw = safe_input(
+            f"Choose a lineage actor (1-{entry_count}) or type 'back': "
+        ).strip().lower()
+        if choice_raw == "back":
+            return None
+
+        try:
+            selected_index = int(choice_raw)
+        except ValueError:
+            print("Invalid input: Please enter a number or 'back'.")
+            continue
+
+        if 1 <= selected_index <= entry_count:
+            return lineage_entries[selected_index - 1]["actor_id"]
+
+        print("Invalid input: Please choose one of the listed lineage entries.")
+
+
+def open_lineage_view(world, actor_id):
+    """Opens the current lineage list/detail flow for one actor context."""
+    lineage_entries = world.get_lineage_entries_for(actor_id)
+    render_lineage_list(lineage_entries)
+    if not lineage_entries:
+        return
+
+    while True:
+        selected_actor_id = prompt_for_lineage_selection(lineage_entries)
+        if selected_actor_id is None:
+            return
+
+        render_lineage_detail(world.get_lineage_detail_for(actor_id, selected_actor_id))
+        while True:
+            choice_raw = safe_input("Type 'back' to return to lineage list: ").strip().lower()
+            if choice_raw == "back":
+                render_lineage_list(lineage_entries)
+                break
+            print("Invalid input: Type 'back' to return to the lineage list.")
+
+
 def resolve_dead_focus(world):
     """Handles continuation handoff or clean run end when the focused actor is dead."""
     focused_actor_id = world.get_focused_actor_id()
@@ -393,11 +499,14 @@ def game_loop(world, player_id, player):
 
         months_to_advance = 0
         while True: # Input validation loop
-            choice_raw = safe_input("Press Enter for the next month, type a number to skip months, or type 'quit': ").strip().lower()
+            choice_raw = safe_input("Press Enter for the next month, type a number to skip months, or type 'lineage' or 'quit': ").strip().lower()
 
             if choice_raw == '': # Empty input -> 1 month
                 months_to_advance = 1
                 break
+            elif choice_raw == 'lineage':
+                current_focus_id = world.get_focused_actor_id() or player_id
+                open_lineage_view(world, current_focus_id)
             elif choice_raw == 'quit': # Exact 'quit' -> exit game
                 print(QUIT_BANNER)
                 return # Use return to terminate
@@ -410,7 +519,7 @@ def game_loop(world, player_id, player):
                     else: # 0 or negative integers -> invalid
                         print("Invalid input: Please enter a positive number greater than 0.")
                 except ValueError: # Non-numeric input (floats, mixed text, other non-numeric) -> invalid
-                    print("Invalid input: Please enter a number or 'quit'.")
+                    print("Invalid input: Please enter a number, 'lineage', or 'quit'.")
 
         turn_result = world.simulate_advance_turn(player_id, months_to_advance)
 
