@@ -654,6 +654,8 @@ class World:
         link_type = defining_link.get("type")
         link_role = defining_link.get("role")
         relationship_label = f"{link_type}/{link_role}" if link_role else str(link_type)
+        lifecycle = candidate_actor.get_lifecycle_state(self.current_year, self.current_month)
+        current_place_name = self.get_place_name(candidate_actor.current_place_id)
         return {
             "actor_id": candidate_actor_id,
             "full_name": candidate_actor.get_full_name(),
@@ -662,6 +664,9 @@ class World:
             "relationship_label": relationship_label,
             "structural_status": candidate_actor.structural_status,
             "is_alive": True,
+            "age": lifecycle["age_years"],
+            "life_stage": lifecycle["life_stage"],
+            "current_place_name": current_place_name,
         }
 
     def _get_continuity_candidate_sort_key(self, candidate):

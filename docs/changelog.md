@@ -1,5 +1,12 @@
 # Actora Changelog
 
+## Version 0.35.3 (Patch) - 2026-03-28
+- **Continuation Choice Inspectability Improvement:**
+    - Expanded structured continuity-candidate data in `world.py` to include `age`, `life_stage`, and `current_place_name` for each living continuation target.
+    - Updated dead-focus continuation rendering in `main.py` so each candidate now shows relationship label, age, life stage, and current place instead of only name plus relationship label.
+    - Preserved current deterministic candidate ordering, dead-focus acknowledgment flow, and world-owned continuation validation/handoff.
+    - Did not introduce archive browsing, full actor preview UI, pagination, succession weighting, or broader continuity-system redesign.
+
 ## Version 0.35.2 (Patch) - 2026-03-28
 - **Character Creation Sex / Gender Expansion:**
     - Expanded human biological sex selection in `main.py` from `Male/Female` to `Male/Female/Intersex`.

@@ -137,9 +137,12 @@ def render_continuation_choices(continuity_state):
     if continuity_state["had_continuity_candidates"]:
         print("Select a living connected actor to continue:")
         for index, candidate in enumerate(continuity_state["continuity_candidates"], 1):
+            place_label = candidate.get("current_place_name") or "Unknown"
             print(
                 f"  {index}) {candidate['full_name']} "
-                f"[{candidate['relationship_label']}]"
+                f"[{candidate['relationship_label']}] — "
+                f"Age {candidate['age']} ({candidate['life_stage']}) — "
+                f"{place_label}"
             )
     else:
         print("No living connected continuation candidates were found.")
