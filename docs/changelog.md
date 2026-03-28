@@ -1,5 +1,14 @@
 # Actora Changelog
 
+## Version 0.35.0 (Minor) - 2026-03-28
+- **Dead-Focus Transition Flow Tightening:**
+    - Reworked shell-level dead-focus handling in `main.py` so death now appears as a dedicated interrupt instead of a flat continuity block.
+    - The shell now leads with `You are dead.`, shows the dead focused actor plus death year/month/reason when available, and explicitly states that the universe continues.
+    - Added a deliberate acknowledgment step before any continuation choices are rendered.
+    - Kept continuation candidate ordering, validation, and focus handoff world-owned through the existing `World.build_continuity_state_for(...)` and `World.handoff_focus_to_continuation(...)` seams.
+    - Preserved ordinary alive-play snapshot output without reintroducing the structural-state block.
+    - Kept no-candidate dead-focus handling clean without introducing archive browsing, paged continuation UI, persistence changes, or broader death-system expansion.
+
 ## Version 0.34.0 (Minor) - 2026-03-28
 - **Controlled Spatial Identity Mutation Boundary:**
     - Added `World.update_actor_spatial_identity(...)` as the narrow world-owned mutation seam for actor `current_place_id`, `residence_place_id`, `jurisdiction_place_id`, and `temporary_occupancy_place_id`.

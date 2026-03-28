@@ -1,6 +1,6 @@
 # Actora Architecture Summary
 
-**Version:** 0.34.0
+**Version:** 0.35.0
 **Last Updated:** 2026-03-28
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
@@ -300,21 +300,23 @@ Responsible for:
 - post-turn rendering orchestration
 - rendering terminal snapshots from structured snapshot data
 - converting structured event results into display text
-- rendering structural transition / continuity output when present in turn results
+- rendering the shell-owned dead-focus interrupt and continuation handoff flow when present
 
 Current shell-level functions:
 - `render_snapshot(...)` — terminal rendering of the structured current-state snapshot returned by `Human.get_snapshot_data(...)`
 - `render_turn_events(...)` — terminal rendering of one structured turn’s event output with the current detail/summary thresholds
-- `render_continuity_state(...)` — terminal rendering of the current dead-focus continuity state and available continuation options
+- `render_death_interrupt(...)` — terminal rendering of the dedicated dead-focus interrupt before continuation choices are shown
+- `prompt_for_death_acknowledgment(...)` — shell-level acknowledgment gate before continuation choices are revealed
+- `render_continuation_choices(...)` — terminal rendering of current continuation candidates after acknowledgment
 - `prompt_for_continuation_choice(...)` — validated continuation-target input helper for the shell layer
-- `resolve_dead_focus(...)` — shell-owned continuation orchestration that renders dead-focus state, prompts for successor selection, delegates the actual focus mutation to `World.handoff_focus_to_continuation(...)`, and cleanly ends the run when no valid continuation target exists
+- `resolve_dead_focus(...)` — shell-owned continuation orchestration that renders the death interrupt, requires acknowledgment, then renders continuation choices, delegates the actual focus mutation to `World.handoff_focus_to_continuation(...)`, and cleanly ends the run when no valid continuation target exists
 - `safe_input(prompt)` — narrow shared CLI input boundary helper that exits cleanly on `EOFError` and `KeyboardInterrupt`
 - `create_character()` — character creation prompts and input validation
 - `setup_initial_world(...)` — World creation, parent identity generation, startup actor entry delegation through world-owned helpers (`create_human_actor(...)` and `create_human_child_with_parents(...)`), and initial focused-actor assignment through `World.set_focused_actor(...)`
 - `game_loop(...)` — main input/advancement/display loop
 - `start_game()` — top-level orchestration (banner, then delegates to the above)
 
-Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation, while the shell continues to render ancestry-resolved world body plus current place plus one clean jurisdiction line and remains capable of rendering structural transition / continuity result blocks when those keys are present.
+Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Ordinary alive-play snapshots still stay narrow and do not expose the structural-state block, while dead focus is now presented as a dedicated shell interrupt before any continuation choices are shown.
 
 ### `identity.py`
 Responsible for:
@@ -432,9 +434,10 @@ This function does not perform terminal input, output, or presentation formattin
     - Small event counts are shown as full dated lines.
     - Large event counts are summarized with a total count, a recent-event subset, and an omitted-older-events line.
     - Triggered monthly events are also preserved as structured world-owned records in addition to current terminal rendering.
-15. If present, render structural transition / continuity output.
-16. If the focused actor is dead, resolve continuation handoff or end the run cleanly.
-17. Return to step 7.
+15. If the focused actor is dead, render the dedicated death interrupt first.
+16. Require acknowledgment before rendering any continuation choices.
+17. Resolve continuation handoff or end the run cleanly.
+18. Return to step 7.
 
 ## 9. Current Gameplay Behavior
 
@@ -513,7 +516,7 @@ Current structural-transition behavior:
 - continuity state can be built from the current linked living actors through `World.build_continuity_state_for(...)`
 - current continuity candidates are returned in deterministic order with display-ready relationship metadata
 - ordinary month advancement does not proceed once the focused actor is dead
-- `main.py` now renders the dead-focus structural transition state, allows the player to choose a living continuation target, and switches focus through the world-owned handoff method
+- `main.py` now renders a dedicated dead-focus interrupt led by `You are dead.`, shows current death context when available, requires acknowledgment before showing continuation choices, and switches focus through the world-owned handoff method
 - if no valid continuation candidates exist, the shell reports that cleanly and ends the current run without fake continuation
 
 Current limitations:

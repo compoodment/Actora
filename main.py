@@ -96,29 +96,54 @@ def render_turn_events(turn_result):
         print(f"  - ... {omitted_count} older events omitted.")
 
 
-def render_continuity_state(continuity_state):
-    """Renders the current dead-focus continuity state."""
-    print("\n--- Continuity ---")
-    print("  - Structural Transition: Focus is currently dead.")
-    print(f"  - Previous Focus: {continuity_state['focus_actor_name']}")
+def render_death_interrupt(continuity_state):
+    """Renders the shell-owned dead-focus interrupt before continuation choices."""
+    print("\n--- Death ---")
+    print("You are dead.")
+    print(f"  {continuity_state['focus_actor_name']}")
 
     death_year = continuity_state["focus_actor_death_year"]
     death_month = continuity_state["focus_actor_death_month"]
-    if death_year is not None and death_month is not None:
-        print(f"  - Death: Year {death_year}, Month {death_month}")
-    if continuity_state["focus_actor_death_reason"]:
-        print(f"  - Death Reason: {continuity_state['focus_actor_death_reason']}")
+    death_reason = continuity_state["focus_actor_death_reason"]
 
-    print("  - The universe continues.")
+    death_context_parts = []
+    if death_year is not None and death_month is not None:
+        death_context_parts.append(f"Year {death_year}, Month {death_month}")
+    if death_reason:
+        death_context_parts.append(death_reason)
+
+    if death_context_parts:
+        print(f"  {' | '.join(death_context_parts)}")
+
+    print("  The universe continues.")
+    print("--------------------")
+
+
+def prompt_for_death_acknowledgment():
+    """Requires a deliberate acknowledgment before showing continuation options."""
+    while True:
+        choice_raw = safe_input(
+            "Press Enter to acknowledge, or type 'quit': "
+        ).strip().lower()
+        if choice_raw == "":
+            return True
+        if choice_raw == "quit":
+            return False
+        print("Invalid input: Press Enter to continue or type 'quit'.")
+
+
+def render_continuation_choices(continuity_state):
+    """Renders continuation options only after the death interrupt is acknowledged."""
+    print("\n--- Continuation ---")
     if continuity_state["had_continuity_candidates"]:
-        print("  - Select a living connected actor to continue:")
+        print("Select a living connected actor to continue:")
         for index, candidate in enumerate(continuity_state["continuity_candidates"], 1):
             print(
-                f"    {index}) {candidate['full_name']} "
+                f"  {index}) {candidate['full_name']} "
                 f"[{candidate['relationship_label']}]"
             )
     else:
-        print("  - No living connected continuation candidates were found.")
+        print("No living connected continuation candidates were found.")
     print("--------------------")
 
 
@@ -155,7 +180,13 @@ def resolve_dead_focus(world):
         return True
 
     continuity_state = world.build_continuity_state_for(focused_actor_id)
-    render_continuity_state(continuity_state)
+    render_death_interrupt(continuity_state)
+
+    if not prompt_for_death_acknowledgment():
+        print(QUIT_BANNER)
+        return False
+
+    render_continuation_choices(continuity_state)
 
     if not continuity_state["had_continuity_candidates"]:
         print("This run has ended because no valid continuation target exists.")
@@ -385,18 +416,7 @@ def game_loop(world, player_id, player):
         )
         render_turn_events(turn_result)
 
-        if turn_result["structural_transition"] is not None:
-            transition = turn_result["structural_transition"]
-            if transition["type"] == "death":
-                print(
-                    f"  - Structural Transition: {final_player_state.get_full_name()} died in "
-                    f"Year {transition['year']}, Month {transition['month']}."
-                )
-
-        if turn_result["continuity_state"] is not None and not turn_result["advancement_blocked"]:
-            render_continuity_state(turn_result["continuity_state"])
-
-        if turn_result["advancement_blocked"]:
+        if turn_result["continuity_state"] is not None:
             if not resolve_dead_focus(world):
                 return
 
