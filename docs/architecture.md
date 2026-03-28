@@ -498,7 +498,7 @@ Current snapshots display:
 - temporary occupancy remains internal and is not rendered in the snapshot yet
 - statistics (health, happiness, intelligence, money)
 - family references (mother, father), still resolved from the world layer
-- structural state (`status`, optional death date, optional death reason)
+- structural state remains internal to the current ordinary-play snapshot flow and is not rendered during ordinary alive play; structural death/continuity handling is surfaced separately when relevant
 
 ### Structural Transition / Continuity Foundation
 Current structural-transition behavior:

@@ -1,5 +1,12 @@
 # Actora Changelog
 
+## Version 0.33.1 (Patch) - 2026-03-28
+- **Alive-Play Snapshot Structural-State Removal:**
+    - Removed the ordinary-play `Structural State` section from terminal snapshot rendering in `main.py` so alive-state is no longer redundantly exposed as front UI.
+    - Preserved backend structural actor state, structural death data, and continuity/death handling logic.
+    - Preserved current snapshot identity/time/location/statistics/family output and current continuity rendering paths.
+    - Did not introduce the fuller death-transition UI, archive browser, richer continuation paging, or time-layout redesign.
+
 ## Version 0.33.0 (Minor) - 2026-03-27
 - **Spatial Identity Separation Strengthening:**
     - Added explicit actor-level `jurisdiction_place_id` and `temporary_occupancy_place_id` storage alongside the existing `current_place_id` and `residence_place_id`.

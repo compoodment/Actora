@@ -45,6 +45,7 @@ Verified repo truth is currently through v0.33.0, including:
 - link foundation strengthening through normalized `_build_link_record(...)`, small general `get_links(...)` query access, thinner compatibility link helpers, continuity candidate gathering routed through the generic link seam, and one startup parent-to-parent `association/coparent` proof link
 - structured place / place-hierarchy strengthening through `get_child_places(...)`, `get_place_lineage(...)`, `get_nearest_place_of_kind(...)`, startup `world_body -> country -> city` hierarchy, and ancestry-aware snapshot world-body resolution
 - spatial identity separation strengthening through explicit `jurisdiction_place_id` and `temporary_occupancy_place_id`, startup jurisdiction assignment to `earth_country_01`, and one clean snapshot `Jurisdiction` line
+- clarified terminal-UI / death-flow intent: alive-state should remain implicit during ordinary play, death should interrupt with a dedicated message/context first, continuation options should follow only after acknowledgment, archived dead actors should remain explorable/reusable later, and terminal information density/timing should be treated as real design work rather than ignored because the interface is temporary
 
 The backbone is materially stronger and more honest than it was at the start of this patch run.
 The constructor seam, snapshot/output seam, event-result contract seam, later-life human event coverage gap, startup-family origin/care semantic collapse, event-boundary honesty pressure, identity-generation context-prep pressure, simulation-step ownership seam, silent unknown-stat mutation risk, rough CLI interruption boundary, singleton startup actor ID future-footgun, structural death/continuity foundation gap, current-facing naming inconsistency, first playable continuity handoff gap, place-hierarchy flatness, and spatial identity collapse have all been moved materially forward.
@@ -62,6 +63,7 @@ The active near-term read is therefore:
 - identity realism/context richness remains visibly placeholder-level beneath the cleaner seam, but still should not jump the dependency queue
 - operator/dev tooling pressure is real, but full dev mode right now would risk becoming premature support-fluff unless enough repeated testing pain across real systems justifies it
 - the spatial model now has better storage truth than mutation-discipline truth, which makes controlled state mutation a more convincing next candidate than broader spatial gameplay
+- terminal UI flow and information reveal now need to be treated as an explicit near-term design pressure rather than background vibes, especially around death handling, continuation browsing, archive visibility, and time presentation clarity
 
 WIR housekeeping note:
 - completed singleton startup actor ID cleanup should remain out of the active slot after v0.27.0
@@ -121,6 +123,21 @@ Dependencies: stronger actor/context/social foundations, record/link maturity, l
 Risks: collapsing it into one fake moral score, promoting it too early into foundation work, or forgetting it entirely until the game has already hardened around weaker assumptions
 Suggested timing: keep visible as later design pressure, not the next patch title
 Next action: preserve as a named future layer and pressure-test stable docs later if it becomes durable enough
+
+ID: IDEA-108
+Created: 2026-03-28
+Last Reviewed: 2026-03-28
+Title: Terminal UI reveal flow / death-transition intent
+Status: Active near-term design pressure
+Priority: P1
+Roadmap fit: presentation / information-reveal guardrail supporting current prototype honesty
+Immediate roadmap-layer fit: yes, as a narrow UI-intent capture and small correction seam rather than a full interface overhaul
+Summary: The terminal UI should not constantly expose backend state just because that state exists. Alive-state should remain implicit during ordinary play; death should interrupt with a dedicated message first ("You are dead." plus when/why/context), continuation options should appear only after acknowledgment, continuation browsing should eventually become more inspectable than a blind numbered list, and archived dead actors should remain explorable/reusable later rather than being treated as disposable noise.
+Why it matters: The terminal interface is not the forever final UI, but it is still the current real play surface. If it trains bad information-reveal habits now, later interface work inherits that sludge. This also captures the user’s explicit correction that time presentation and death/continuation reveal flow need more intentional thought.
+Dependencies: current snapshot/output seam, continuity handoff seam, structural death truth, stable UI-agnostic architecture direction
+Risks: either ignoring UI intent because the terminal is “temporary,” or overreacting by building a giant pager/archive UI too early
+Suggested timing: capture immediately; implement only the smallest honest correction now
+Next action: preserve this as active design pressure and pair it with one tiny current patch that removes alive-play structural-state UI while keeping backend structural state untouched
 
 ID: IDEA-104
 Created: 2026-03-27
@@ -212,6 +229,21 @@ Actora should not quietly collapse back into “deeper BitLife,” “detached g
 
 
 === COMPLETED / MOVED-OUT PRESSURES ===
+
+ID: IDEA-109
+Created: 2026-03-28
+Last Reviewed: 2026-03-28
+Title: Remove alive-play structural-state block from snapshot UI
+Status: Immediate tiny patch candidate
+Priority: P1
+Roadmap fit: narrow UI correction preserving better reveal timing without broader interface churn
+Immediate roadmap-layer fit: yes, tiny bounded correction
+Summary: The current terminal snapshot still renders an ordinary-play `Structural State` block with `Status: active`, which exposes backend structural truth too eagerly and weakens the intended reveal flow.
+Why it matters: If the player can currently control the actor, alive-state is already implied. Showing `Status: active` every turn feels implementation-smelling and clashes with the intended death flow where death should become a dedicated interrupt/transition rather than a standing status line.
+Dependencies: current snapshot rendering seam, preserved backend structural state, current continuity/death foundation
+Risks: accidentally removing backend structural truth instead of only hiding ordinary-play UI, or overbuilding death UI in the same patch
+Suggested timing: immediate tiny patch if/when chosen
+Next action: remove the visible structural-state section from ordinary snapshot rendering while keeping structural state in the model and leaving death/continuity UI work for a later dedicated pass
 
 ID: IDEA-107
 Created: 2026-03-28

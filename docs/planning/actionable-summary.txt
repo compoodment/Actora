@@ -36,6 +36,7 @@ Actora now has a materially stronger early backbone, and verified repo truth is 
 - link foundation strengthening through normalized `_build_link_record(...)`, small general `get_links(...)` query access, thinner compatibility link helpers, continuity candidate gathering routed through the generic link seam, and one startup parent-to-parent `association/coparent` proof link
 - structured place / place-hierarchy strengthening through ancestry-aware place lookup, startup `world_body -> country -> city` hierarchy, and cleaner current-place snapshot truth
 - spatial identity separation strengthening through explicit `jurisdiction_place_id` and `temporary_occupancy_place_id`, with startup actors now structurally living in the startup city while jurisdictionally belonging to the startup country
+- clarified terminal-UI / death-flow intent: alive-state should remain implicit during ordinary play, death should interrupt with a dedicated transition message first, continuation choices should come only after acknowledgment, archived dead actors should remain explorable/reusable later, and terminal info density/timing should be treated as a real design concern rather than hand-waved away because the UI is temporary
 
 
 === CURRENT CLARIFIED DESIGN READ ===
@@ -170,6 +171,9 @@ This is a real pressure, but a full dev mode right now could become premature to
 6. The spatial model is ahead of the spatial mutation boundary
 The repo now stores more honest spatial identity, but future systems would still be too tempted to poke actor fields directly unless a cleaner world-owned mutation seam arrives soon.
 
+7. Terminal UI intent is under-documented relative to its importance
+The terminal UI is not the forever final interface, but it is still the current real play surface. Reveal timing, page flow, browsing depth, and information density need to be treated as real design work now rather than ignored just because broader UI flexibility is protected in the architecture.
+
 
 === LEADING PLANNING BUCKETS NOW ===
 
@@ -187,28 +191,45 @@ Use:
 - optionally preserve meaningful spatial-state changes as records if justified
 - do not smuggle travel/property/politics in through the back door
 
-3. Multi-axis social perception / opportunity layer
+3. Tiny current UI correction patch
+Use:
+- remove the alive-play structural-state block from the ordinary snapshot UI
+- keep backend structural state untouched
+- keep death/continuity data available for later dedicated transition flow
+- do not overbuild the death UI in the same tiny patch
+
+4. Multi-axis social perception / opportunity layer
 Use:
 - keep visible as a real later vision component
 - do not let it vanish into vague “social stuff later” mush
 - also do not promote it into immediate foundation work
 
-4. Entity registry vs actor view layering
+5. Entity registry vs actor view layering
 Use:
 - still a real architectural guardrail
 - still not the next code patch automatically
 
-5. Identity generation realism / context-awareness
+6. Identity generation realism / context-awareness
 Use:
 - still visible later
 - still blocked by stronger context/place/era maturity and by stronger mutation/creation discipline
 
-6. Continuity / lineage / archive maturation
+7. Continuity / lineage / archive maturation
 Use:
 - continuity is now more real in implementation than before
 - archive/lineage/succession depth are still not ready to be overclaimed or automatically promoted
+- preserve the newer intention that dead actors should eventually become stored/archived in a way that supports later exploration and possible reuse, not just disposal
 
-7. Operator tooling / scenario testing seam
+8. Terminal UI / information reveal flow
+Use:
+- preserve that alive-state should remain implicit during ordinary play
+- preserve that death should interrupt with its own message/context before continuation options appear
+- preserve that continuation choice should become more inspectable than a blind numbered list
+- preserve that archived dead actors should be explorable later rather than discarded
+- preserve that age and simulation date likely need cleaner separation in the terminal UI
+- do not force full pager/archive UI immediately just because the intent is now clearer
+
+9. Operator tooling / scenario testing seam
 Use:
 - preserve as a valid future support/tooling pressure
 - do not let it jump ahead of real simulation/system growth

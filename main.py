@@ -32,7 +32,6 @@ def render_snapshot(snapshot_data):
     location = snapshot_data["location"]
     statistics = snapshot_data["statistics"]
     relationships = snapshot_data["relationships"]
-    structural = snapshot_data["structural"]
 
     print(f"\n--- {identity['full_name']} ---")
 
@@ -63,13 +62,6 @@ def render_snapshot(snapshot_data):
     print("  Family:")
     print(f"    Mother: {relationships['mother_name']}")
     print(f"    Father: {relationships['father_name']}")
-
-    print("\n--- Structural State ---")
-    print(f"  Status: {structural['structural_status']}")
-    if structural["death_year"] is not None and structural["death_month"] is not None:
-        print(f"  Death: Year {structural['death_year']}, Month {structural['death_month']}")
-    if structural["death_reason"]:
-        print(f"  Death Reason: {structural['death_reason']}")
     print("--------------------")
 
 
