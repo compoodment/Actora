@@ -279,8 +279,8 @@ Current structural-state access is formalized through `Human.get_structural_stat
 
 Current snapshot access is formalized through `Human.get_snapshot_data(current_year, current_month, world, actor_id)`, which returns a structured dictionary with the current shell-rendered sections:
 
-- `identity` (`full_name`, `species`, `sex`, `gender`)
-- `time` (`age`, `life_stage`, `year`, `month`)
+- `identity` (`full_name`, `species`, `sex`, `gender`, `age`, `life_stage`)
+- `time` (`year`, `month`)
 - `location` (`world_body_name`, `current_place_name`, `current_place_kind`, `jurisdiction_place_name`, `jurisdiction_place_kind`)
 - `statistics` (`health`, `happiness`, `intelligence`, `money`)
 - `relationships` (`mother_name`, `father_name`)
@@ -497,8 +497,8 @@ Current event behavior:
 
 ### Snapshot
 Current snapshots display:
-- identity (full name, species, sex, gender)
-- time (age, life stage, year, month)
+- identity (full name, species, sex, gender, age, life stage)
+- time (simulation date only: year and month)
 - location (ancestry-resolved world body plus current place plus one clean jurisdiction line, resolved through `Human.get_snapshot_data(...)`, which currently reads `Human.get_spatial_state(world)` and world place helpers)
 - residence remains internal and is not rendered in the snapshot yet
 - temporary occupancy remains internal and is not rendered in the snapshot yet

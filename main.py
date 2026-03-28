@@ -40,12 +40,11 @@ def render_snapshot(snapshot_data):
     print(f"  Species: {identity['species']}")
     print(f"  Sex: {identity['sex']}")
     print(f"  Gender: {identity['gender']}")
+    print(f"  Age: {identity['age']}")
+    print(f"  Life Stage: {identity['life_stage']}")
 
     print("\n--- Time ---")
-    print(f"  Age: {time_state['age']}")
-    print(f"  Life Stage: {time_state['life_stage']}")
-    print(f"  Year: {time_state['year']}")
-    print(f"  Month: {time_state['month']}")
+    print(f"  Sim Date: Year {time_state['year']}, Month {time_state['month']}")
 
     print("\n--- Location ---")
     print(f"  World Body: {location['world_body_name']}")

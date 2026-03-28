@@ -158,10 +158,10 @@ class Human:
                 "species": self.species,
                 "sex": self.sex,
                 "gender": self.gender,
-            },
-            "time": {
                 "age": lifecycle["age_years"],
                 "life_stage": lifecycle["life_stage"],
+            },
+            "time": {
                 "year": current_year,
                 "month": current_month,
             },

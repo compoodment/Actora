@@ -1,5 +1,13 @@
 # Actora Changelog
 
+## Version 0.35.1 (Patch) - 2026-03-28
+- **Time Presentation Cleanup:**
+    - Moved `Age` and `Life Stage` out of the terminal snapshot `Time` section and into `Identity` so actor-derived lifecycle facts are no longer visually mixed with shared simulation clock data.
+    - Tightened the terminal `Time` section to one explicit `Sim Date` line (`Year`, `Month`) in `main.py`.
+    - Updated `Human.get_snapshot_data(...)` so the structured snapshot contract now exposes `age` and `life_stage` under `identity`, while `time` now contains only simulation date fields.
+    - Updated repo-local architecture documentation to match the new snapshot contract and terminal rendering truth.
+    - Preserved current simulation behavior, continuity/death handling, spatial output, statistics, family display, and the absence of broader UI redesign.
+
 ## Version 0.35.0 (Minor) - 2026-03-28
 - **Dead-Focus Transition Flow Tightening:**
     - Reworked shell-level dead-focus handling in `main.py` so death now appears as a dedicated interrupt instead of a flat continuity block.
