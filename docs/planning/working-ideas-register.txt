@@ -1,4 +1,4 @@
-Actora Working Ideas Register v37
+Actora Working Ideas Register v39
 
 Date: 2026-03-28
 Role: flexible idea intake, staging, parking, and rewrite-pressure tracking for Actora
@@ -8,7 +8,7 @@ Interpretation rule: stable source docs win over this file; verified repo truth 
 
 === CURRENT WORKING READ ===
 
-Verified repo truth is currently through v0.35.0, including:
+Verified repo truth is currently through v0.35.4, including:
 - world-owned actor registry
 - world-owned structured place registry with parent-place hierarchy
 - world-owned link truth
@@ -47,6 +47,10 @@ Verified repo truth is currently through v0.35.0, including:
 - spatial identity separation strengthening through explicit `jurisdiction_place_id` and `temporary_occupancy_place_id`, startup jurisdiction assignment to `earth_country_01`, and one clean snapshot `Jurisdiction` line
 - controlled spatial identity mutation through `World.update_actor_spatial_identity(...)`, including explicit actor/place validation, unchanged unspecified fields, and structured change reporting
 - dead-focus transition flow tightening through a dedicated shell death interrupt led by `You are dead.`, current death context display, and acknowledgment-gated continuation choices
+- snapshot time-presentation cleanup through identity/time separation so actor age/life-stage no longer visually mix with shared simulation date
+- expanded visible human character-creation identity options so sex now includes `Intersex`, gender includes `Agender`, `Genderfluid`, and `Other`, and `Other` supports free-text entry
+- continuation-choice inspectability improvement through richer dead-focus candidate rendering with relationship label, age, life stage, and current place
+- family lineage / archive foundation v1 through world-owned `get_lineage_entries_for(...)` and `get_lineage_detail_for(...)`, plus a `lineage` terminal command with list-first family-linked actor inspection and detail views backed by current actor/link/record truth without separate physical archive storage
 - clarified terminal-UI / death-flow intent: alive-state should remain implicit during ordinary play, death should interrupt with a dedicated message/context first, continuation options should follow only after acknowledgment, archived dead actors should remain explorable/reusable later, and terminal information density/timing should be treated as real design work rather than ignored because the interface is temporary
 
 The backbone is materially stronger and more honest than it was at the start of this patch run.
@@ -59,19 +63,19 @@ The active near-term read is therefore:
 - the major recent backbone clarifications are now in a substantially better place
 - continuity is now more real than it was before, and the shell death flow is cleaner than it was before, but the broader continuity/archive layer is still not broad/deep complete
 - the source stack is now materially more aligned on what Actora is supposed to be
-- the next-step question is now “what follows the dead-focus flow tightening?” rather than “what follows spatial identity separation?”
+- the next-step question is now “what follows the first lineage/archive foundation?” rather than “should lineage foundation exist?”
 - entity registry vs actor view layering remains a long-term architectural guardrail, not an automatic next implementation target
 - broader lineage / care / relationship systems remain only partially prepared and should not be overclaimed
 - identity realism/context richness remains visibly placeholder-level beneath the cleaner seam, but still should not jump the dependency queue
 - operator/dev tooling pressure is real, but full dev mode right now would risk becoming premature support-fluff unless enough repeated testing pain across real systems justifies it
-- the spatial layer is in a materially better place after `v0.34.0`, so the more obvious remaining near-term design pressure now sits around continuity/archive/time follow-through rather than another immediate spatial patch
-- terminal UI flow and information reveal still need to be treated as explicit near-term design pressure, especially around archive visibility, continuation inspectability, and time presentation clarity
+- the spatial layer is in a materially better place after `v0.34.0`, so the more obvious remaining near-term design pressure now sits around continuity/archive/lineage follow-through rather than another immediate spatial patch
+- terminal UI flow and information reveal still need to be treated as explicit near-term design pressure, especially around archive visibility and lineage/continuity inspectability
 
 WIR housekeeping note:
 - completed singleton startup actor ID cleanup should remain out of the active slot after v0.27.0
 - completed CLI input hardening should remain out of the active slot after v0.26.0
 - completed unknown-stat hardening should remain out of the active slot after v0.25.0
-- completed structured place, spatial identity, spatial mutation, and dead-focus flow milestones should no longer sit in the active candidate slot after v0.32.0, v0.33.0, v0.34.0, and v0.35.0
+- completed structured place, spatial identity, spatial mutation, dead-focus flow, and first lineage foundation milestones should no longer sit in the active candidate slot after v0.32.0, v0.33.0, v0.34.0, v0.35.0, and v0.35.4
 - clarified design wording is now preserved here and partly promoted into stable docs, so the project should drift less across compaction/reset
 - historical-only clutter should not be kept active once it stops affecting planning
 - the absence of one loud runtime gap does not mean the foundation is finished
@@ -84,17 +88,17 @@ WIR housekeeping note:
 ID: IDEA-111
 Created: 2026-03-28
 Last Reviewed: 2026-03-28
-Title: Post-v0.35.0 continuity / archive / time follow-through
-Status: Leading next-step candidate
+Title: Family lineage / archive foundation before random mortality
+Status: Completed in v0.35.4
 Priority: P1
-Roadmap fit: continuity/death follow-through and presentation-honesty pressure after the current shell tightening
-Immediate roadmap-layer fit: yes, as a planning/spec checkpoint more than an automatic build order
-Summary: After `v0.35.0`, Actora now has a materially cleaner dead-focus shell interrupt, but continuity browsing is still intentionally thin, dead actors are not yet stored as explorable archive objects, and terminal time presentation is still muddled. The next honest move is probably to choose one narrow same-layer follow-through — likely beginning with planning/spec clarification rather than immediately building a giant archive UI.
-Why it matters: The project now risks a different kind of slop: pretending the death/continuity experience is solved because the interrupt text got better. Archive meaning, continuation inspectability, and time clarity still matter, but should be sequenced without ballooning into mausoleum-theater.
-Dependencies: current structural death truth, current continuity seams, current shell death interrupt flow, clarified terminal UI intent
-Risks: overbuilding archive UI too early, smuggling broad lineage systems in through the side door, or turning a useful planning checkpoint into patch-number momentum theater
-Suggested timing: immediate candidate for the next deliberate planning/spec pass
-Next action: pressure-test which narrow follow-through actually earns the slot next: archive-state/storage seam, richer continuation inspection, time-presentation cleanup, or another same-layer clarification
+Roadmap fit: continuity/death follow-through and preserved-history meaning before mortality mechanics
+Immediate roadmap-layer fit: completed
+Summary: After `v0.35.0` through `v0.35.3`, Actora still lacked a dedicated lineage/archive surface, so alive and dead family-linked actors were not meaningfully inspectable through ordinary play.
+Why it mattered: Random death without lineage/archive aftermath would make death mechanically more real before its preserved meaning was real enough. A narrow lineage surface gave continuity, records, and dead actors somewhere to live in the player experience without overbuilding a giant archive browser.
+Dependencies: structural death truth, continuity seams, record/history foundation, current family-link semantics, current shell death interrupt flow, clarified terminal UI intent
+Risks addressed: avoided full archive/tree UI overbuild, avoided separate physical dead-actor storage, and avoided smuggling broad lineage systems in through the side door
+Result: v0.35.4 added world-owned `get_lineage_entries_for(...)` and `get_lineage_detail_for(...)`, plus a `lineage` terminal command with list-first family-linked actor inspection and detail views backed by the current actor/link/record truth without separate physical archive storage.
+Next action: keep only as completed history, not an active candidate
 
 ID: IDEA-102
 Created: 2026-03-27
@@ -134,7 +138,7 @@ Status: Active near-term design pressure, partially realized in repo
 Priority: P1
 Roadmap fit: presentation / information-reveal guardrail supporting current prototype honesty
 Immediate roadmap-layer fit: yes, as an ongoing guardrail rather than a license for full interface overbuild
-Summary: The terminal UI should not constantly expose backend state just because that state exists. Alive-state should remain implicit during ordinary play; death should interrupt with a dedicated message first ("You are dead." plus when/why/context), continuation options should appear only after acknowledgment, continuation browsing should eventually become more inspectable than a blind numbered list, and archived dead actors should remain explorable/reusable later rather than being treated as disposable noise. `v0.33.1` and `v0.35.0` moved this materially forward, but they did not finish the whole reveal-flow problem.
+Summary: The terminal UI should not constantly expose backend state just because that state exists. Alive-state should remain implicit during ordinary play; death should interrupt with a dedicated message first ("You are dead." plus when/why/context); continuation options should appear only after acknowledgment; and archived/lineage-relevant actors should remain explorable later rather than being treated as disposable noise. `v0.33.1`, `v0.35.0`, `v0.35.1`, `v0.35.3`, and `v0.35.4` moved this materially forward, but they did not finish the whole reveal-flow problem.
 Why it matters: The terminal interface is not the forever final UI, but it is still the current real play surface. If it trains bad information-reveal habits now, later interface work inherits that sludge. This also captures the user’s explicit correction that time presentation and death/continuation reveal flow need more intentional thought.
 Dependencies: current snapshot/output seam, continuity handoff seam, structural death truth, stable UI-agnostic architecture direction
 Risks: either ignoring UI intent because the terminal is “temporary,” or overreacting by building a giant pager/archive UI too early
@@ -378,7 +382,7 @@ Next action: do not promote on its own
 === DOCUMENT-SYSTEM RESULT OF THIS CLARIFICATION PASS ===
 
 - stable docs now reflect the clarified vision materially better than before
-- planning now also reflects repo truth through `v0.35.0`
+- planning now also reflects repo truth through `v0.35.4`
 - WIR still preserves the clarified wording explicitly so the concept is not lost between sessions
 - roadmap sequencing remains synced materially better with the clarified identity
 - repo docs/changelog do not need extra changes from this planning sync alone
@@ -387,7 +391,7 @@ Next action: do not promote on its own
 === NEXT BEST USE ===
 
 1. Use IDEA-102 and the preserved clarified-design section to keep future sessions aligned on what Actora is actually supposed to be.
-2. Use IDEA-111 plus IDEA-108 as the leading current checkpoint unless a better same-layer candidate beats them honestly.
+2. Use IDEA-108 plus the completed IDEA-111 result to judge the strongest post-lineage next step honestly.
 3. Keep IDEA-103 visible as a later layer, not an immediate patch title.
 4. Keep IDEA-104 visible as a later tooling pressure, not an immediate build excuse.
 5. Do not force an implementation patch until the next target actually earns its place.
@@ -395,4 +399,4 @@ Next action: do not promote on its own
 
 === ONE-LINE SUMMARY ===
 
-The project now has preserved wording for the actor-anchored, zoomable, continuous-universe vision, verified repo truth through the spatial mutation seam and dead-focus flow tightening, and a cleaner planning position for choosing the next narrow continuity/archive/time follow-through without drifting into either fake momentum or premature tooling fluff.
+The project now has preserved wording for the actor-anchored, zoomable, continuous-universe vision, verified repo truth through the first lineage/archive foundation, and a cleaner planning position for choosing the next narrow post-lineage follow-through without drifting into either fake momentum or premature tooling fluff.
