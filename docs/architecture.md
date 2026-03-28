@@ -1,7 +1,7 @@
 # Actora Architecture Summary
 
-**Version:** 0.33.0
-**Last Updated:** 2026-03-27
+**Version:** 0.34.0
+**Last Updated:** 2026-03-28
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
 It is intended to support safe patching, review, and manual verification.
@@ -51,6 +51,7 @@ Current methods:
 - `get_actor_records(actor_id, record_type=None)`
 - `get_latest_record(actor_id=None, record_type=None)`
 - `get_records_by_tag(tag, actor_id=None)`
+- `update_actor_spatial_identity(actor_id, *, current_place_id=UNSET, residence_place_id=UNSET, jurisdiction_place_id=UNSET, temporary_occupancy_place_id=UNSET)`
 - `create_human_actor(actor_id, species, first_name, last_name, sex, gender, birth_year, birth_month, current_place_id=None, residence_place_id=None, jurisdiction_place_id=None, temporary_occupancy_place_id=None, randomize_stats=False)`
 - `create_human_child_with_parents(child_id, first_name, last_name, sex, gender, mother_id, father_id, birth_year, birth_month, place_id, jurisdiction_place_id=None, temporary_occupancy_place_id=None, randomize_stats=False)`
 - `get_actor(actor_id)`
@@ -198,7 +199,8 @@ Current structural-death record details:
 
 Actor entry helpers:
 
-- `create_human_actor(...)` is the current world-owned actor creation/registration path for startup actors, and it is explicitly human-backed. It directly constructs a `Human`, optionally randomizes starting stats, optionally applies current/residence/jurisdiction/temporary-occupancy place IDs, registers the actor via `add_actor(...)`, writes an `actor_entry` record with `entry_method="create_human_actor"`, and returns the created actor.
+- `update_actor_spatial_identity(...)` is the current world-owned mutation seam for actor spatial identity. It validates actor existence, validates any provided non-`None` place IDs against the world place registry, allows explicit `None` where current structure permits it, leaves unspecified fields untouched through an internal `UNSET` sentinel, and returns a small structured change summary.
+- `create_human_actor(...)` is the current world-owned actor creation/registration path for startup actors, and it is explicitly human-backed. It directly constructs a `Human`, optionally randomizes starting stats, registers the actor via `add_actor(...)`, applies any startup spatial identity through `update_actor_spatial_identity(...)`, writes an `actor_entry` record with `entry_method="create_human_actor"`, and returns the created actor.
 - `create_human_child_with_parents(...)` remains a narrow human-startup helper layered on top of `create_human_actor(...)`. It creates the child in the provided place, currently assigns the same startup place as both current and residence, optionally assigns separate jurisdiction and temporary occupancy context, adds startup family link pairs for mother/father when IDs are provided, writes explicit origin/care/bootstrap metadata onto those directional links, and writes a `family_bootstrap` record for the current startup family-link bootstrap. No generic actor constructor, species framework, adoption system, guardianship system, or broader origin framework is currently implemented.
 
 Basic world link helper contract:
@@ -312,7 +314,7 @@ Current shell-level functions:
 - `game_loop(...)` — main input/advancement/display loop
 - `start_game()` — top-level orchestration (banner, then delegates to the above)
 
-Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. The current shell also now renders a narrow structural-state section in snapshots, renders ancestry-resolved world body plus current place plus one clean jurisdiction line, and is capable of rendering structural transition / continuity result blocks when those keys are present.
+Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation, while the shell continues to render ancestry-resolved world body plus current place plus one clean jurisdiction line and remains capable of rendering structural transition / continuity result blocks when those keys are present.
 
 ### `identity.py`
 Responsible for:
@@ -458,6 +460,7 @@ Current initialization behavior:
 - if player last name is blank, parent last names use a random fallback from `FALLBACK_LAST_NAME_POOL`
 - startup mother, startup father, and startup player each receive `current_place_id = "earth_city_01"` and `residence_place_id = "earth_city_01"` during setup
 - those same startup actors also receive `jurisdiction_place_id = "earth_country_01"` during setup while `temporary_occupancy_place_id` remains unset (`None`)
+- those startup spatial assignments now flow through `World.update_actor_spatial_identity(...)`, which leaves unspecified fields unchanged and fails explicitly on unknown actor IDs or unknown non-`None` place IDs
 - startup actor IDs now follow the `startup_<role>_<suffix>` pattern instead of fixed singleton IDs, while preserving the current one-family startup shape and parent/player lookup behavior
 - parent birth months are randomized from 1-12
 - the startup player is set as the current world-owned focused actor

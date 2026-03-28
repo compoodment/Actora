@@ -1,6 +1,10 @@
 from events import get_human_monthly_event_from_lifecycle
 from human import Human
 
+
+UNSET = object()
+
+
 class World:
     """Represents the game world and manages its state."""
     def __init__(self, start_year, start_month=1):
@@ -77,6 +81,53 @@ class World:
     def add_actor(self, actor_id, actor_obj):
         """Adds an actor to the world."""
         self.actors[actor_id] = actor_obj
+
+    def update_actor_spatial_identity(
+        self,
+        actor_id,
+        *,
+        current_place_id=UNSET,
+        residence_place_id=UNSET,
+        jurisdiction_place_id=UNSET,
+        temporary_occupancy_place_id=UNSET,
+    ):
+        """Applies a narrow world-owned spatial identity update for one actor."""
+        actor = self.get_actor(actor_id)
+        if actor is None:
+            raise ValueError(f"update_actor_spatial_identity: unknown actor_id '{actor_id}'")
+
+        requested_updates = {
+            "current_place_id": current_place_id,
+            "residence_place_id": residence_place_id,
+            "jurisdiction_place_id": jurisdiction_place_id,
+            "temporary_occupancy_place_id": temporary_occupancy_place_id,
+        }
+
+        changed_fields = {}
+        for field_name, requested_value in requested_updates.items():
+            if requested_value is UNSET:
+                continue
+            if requested_value is not None and self.get_place(requested_value) is None:
+                raise ValueError(
+                    f"update_actor_spatial_identity: unknown place_id '{requested_value}' "
+                    f"for field '{field_name}'"
+                )
+
+            previous_value = getattr(actor, field_name)
+            if previous_value == requested_value:
+                continue
+
+            setattr(actor, field_name, requested_value)
+            changed_fields[field_name] = {
+                "old": previous_value,
+                "new": requested_value,
+            }
+
+        return {
+            "actor_id": actor_id,
+            "changed": bool(changed_fields),
+            "changed_fields": changed_fields,
+        }
 
     def set_focused_actor(self, actor_id):
         """Sets the world-owned currently focused actor ID."""
@@ -210,15 +261,14 @@ class World:
         )
         if randomize_stats:
             actor.randomize_starting_statistics()
-        if current_place_id is not None:
-            actor.current_place_id = current_place_id
-        if residence_place_id is not None:
-            actor.residence_place_id = residence_place_id
-        if jurisdiction_place_id is not None:
-            actor.jurisdiction_place_id = jurisdiction_place_id
-        if temporary_occupancy_place_id is not None:
-            actor.temporary_occupancy_place_id = temporary_occupancy_place_id
         self.add_actor(actor_id, actor)
+        self.update_actor_spatial_identity(
+            actor_id,
+            current_place_id=current_place_id,
+            residence_place_id=residence_place_id,
+            jurisdiction_place_id=jurisdiction_place_id,
+            temporary_occupancy_place_id=temporary_occupancy_place_id,
+        )
         self.add_record(
             record_type="actor_entry",
             scope="actor",

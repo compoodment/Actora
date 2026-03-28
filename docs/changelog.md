@@ -1,5 +1,14 @@
 # Actora Changelog
 
+## Version 0.34.0 (Minor) - 2026-03-28
+- **Controlled Spatial Identity Mutation Boundary:**
+    - Added `World.update_actor_spatial_identity(...)` as the narrow world-owned mutation seam for actor `current_place_id`, `residence_place_id`, `jurisdiction_place_id`, and `temporary_occupancy_place_id`.
+    - Implemented explicit validation so unknown actor IDs fail, and any provided non-`None` place ID must already exist in the world place registry.
+    - Kept unspecified spatial fields unchanged through an internal sentinel-based boundary while still allowing explicit `None`, including the current `temporary_occupancy_place_id = None` case.
+    - Returned a small structured result describing which spatial fields actually changed.
+    - Routed `World.create_human_actor(...)` through the new seam so startup actor spatial identity setup stays world-owned without adding a broader mutation engine.
+    - Preserved current startup spatial truth (`earth_city_01` current/residence, `earth_country_01` jurisdiction, temporary occupancy unset), current snapshot output, structural death/continuity behavior, and the absence of travel, migration, property, politics, or auto-coupled spatial rules.
+
 ## Version 0.33.1 (Patch) - 2026-03-28
 - **Alive-Play Snapshot Structural-State Removal:**
     - Removed the ordinary-play `Structural State` section from terminal snapshot rendering in `main.py` so alive-state is no longer redundantly exposed as front UI.
