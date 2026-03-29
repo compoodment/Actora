@@ -82,6 +82,8 @@ Current methods:
 - `build_continuity_state_for(actor_id)`
 - `handoff_focus_to_continuation(from_actor_id, successor_actor_id)`
 - `mark_actor_dead(actor_id, year=None, month=None, reason=None)`
+- `build_monthly_mortality_profile_for(actor_id)`
+- `resolve_monthly_mortality()`
 - `simulate_advance_turn(player_id, months_to_advance)`
 
 ### Human (`human.py`)
@@ -120,7 +122,7 @@ Current structural-state details:
 - `structural_status` is the current storage truth for narrow actor structural state and currently uses `"active"` / `"dead"`
 - `is_alive()` derives living state from `structural_status` instead of duplicating a separate stored boolean
 - `death_year`, `death_month`, and `death_reason` remain `None` until a controlled structural death transition is applied
-- this does not yet implement archive state, mortality rules, inheritance, or broader lifecycle/death gameplay
+- this still does not implement archive state, inheritance, or broader lifecycle/death gameplay beyond the current baseline old-age mortality rule
 
 Current stat-mutation boundary details:
 - `modify_stat(...)` supports keys currently present in `self.stats` (`health`, `happiness`, `intelligence`) and applies clamped mutation in the inclusive range 0-100.
@@ -376,7 +378,7 @@ Current event boundary truth:
 - this seam clarification does not mean species-general event support now exists
 - the structured monthly event contract is unchanged: `event_id`, `text`, `outcome`, `tags`, `year`, and `month`
 - there is still no top-level `stat_changes`; `outcome["stat_changes"]` remains the sole authoritative mutation payload
-- this patch does not add mortality events or automatic death triggers during ordinary play
+- ordinary-play mortality now comes from `world.py` structural checks rather than event payloads
 
 ### `banners.py`
 Responsible for:
@@ -398,6 +400,7 @@ Current behavior:
 - advances time month-by-month
 - ensures the current focused actor ID is available for turn-result reporting
 - uses the current focused actor as the event/snapshot advancement subject once focus exists
+- resolves baseline old-age mortality across all living actors after each month advances
 - requests monthly structured event data from `events.py`
 - applies each returned event outcome centrally through `World.apply_outcome(...)`
 - writes one preserved world-owned `event` record for each triggered monthly event after outcome application
@@ -417,10 +420,11 @@ Current return keys:
 - `advancement_block_reason`
 
 Current return-contract notes:
-- `structural_transition` is currently `None` during ordinary advancement because this patch does not yet introduce automatic mortality rules
+- `structural_transition` contains the focused actor death transition when the focused actor dies during advancement
 - `continuity_state` is currently present when advancement is blocked because the focused actor is dead
 - `advancement_block_reason` is currently `"focused_actor_dead"` for the dead-focus blocked path
-- this patch now supports narrow playable continuation handoff without introducing automatic mortality, archive behavior, or broader continuity systems
+- `months_advanced` reports real completed advancement, which may be lower than the requested skip when death interrupts the focused actor
+- this patch now supports narrow playable continuation handoff with baseline automatic old-age mortality while still avoiding archive behavior or broader continuity systems
 
 This function does not perform terminal input, output, or presentation formatting. Terminal presentation remains in `main.py` and consumes the returned structured result.
 
@@ -510,7 +514,7 @@ Current event behavior:
 - small event counts are shown with full dated event lines
 - large event counts are compacted with a total summary, recent-event subset, and omitted-older-events line
 - fully quiet turns show a fallback line
-- this patch does not yet introduce ordinary-play death events or automatic mortality
+- ordinary-play death remains structural rather than event-text-driven; later cause-specific event layers still do not exist
 
 ### Snapshot
 Current snapshots display:
@@ -531,6 +535,8 @@ Current structural-transition behavior:
 - the world does not end when an actor dies
 - focus does not auto-switch during the death transition itself
 - a preserved `death` record is written for the actor
+- baseline old-age mortality is now resolved monthly through `World.resolve_monthly_mortality()`
+- `World.build_monthly_mortality_profile_for(...)` is the current extension seam for future health/lifestyle/place tuning without moving mortality into the shell
 - continuity state can be built from the current linked living actors through `World.build_continuity_state_for(...)`
 - current continuity candidates are returned in deterministic order with display-ready relationship metadata
 - ordinary month advancement does not proceed once the focused actor is dead
@@ -539,7 +545,7 @@ Current structural-transition behavior:
 - if no valid continuation candidates exist, the shell reports that cleanly and leaves the run only through explicit quit
 
 Current limitations:
-- no automatic mortality system yet
+- only one baseline mortality cause exists so far: `Old age`
 - no archive behavior yet
 - no inheritance/estate consequences yet
 - no broader connected-actor prioritization system yet

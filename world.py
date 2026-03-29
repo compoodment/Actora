@@ -1,3 +1,5 @@
+import random
+
 from events import get_human_monthly_event_from_lifecycle
 from human import Human
 
@@ -664,7 +666,17 @@ class World:
         if linked_actor is None or not links:
             return None
 
-        lifecycle = linked_actor.get_lifecycle_state(self.current_year, self.current_month)
+        lifecycle_year = self.current_year
+        lifecycle_month = self.current_month
+        if (
+            not linked_actor.is_alive()
+            and linked_actor.death_year is not None
+            and linked_actor.death_month is not None
+        ):
+            lifecycle_year = linked_actor.death_year
+            lifecycle_month = linked_actor.death_month
+
+        lifecycle = linked_actor.get_lifecycle_state(lifecycle_year, lifecycle_month)
         current_place_name = self.get_place_name(linked_actor.current_place_id) or "Unknown"
         birth_date = self._format_year_month(linked_actor.birth_year, linked_actor.birth_month)
         death_date = self._format_year_month(linked_actor.death_year, linked_actor.death_month)
@@ -973,10 +985,13 @@ class World:
         actor.death_reason = transition_reason
 
         continuity_state = self.build_continuity_state_for(actor_id)
+        death_record_text = f"{actor.get_full_name()} died."
+        if transition_reason != "Unspecified":
+            death_record_text = f"{death_record_text} Cause: {transition_reason}."
         self.add_record(
             record_type="death",
             scope="actor",
-            text=f"{actor.get_full_name()} died.",
+            text=death_record_text,
             year=transition_year,
             month=transition_month,
             actor_ids=[actor_id],
@@ -996,6 +1011,87 @@ class World:
             "reason": transition_reason,
         }
 
+    def _get_monthly_old_age_death_probability(self, lifecycle_state):
+        """Returns the current baseline monthly old-age death probability for one actor."""
+        if lifecycle_state.get("life_stage_model") != "human_default":
+            return 0.0
+
+        age_months = lifecycle_state["age_months"]
+        threshold_points = (
+            (65 * 12, 0.0005),
+            (75 * 12, 0.0025),
+            (85 * 12, 0.0100),
+            (95 * 12, 0.0350),
+            (105 * 12, 0.1200),
+            (115 * 12, 0.3500),
+            (120 * 12, 1.0000),
+        )
+
+        if age_months < threshold_points[0][0]:
+            return 0.0
+        if age_months >= threshold_points[-1][0]:
+            return threshold_points[-1][1]
+
+        for lower_point, upper_point in zip(threshold_points, threshold_points[1:]):
+            lower_age_months, lower_probability = lower_point
+            upper_age_months, upper_probability = upper_point
+            if age_months < upper_age_months:
+                span_months = upper_age_months - lower_age_months
+                progress = (age_months - lower_age_months) / span_months
+                probability_delta = upper_probability - lower_probability
+                return lower_probability + (probability_delta * progress)
+        return 0.0
+
+    def build_monthly_mortality_profile_for(self, actor_id):
+        """Builds the current simulation-owned mortality profile for one living actor."""
+        actor = self.get_actor(actor_id)
+        if actor is None:
+            raise ValueError(f"build_monthly_mortality_profile_for: unknown actor_id '{actor_id}'")
+        if not actor.is_alive():
+            return None
+
+        lifecycle_state = actor.get_lifecycle_state(self.current_year, self.current_month)
+        old_age_probability = self._get_monthly_old_age_death_probability(lifecycle_state)
+        if old_age_probability <= 0:
+            return None
+
+        return {
+            "actor_id": actor_id,
+            "reason": "Old age",
+            "monthly_death_probability": old_age_probability,
+            "rule": "baseline_old_age",
+            "lifecycle_state": lifecycle_state,
+        }
+
+    def resolve_monthly_mortality(self):
+        """Applies one month of mortality checks across all living actors."""
+        structural_transitions = []
+        for actor_id in sorted(self.actors):
+            actor = self.get_actor(actor_id)
+            if actor is None or not actor.is_alive():
+                continue
+
+            mortality_profile = self.build_monthly_mortality_profile_for(actor_id)
+            if mortality_profile is None:
+                continue
+
+            death_probability = mortality_profile["monthly_death_probability"]
+            if death_probability < 1.0 and random.random() >= death_probability:
+                continue
+
+            structural_transition = self.mark_actor_dead(
+                actor_id,
+                year=self.current_year,
+                month=self.current_month,
+                reason=mortality_profile["reason"],
+            )
+            structural_transition["rule"] = mortality_profile["rule"]
+            structural_transition["age_years"] = mortality_profile["lifecycle_state"]["age_years"]
+            structural_transition["age_months"] = mortality_profile["lifecycle_state"]["age_months"]
+            structural_transitions.append(structural_transition)
+
+        return structural_transitions
+
     def simulate_advance_turn(self, player_id: str, months_to_advance: int) -> dict:
         """
         World-owned authoritative simulation-step boundary.
@@ -1011,11 +1107,12 @@ class World:
         structural_transition = None
         continuity_state = None
         focused_actor = self.get_actor(focused_actor_id)
+        months_advanced = 0
 
         if focused_actor is not None and not focused_actor.is_alive():
             continuity_state = self.build_continuity_state_for(focused_actor_id)
             return {
-                "months_advanced": 0,
+                "months_advanced": months_advanced,
                 "events": collected_structured_events,
                 "had_any_events": False,
                 "focused_actor_id": focused_actor_id,
@@ -1028,6 +1125,25 @@ class World:
 
         for _ in range(months_to_advance):
             self.advance_months(1)
+            months_advanced += 1
+
+            monthly_structural_transitions = self.resolve_monthly_mortality()
+            focused_actor_transition = next(
+                (
+                    transition
+                    for transition in monthly_structural_transitions
+                    if transition["actor_id"] == focused_actor_id
+                ),
+                None,
+            )
+            if focused_actor_transition is not None:
+                structural_transition = focused_actor_transition
+
+            focused_actor = self.get_actor(focused_actor_id)
+            if focused_actor is None or not focused_actor.is_alive():
+                continuity_state = self.build_continuity_state_for(focused_actor_id)
+                break
+
             lifecycle_state_for_event = focused_actor.get_lifecycle_state(
                 self.current_year,
                 self.current_month,
@@ -1060,7 +1176,7 @@ class World:
             continuity_state = self.build_continuity_state_for(focused_actor_id)
 
         return {
-            "months_advanced": months_to_advance,
+            "months_advanced": months_advanced,
             "events": collected_structured_events,
             "had_any_events": bool(collected_structured_events),
             "focused_actor_id": focused_actor_id,

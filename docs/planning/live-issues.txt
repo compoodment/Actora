@@ -31,5 +31,5 @@ Purpose: repo-local parking lot for current bugs, regressions, and revisit items
   Note: current planning docs still overlap more than ideal and may want a later simplification pass once the current TUI cleanup churn settles.
 
 - old-age mortality still missing as real simulation truth
-  Status: later / not part of v0.36.7
-  Note: this remains intentionally out of scope for this patch and should land only as actual simulation truth, not as UI-only theater.
+  Status: resolved in v0.36.8
+  Note: baseline old-age mortality now resolves in simulation via world-owned monthly checks and surfaces through ordinary death/lineage truth.

@@ -1,5 +1,13 @@
 # Actora Changelog
 
+## Version 0.36.8 (Patch) - 2026-03-29
+- **Ordinary Mortality / Old-Age Death Truth:**
+    - Added world-owned monthly old-age mortality in `world.py` so living actors now face baseline later-life death risk during ordinary simulation instead of surviving indefinitely by default.
+    - Resolved mortality across all living actors each simulated month, not only the focused actor, so family-lineage truth can accumulate ordinary deaths as world time advances.
+    - Used the simple first-pass death reason `Old age` and preserved it through the existing structural death flow, continuity state, and death record metadata.
+    - Stopped skip-time advancement honestly when the focused actor dies mid-jump, with `simulate_advance_turn(...)` now reporting actual `months_advanced` instead of pretending the full request completed.
+    - Strengthened death/history truth by freezing dead lineage ages at death time and by writing cause text into death records when a cause is known.
+
 ## Version 0.36.7 (Patch) - 2026-03-29
 - **Life View + Lineage Usability Cleanup:**
     - Reworked the main alive-state TUI in `main.py` into a lighter split `Life View`, keeping identity/location/stats/relationships on the left and recent activity on the right so events remain visible during ordinary play.

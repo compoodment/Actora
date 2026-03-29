@@ -511,10 +511,15 @@ class ActoraTUI:
         """Advances time using the existing world-owned simulation seam."""
         turn_result = self.world.simulate_advance_turn(self.player_id, months_to_advance)
         self.last_event_lines = build_event_lines(turn_result)
-        if months_to_advance == 1:
+        actual_months_advanced = turn_result["months_advanced"]
+        if actual_months_advanced == 1:
             self.last_message = "Advanced 1 month."
+        elif actual_months_advanced != months_to_advance:
+            self.last_message = (
+                f"Advanced {actual_months_advanced} of {months_to_advance} months before death."
+            )
         else:
-            self.last_message = f"Advanced {months_to_advance} months."
+            self.last_message = f"Advanced {actual_months_advanced} months."
         if turn_result["continuity_state"] is not None and not turn_result["focused_actor_alive"]:
             self.screen_name = "death_ack"
 
