@@ -1,6 +1,6 @@
 # Actora Architecture Summary
 
-**Version:** 0.36.4
+**Version:** 0.36.6
 **Last Updated:** 2026-03-29
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
@@ -9,7 +9,7 @@ It is intended to support safe patching, review, and manual verification.
 ## 1. Stack
 
 - **Language:** Python
-- **Interface:** Terminal with a narrow curses TUI shell for ordinary play and structured lineage/archive browsing
+- **Interface:** Terminal with a narrow curses TUI shell for ordinary play, structured lineage/archive browsing, death/continuation interrupts, and skip-time utility flow
 - **Structure:** Small modular prototype with separated simulation and rendering responsibilities
 
 ## 2. Current File Structure
@@ -301,6 +301,7 @@ Responsible for:
 - character creation flow
 - initial world setup flow
 - curses-driven actor-first ordinary play flow
+- screen-level visual-system orchestration for the current TUI
 - post-turn rendering orchestration
 - rendering TUI snapshots from structured snapshot data
 - converting structured event results into display text

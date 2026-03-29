@@ -1,5 +1,14 @@
 # Actora Changelog
 
+## Version 0.36.6 (Patch) - 2026-03-29
+- **TUI Visual-System Consistency Pass:**
+    - Reworked the current curses shell in `main.py` around a stronger centered visual system with a centered `Actora` header rule, centered subtitle/date rhythm, and more deliberate content-column composition instead of dumping most screens against the left edge.
+    - Switched footer hints to a bracketed action language (for example `[A] Advance   [S] Skip Time   [L] Lineage   [Q] Quit`) so major screens now share a clearer interaction grammar.
+    - Renamed the main alive-state screen from `Ordinary Play` to `Life View` and tightened screen-specific layout rhythm across ordinary play, lineage browsing, skip-time, death interrupt, and continuation flow without moving startup into curses.
+    - Removed the heavy box dependence introduced by the lineage browser foundation and replaced it with lighter centered layout composition plus a narrow vertical divider, preserving compact one-line lineage rows while making the browser/detail split easier to read.
+    - Strengthened spacing rhythm in ordinary play, made continuation/death utility screens feel more staged, and preserved current functionality across startup, lineage filters/search, skip-time flow, death acknowledgment, and continuation selection.
+    - Fixed visual-pass follow-up issues before release, including skip-time highlight indexing and a small helper-shape cleanup in the centered column splitter.
+
 ## Version 0.36.4 (Patch) - 2026-03-29
 - **Lineage Row Truncation Hygiene:**
     - Tightened left-pane lineage browser rendering in `main.py` so lineage rows now stay single-line and truncate with an ellipsis instead of wrapping awkwardly across multiple lines.

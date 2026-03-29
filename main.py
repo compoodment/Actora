@@ -158,7 +158,7 @@ def format_sim_date(year, month):
 def build_screen_chrome(screen_name, world, focused_actor_name):
     """Builds shell-owned title/subtitle text for the current screen."""
     title_map = {
-        "main": "Ordinary Play",
+        "main": "Life View",
         "lineage": "Lineage Browser",
         "skip_time": "Skip Time",
         "death_ack": "Death Interrupt",
@@ -188,6 +188,55 @@ def wrap_text_line(text, width):
     return textwrap.wrap(text, width=width) or [""]
 
 
+def center_text(text, width):
+    """Centers one line of text inside a fixed-width field."""
+    if width <= 0:
+        return ""
+    if len(text) >= width:
+        return text[:width]
+    padding = width - len(text)
+    left_padding = padding // 2
+    right_padding = padding - left_padding
+    return (" " * left_padding) + text + (" " * right_padding)
+
+
+def build_centered_rule(label, width, fill_char="═"):
+    """Builds one centered decorative rule with a single inline label."""
+    if width <= 0:
+        return ""
+    decorated_label = f" {label} "
+    if len(decorated_label) >= width:
+        return decorated_label[:width]
+    remaining = width - len(decorated_label)
+    left_fill = remaining // 2
+    right_fill = remaining - left_fill
+    return (fill_char * left_fill) + decorated_label + (fill_char * right_fill)
+
+
+def get_content_bounds(width, *, max_width=100, min_margin=2):
+    """Returns a centered content column sized for readable TUI composition."""
+    usable_width = max(1, width - 1)
+    content_width = min(max_width, usable_width - (min_margin * 2))
+    if content_width < 24:
+        content_width = usable_width
+    left = max(0, (usable_width - content_width) // 2)
+    return left, content_width
+
+
+def split_centered_columns(content_left, content_width, left_ratio=0.52, gap=3):
+    """Splits one centered region into two readable columns."""
+    gap = min(gap, max(1, content_width // 8))
+    left_width = max(28, int(content_width * left_ratio))
+    right_width = content_width - left_width - gap
+    if right_width < 26:
+        right_width = 26
+        left_width = max(24, content_width - right_width - gap)
+    if left_width + right_width + gap > content_width:
+        right_width = max(20, content_width - left_width - gap)
+    right_left = content_left + left_width + gap
+    return left_width, right_left, right_width
+
+
 def draw_text_block(stdscr, start_y, start_x, width, height, lines, *, highlight_index=None):
     """Draws a wrapped block of text inside the provided bounds."""
     y = start_y
@@ -200,6 +249,41 @@ def draw_text_block(stdscr, start_y, start_x, width, height, lines, *, highlight
             stdscr.addnstr(y, start_x, wrapped_line, width, attr)
             y += 1
     return y
+
+
+def draw_centered_text_block(stdscr, start_y, total_width, block_width, height, lines, *, highlight_index=None):
+    """Draws one wrapped block inside a centered column."""
+    block_width = min(block_width, max(1, total_width - 1))
+    start_x = max(0, (max(1, total_width - 1) - block_width) // 2)
+    return draw_text_block(
+        stdscr,
+        start_y,
+        start_x,
+        block_width,
+        height,
+        lines,
+        highlight_index=highlight_index,
+    )
+
+
+def draw_truncated_block(stdscr, start_y, start_x, width, height, lines, *, highlight_index=None):
+    """Draws one fixed-line block without wrapping, truncating long rows in place."""
+    y = start_y
+    for index, raw_line in enumerate(lines):
+        if y >= start_y + height:
+            return y
+        attr = curses.A_REVERSE if highlight_index == index else curses.A_NORMAL
+        stdscr.addnstr(y, start_x, truncate_for_width(raw_line, width).ljust(width), width, attr)
+        y += 1
+    return y
+
+
+def draw_vertical_divider(stdscr, top, left, height, char="│"):
+    """Draws one light vertical divider for layout separation without boxing the whole screen."""
+    if height <= 0:
+        return
+    for row in range(top, top + height):
+        stdscr.addnstr(row, left, char, 1)
 
 
 def draw_box(stdscr, top, left, height, width, *, title=None):
@@ -257,9 +341,8 @@ def build_person_card_lines(summary):
     age_label = "Age" if summary.get("is_alive") else "Age at Death"
     lines = [
         summary.get("full_name", "Unknown"),
-        f"Relationship: {summary.get('relationship_label', 'Connected')}",
-        f"Status: {status_label}",
-        f"{age_label}: {summary.get('age', '?')} ({summary.get('life_stage', 'Unknown')})",
+        f"Status: {status_label}   Relationship: {summary.get('relationship_label', 'Connected')}",
+        f"{age_label}: {summary.get('age', '?')}   Life Stage: {summary.get('life_stage', 'Unknown')}",
         f"Place: {summary.get('current_place_name') or 'Unknown'}",
     ]
 
@@ -284,12 +367,12 @@ def build_person_card_lines(summary):
 
 def build_lineage_row(entry):
     """Builds one compact lineage browser row."""
-    status_label = "ALIVE" if entry["is_alive"] else "DEAD"
+    status_label = "Alive" if entry["is_alive"] else "Dead"
     age_label = f"Age {entry['age']}" if entry["is_alive"] else f"Died at {entry['age']}"
     branch_label = entry.get("family_branch_label") or "Linked"
     return (
-        f"{entry['full_name']} | {entry['relationship_label']} | {status_label} | "
-        f"{age_label} | {entry['current_place_name']} | {branch_label}"
+        f"{entry['full_name']} · {entry['relationship_label']} · {status_label} · "
+        f"{age_label} · {entry['current_place_name']} · {branch_label}"
     )
 
 
@@ -615,63 +698,66 @@ class ActoraTUI:
 
     def render_footer(self, stdscr, height, width):
         footer_hints = {
-            "main": "A/Enter advance   S skip time   L lineage   Q quit",
-            "lineage": "Up/Down move   A all   L living   D dead   / search   Backspace clear   Esc/Q back",
-            "skip_time": "Up/Down preset   Digits custom   Backspace erase   Enter confirm   Esc/Q back",
-            "death_ack": "Enter acknowledge   Q quit",
-            "continuation": "Up/Down move   Enter continue   Q quit",
+            "main": "[A] Advance   [S] Skip Time   [L] Lineage   [Q] Quit",
+            "lineage": "[↑↓] Move   [A] All   [L] Living   [D] Dead   [/] Search   [Bksp] Clear   [Esc] Back",
+            "skip_time": "[↑↓] Preset   [0-9] Custom   [Bksp] Erase   [Enter] Confirm   [Esc] Back",
+            "death_ack": "[Enter] Continue   [Q] Quit",
+            "continuation": "[↑↓] Move   [Enter] Continue   [Q] Quit",
         }
         footer_text = footer_hints.get(self.screen_name, "")
-        content_width = max(1, width - 1)
+        content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
         hline_char = getattr(curses, "ACS_HLINE", ord("-"))
-        stdscr.hline(height - 2, 0, hline_char, content_width)
+        stdscr.hline(height - 2, content_left, hline_char, content_width)
         stdscr.addnstr(
             height - 1,
-            0,
-            footer_text.ljust(content_width),
+            content_left,
+            center_text(footer_text, content_width),
             content_width,
-            curses.A_REVERSE,
+            curses.A_NORMAL,
         )
 
     def render_header(self, stdscr, width):
         focused_actor = self.get_focused_actor()
         focused_actor_name = focused_actor.get_full_name() if focused_actor is not None else "Unknown"
         chrome = build_screen_chrome(self.screen_name, self.world, focused_actor_name)
-        content_width = max(1, width - 1)
-        title_text = f" Actora :: {chrome['title']} "
-        stdscr.addnstr(0, 0, title_text.ljust(content_width), content_width, curses.A_REVERSE)
-        subtitle_text = f" {chrome['subtitle']} | {chrome['date_text']} "
-        stdscr.addnstr(1, 0, subtitle_text.ljust(content_width), content_width, curses.A_BOLD)
-        hline_char = getattr(curses, "ACS_HLINE", ord("-"))
-        stdscr.hline(2, 0, hline_char, content_width)
+        content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
+        title_text = build_centered_rule("Actora", content_width)
+        subtitle_text = center_text(
+            f"{chrome['title']} • {chrome['subtitle']} • {chrome['date_text']}",
+            content_width,
+        )
+        bottom_rule = "═" * content_width
+        stdscr.addnstr(0, content_left, title_text, content_width, curses.A_BOLD)
+        stdscr.addnstr(1, content_left, subtitle_text, content_width)
+        stdscr.addnstr(2, content_left, bottom_rule, content_width, curses.A_BOLD)
 
     def render_main(self, stdscr, height, width):
         snapshot_data = self.get_snapshot_data()
         snapshot_sections = build_snapshot_sections(snapshot_data)
-        lines = [self.last_message, ""]
+        content_left, content_width = get_content_bounds(width)
+        lines = [center_text(self.last_message, content_width), ""]
         for section_title, section_lines in snapshot_sections:
-            lines.append(f"[ {section_title} ]")
+            lines.append(center_text(section_title.upper(), content_width))
+            lines.append("")
             lines.extend(f"  {line}" for line in section_lines)
             lines.append("")
-        lines.extend(self.last_event_lines)
-        draw_text_block(stdscr, 3, 0, width, height - 5, lines)
+        lines.append(center_text("RECENT ACTIVITY", content_width))
+        lines.append("")
+        lines.extend(self.last_event_lines[1:] if self.last_event_lines[:1] == ["Recent Activity"] else self.last_event_lines)
+        draw_text_block(stdscr, 4, content_left, content_width, height - 6, lines)
 
     def render_lineage(self, stdscr, height, width):
         browser_state = self.get_lineage_browser_state()
         lineage_entries = browser_state["entries"]
         selected_detail = browser_state["selected_detail"]
 
-        top = 3
-        body_height = height - 5
-        left_width = max(30, min(width // 2, width - 36))
-        right_width = width - left_width
-
+        top = 4
+        body_height = height - 6
+        content_left, content_width = get_content_bounds(width, max_width=112)
+        left_width, right_left, right_width = split_centered_columns(content_left, content_width)
         filter_label = LINEAGE_FILTER_LABELS[browser_state["filter_mode"]]
-        left_title = f"Lineage | {filter_label} | {browser_state['result_count']} result(s)"
-        draw_box(stdscr, top, 0, body_height, left_width, title=left_title)
-
         left_lines = [
-            self.last_message,
+            f"Archive • {filter_label} • {browser_state['result_count']} result(s)",
             self.get_lineage_search_status(),
             "",
         ]
@@ -684,20 +770,23 @@ class ActoraTUI:
                     highlight_index = len(left_lines)
                 left_lines.append(build_lineage_row(entry))
 
-        draw_panel_text(
+        draw_truncated_block(
             stdscr,
             top,
-            0,
-            body_height,
+            content_left,
             left_width,
+            body_height,
             left_lines,
             highlight_index=highlight_index,
-            wrap=False,
         )
 
-        draw_box(stdscr, top, left_width, body_height, right_width, title="Selected Person")
+        divider_x = right_left - 2
+        draw_vertical_divider(stdscr, top, divider_x, body_height)
+
         if selected_detail is None:
             right_lines = [
+                center_text("SELECTED PERSON", right_width),
+                "",
                 "No lineage detail available.",
                 "",
                 "Try another filter or search.",
@@ -706,17 +795,15 @@ class ActoraTUI:
             summary = selected_detail["summary"]
             records = selected_detail["records"]
             right_lines = []
+            right_lines.append(center_text("SELECTED PERSON", right_width))
+            right_lines.append("")
             right_lines.extend(build_person_card_lines(summary))
             right_lines.extend(
                 [
                     "",
-                    f"Species: {summary['species']}",
-                    f"Sex: {summary['sex']}",
-                    f"Gender: {summary['gender']}",
-                    f"Health: {summary['health']}",
-                    f"Happiness: {summary['happiness']}",
-                    f"Intelligence: {summary['intelligence']}",
-                    f"Money: ${summary['money']}",
+                    f"Identity: {summary['species']}   {summary['sex']}   {summary['gender']}",
+                    f"Condition: Health {summary['health']}   Happiness {summary['happiness']}   Intelligence {summary['intelligence']}",
+                    f"Resources: ${summary['money']}",
                     "",
                     "Recent Records",
                 ]
@@ -730,25 +817,27 @@ class ActoraTUI:
                         f"({record['record_type']}) {record['text']}"
                     )
 
-        draw_panel_text(stdscr, top, left_width, body_height, right_width, right_lines)
+        draw_text_block(stdscr, top, right_left, right_width, body_height, right_lines)
 
     def render_skip_time(self, stdscr, height, width):
         custom_months = self.get_custom_skip_months()
         selected_months = self.get_selected_skip_months()
+        content_left, content_width = get_content_bounds(width, max_width=76)
         lines = [
+            center_text("TIME JUMP", content_width),
+            "",
             self.last_message,
             "",
-            "[ Presets ]",
+            "Presets",
         ]
-        highlight_index = 3 + self.skip_selection
+        highlight_index = 5 + self.skip_selection
         for preset_months in SKIP_MONTH_PRESETS:
-            marker = ">" if preset_months == selected_months else " "
             label = "month" if preset_months == 1 else "months"
-            lines.append(f"{marker} {preset_months:>2} {label}")
+            lines.append(f"{preset_months:>2} {label}")
         lines.extend(
             [
                 "",
-                "[ Custom Months ]",
+                "Custom Months",
                 (
                     f"Typed value: {self.skip_custom_value} months"
                     if self.skip_custom_value
@@ -761,23 +850,44 @@ class ActoraTUI:
                 ),
             ]
         )
-        draw_text_block(stdscr, 3, 0, width, height - 5, lines, highlight_index=highlight_index)
+        draw_text_block(stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
 
     def render_death_ack(self, stdscr, height, width):
         continuity_state = self.get_continuity_state()
+        content_left, content_width = get_content_bounds(width, max_width=74)
+        lines = [
+            "",
+            center_text("DEATH INTERRUPT", content_width),
+            "",
+        ]
+        lines.extend(build_death_lines(continuity_state))
+        lines.extend(
+            [
+                "",
+                center_text("Press Enter to continue.", content_width),
+            ]
+        )
         draw_text_block(
             stdscr,
-            3,
-            0,
-            width,
-            height - 5,
-            build_death_lines(continuity_state),
+            5,
+            content_left,
+            content_width,
+            height - 7,
+            lines,
         )
 
     def render_continuation(self, stdscr, height, width):
         continuity_state = self.get_continuity_state()
         candidates = continuity_state["continuity_candidates"]
-        lines = [self.last_message, "", "[ Continuity Candidates ]"]
+        content_left, content_width = get_content_bounds(width, max_width=96)
+        lines = [
+            center_text("CONTINUATION", content_width),
+            "",
+            center_text(self.last_message, content_width),
+            "",
+            center_text("CONNECTED LIVING CANDIDATES", content_width),
+            "",
+        ]
         highlight_index = None
 
         if not candidates:
@@ -793,12 +903,12 @@ class ActoraTUI:
                 summary["birth_date"] = None
                 summary["death_date"] = None
                 summary["death_reason"] = None
-                line = " | ".join(build_person_card_lines(summary)[:5])
-                if len(lines) == 3 + self.continuation_selection:
+                line = " · ".join(build_person_card_lines(summary)[:4])
+                if len(lines) == 6 + self.continuation_selection:
                     highlight_index = len(lines)
                 lines.append(line)
 
-        draw_text_block(stdscr, 3, 0, width, height - 5, lines, highlight_index=highlight_index)
+        draw_text_block(stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
 
     def render(self, stdscr):
         stdscr.erase()
