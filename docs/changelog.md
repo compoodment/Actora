@@ -1,5 +1,15 @@
 # Actora Changelog
 
+## Version 0.36.7 (Patch) - 2026-03-29
+- **Life View + Lineage Usability Cleanup:**
+    - Reworked the main alive-state TUI in `main.py` into a lighter split `Life View`, keeping identity/location/stats/relationships on the left and recent activity on the right so events remain visible during ordinary play.
+    - Added simple vertical scrolling for the left-side Life View info stack so lower-priority sections like relationships are no longer silently cut off under tighter terminal heights.
+    - Slimmed lineage browser rows down to name, relationship, alive/dead status, and age for faster scanning and less truncation noise.
+    - Clarified lineage identity formatting in the detail pane with explicit labeled lines for `Species`, `Sex`, and `Gender`.
+    - Fixed lineage search-mode exit handling so `Esc` cancels search first instead of immediately behaving like a full lineage back action.
+    - Reduced visible dependence on `Esc` for back navigation by promoting `[B] Back` in lineage and skip-time footer hints while keeping `Esc` as a compatibility path.
+    - Added `docs/planning/live-issues.txt` as a repo-local place to track current bugs, regressions, and revisit items without losing them between patches.
+
 ## Version 0.36.6 (Patch) - 2026-03-29
 - **TUI Visual-System Consistency Pass:**
     - Reworked the current curses shell in `main.py` around a stronger centered visual system with a centered `Actora` header rule, centered subtitle/date rhythm, and more deliberate content-column composition instead of dumping most screens against the left edge.

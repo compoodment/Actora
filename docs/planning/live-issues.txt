@@ -1,0 +1,35 @@
+Live Issues / Revisit Tracker
+Date: 2026-03-29
+Purpose: repo-local parking lot for current bugs, regressions, and revisit items so they do not get lost between patches.
+
+- skip-time Esc/back UX lag concern
+  Status: open
+  Note: visible back guidance now favors `B`, but real-terminal feel around leaving skip-time should keep being watched during smoke passes.
+
+- lineage search exit behavior
+  Status: resolved in v0.36.7
+  Note: `Esc` now exits lineage search mode first instead of immediately also acting like a full lineage back.
+
+- lineage row overstuffing
+  Status: resolved in v0.36.7
+  Note: lineage rows were reduced to name, relationship, alive/dead, and age.
+
+- lineage identity formatting confusion
+  Status: resolved in v0.36.7
+  Note: lineage detail now uses an explicit `Identity` block with labeled `Species`, `Sex`, and `Gender` lines.
+
+- Life View event visibility regression
+  Status: resolved in v0.36.7
+  Note: the main ordinary-play TUI now keeps recent activity visible in the right pane.
+
+- Life View content cutoff / scrollability need
+  Status: partially resolved in v0.36.7
+  Note: simple left-pane vertical scrolling exists now; fancier tabs/section systems remain later if still justified.
+
+- planning-doc simplification / possible merge of actionable-summary + working-ideas-register later
+  Status: open revisit
+  Note: current planning docs still overlap more than ideal and may want a later simplification pass once the current TUI cleanup churn settles.
+
+- old-age mortality still missing as real simulation truth
+  Status: later / not part of v0.36.7
+  Note: this remains intentionally out of scope for this patch and should land only as actual simulation truth, not as UI-only theater.

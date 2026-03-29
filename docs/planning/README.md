@@ -11,5 +11,6 @@ Use this folder for:
 Files:
 - `working-ideas-register.txt`
 - `actionable-summary.txt`
+- `live-issues.txt`
 
 Rule: planning docs are useful, but they do not outrank the stable source stack or verified repo truth.

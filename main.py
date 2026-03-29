@@ -17,11 +17,9 @@ LINEAGE_FILTER_LABELS = {
     "living": "Living",
     "dead": "Dead",
 }
+MAIN_LEFT_SECTION_KEYS = ("identity", "location", "statistics", "relationships")
 BACK_KEYS = {
     27,
-    curses.KEY_BACKSPACE,
-    127,
-    8,
 }
 
 
@@ -47,8 +45,9 @@ def build_snapshot_sections(snapshot_data):
     statistics = snapshot_data["statistics"]
     relationships = snapshot_data["relationships"]
 
-    return [
+    section_pairs = [
         (
+            "identity",
             "Identity",
             [
                 f"Name: {identity['full_name']}",
@@ -60,12 +59,14 @@ def build_snapshot_sections(snapshot_data):
             ],
         ),
         (
+            "time",
             "Time",
             [
                 f"Sim Date: Year {time_state['year']}, Month {time_state['month']}",
             ],
         ),
         (
+            "location",
             "Location",
             [
                 f"World Body: {location['world_body_name']}",
@@ -74,6 +75,7 @@ def build_snapshot_sections(snapshot_data):
             ],
         ),
         (
+            "statistics",
             "Statistics",
             [
                 f"Health: {statistics['health']}",
@@ -83,12 +85,17 @@ def build_snapshot_sections(snapshot_data):
             ],
         ),
         (
+            "relationships",
             "Relationships",
             [
                 f"Mother: {relationships['mother_name']}",
                 f"Father: {relationships['father_name']}",
             ],
         ),
+    ]
+    return [
+        {"key": key, "title": title, "lines": lines}
+        for key, title, lines in section_pairs
     ]
 
 
@@ -278,6 +285,16 @@ def draw_truncated_block(stdscr, start_y, start_x, width, height, lines, *, high
     return y
 
 
+def get_scroll_window(lines, height, offset):
+    """Returns the visible slice for a simple vertical scroll window."""
+    if height <= 0:
+        return [], 0, 0, 0
+    total_lines = len(lines)
+    max_offset = max(0, total_lines - height)
+    offset = max(0, min(offset, max_offset))
+    return lines[offset : offset + height], offset, max_offset, total_lines
+
+
 def draw_vertical_divider(stdscr, top, left, height, char="│"):
     """Draws one light vertical divider for layout separation without boxing the whole screen."""
     if height <= 0:
@@ -368,12 +385,7 @@ def build_person_card_lines(summary):
 def build_lineage_row(entry):
     """Builds one compact lineage browser row."""
     status_label = "Alive" if entry["is_alive"] else "Dead"
-    age_label = f"Age {entry['age']}" if entry["is_alive"] else f"Died at {entry['age']}"
-    branch_label = entry.get("family_branch_label") or "Linked"
-    return (
-        f"{entry['full_name']} · {entry['relationship_label']} · {status_label} · "
-        f"{age_label} · {entry['current_place_name']} · {branch_label}"
-    )
+    return f"{entry['full_name']} · {entry['relationship_label']} · {status_label} · Age {entry['age']}"
 
 
 class ActoraTUI:
@@ -392,6 +404,7 @@ class ActoraTUI:
         self.lineage_filter_mode = "all"
         self.lineage_search_text = ""
         self.lineage_search_active = False
+        self.main_left_scroll = 0
         self.last_message = "A/Enter advances one month."
         self.last_event_lines = [
             "Recent Activity",
@@ -537,6 +550,33 @@ class ActoraTUI:
         self.screen_name = "lineage"
         self.last_message = "Browsing lineage archive."
 
+    def scroll_main_left(self, delta):
+        snapshot_sections = build_snapshot_sections(self.get_snapshot_data())
+        scrollable_lines = self.build_main_left_lines(snapshot_sections, include_time=False)
+        visible_height = self.main_body_height
+        if visible_height <= 0:
+            visible_height = 1
+        _, next_offset, _, _ = get_scroll_window(scrollable_lines, visible_height, self.main_left_scroll + delta)
+        if next_offset != self.main_left_scroll:
+            self.main_left_scroll = next_offset
+            self.last_message = "Scrolled Life View details."
+
+    @property
+    def main_body_height(self):
+        return getattr(self, "_main_body_height", 0)
+
+    def build_main_left_lines(self, snapshot_sections, *, include_time):
+        lines = []
+        for section in snapshot_sections:
+            if not include_time and section["key"] == "time":
+                continue
+            lines.append(section["title"])
+            lines.extend(section["lines"])
+            lines.append("")
+        if lines and lines[-1] == "":
+            lines.pop()
+        return lines
+
     def acknowledge_death(self):
         continuity_state = self.get_continuity_state()
         self.continuation_selection = 0
@@ -581,12 +621,16 @@ class ActoraTUI:
             self.open_skip_time()
         elif key in (ord("l"), ord("L")):
             self.open_lineage()
+        elif key == curses.KEY_UP:
+            self.scroll_main_left(-1)
+        elif key == curses.KEY_DOWN:
+            self.scroll_main_left(1)
 
     def handle_lineage_key(self, key):
         if self.lineage_search_active:
             if key == 27:
                 self.lineage_search_active = False
-                self.last_message = "Lineage search canceled."
+                self.last_message = "Returned to lineage results."
                 return
             if key in (curses.KEY_ENTER, 10, 13):
                 self.lineage_search_active = False
@@ -610,7 +654,7 @@ class ActoraTUI:
                 return
 
         lineage_entries = self.get_lineage_entries()
-        if key in BACK_KEYS or key in (ord("q"), ord("Q")):
+        if key in (ord("b"), ord("B")) or key in BACK_KEYS or key in (ord("q"), ord("Q")):
             self.screen_name = "main"
             self.lineage_search_active = False
             self.last_message = "Returned to actor view."
@@ -626,7 +670,7 @@ class ActoraTUI:
             return
         if key == ord("/"):
             self.lineage_search_active = True
-            self.last_message = "Type to search lineage names. Enter confirms. Esc cancels."
+            self.last_message = "Type to search lineage names. Enter confirms. Esc cancels search."
             return
         if key == curses.KEY_BACKSPACE or key in (127, 8):
             self.clear_lineage_search()
@@ -649,7 +693,7 @@ class ActoraTUI:
             self.acknowledge_death()
 
     def handle_skip_time_key(self, key):
-        if key == 27 or key in (ord("q"), ord("Q")):
+        if key in (ord("b"), ord("B"), 27) or key in (ord("q"), ord("Q")):
             self.screen_name = "main"
             self.last_message = "Returned to actor view."
             return
@@ -699,12 +743,14 @@ class ActoraTUI:
     def render_footer(self, stdscr, height, width):
         footer_hints = {
             "main": "[A] Advance   [S] Skip Time   [L] Lineage   [Q] Quit",
-            "lineage": "[↑↓] Move   [A] All   [L] Living   [D] Dead   [/] Search   [Bksp] Clear   [Esc] Back",
-            "skip_time": "[↑↓] Preset   [0-9] Custom   [Bksp] Erase   [Enter] Confirm   [Esc] Back",
+            "lineage": "[↑↓] Move   [A] All   [L] Living   [D] Dead   [/] Search   [B] Back",
+            "lineage_search": "Type search   [Enter] Confirm   [Esc] Exit Search",
+            "skip_time": "[↑↓] Preset   [0-9] Custom   [Bksp] Erase   [Enter] Confirm   [B] Back",
             "death_ack": "[Enter] Continue   [Q] Quit",
             "continuation": "[↑↓] Move   [Enter] Continue   [Q] Quit",
         }
-        footer_text = footer_hints.get(self.screen_name, "")
+        footer_key = "lineage_search" if self.screen_name == "lineage" and self.lineage_search_active else self.screen_name
+        footer_text = footer_hints.get(footer_key, "")
         content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
         hline_char = getattr(curses, "ACS_HLINE", ord("-"))
         stdscr.hline(height - 2, content_left, hline_char, content_width)
@@ -734,17 +780,43 @@ class ActoraTUI:
     def render_main(self, stdscr, height, width):
         snapshot_data = self.get_snapshot_data()
         snapshot_sections = build_snapshot_sections(snapshot_data)
-        content_left, content_width = get_content_bounds(width)
-        lines = [center_text(self.last_message, content_width), ""]
-        for section_title, section_lines in snapshot_sections:
-            lines.append(center_text(section_title.upper(), content_width))
-            lines.append("")
-            lines.extend(f"  {line}" for line in section_lines)
-            lines.append("")
-        lines.append(center_text("RECENT ACTIVITY", content_width))
-        lines.append("")
-        lines.extend(self.last_event_lines[1:] if self.last_event_lines[:1] == ["Recent Activity"] else self.last_event_lines)
-        draw_text_block(stdscr, 4, content_left, content_width, height - 6, lines)
+        top = 4
+        body_height = height - 6
+        self._main_body_height = body_height
+        content_left, content_width = get_content_bounds(width, max_width=112)
+        left_width, right_left, right_width = split_centered_columns(content_left, content_width, left_ratio=0.5)
+        divider_x = right_left - 2
+
+        left_sections = [
+            section
+            for section in snapshot_sections
+            if section["key"] in MAIN_LEFT_SECTION_KEYS
+        ]
+        left_lines = [self.last_message, ""]
+        left_lines.extend(self.build_main_left_lines(left_sections, include_time=False))
+        visible_left_lines, self.main_left_scroll, main_left_max_offset, total_left_lines = get_scroll_window(
+            left_lines,
+            body_height,
+            self.main_left_scroll,
+        )
+        right_lines = ["Recent Activity", ""]
+        right_lines.extend(
+            self.last_event_lines[1:] if self.last_event_lines[:1] == ["Recent Activity"] else self.last_event_lines
+        )
+
+        draw_text_block(stdscr, top, content_left, left_width, body_height, visible_left_lines)
+        draw_vertical_divider(stdscr, top, divider_x, body_height)
+        draw_text_block(stdscr, top, right_left, right_width, body_height, right_lines)
+
+        if main_left_max_offset > 0:
+            scroll_label = f"More details: {self.main_left_scroll + 1}-{self.main_left_scroll + len(visible_left_lines)} / {total_left_lines}"
+            stdscr.addnstr(
+                min(height - 3, top + body_height - 1),
+                content_left,
+                truncate_for_width(scroll_label, left_width),
+                left_width,
+                curses.A_DIM,
+            )
 
     def render_lineage(self, stdscr, height, width):
         browser_state = self.get_lineage_browser_state()
@@ -801,7 +873,10 @@ class ActoraTUI:
             right_lines.extend(
                 [
                     "",
-                    f"Identity: {summary['species']}   {summary['sex']}   {summary['gender']}",
+                    "Identity",
+                    f"Species: {summary['species']}",
+                    f"Sex: {summary['sex']}",
+                    f"Gender: {summary['gender']}",
                     f"Condition: Health {summary['health']}   Happiness {summary['happiness']}   Intelligence {summary['intelligence']}",
                     f"Resources: ${summary['money']}",
                     "",

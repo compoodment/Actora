@@ -1,6 +1,6 @@
 # Actora Architecture Summary
 
-**Version:** 0.36.6
+**Version:** 0.36.7
 **Last Updated:** 2026-03-29
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
@@ -314,14 +314,14 @@ Current shell-level functions:
 - `build_death_lines(...)` — shell-owned dead-focus interrupt copy assembly
 - `build_screen_chrome(...)` — shell-owned title/subtitle/date chrome assembly for the current TUI screen
 - `draw_text_block(...)` — small curses text rendering helper with wrapping support
-- `ActoraTUI` — narrow curses shell object managing the main actor view, styled header/footer chrome, lineage list/detail, skip-time selection, death acknowledgment, continuation selection, and safe footer rendering that avoids writing into the terminal’s last column
+- `ActoraTUI` — narrow curses shell object managing the split Life View, styled header/footer chrome, lineage list/detail, skip-time selection, death acknowledgment, continuation selection, simple left-pane scrolling, and safe footer rendering that avoids writing into the terminal’s last column
 - `safe_input(prompt)` — narrow shared CLI input boundary helper that exits cleanly on `EOFError` and `KeyboardInterrupt`
 - `create_character()` — character creation prompts and input validation
 - `setup_initial_world(...)` — World creation, parent identity generation, startup actor entry delegation through world-owned helpers (`create_human_actor(...)` and `create_human_child_with_parents(...)`), and initial focused-actor assignment through `World.set_focused_actor(...)`
 - `run_game_tui(...)` — curses wrapper entry point for ordinary play
 - `start_game()` — top-level orchestration (banner, then delegates to the above)
 
-Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Once startup completes, ordinary play now lives inside a narrow curses shell: the main actor screen stays visible beneath a styled header bar, `A`/`Enter` advances one month, `S` opens the shell-owned skip-time screen, `L` opens lineage browsing, and alive-state snapshot rendering still stays narrow without exposing the structural-state block. Dead focus is still presented first as a dedicated shell interrupt before any continuation choices are shown.
+Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Once startup completes, ordinary play now lives inside a narrow curses shell: the split `Life View` keeps identity/location/stats/relationships on the left, keeps recent activity visible on the right, allows simple left-side vertical scrolling under terminal-height pressure, still opens lineage with `L`, and still preserves the dead-focus interrupt before any continuation choices are shown.
 
 ### `identity.py`
 Responsible for:
@@ -487,11 +487,13 @@ Current advancement behavior:
 - `Enter` in the skip-time screen advances using the typed custom month count when present; otherwise it advances using the currently highlighted preset
 - skip-time selection remains shell-owned and still delegates actual advancement to `World.simulate_advance_turn(...)`, so larger jumps continue to process month-by-month internally
 - `L` opens lineage browsing from the persistent actor screen
+- `B` is the visible back hint in skip-time and lineage, while `Esc` remains a compatibility path
 - `Q` exits the run from the TUI
 - ordinary play no longer requires typed `lineage`, `back`, or `quit` command words
 
 ### Events
 Current event behavior:
+- Life View keeps recent activity visible in a stable right-hand pane while ordinary-play identity/location/stats/relationships stay on the left
 - events are processed monthly
 - 50% chance to generate an event each month
 - events are filtered by life stage, min_age_months, and max_age_months
@@ -520,7 +522,7 @@ Current snapshots display:
 - statistics (health, happiness, intelligence, money)
 - family references (mother, father), still resolved from the world layer
 - structural state remains internal to the current ordinary-play snapshot flow and is not rendered during ordinary alive play; structural death/continuity handling is surfaced separately when relevant
-- the curses shell now adds restrained chrome through a styled title/date header, bracketed section emphasis, and screen-specific framing without restoring the older large shell banners inside ordinary play
+- the curses shell now adds restrained chrome through a styled title/date header, bracketed section emphasis, screen-specific framing, and simple left-pane scrolling without restoring the older large shell banners inside ordinary play
 
 ### Structural Transition / Continuity Foundation
 Current structural-transition behavior:
