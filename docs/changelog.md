@@ -1,5 +1,14 @@
 # Actora Changelog
 
+## Version 0.36.2 (Patch) - 2026-03-29
+- **TUI Style / Time-Control Follow-Through:**
+    - Kept the v0.36.1 curses shell foundation but restored some visual personality through a restrained styled header bar, clearer screen titling, date chrome, and small bracketed section framing instead of dumping large ASCII banners into ordinary play.
+    - Restored multi-month time skipping in `main.py` through a dedicated shell-owned skip-time screen opened with `S`, while preserving `A` / `Enter` as the quick one-month path from the main actor view.
+    - Added obvious preset jumps (`1`, `3`, `6`, `12`, `24`, `60` months) plus a small numeric custom-month input path so larger jumps can be chosen without typed shell commands.
+    - Kept larger skips delegating to the existing world-owned `World.simulate_advance_turn(...)` seam, so advancement still processes month-by-month internally and no simulation-core rewrite was introduced.
+    - Preserved current reveal-flow rules: alive-state still does not expose structural-state sludge, death still interrupts first, and continuation choices still appear only after acknowledgment.
+    - Preserved lineage browsing, continuation handoff flow, and the v0.36.1 footer safety fix that avoids writing into the terminal’s last column.
+
 ## Version 0.36.1 (Patch) - 2026-03-29
 - **Curses Footer Render Fix:**
     - Fixed a terminal-edge rendering bug in the new curses shell where drawing the footer to the full terminal width could raise `_curses.error: addnwstr() returned ERR` on startup in real terminals.

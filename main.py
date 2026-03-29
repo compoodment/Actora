@@ -9,6 +9,7 @@ from world import World
 
 EVENT_DETAIL_THRESHOLD = 8
 EVENT_RECENT_DISPLAY_LIMIT = 5
+SKIP_MONTH_PRESETS = (1, 3, 6, 12, 24, 60)
 INPUT_INTERRUPTED_MESSAGE = "Input interrupted. Exiting Actora."
 BACK_KEYS = {
     27,
@@ -123,7 +124,6 @@ def build_event_lines(turn_result):
 def build_death_lines(continuity_state):
     """Builds the dead-focus interrupt copy for the TUI shell."""
     lines = [
-        "Death",
         "You are dead.",
         continuity_state["focus_actor_name"],
     ]
@@ -142,6 +142,37 @@ def build_death_lines(continuity_state):
         lines.append(" | ".join(death_context_parts))
     lines.append("The universe continues.")
     return lines
+
+
+def format_sim_date(year, month):
+    """Formats one compact simulation date string."""
+    return f"Year {year}, Month {month}"
+
+
+def build_screen_chrome(screen_name, world, focused_actor_name):
+    """Builds shell-owned title/subtitle text for the current screen."""
+    title_map = {
+        "main": "Ordinary Play",
+        "lineage": "Lineage Archive",
+        "lineage_detail": "Lineage Detail",
+        "skip_time": "Skip Time",
+        "death_ack": "Death Interrupt",
+        "continuation": "Continuation",
+    }
+    subtitle_map = {
+        "main": focused_actor_name,
+        "lineage": f"Focused actor: {focused_actor_name}",
+        "lineage_detail": f"Focused actor: {focused_actor_name}",
+        "skip_time": "Choose a larger time jump or enter custom months",
+        "death_ack": "Death reveals before any continuation choice",
+        "continuation": "Continuation choices appear only after acknowledgment",
+    }
+    date_text = format_sim_date(world.current_year, world.current_month)
+    return {
+        "title": title_map.get(screen_name, "Actora"),
+        "subtitle": subtitle_map.get(screen_name, focused_actor_name),
+        "date_text": date_text,
+    }
 
 
 def wrap_text_line(text, width):
@@ -177,6 +208,8 @@ class ActoraTUI:
         self.running = True
         self.lineage_selection = 0
         self.continuation_selection = 0
+        self.skip_selection = 0
+        self.skip_custom_value = ""
         self.selected_lineage_actor_id = None
         self.last_message = "A/Enter advances one month."
         self.last_event_lines = [
@@ -225,13 +258,41 @@ class ActoraTUI:
     def get_continuity_state(self):
         return self.world.build_continuity_state_for(self.get_focused_actor_id())
 
-    def advance_one_month(self):
+    def advance_time(self, months_to_advance):
         """Advances time using the existing world-owned simulation seam."""
-        turn_result = self.world.simulate_advance_turn(self.player_id, 1)
+        turn_result = self.world.simulate_advance_turn(self.player_id, months_to_advance)
         self.last_event_lines = build_event_lines(turn_result)
-        self.last_message = "Advanced 1 month."
+        if months_to_advance == 1:
+            self.last_message = "Advanced 1 month."
+        else:
+            self.last_message = f"Advanced {months_to_advance} months."
         if turn_result["continuity_state"] is not None and not turn_result["focused_actor_alive"]:
             self.screen_name = "death_ack"
+
+    def advance_one_month(self):
+        self.advance_time(1)
+
+    def open_skip_time(self):
+        self.skip_selection = 0
+        self.skip_custom_value = ""
+        self.screen_name = "skip_time"
+        self.last_message = "Choose how far ahead to jump."
+
+    def get_selected_skip_months(self):
+        return SKIP_MONTH_PRESETS[self.skip_selection]
+
+    def get_custom_skip_months(self):
+        if not self.skip_custom_value:
+            return None
+        custom_months = int(self.skip_custom_value)
+        if custom_months <= 0:
+            return None
+        return custom_months
+
+    def confirm_skip_selection(self):
+        months_to_advance = self.get_custom_skip_months() or self.get_selected_skip_months()
+        self.screen_name = "main"
+        self.advance_time(months_to_advance)
 
     def open_lineage(self):
         self.lineage_selection = 0
@@ -288,6 +349,8 @@ class ActoraTUI:
             self.running = False
         elif key in (curses.KEY_ENTER, 10, 13, ord("a"), ord("A")):
             self.advance_one_month()
+        elif key in (ord("s"), ord("S")):
+            self.open_skip_time()
         elif key in (ord("l"), ord("L")):
             self.open_lineage()
 
@@ -317,6 +380,23 @@ class ActoraTUI:
         elif key in (curses.KEY_ENTER, 10, 13):
             self.acknowledge_death()
 
+    def handle_skip_time_key(self, key):
+        if key == 27 or key in (ord("q"), ord("Q")):
+            self.screen_name = "main"
+            self.last_message = "Returned to actor view."
+            return
+        if key == curses.KEY_UP:
+            self.skip_selection = max(0, self.skip_selection - 1)
+        elif key == curses.KEY_DOWN:
+            self.skip_selection = min(len(SKIP_MONTH_PRESETS) - 1, self.skip_selection + 1)
+        elif key in (curses.KEY_ENTER, 10, 13):
+            self.confirm_skip_selection()
+        elif key == curses.KEY_BACKSPACE or key in (127, 8):
+            self.skip_custom_value = self.skip_custom_value[:-1]
+        elif ord("0") <= key <= ord("9"):
+            if len(self.skip_custom_value) < 4:
+                self.skip_custom_value += chr(key)
+
     def handle_continuation_key(self, key):
         continuity_state = self.get_continuity_state()
         candidates = continuity_state["continuity_candidates"]
@@ -343,6 +423,8 @@ class ActoraTUI:
             self.handle_lineage_key(key)
         elif self.screen_name == "lineage_detail":
             self.handle_lineage_detail_key(key)
+        elif self.screen_name == "skip_time":
+            self.handle_skip_time_key(key)
         elif self.screen_name == "death_ack":
             self.handle_death_ack_key(key)
         elif self.screen_name == "continuation":
@@ -350,9 +432,10 @@ class ActoraTUI:
 
     def render_footer(self, stdscr, height, width):
         footer_hints = {
-            "main": "A/Enter advance   L lineage   Q quit",
+            "main": "A/Enter advance   S skip time   L lineage   Q quit",
             "lineage": "Up/Down move   Enter inspect   Esc/Backspace/Q back",
             "lineage_detail": "Esc/Backspace/Q back",
+            "skip_time": "Up/Down preset   Digits custom   Backspace erase   Enter confirm   Esc/Q back",
             "death_ack": "Enter acknowledge   Q quit",
             "continuation": "Up/Down move   Enter continue   Q quit",
         }
@@ -368,22 +451,32 @@ class ActoraTUI:
             curses.A_REVERSE,
         )
 
+    def render_header(self, stdscr, width):
+        focused_actor = self.get_focused_actor()
+        focused_actor_name = focused_actor.get_full_name() if focused_actor is not None else "Unknown"
+        chrome = build_screen_chrome(self.screen_name, self.world, focused_actor_name)
+        content_width = max(1, width - 1)
+        title_text = f" Actora :: {chrome['title']} "
+        stdscr.addnstr(0, 0, title_text.ljust(content_width), content_width, curses.A_REVERSE)
+        subtitle_text = f" {chrome['subtitle']} | {chrome['date_text']} "
+        stdscr.addnstr(1, 0, subtitle_text.ljust(content_width), content_width, curses.A_BOLD)
+        hline_char = getattr(curses, "ACS_HLINE", ord("-"))
+        stdscr.hline(2, 0, hline_char, content_width)
+
     def render_main(self, stdscr, height, width):
         snapshot_data = self.get_snapshot_data()
         snapshot_sections = build_snapshot_sections(snapshot_data)
-        identity_name = snapshot_data["identity"]["full_name"]
-
-        lines = [f"Actora | {identity_name}", self.last_message, ""]
+        lines = [self.last_message, ""]
         for section_title, section_lines in snapshot_sections:
-            lines.append(section_title)
+            lines.append(f"[ {section_title} ]")
             lines.extend(f"  {line}" for line in section_lines)
             lines.append("")
         lines.extend(self.last_event_lines)
-        draw_text_block(stdscr, 0, 0, width, height - 2, lines)
+        draw_text_block(stdscr, 3, 0, width, height - 5, lines)
 
     def render_lineage(self, stdscr, height, width):
         lineage_entries = self.get_lineage_entries()
-        lines = ["Lineage", self.last_message, ""]
+        lines = [self.last_message, "", "[ Family Links ]"]
         highlight_index = None
 
         if not lineage_entries:
@@ -406,7 +499,7 @@ class ActoraTUI:
                     highlight_index = len(lines)
                 lines.append(line)
 
-        draw_text_block(stdscr, 0, 0, width, height - 2, lines, highlight_index=highlight_index)
+        draw_text_block(stdscr, 3, 0, width, height - 5, lines, highlight_index=highlight_index)
 
     def render_lineage_detail(self, stdscr, height, width):
         lineage_detail = self.get_lineage_detail()
@@ -418,8 +511,9 @@ class ActoraTUI:
         summary = lineage_detail["summary"]
         records = lineage_detail["records"]
         lines = [
-            f"Lineage Detail | {summary['full_name']}",
+            summary["full_name"],
             "",
+            "[ Identity ]",
             f"Relationship: {summary['relationship_label']}",
             f"Species: {summary['species']}",
             f"Sex: {summary['sex']}",
@@ -440,13 +534,13 @@ class ActoraTUI:
             [
                 f"Place: {summary['current_place_name']}",
                 "",
-                "Core Statistics",
+                "[ Core Statistics ]",
                 f"  Health: {summary['health']}",
                 f"  Happiness: {summary['happiness']}",
                 f"  Intelligence: {summary['intelligence']}",
                 f"  Money: ${summary['money']}",
                 "",
-                "Recent Records",
+                "[ Recent Records ]",
             ]
         )
         if not records:
@@ -457,23 +551,54 @@ class ActoraTUI:
                     f"  [{record['year']:04d}-{record['month']:02d}] "
                     f"({record['record_type']}) {record['text']}"
                 )
-        draw_text_block(stdscr, 0, 0, width, height - 2, lines)
+        draw_text_block(stdscr, 3, 0, width, height - 5, lines)
+
+    def render_skip_time(self, stdscr, height, width):
+        custom_months = self.get_custom_skip_months()
+        selected_months = self.get_selected_skip_months()
+        lines = [
+            self.last_message,
+            "",
+            "[ Presets ]",
+        ]
+        highlight_index = 3 + self.skip_selection
+        for preset_months in SKIP_MONTH_PRESETS:
+            marker = ">" if preset_months == selected_months else " "
+            label = "month" if preset_months == 1 else "months"
+            lines.append(f"{marker} {preset_months:>2} {label}")
+        lines.extend(
+            [
+                "",
+                "[ Custom Months ]",
+                (
+                    f"Typed value: {self.skip_custom_value} months"
+                    if self.skip_custom_value
+                    else "Typed value: none"
+                ),
+                (
+                    f"Enter will advance {custom_months} months from the custom value."
+                    if custom_months is not None
+                    else f"Enter will advance {selected_months} months from the selected preset."
+                ),
+            ]
+        )
+        draw_text_block(stdscr, 3, 0, width, height - 5, lines, highlight_index=highlight_index)
 
     def render_death_ack(self, stdscr, height, width):
         continuity_state = self.get_continuity_state()
         draw_text_block(
             stdscr,
-            0,
+            3,
             0,
             width,
-            height - 2,
+            height - 5,
             build_death_lines(continuity_state),
         )
 
     def render_continuation(self, stdscr, height, width):
         continuity_state = self.get_continuity_state()
         candidates = continuity_state["continuity_candidates"]
-        lines = ["Continuation", self.last_message, ""]
+        lines = [self.last_message, "", "[ Continuity Candidates ]"]
         highlight_index = None
 
         if not candidates:
@@ -494,21 +619,24 @@ class ActoraTUI:
                     highlight_index = len(lines)
                 lines.append(line)
 
-        draw_text_block(stdscr, 0, 0, width, height - 2, lines, highlight_index=highlight_index)
+        draw_text_block(stdscr, 3, 0, width, height - 5, lines, highlight_index=highlight_index)
 
     def render(self, stdscr):
         stdscr.erase()
         height, width = stdscr.getmaxyx()
-        if height < 12 or width < 50:
+        if height < 16 or width < 50:
             stdscr.addnstr(0, 0, "Terminal too small for Actora TUI. Resize and try again.", width - 1)
             return
 
+        self.render_header(stdscr, width)
         if self.screen_name == "main":
             self.render_main(stdscr, height, width)
         elif self.screen_name == "lineage":
             self.render_lineage(stdscr, height, width)
         elif self.screen_name == "lineage_detail":
             self.render_lineage_detail(stdscr, height, width)
+        elif self.screen_name == "skip_time":
+            self.render_skip_time(stdscr, height, width)
         elif self.screen_name == "death_ack":
             self.render_death_ack(stdscr, height, width)
         elif self.screen_name == "continuation":

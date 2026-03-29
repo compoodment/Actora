@@ -1,6 +1,6 @@
 # Actora Architecture Summary
 
-**Version:** 0.36.0
+**Version:** 0.36.2
 **Last Updated:** 2026-03-29
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
@@ -308,15 +308,16 @@ Current shell-level functions:
 - `build_snapshot_sections(...)` — shell-owned transformation from structured snapshot data into TUI-ready section lines
 - `build_event_lines(...)` — shell-owned event summary formatting with the current detail/summary thresholds
 - `build_death_lines(...)` — shell-owned dead-focus interrupt copy assembly
+- `build_screen_chrome(...)` — shell-owned title/subtitle/date chrome assembly for the current TUI screen
 - `draw_text_block(...)` — small curses text rendering helper with wrapping support
-- `ActoraTUI` — narrow curses shell object managing the main actor view, lineage list/detail, death acknowledgment, continuation selection, and safe footer rendering that avoids writing into the terminal’s last column
+- `ActoraTUI` — narrow curses shell object managing the main actor view, styled header/footer chrome, lineage list/detail, skip-time selection, death acknowledgment, continuation selection, and safe footer rendering that avoids writing into the terminal’s last column
 - `safe_input(prompt)` — narrow shared CLI input boundary helper that exits cleanly on `EOFError` and `KeyboardInterrupt`
 - `create_character()` — character creation prompts and input validation
 - `setup_initial_world(...)` — World creation, parent identity generation, startup actor entry delegation through world-owned helpers (`create_human_actor(...)` and `create_human_child_with_parents(...)`), and initial focused-actor assignment through `World.set_focused_actor(...)`
 - `run_game_tui(...)` — curses wrapper entry point for ordinary play
 - `start_game()` — top-level orchestration (banner, then delegates to the above)
 
-Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Once startup completes, ordinary play now lives inside a narrow curses shell: the main actor screen stays visible, `A`/`Enter` advances one month, `L` opens lineage browsing, and alive-state snapshot rendering still stays narrow without exposing the structural-state block. Dead focus is still presented first as a dedicated shell interrupt before any continuation choices are shown.
+Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Once startup completes, ordinary play now lives inside a narrow curses shell: the main actor screen stays visible beneath a styled header bar, `A`/`Enter` advances one month, `S` opens the shell-owned skip-time screen, `L` opens lineage browsing, and alive-state snapshot rendering still stays narrow without exposing the structural-state block. Dead focus is still presented first as a dedicated shell interrupt before any continuation choices are shown.
 
 ### `identity.py`
 Responsible for:
@@ -424,19 +425,20 @@ This function does not perform terminal input, output, or presentation formattin
 6. Render the initial focused-actor snapshot screen.
 7. Read one key-driven TUI action.
 8. Resolve advance, lineage browse, continuation selection, back, or quit.
-9. Call `World.simulate_advance_turn(...)` when advancing.
-10. Advance time internally month-by-month.
-11. Apply triggered event outcomes through `World.apply_outcome(...)`.
-12. Collect triggered structured events.
-13. Re-render the updated focused-actor snapshot screen.
-14. Render event output by combining structured `year`, `month`, and raw event `text`.
+9. If the player requests a larger jump, resolve the shell-owned skip-time selection first.
+10. Call `World.simulate_advance_turn(...)` when advancing.
+11. Advance time internally month-by-month.
+12. Apply triggered event outcomes through `World.apply_outcome(...)`.
+13. Collect triggered structured events.
+14. Re-render the updated focused-actor snapshot screen.
+15. Render event output by combining structured `year`, `month`, and raw event `text`.
     - Small event counts are shown as full dated lines.
     - Large event counts are summarized with a total count, a recent-event subset, and an omitted-older-events line.
     - Triggered monthly events are also preserved as structured world-owned records in addition to current terminal rendering.
-15. If the focused actor is dead, render the dedicated death interrupt first.
-16. Require acknowledgment before rendering any continuation choices.
-17. Resolve continuation handoff or end the run cleanly.
-18. Return to step 7.
+16. If the focused actor is dead, render the dedicated death interrupt first.
+17. Require acknowledgment before rendering any continuation choices.
+18. Resolve continuation handoff or end the run cleanly.
+19. Return to step 7.
 
 ## 9. Current Gameplay Behavior
 
@@ -471,6 +473,10 @@ Current initialization behavior:
 ### Time Advancement
 Current advancement behavior:
 - `A` or `Enter` advances 1 month from the persistent actor screen
+- `S` opens a shell-owned skip-time screen from the persistent actor screen
+- the skip-time screen currently offers clear preset jumps (`1`, `3`, `6`, `12`, `24`, `60` months) plus a small numeric custom-month input path
+- `Enter` in the skip-time screen advances using the typed custom month count when present; otherwise it advances using the currently highlighted preset
+- skip-time selection remains shell-owned and still delegates actual advancement to `World.simulate_advance_turn(...)`, so larger jumps continue to process month-by-month internally
 - `L` opens lineage browsing from the persistent actor screen
 - `Q` exits the run from the TUI
 - ordinary play no longer requires typed `lineage`, `back`, or `quit` command words
@@ -505,6 +511,7 @@ Current snapshots display:
 - statistics (health, happiness, intelligence, money)
 - family references (mother, father), still resolved from the world layer
 - structural state remains internal to the current ordinary-play snapshot flow and is not rendered during ordinary alive play; structural death/continuity handling is surfaced separately when relevant
+- the curses shell now adds restrained chrome through a styled title/date header, bracketed section emphasis, and screen-specific framing without restoring the older large shell banners inside ordinary play
 
 ### Structural Transition / Continuity Foundation
 Current structural-transition behavior:
@@ -555,11 +562,13 @@ After patching, verify:
 - startup still works
 - character creation still works
 - TUI advancement input still works
+- TUI multi-month skip input still works
 - quit still works
 - snapshot output still renders correctly in the curses shell
 - origin/care/bootstrap family-link semantics remain explicit in `World.links` without implying broader relationship systems
 - events still trigger and display correctly (with correct date prefixes rendered by main.py)
 - month-by-month advancement still behaves correctly
+- larger skip requests still behave correctly while advancing internally month-by-month
 - focused actor assignment works correctly at startup
 - lineage browsing still works through the shell without typed command words
 - direct structural death transition testing correctly updates actor state, preserves the actor in `World.actors`, writes a `death` record, and returns sensible continuity candidates from living linked actors
