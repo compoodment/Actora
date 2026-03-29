@@ -9,8 +9,14 @@ from world import World
 
 EVENT_DETAIL_THRESHOLD = 8
 EVENT_RECENT_DISPLAY_LIMIT = 5
+LINEAGE_RECORD_LIMIT = 6
 SKIP_MONTH_PRESETS = (1, 3, 6, 12, 24, 60)
 INPUT_INTERRUPTED_MESSAGE = "Input interrupted. Exiting Actora."
+LINEAGE_FILTER_LABELS = {
+    "all": "All",
+    "living": "Living",
+    "dead": "Dead",
+}
 BACK_KEYS = {
     27,
     curses.KEY_BACKSPACE,
@@ -153,8 +159,7 @@ def build_screen_chrome(screen_name, world, focused_actor_name):
     """Builds shell-owned title/subtitle text for the current screen."""
     title_map = {
         "main": "Ordinary Play",
-        "lineage": "Lineage Archive",
-        "lineage_detail": "Lineage Detail",
+        "lineage": "Lineage Browser",
         "skip_time": "Skip Time",
         "death_ack": "Death Interrupt",
         "continuation": "Continuation",
@@ -162,7 +167,6 @@ def build_screen_chrome(screen_name, world, focused_actor_name):
     subtitle_map = {
         "main": focused_actor_name,
         "lineage": f"Focused actor: {focused_actor_name}",
-        "lineage_detail": f"Focused actor: {focused_actor_name}",
         "skip_time": "Choose a larger time jump or enter custom months",
         "death_ack": "Death reveals before any continuation choice",
         "continuation": "Continuation choices appear only after acknowledgment",
@@ -198,6 +202,86 @@ def draw_text_block(stdscr, start_y, start_x, width, height, lines, *, highlight
     return y
 
 
+def draw_box(stdscr, top, left, height, width, *, title=None):
+    """Draws one light box frame using ASCII-safe characters."""
+    if height < 2 or width < 2:
+        return
+
+    inner_width = max(0, width - 2)
+    horizontal = "-" * inner_width
+    stdscr.addnstr(top, left, "+" + horizontal + "+", width)
+    for row in range(top + 1, top + height - 1):
+        stdscr.addnstr(row, left, "|", 1)
+        if inner_width > 0:
+            stdscr.addnstr(row, left + 1, " " * inner_width, inner_width)
+        stdscr.addnstr(row, left + width - 1, "|", 1)
+    stdscr.addnstr(top + height - 1, left, "+" + horizontal + "+", width)
+
+    if title and width > 4:
+        title_text = f"[ {title} ]"
+        stdscr.addnstr(top, left + 2, title_text[: max(0, width - 4)], max(0, width - 4), curses.A_BOLD)
+
+
+def draw_panel_text(stdscr, top, left, height, width, lines, *, highlight_index=None):
+    """Draws wrapped text inside a boxed panel."""
+    if height < 3 or width < 3:
+        return
+
+    y = top + 1
+    inner_height = height - 2
+    inner_width = width - 2
+    for index, raw_line in enumerate(lines):
+        wrapped_lines = wrap_text_line(raw_line, inner_width)
+        attr = curses.A_REVERSE if highlight_index == index else curses.A_NORMAL
+        for wrapped_line in wrapped_lines:
+            if y >= top + 1 + inner_height:
+                return
+            stdscr.addnstr(y, left + 1, wrapped_line.ljust(inner_width), inner_width, attr)
+            y += 1
+
+
+def build_person_card_lines(summary):
+    """Builds a reusable person-card line set for lineage and continuity views."""
+    status_label = "Alive" if summary.get("is_alive") else "Dead"
+    age_label = "Age" if summary.get("is_alive") else "Age at Death"
+    lines = [
+        summary.get("full_name", "Unknown"),
+        f"Relationship: {summary.get('relationship_label', 'Connected')}",
+        f"Status: {status_label}",
+        f"{age_label}: {summary.get('age', '?')} ({summary.get('life_stage', 'Unknown')})",
+        f"Place: {summary.get('current_place_name') or 'Unknown'}",
+    ]
+
+    family_branch_label = summary.get("family_branch_label")
+    if family_branch_label:
+        lines.append(f"Family Side: {family_branch_label}")
+
+    birth_date = summary.get("birth_date")
+    if birth_date:
+        lines.append(f"Born: {birth_date}")
+
+    death_date = summary.get("death_date")
+    if death_date:
+        lines.append(f"Died: {death_date}")
+
+    death_reason = summary.get("death_reason")
+    if death_reason:
+        lines.append(f"Cause: {death_reason}")
+
+    return lines
+
+
+def build_lineage_row(entry):
+    """Builds one compact lineage browser row."""
+    status_label = "ALIVE" if entry["is_alive"] else "DEAD"
+    age_label = f"Age {entry['age']}" if entry["is_alive"] else f"Died at {entry['age']}"
+    branch_label = entry.get("family_branch_label") or "Linked"
+    return (
+        f"{entry['full_name']} | {entry['relationship_label']} | {status_label} | "
+        f"{age_label} | {entry['current_place_name']} | {branch_label}"
+    )
+
+
 class ActoraTUI:
     """Small actor-first curses shell layered on top of the existing world seams."""
 
@@ -211,6 +295,9 @@ class ActoraTUI:
         self.skip_selection = 0
         self.skip_custom_value = ""
         self.selected_lineage_actor_id = None
+        self.lineage_filter_mode = "all"
+        self.lineage_search_text = ""
+        self.lineage_search_active = False
         self.last_message = "A/Enter advances one month."
         self.last_event_lines = [
             "Recent Activity",
@@ -244,16 +331,71 @@ class ActoraTUI:
         if self.screen_name not in {"death_ack", "continuation"}:
             self.screen_name = "death_ack"
 
-    def get_lineage_entries(self):
-        return self.world.get_lineage_entries_for(self.get_focused_actor_id())
+    def get_lineage_browser_state(self):
+        browser_state = self.world.get_lineage_browser_data_for(
+            self.get_focused_actor_id(),
+            filter_mode=self.lineage_filter_mode,
+            search_text=self.lineage_search_text,
+            recent_record_limit=LINEAGE_RECORD_LIMIT,
+        )
 
-    def get_lineage_detail(self):
-        if self.selected_lineage_actor_id is None:
-            return None
-        return self.world.get_lineage_detail_for(
+        entries = browser_state["entries"]
+        if not entries:
+            self.lineage_selection = 0
+            self.selected_lineage_actor_id = None
+            browser_state["selected_detail"] = None
+            return browser_state
+
+        if self.selected_lineage_actor_id is not None:
+            matching_index = next(
+                (
+                    index
+                    for index, entry in enumerate(entries)
+                    if entry["actor_id"] == self.selected_lineage_actor_id
+                ),
+                None,
+            )
+            if matching_index is not None:
+                self.lineage_selection = matching_index
+            else:
+                self.lineage_selection = 0
+                self.selected_lineage_actor_id = entries[0]["actor_id"]
+        else:
+            self.lineage_selection = max(0, min(self.lineage_selection, len(entries) - 1))
+            self.selected_lineage_actor_id = entries[self.lineage_selection]["actor_id"]
+
+        browser_state["selected_detail"] = self.world.get_lineage_detail_for(
             self.get_focused_actor_id(),
             self.selected_lineage_actor_id,
+            recent_record_limit=LINEAGE_RECORD_LIMIT,
         )
+        return browser_state
+
+    def get_lineage_entries(self):
+        return self.get_lineage_browser_state()["entries"]
+
+    def get_lineage_detail(self):
+        return self.get_lineage_browser_state()["selected_detail"]
+
+    def set_lineage_filter_mode(self, filter_mode):
+        self.lineage_filter_mode = filter_mode
+        self.lineage_selection = 0
+        self.selected_lineage_actor_id = None
+        self.last_message = f"Lineage filter: {LINEAGE_FILTER_LABELS[filter_mode]}."
+
+    def clear_lineage_search(self):
+        if self.lineage_search_text:
+            self.lineage_search_text = ""
+            self.lineage_selection = 0
+            self.selected_lineage_actor_id = None
+            self.last_message = "Lineage search cleared."
+
+    def get_lineage_search_status(self):
+        if self.lineage_search_active:
+            return f"Search: {self.lineage_search_text}_"
+        if self.lineage_search_text:
+            return f"Search: {self.lineage_search_text}"
+        return "Search: off"
 
     def get_continuity_state(self):
         return self.world.build_continuity_state_for(self.get_focused_actor_id())
@@ -297,17 +439,9 @@ class ActoraTUI:
     def open_lineage(self):
         self.lineage_selection = 0
         self.selected_lineage_actor_id = None
+        self.lineage_search_active = False
         self.screen_name = "lineage"
-        self.last_message = "Browsing lineage."
-
-    def open_lineage_detail(self):
-        lineage_entries = self.get_lineage_entries()
-        if not lineage_entries:
-            self.last_message = "No family-linked lineage entries were found."
-            return
-        self.lineage_selection = max(0, min(self.lineage_selection, len(lineage_entries) - 1))
-        self.selected_lineage_actor_id = lineage_entries[self.lineage_selection]["actor_id"]
-        self.screen_name = "lineage_detail"
+        self.last_message = "Browsing lineage archive."
 
     def acknowledge_death(self):
         continuity_state = self.get_continuity_state()
@@ -355,24 +489,64 @@ class ActoraTUI:
             self.open_lineage()
 
     def handle_lineage_key(self, key):
+        if self.lineage_search_active:
+            if key == 27:
+                self.lineage_search_active = False
+                self.last_message = "Lineage search canceled."
+                return
+            if key in (curses.KEY_ENTER, 10, 13):
+                self.lineage_search_active = False
+                self.lineage_selection = 0
+                self.selected_lineage_actor_id = None
+                if self.lineage_search_text:
+                    self.last_message = f"Lineage search: {self.lineage_search_text}."
+                else:
+                    self.last_message = "Lineage search cleared."
+                return
+            if key == curses.KEY_BACKSPACE or key in (127, 8):
+                if self.lineage_search_text:
+                    self.lineage_search_text = self.lineage_search_text[:-1]
+                    self.lineage_selection = 0
+                    self.selected_lineage_actor_id = None
+                return
+            if 32 <= key <= 126 and len(self.lineage_search_text) < 24:
+                self.lineage_search_text += chr(key)
+                self.lineage_selection = 0
+                self.selected_lineage_actor_id = None
+                return
+
         lineage_entries = self.get_lineage_entries()
         if key in BACK_KEYS or key in (ord("q"), ord("Q")):
             self.screen_name = "main"
+            self.lineage_search_active = False
             self.last_message = "Returned to actor view."
+            return
+        if key in (ord("a"), ord("A")):
+            self.set_lineage_filter_mode("all")
+            return
+        if key in (ord("l"), ord("L")):
+            self.set_lineage_filter_mode("living")
+            return
+        if key in (ord("d"), ord("D")):
+            self.set_lineage_filter_mode("dead")
+            return
+        if key == ord("/"):
+            self.lineage_search_active = True
+            self.last_message = "Type to search lineage names. Enter confirms. Esc cancels."
+            return
+        if key == curses.KEY_BACKSPACE or key in (127, 8):
+            self.clear_lineage_search()
             return
         if not lineage_entries:
             return
         if key == curses.KEY_UP:
             self.lineage_selection = max(0, self.lineage_selection - 1)
+            self.selected_lineage_actor_id = lineage_entries[self.lineage_selection]["actor_id"]
         elif key == curses.KEY_DOWN:
             self.lineage_selection = min(len(lineage_entries) - 1, self.lineage_selection + 1)
+            self.selected_lineage_actor_id = lineage_entries[self.lineage_selection]["actor_id"]
         elif key in (curses.KEY_ENTER, 10, 13):
-            self.open_lineage_detail()
-
-    def handle_lineage_detail_key(self, key):
-        if key in BACK_KEYS or key in (ord("q"), ord("Q")):
-            self.screen_name = "lineage"
-            self.last_message = "Returned to lineage list."
+            self.last_message = f"Inspecting {lineage_entries[self.lineage_selection]['full_name']}."
 
     def handle_death_ack_key(self, key):
         if key in (ord("q"), ord("Q")):
@@ -421,8 +595,6 @@ class ActoraTUI:
             self.handle_main_key(key)
         elif self.screen_name == "lineage":
             self.handle_lineage_key(key)
-        elif self.screen_name == "lineage_detail":
-            self.handle_lineage_detail_key(key)
         elif self.screen_name == "skip_time":
             self.handle_skip_time_key(key)
         elif self.screen_name == "death_ack":
@@ -433,8 +605,7 @@ class ActoraTUI:
     def render_footer(self, stdscr, height, width):
         footer_hints = {
             "main": "A/Enter advance   S skip time   L lineage   Q quit",
-            "lineage": "Up/Down move   Enter inspect   Esc/Backspace/Q back",
-            "lineage_detail": "Esc/Backspace/Q back",
+            "lineage": "Up/Down move   A all   L living   D dead   / search   Backspace clear   Esc/Q back",
             "skip_time": "Up/Down preset   Digits custom   Backspace erase   Enter confirm   Esc/Q back",
             "death_ack": "Enter acknowledge   Q quit",
             "continuation": "Up/Down move   Enter continue   Q quit",
@@ -475,83 +646,71 @@ class ActoraTUI:
         draw_text_block(stdscr, 3, 0, width, height - 5, lines)
 
     def render_lineage(self, stdscr, height, width):
-        lineage_entries = self.get_lineage_entries()
-        lines = [self.last_message, "", "[ Family Links ]"]
-        highlight_index = None
+        browser_state = self.get_lineage_browser_state()
+        lineage_entries = browser_state["entries"]
+        selected_detail = browser_state["selected_detail"]
 
-        if not lineage_entries:
-            lines.append("No family-linked lineage entries were found.")
-        else:
-            self.lineage_selection = max(0, min(self.lineage_selection, len(lineage_entries) - 1))
-            for entry in lineage_entries:
-                if entry["is_alive"]:
-                    line = (
-                        f"{entry['full_name']} [{entry['relationship_label']}] "
-                        f"- Age {entry['age']} - {entry['current_place_name']}"
-                    )
-                else:
-                    line = (
-                        f"{entry['full_name']} [{entry['relationship_label']}] "
-                        f"- {entry['birth_date']} / {entry['death_date']} "
-                        f"- {entry['death_reason']} - {entry['current_place_name']}"
-                    )
-                if len(lines) == 3 + self.lineage_selection:
-                    highlight_index = len(lines)
-                lines.append(line)
+        top = 3
+        body_height = height - 5
+        left_width = max(30, min(width // 2, width - 36))
+        right_width = width - left_width
 
-        draw_text_block(stdscr, 3, 0, width, height - 5, lines, highlight_index=highlight_index)
+        filter_label = LINEAGE_FILTER_LABELS[browser_state["filter_mode"]]
+        left_title = f"Lineage | {filter_label} | {browser_state['result_count']} result(s)"
+        draw_box(stdscr, top, 0, body_height, left_width, title=left_title)
 
-    def render_lineage_detail(self, stdscr, height, width):
-        lineage_detail = self.get_lineage_detail()
-        if lineage_detail is None:
-            self.screen_name = "lineage"
-            self.render_lineage(stdscr, height, width)
-            return
-
-        summary = lineage_detail["summary"]
-        records = lineage_detail["records"]
-        lines = [
-            summary["full_name"],
+        left_lines = [
+            self.last_message,
+            self.get_lineage_search_status(),
             "",
-            "[ Identity ]",
-            f"Relationship: {summary['relationship_label']}",
-            f"Species: {summary['species']}",
-            f"Sex: {summary['sex']}",
-            f"Gender: {summary['gender']}",
-            f"Status: {summary['structural_status'].title()}",
-            (
-                f"Age at Death: {summary['age']}"
-                if summary["death_date"] is not None
-                else f"Age: {summary['age']}"
-            ),
-            f"Life Stage: {summary['life_stage']}",
-            f"Born: {summary['birth_date']}",
         ]
-        if summary["death_date"] is not None:
-            lines.append(f"Died: {summary['death_date']}")
-            lines.append(f"Cause of Death: {summary['death_reason']}")
-        lines.extend(
-            [
-                f"Place: {summary['current_place_name']}",
-                "",
-                "[ Core Statistics ]",
-                f"  Health: {summary['health']}",
-                f"  Happiness: {summary['happiness']}",
-                f"  Intelligence: {summary['intelligence']}",
-                f"  Money: ${summary['money']}",
-                "",
-                "[ Recent Records ]",
-            ]
-        )
-        if not records:
-            lines.append("  No records found.")
+        highlight_index = None
+        if not lineage_entries:
+            left_lines.append("No lineage entries match the current filter/search.")
         else:
-            for record in records:
-                lines.append(
-                    f"  [{record['year']:04d}-{record['month']:02d}] "
-                    f"({record['record_type']}) {record['text']}"
-                )
-        draw_text_block(stdscr, 3, 0, width, height - 5, lines)
+            for index, entry in enumerate(lineage_entries):
+                if index == self.lineage_selection:
+                    highlight_index = len(left_lines)
+                left_lines.append(build_lineage_row(entry))
+
+        draw_panel_text(stdscr, top, 0, body_height, left_width, left_lines, highlight_index=highlight_index)
+
+        draw_box(stdscr, top, left_width, body_height, right_width, title="Selected Person")
+        if selected_detail is None:
+            right_lines = [
+                "No lineage detail available.",
+                "",
+                "Try another filter or search.",
+            ]
+        else:
+            summary = selected_detail["summary"]
+            records = selected_detail["records"]
+            right_lines = []
+            right_lines.extend(build_person_card_lines(summary))
+            right_lines.extend(
+                [
+                    "",
+                    f"Species: {summary['species']}",
+                    f"Sex: {summary['sex']}",
+                    f"Gender: {summary['gender']}",
+                    f"Health: {summary['health']}",
+                    f"Happiness: {summary['happiness']}",
+                    f"Intelligence: {summary['intelligence']}",
+                    f"Money: ${summary['money']}",
+                    "",
+                    "Recent Records",
+                ]
+            )
+            if not records:
+                right_lines.append("No records found.")
+            else:
+                for record in records:
+                    right_lines.append(
+                        f"[{record['year']:04d}-{record['month']:02d}] "
+                        f"({record['record_type']}) {record['text']}"
+                    )
+
+        draw_panel_text(stdscr, top, left_width, body_height, right_width, right_lines)
 
     def render_skip_time(self, stdscr, height, width):
         custom_months = self.get_custom_skip_months()
@@ -610,11 +769,11 @@ class ActoraTUI:
                 min(self.continuation_selection, len(candidates) - 1),
             )
             for candidate in candidates:
-                line = (
-                    f"{candidate['full_name']} [{candidate['relationship_label']}] "
-                    f"- Age {candidate['age']} ({candidate['life_stage']}) "
-                    f"- {candidate['current_place_name'] or 'Unknown'}"
-                )
+                summary = dict(candidate)
+                summary["birth_date"] = None
+                summary["death_date"] = None
+                summary["death_reason"] = None
+                line = " | ".join(build_person_card_lines(summary)[:5])
                 if len(lines) == 3 + self.continuation_selection:
                     highlight_index = len(lines)
                 lines.append(line)
@@ -633,8 +792,6 @@ class ActoraTUI:
             self.render_main(stdscr, height, width)
         elif self.screen_name == "lineage":
             self.render_lineage(stdscr, height, width)
-        elif self.screen_name == "lineage_detail":
-            self.render_lineage_detail(stdscr, height, width)
         elif self.screen_name == "skip_time":
             self.render_skip_time(stdscr, height, width)
         elif self.screen_name == "death_ack":

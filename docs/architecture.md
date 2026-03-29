@@ -1,6 +1,6 @@
 # Actora Architecture Summary
 
-**Version:** 0.36.2
+**Version:** 0.36.3
 **Last Updated:** 2026-03-29
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
@@ -9,7 +9,7 @@ It is intended to support safe patching, review, and manual verification.
 ## 1. Stack
 
 - **Language:** Python
-- **Interface:** Terminal with a narrow curses TUI shell for ordinary play
+- **Interface:** Terminal with a narrow curses TUI shell for ordinary play and structured lineage/archive browsing
 - **Structure:** Small modular prototype with separated simulation and rendering responsibilities
 
 ## 2. Current File Structure
@@ -78,6 +78,7 @@ Current methods:
 - `get_nearest_place_of_kind(place_id, kind, include_self=True)`
 - `apply_outcome(actor_id, outcome)`
 - `get_continuity_candidates_for(actor_id)`
+- `get_lineage_browser_data_for(actor_id, *, filter_mode="all", search_text="", recent_record_limit=5)`
 - `build_continuity_state_for(actor_id)`
 - `handoff_focus_to_continuation(from_actor_id, successor_actor_id)`
 - `mark_actor_dead(actor_id, year=None, month=None, reason=None)`
@@ -162,8 +163,10 @@ Current continuity-candidate boundary:
 - current candidate labeling and ordering are deterministic: candidate-defining link context is chosen by a stable link sort key, and final candidate ordering uses (`full_name`, `link_type`, `link_role`, `actor_id`) rather than relying on incidental link iteration order
 - continuity candidate gathering now delegates through the generic world-owned `get_links(...)` seam, so current candidates can come from any stored link type even though startup only seeds family links plus one direct parent-to-parent `association/coparent` pair
 - `handoff_focus_to_continuation(...)` is the current world-owned validation/mutation seam for switching focus after the focused actor is dead
-- `get_lineage_entries_for(actor_id)` and `get_lineage_detail_for(actor_id, linked_actor_id, recent_record_limit=5)` now provide the first logical lineage/archive access seam on top of the current actor/link/record truth without splitting dead actors into a separate physical archive store
-- this still does not implement weighting, succession rules, archive state, lineage systems, or a broader connected-actor prioritization framework
+- `get_lineage_entries_for(actor_id, *, filter_mode="all", search_text="")` and `get_lineage_detail_for(actor_id, linked_actor_id, recent_record_limit=5)` now provide the lineage/archive access seam on top of the current actor/link/record truth without splitting dead actors into a separate physical archive store
+- `get_lineage_browser_data_for(...)` now adds one small world-owned browser payload for the TUI so filtering/search/detail selection do not have to be reconstructed as ad hoc shell string hacks
+- lineage entries now also expose a lightweight `family_branch_label` when it can be derived honestly from current directional family-link roles (`mother` => maternal, `father` => paternal, reverse `child` => descendant); this is intentionally narrow and is not a full genealogy/tree system
+- this still does not implement weighting, succession rules, archive state, full lineage systems, or a broader connected-actor prioritization framework
 
 Record storage truth is owned by `World.records`.
 

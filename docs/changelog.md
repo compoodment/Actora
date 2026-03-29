@@ -1,5 +1,15 @@
 # Actora Changelog
 
+## Version 0.36.3 (Patch) - 2026-03-29
+- **Lineage Browser Foundation Strengthening:**
+    - Reworked lineage browsing in `main.py` from a page-flip list/detail flow into a structured two-pane lineage browser so family-linked actors can be inspected inside one persistent archive surface.
+    - Added real lineage browser modes in the TUI: `A` for all, `L` for living only, and `D` for dead only.
+    - Added modest lineage name search in the TUI with `/` to start typing, `Enter` to confirm, and `Backspace` to clear, while keeping the browser shell-owned.
+    - Added a small world-owned lineage browser seam through `World.get_lineage_browser_data_for(...)` plus filtered/searchable `get_lineage_entries_for(...)` access, so browser state is backed by current actor/link/record truth rather than fake TUI-only data.
+    - Expanded lineage metadata and unified person-card language across lineage and continuation rendering, including status, age vs age-at-death, place, and a lightweight `family_branch_label` when current family-link roles support it honestly.
+    - Kept branch/family-side interpretation intentionally narrow (`maternal`, `paternal`, `descendant`) and did not overclaim a true family-tree or archive-storage system.
+    - Preserved skip-time flow, death reveal ordering, continuation handoff behavior, and the existing simulation-core ownership boundaries.
+
 ## Version 0.36.2 (Patch) - 2026-03-29
 - **TUI Style / Time-Control Follow-Through:**
     - Kept the v0.36.1 curses shell foundation but restored some visual personality through a restrained styled header bar, clearer screen titling, date chrome, and small bracketed section framing instead of dumping large ASCII banners into ordinary play.

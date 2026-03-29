@@ -637,6 +637,27 @@ class World:
         link_type = defining_link.get("type")
         return str(link_type).replace("_", " ").title() if link_type else "Connected"
 
+    def _derive_family_branch_label(self, actor_id, links):
+        """Builds one honest lightweight family-side label from current family-link truth."""
+        outgoing_roles = {
+            link.get("role")
+            for link in links
+            if link.get("source_id") == actor_id and link.get("type") == "family"
+        }
+        incoming_roles = {
+            link.get("role")
+            for link in links
+            if link.get("target_id") == actor_id and link.get("type") == "family"
+        }
+
+        if "mother" in outgoing_roles:
+            return "Maternal"
+        if "father" in outgoing_roles:
+            return "Paternal"
+        if "child" in incoming_roles:
+            return "Descendant"
+        return None
+
     def _build_lineage_entry(self, actor_id, linked_actor_id, links):
         """Builds one lineage entry for a family-linked actor connected to the current actor."""
         linked_actor = self.get_actor(linked_actor_id)
@@ -652,6 +673,7 @@ class World:
             "actor_id": linked_actor_id,
             "full_name": linked_actor.get_full_name(),
             "relationship_label": self._build_lineage_relationship_label(actor_id, linked_actor_id, links),
+            "family_branch_label": self._derive_family_branch_label(actor_id, links),
             "is_alive": linked_actor.is_alive(),
             "structural_status": linked_actor.structural_status,
             "age": lifecycle["age_years"],
@@ -662,8 +684,8 @@ class World:
             "current_place_name": current_place_name,
         }
 
-    def get_lineage_entries_for(self, actor_id):
-        """Returns family-linked lineage entries for one actor, including alive and dead actors."""
+    def get_lineage_entries_for(self, actor_id, *, filter_mode="all", search_text=""):
+        """Returns family-linked lineage entries for one actor, including optional filtering/search."""
         if actor_id not in self.actors:
             raise ValueError(f"get_lineage_entries_for: unknown actor_id '{actor_id}'")
 
@@ -684,10 +706,18 @@ class World:
             lineage_links.setdefault(linked_actor_id, []).append(link)
 
         lineage_entries = []
+        normalized_search = (search_text or "").strip().casefold()
         for linked_actor_id, links in lineage_links.items():
             lineage_entry = self._build_lineage_entry(actor_id, linked_actor_id, links)
-            if lineage_entry is not None:
-                lineage_entries.append(lineage_entry)
+            if lineage_entry is None:
+                continue
+            if filter_mode == "living" and not lineage_entry["is_alive"]:
+                continue
+            if filter_mode == "dead" and lineage_entry["is_alive"]:
+                continue
+            if normalized_search and normalized_search not in lineage_entry["full_name"].casefold():
+                continue
+            lineage_entries.append(lineage_entry)
 
         return sorted(
             lineage_entries,
@@ -731,6 +761,7 @@ class World:
                 "actor_id": linked_actor_id,
                 "full_name": linked_actor.get_full_name(),
                 "relationship_label": selected_entry["relationship_label"],
+                "family_branch_label": selected_entry.get("family_branch_label"),
                 "species": linked_actor.species,
                 "sex": linked_actor.sex,
                 "gender": linked_actor.gender,
@@ -748,6 +779,31 @@ class World:
                 "money": linked_actor.money,
             },
             "records": record_summaries,
+        }
+
+    def get_lineage_browser_data_for(self, actor_id, *, filter_mode="all", search_text="", recent_record_limit=5):
+        """Builds one structured lineage-browser payload for the TUI shell."""
+        lineage_entries = self.get_lineage_entries_for(
+            actor_id,
+            filter_mode=filter_mode,
+            search_text=search_text,
+        )
+
+        selected_detail = None
+        if lineage_entries:
+            selected_detail = self.get_lineage_detail_for(
+                actor_id,
+                lineage_entries[0]["actor_id"],
+                recent_record_limit=recent_record_limit,
+            )
+
+        return {
+            "actor_id": actor_id,
+            "filter_mode": filter_mode,
+            "search_text": search_text,
+            "entries": lineage_entries,
+            "result_count": len(lineage_entries),
+            "selected_detail": selected_detail,
         }
 
     def apply_outcome(self, actor_id, outcome):
@@ -797,6 +853,7 @@ class World:
             "link_type": link_type,
             "link_role": link_role,
             "relationship_label": relationship_label,
+            "family_branch_label": self._derive_family_branch_label(actor_id, links),
             "structural_status": candidate_actor.structural_status,
             "is_alive": True,
             "age": lifecycle["age_years"],
