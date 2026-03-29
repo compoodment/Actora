@@ -1,14 +1,15 @@
-Actora Working Ideas Register v41
+Actora Working Ideas Register v42
 
 Date: 2026-03-28
-Role: flexible idea intake, staging, parking, and rewrite-pressure tracking for Actora
+Role: broad working idea intake, staging, parking, interview-derived design retention, and rewrite-pressure tracking for Actora
 Authority level: flexible working layer, not durable architecture truth
 Interpretation rule: stable source docs win over this file; verified repo truth wins on what is already implemented
+Usage rule: preserve substantial design material and conversation-derived pressure here instead of flattening everything into short-term task summaries
 
 
 === CURRENT WORKING READ ===
 
-Verified repo truth is currently through v0.36.4, including:
+Verified repo truth is currently through v0.36.7, including:
 - world-owned actor registry
 - world-owned structured place registry with parent-place hierarchy
 - world-owned link truth
@@ -56,6 +57,9 @@ Verified repo truth is currently through v0.36.4, including:
 - TUI style / time-control follow-through through restrained header/date chrome and a shell-owned skip-time screen with preset/custom larger jumps
 - lineage browser foundation strengthening through a two-pane browser surface, real all/living/dead filtering, modest search, stronger lineage metadata, and more unified person-card language across lineage and continuation views
 - lineage row truncation hygiene so left-pane browser rows now stay single-line with ellipsis truncation instead of wrapping awkwardly into visual sludge
+- TUI-aware repo cleanup / shell-era drift reduction through dead banner removal, clearer startup-vs-curses wording, and repo-local interface-boundary cleanup
+- TUI visual-system consistency pass through stronger centered chrome, bracketed action language, lighter browser separation, and more deliberate screen composition
+- Life View + lineage usability cleanup through split ordinary-play layout, visible right-side recent activity, simple left-side scrolling, slimmer lineage rows, cleaner lineage identity formatting, clearer lineage search behavior, and explicit `B` back guidance
 - clarified terminal-UI / death-flow intent: alive-state should remain implicit during ordinary play, death should interrupt with a dedicated message/context first, continuation options should follow only after acknowledgment, archived dead actors should remain explorable/reusable later, and terminal information density/timing should be treated as real design work rather than ignored because the interface is temporary
 
 The backbone is materially stronger and more honest than it was at the start of this patch run.
@@ -185,16 +189,31 @@ ID: IDEA-114
 Created: 2026-03-29
 Last Reviewed: 2026-03-29
 Title: TUI-aware repo cleanup / shell-era drift reduction
-Status: Leading next-step candidate
+Status: Materially realized through v0.36.5-v0.36.7
 Priority: P1
 Roadmap fit: interface-truth cleanup and anti-drift follow-through after the first real TUI/browser foundation
-Immediate roadmap-layer fit: yes, as the strongest grounded next implementation/spec target
-Summary: After `v0.36.0` through `v0.36.4`, Actora now has a real curses ordinary-play surface, a structured lineage browser, and initial browser hygiene cleanup. The repo, however, still carries shell-era residue in repo-local docs, banner boundaries, and some wording/organizational assumptions that were more correct before the TUI became the real ordinary-play surface. The next honest move is a repo-wide TUI familiarization cleanup that removes dead banner baggage, clarifies plain-text startup vs curses ordinary play, and makes current-facing repo docs/code comments reflect current interface truth without overreacting into a startup-in-curses rewrite.
-Why it matters: Once the repo’s actual play surface changes, stale interface assumptions become invisible rot. If they are left alone, later TUI work inherits sloppy language, dead assets, and muddled boundaries between startup text flow, non-curses banner use, and the real in-play surface.
-Dependencies: current curses TUI shell, current banner usage truth, current repo-local docs, stable UI-agnostic architecture direction, disciplined scope control
-Risks: turning a cleanup pass into broad TUI feature creep, overrewriting historical docs that should stay historical, or deleting useful non-curses startup/exit affordances just because the TUI now exists
-Suggested timing: immediate
-Next action: audit banner usage, remove dead shell-era assets, tighten current-facing repo docs/readme/architecture wording around plain-text startup vs curses ordinary play, and fix any obvious post-curses banner/output hygiene issues without broadening into a startup UI rewrite
+Immediate roadmap-layer fit: yes, as recently realized history and a continuing anti-drift guardrail
+Summary: After `v0.36.0` through `v0.36.4`, Actora had a real curses ordinary-play surface but still carried shell-era residue in repo-local docs, banner boundaries, visual-system assumptions, and usability behavior. `v0.36.5` cleaned repo-local interface truth and dead banner baggage, `v0.36.6` established a more coherent TUI visual system, and `v0.36.7` followed through on Life View visibility, lineage usability, and a live issue-tracking seam.
+Why it matters: The repo now has a materially more credible TUI and a better aligned project/document layer than it did before, which means future work can build on a cleaner interface foundation instead of repeatedly re-solving shell-era drift.
+Dependencies: current curses TUI shell, current repo-local docs, stable UI-agnostic architecture direction, disciplined scope control
+Risks: overreading this cleanup sequence as if the interface layer were now finished, or using improved TUI polish as an excuse to ignore missing simulation truth
+Suggested timing: keep as recently realized history plus an anti-drift guardrail
+Next action: keep only as recently realized history/guardrail and choose the next honest post-v0.36.7 pressure deliberately
+
+ID: IDEA-115
+Created: 2026-03-29
+Last Reviewed: 2026-03-29
+Title: Ordinary mortality / old-age death as real simulation truth
+Status: Leading next-step candidate
+Priority: P1
+Roadmap fit: simulation-truth follow-through after the first TUI/browser/Life View stabilization run
+Immediate roadmap-layer fit: yes, as the strongest grounded gameplay/system pressure now visible from real playtesting
+Summary: Real playtesting after the early TUI stabilization run surfaced a core simulation gap: old age is not behaving like an ordinary truth of the world. The user explicitly corrected that old-age death should not be a rare edge case but an expected part of life. The next honest move may therefore be to implement or repair ordinary mortality pressure in the simulation layer rather than continuing to patch only the interface.
+Why it matters: If aging and mortality are not real, the continuity/death layer becomes presentation theater rather than actual world truth. A better TUI cannot compensate for missing ordinary death behavior.
+Dependencies: current world-owned turn simulation seam, current lifecycle state truth, current death/continuity handling, disciplined separation from pure UI cleanup work
+Risks: faking mortality through shell messaging instead of implementing it in the simulation layer, or mixing a real mortality patch with unrelated TUI churn until neither is trustworthy
+Suggested timing: immediate candidate for the next deliberate implementation/spec pass
+Next action: inspect current aging/death logic, verify why old-age mortality is not manifesting in ordinary play, and define a narrow simulation-truth patch that makes ordinary death behavior real without hand-wavy UI excuses
 
 ID: IDEA-104
 Created: 2026-03-27
