@@ -1,4 +1,4 @@
-Actora Working Ideas Register v40
+Actora Working Ideas Register v41
 
 Date: 2026-03-28
 Role: flexible idea intake, staging, parking, and rewrite-pressure tracking for Actora
@@ -8,7 +8,7 @@ Interpretation rule: stable source docs win over this file; verified repo truth 
 
 === CURRENT WORKING READ ===
 
-Verified repo truth is currently through v0.36.2, including:
+Verified repo truth is currently through v0.36.4, including:
 - world-owned actor registry
 - world-owned structured place registry with parent-place hierarchy
 - world-owned link truth
@@ -54,6 +54,8 @@ Verified repo truth is currently through v0.36.2, including:
 - actor-first curses TUI foundation replacing the ordinary typed command loop for normal play, lineage browsing, and continuation/death navigation
 - curses footer safety tightening so real terminals no longer crash on startup when the shell footer reaches the edge
 - TUI style / time-control follow-through through restrained header/date chrome and a shell-owned skip-time screen with preset/custom larger jumps
+- lineage browser foundation strengthening through a two-pane browser surface, real all/living/dead filtering, modest search, stronger lineage metadata, and more unified person-card language across lineage and continuation views
+- lineage row truncation hygiene so left-pane browser rows now stay single-line with ellipsis truncation instead of wrapping awkwardly into visual sludge
 - clarified terminal-UI / death-flow intent: alive-state should remain implicit during ordinary play, death should interrupt with a dedicated message/context first, continuation options should follow only after acknowledgment, archived dead actors should remain explorable/reusable later, and terminal information density/timing should be treated as real design work rather than ignored because the interface is temporary
 
 The backbone is materially stronger and more honest than it was at the start of this patch run.
@@ -66,13 +68,13 @@ The active near-term read is therefore:
 - the major recent backbone clarifications are now in a substantially better place
 - continuity is now more real than it was before, and the shell death flow is cleaner than it was before, but the broader continuity/archive layer is still not broad/deep complete
 - the source stack is now materially more aligned on what Actora is supposed to be
-- the next-step question is now “what follows the first lineage/archive foundation inside the new TUI shell?” rather than “should lineage foundation exist?”
+- the next-step question is now “what follows the first lineage/archive browser foundation inside the new TUI shell?” rather than “should lineage foundation exist?”
 - entity registry vs actor view layering remains a long-term architectural guardrail, not an automatic next implementation target
 - broader lineage / care / relationship systems remain only partially prepared and should not be overclaimed
 - identity realism/context richness remains visibly placeholder-level beneath the cleaner seam, but still should not jump the dependency queue
 - operator/dev tooling pressure is real, but full dev mode right now would risk becoming premature support-fluff unless enough repeated testing pain across real systems justifies it
 - the spatial layer is in a materially better place after `v0.34.0`, so the more obvious remaining near-term design pressure now sits around continuity/archive/lineage follow-through rather than another immediate spatial patch
-- the typed shell problem has now been materially addressed through `v0.36.0`–`v0.36.2`, which shifts the remaining near-term pressure toward lineage/archive browser depth inside the new TUI shell rather than toward another basic interaction-mode replacement
+- the typed shell problem has now been materially addressed through `v0.36.0`–`v0.36.2`, and the first stronger lineage browser follow-through also landed through `v0.36.3`–`v0.36.4`, which shifts the remaining near-term pressure away from basic interaction-mode replacement and toward the next honest same-layer browser/continuity/archive refinement
 - terminal UI flow, information reveal, and navigation friction now all need to be treated as explicit near-term design pressure
 
 WIR housekeeping note:
@@ -168,16 +170,31 @@ ID: IDEA-113
 Created: 2026-03-29
 Last Reviewed: 2026-03-29
 Title: Lineage browser foundation strengthening inside the TUI
-Status: Leading next-step candidate
+Status: Materially realized through v0.36.3-v0.36.4
 Priority: P1
 Roadmap fit: continuity/archive follow-through inside the actor-first TUI foundation
-Immediate roadmap-layer fit: yes, as the strongest grounded next implementation/spec target
-Summary: After `v0.36.0` through `v0.36.2`, Actora now has a real actor-first curses shell, footer-safe rendering, and restored time-control flow. The weakest same-layer surface is now lineage/archive browsing, which still behaves more like a narrow v1 list/detail seam than the beginning of a structured browser. The strongest next move is to strengthen lineage browsing into a more structured, filterable, searchable browser surface with more unified person-card language while keeping simulation truth world-owned and avoiding archive/tree overbuild.
-Why it matters: The shell finally has somewhere sane for continuity/history surfaces to live, but the current lineage browser is still thin relative to that stronger shell. Strengthening it now gives dead and living family-linked actors a calmer, more inspectable archive presence without pretending a full genealogy/archive system already exists.
+Immediate roadmap-layer fit: yes, as a recently realized same-layer milestone and ongoing guardrail
+Summary: After `v0.36.0` through `v0.36.2`, Actora had a real actor-first curses shell but lineage/archive browsing was still thin. `v0.36.3` then strengthened lineage browsing into a more structured, filterable, searchable browser surface with more unified person-card language, and `v0.36.4` immediately cleaned the first obvious row-wrapping visibility flaw through single-line truncation hygiene.
+Why it matters: The shell now has a materially more credible archive/continuity surface than it did before, which means future work can build on a real browser foundation instead of relitigating whether the browser should exist at all.
 Dependencies: existing TUI shell, current lineage/detail seams, current record truth, current continuity/death flow, stable UI-agnostic architecture direction, disciplined scope control
-Risks: faking branch/family-side certainty the current link truth does not justify, turning a browser patch into giant archive sprawl, stuffing too much filtering/presentation sludge directly into `main.py`, or accidentally regressing skip-time/death/continuation flow
+Risks: overreading the current browser as if it were already a full genealogy/archive system, or letting the existence of a good-enough browser justify sloppy future additions
+Suggested timing: keep as recently realized history plus an anti-drift guardrail
+Next action: keep only as recently realized history/guardrail and choose the next honest browser/continuity/archive follow-through from the new post-v0.36.4 position
+
+ID: IDEA-114
+Created: 2026-03-29
+Last Reviewed: 2026-03-29
+Title: TUI-aware repo cleanup / shell-era drift reduction
+Status: Leading next-step candidate
+Priority: P1
+Roadmap fit: interface-truth cleanup and anti-drift follow-through after the first real TUI/browser foundation
+Immediate roadmap-layer fit: yes, as the strongest grounded next implementation/spec target
+Summary: After `v0.36.0` through `v0.36.4`, Actora now has a real curses ordinary-play surface, a structured lineage browser, and initial browser hygiene cleanup. The repo, however, still carries shell-era residue in repo-local docs, banner boundaries, and some wording/organizational assumptions that were more correct before the TUI became the real ordinary-play surface. The next honest move is a repo-wide TUI familiarization cleanup that removes dead banner baggage, clarifies plain-text startup vs curses ordinary play, and makes current-facing repo docs/code comments reflect current interface truth without overreacting into a startup-in-curses rewrite.
+Why it matters: Once the repo’s actual play surface changes, stale interface assumptions become invisible rot. If they are left alone, later TUI work inherits sloppy language, dead assets, and muddled boundaries between startup text flow, non-curses banner use, and the real in-play surface.
+Dependencies: current curses TUI shell, current banner usage truth, current repo-local docs, stable UI-agnostic architecture direction, disciplined scope control
+Risks: turning a cleanup pass into broad TUI feature creep, overrewriting historical docs that should stay historical, or deleting useful non-curses startup/exit affordances just because the TUI now exists
 Suggested timing: immediate
-Next action: define `v0.36.3` narrowly around multi-pane lineage browsing, real all/living/dead filtering, modest search if clean, stronger lineage-browser metadata, and more unified person-card styling across lineage and continuation surfaces
+Next action: audit banner usage, remove dead shell-era assets, tighten current-facing repo docs/readme/architecture wording around plain-text startup vs curses ordinary play, and fix any obvious post-curses banner/output hygiene issues without broadening into a startup UI rewrite
 
 ID: IDEA-104
 Created: 2026-03-27

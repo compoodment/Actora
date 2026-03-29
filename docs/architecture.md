@@ -296,11 +296,11 @@ This helper is read-only, resolves parent names through world semantic link/acto
 
 ### `main.py`
 Responsible for:
-- startup flow
-- terminal shell orchestration
+- plain-text startup flow
+- plain-text to curses TUI orchestration
 - character creation flow
 - initial world setup flow
-- curses-driven actor-first play flow
+- curses-driven actor-first ordinary play flow
 - post-turn rendering orchestration
 - rendering TUI snapshots from structured snapshot data
 - converting structured event results into display text
@@ -379,8 +379,13 @@ Current event boundary truth:
 
 ### `banners.py`
 Responsible for:
-- `ACTORA_TITLE_BANNER`
-- `QUIT_BANNER`
+- plain-text startup title branding shown before curses begins (`ACTORA_TITLE_BANNER`)
+- plain-text exit branding shown after curses has exited (`QUIT_BANNER`)
+
+Current banner-boundary truth:
+- `banners.py` is no longer an in-play UI surface
+- it currently exists only for non-curses startup/exit presentation
+- the old time-advance banner path is gone because ordinary advancement and skip-time now live inside the TUI
 
 ## 7. Simulation Boundary
 

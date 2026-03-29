@@ -1,4 +1,4 @@
-Actionable Ideas Summary — Rev28
+Actionable Ideas Summary — Rev29
 Date: 2026-03-28
 Role: temporary near-term planning snapshot for Actora
 Authority: non-authoritative; stable docs win, repo truth wins on implementation
@@ -6,7 +6,7 @@ Authority: non-authoritative; stable docs win, repo truth wins on implementation
 
 === CURRENT WORKING POSITION ===
 
-Actora now has a materially stronger early backbone, and verified repo truth is through v0.36.2, with source-stack sync carried through:
+Actora now has a materially stronger early backbone, and verified repo truth is through v0.36.4, with source-stack sync carried through:
 - Master Context v9
 - Roadmap v10
 - world-owned actor registry
@@ -91,6 +91,8 @@ The recent verified sequence is now:
 - v0.36.0 — actor-first TUI foundation
 - v0.36.1 — curses footer render fix
 - v0.36.2 — TUI style + time-control follow-through
+- v0.36.3 — lineage browser foundation strengthening
+- v0.36.4 — lineage row truncation hygiene
 
 So the immediate next move is no longer:
 - “what follows spatial identity separation?”
@@ -100,18 +102,18 @@ So the immediate next move is no longer:
 Those questions have been answered already.
 
 The immediate next move is now:
-- choose the strongest honest post-`v0.36.2` follow-through without jumping into archive-browser overbuild, travel/property/politics expansion, or operator-tooling cosplay
+- choose the strongest honest post-`v0.36.4` follow-through without jumping into archive-browser overbuild, travel/property/politics expansion, or operator-tooling cosplay
 
 Why:
 - the place + spatial-identity layer is now materially more disciplined than it was before `v0.34.0`
 - the shell death flow is now materially more honest than it was before `v0.35.0`
-- the actor-first curses shell now exists, the terminal-edge footer bug has been fixed, and multi-month time control has been restored through `v0.36.0`–`v0.36.2`
-- the repo’s main friction is no longer “we still need a real TUI foundation”; it is that lineage/archive browsing is still thin relative to the stronger shell it now lives inside
+- the actor-first curses shell now exists, lineage/archive browsing is materially stronger through `v0.36.3`, and the first obvious browser hygiene flaw was already cleaned in `v0.36.4`
+- the repo’s main friction is no longer “we still need a real lineage browser surface”; it is that the repo itself still carries shell-era wording/assets/boundaries that are now slightly out of sync with the TUI reality it actually runs on
 - roadmap + master-context still protect future panel-based / richer interaction forms while explicitly requiring the simulation core to stay UI-agnostic
-- that means the next checkpoint is less “should we build a TUI at all?” and more “how should the first lineage/archive browser strengthen inside the existing TUI foundation without turning into fake archive sprawl?”
+- that means the next checkpoint is less “should the browser exist?” and more “how do we make the repo itself fully aware of plain-text startup plus curses ordinary play without turning cleanup into feature landfill?”
 
 So the current question is now:
-- “given repo truth through `v0.36.2`, is the strongest next move a lineage/archive browser follow-through inside the new TUI foundation, or does another same-layer refinement beat it honestly?”
+- “given repo truth through `v0.36.4`, is the strongest next same-layer follow-through a TUI-aware repo cleanup / shell-era drift reduction pass before broader browser/continuity expansion?”
 
 
 === WHAT THE RECENT SEQUENCE ACHIEVED ===
@@ -133,7 +135,8 @@ So the current question is now:
 4. The planning checkpoint changed shape again.
 - the project is no longer deciding whether lineage/archive foundation should exist
 - it is no longer deciding whether a narrow actor-first TUI foundation should replace the typed command loop either; that shell now exists
-- it is deciding how the first stronger lineage/archive browser should grow inside that TUI foundation without overclaiming a full archive/tree system
+- it is no longer deciding whether the first stronger lineage/archive browser should exist either; that foundation is now real
+- it is deciding what the next honest follow-through should be after the first browser foundation and its immediate UI hygiene cleanup
 
 
 === MAIN THINGS THIS CURRENT POSITION NOW PROTECTS ===
@@ -198,16 +201,16 @@ The terminal UI is not the forever final interface, but it is still the current 
 
 === LEADING PLANNING BUCKETS NOW ===
 
-1. Next real implementation/planning move after v0.36.2
+1. Next real implementation/planning move after v0.36.4
 Use:
-- choose the next honest same-layer follow-through after the TUI foundation and time-control follow-through landed
+- choose the next honest same-layer follow-through after the lineage browser foundation and its immediate hygiene pass landed
 - avoid patch-number momentum theater
-- do not confuse “the repo now has a stronger TUI shell” with “the continuity/archive layer is solved”
+- do not confuse “the repo now has a credible lineage browser” with “the continuity/archive layer is solved”
 
-2. Lineage / archive browser strengthening inside the TUI
+2. Lineage / archive browser maturation inside the TUI
 Use:
-- the current lineage surface is still materially thinner than the shell it now lives in
-- a structured browser feel, stronger filtering, search, and more unified person-card language are now the most obvious same-layer follow-through
+- the current lineage surface is now materially stronger, but still early
+- follow-through should build on the browser foundation rather than relitigating whether list/detail/filter/search belong at all
 - preserve scope discipline: no giant archive cathedral, no fake genealogy certainty, no simulation-core rewrite, and no smuggling unrelated systems in through a browser patch
 
 3. Continuity / archive / lineage maturation

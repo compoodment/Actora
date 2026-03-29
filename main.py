@@ -992,17 +992,25 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
     return world, player_id
 
 
+def print_post_tui_quit_banner():
+    """Prints one clean post-curses quit banner outside the TUI context."""
+    print()
+    print(QUIT_BANNER.rstrip())
+    print()
+
+
 def run_game_tui(world, player_id):
-    """Runs the actor-first curses shell for ordinary play."""
+    """Runs the actor-first curses TUI for ordinary play after plain-text startup completes."""
     tui = ActoraTUI(world, player_id)
     try:
         curses.wrapper(tui.run)
     except KeyboardInterrupt:
         pass
-    print(QUIT_BANNER)
+    print_post_tui_quit_banner()
 
 
 def start_game():
+    """Runs plain-text startup, then hands ordinary play to the curses TUI."""
     print(ACTORA_TITLE_BANNER)
 
     player_first_name, player_last_name, player_sex, player_gender = create_character()

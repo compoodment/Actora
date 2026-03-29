@@ -3,19 +3,19 @@
 
 ## What this repo contains
 
-- terminal prototype code for the current simulation shell
+- terminal prototype code for Actora's current plain-text startup flow plus curses TUI ordinary-play surface
 - stable source documents for project identity, workflow, and sequencing
 - planning documents for active pressure and near-term direction
 - repo-local implementation docs and changelog
 
 ## Repo structure
 
-- `main.py` — current terminal shell / startup loop
+- `main.py` — plain-text startup flow, curses TUI ordinary-play shell, and current interface orchestration
 - `world.py` — shared simulation state and simulation-step boundary
 - `human.py` — current human actor model
 - `events.py` — current human monthly event layer
 - `identity.py` — current startup identity generation helpers
-- `banners.py` — title / banner text
+- `banners.py` — non-curses startup / exit banner text
 - `docs/` — source docs, planning docs, workflow docs, and repo-local documentation
 
 ## Where to start reading
@@ -30,11 +30,13 @@
 
 ## Current implementation reality
 
-The current prototype is still terminal-first and still structurally narrow, but it now has:
+The current prototype is still terminal-first and still structurally narrow, but the repo now splits interface responsibility more explicitly into plain-text startup plus a curses TUI for ordinary play, lineage browsing, skip-time flow, and continuity/death navigation. It currently has:
 - a world-owned simulation-step boundary
 - structured records, links, and places, plus a small startup place hierarchy
 - focused-actor tracking and structural death / continuity foundation
-- cleaner terminal death flow and clearer age-vs-simulation-date snapshot presentation
+- plain-text character creation followed by actor-first curses ordinary play
+- structured lineage/archive browsing inside the TUI
+- cleaner death/continuation reveal flow and clearer age-vs-simulation-date snapshot presentation
 - expanded human character-creation options for sex and gender
 - current human-only event content
 
