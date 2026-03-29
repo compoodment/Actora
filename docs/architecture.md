@@ -1,6 +1,6 @@
 # Actora Architecture Summary
 
-**Version:** 0.36.7
+**Version:** 0.36.9
 **Last Updated:** 2026-03-29
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
@@ -51,9 +51,10 @@ Current methods:
 - `get_actor_records(actor_id, record_type=None)`
 - `get_latest_record(actor_id=None, record_type=None)`
 - `get_records_by_tag(tag, actor_id=None)`
+- `generate_actor_id(role)`
 - `update_actor_spatial_identity(actor_id, *, current_place_id=UNSET, residence_place_id=UNSET, jurisdiction_place_id=UNSET, temporary_occupancy_place_id=UNSET)`
 - `create_human_actor(actor_id, species, first_name, last_name, sex, gender, birth_year, birth_month, current_place_id=None, residence_place_id=None, jurisdiction_place_id=None, temporary_occupancy_place_id=None, randomize_stats=False)`
-- `create_human_child_with_parents(child_id, first_name, last_name, sex, gender, mother_id, father_id, birth_year, birth_month, place_id, jurisdiction_place_id=None, temporary_occupancy_place_id=None, randomize_stats=False)`
+- `create_human_child_with_parents(child_id, first_name, last_name, sex, gender, mother_id, father_id, birth_year, birth_month, place_id, jurisdiction_place_id=None, temporary_occupancy_place_id=None, randomize_stats=False, family_link_source="startup_family", birth_record_type="family_bootstrap", birth_record_text=None, birth_record_tags=None, birth_record_metadata=None)`
 - `get_actor(actor_id)`
 - `_build_link_record(source_id, target_id, link_type, role, metadata=None)`
 - `advance_months(months)`
@@ -69,6 +70,7 @@ Current methods:
 - `get_origin_parent_ids_for(entity_id)`
 - `get_caregiver_parent_ids_for(entity_id)`
 - `get_parent_ids_for(entity_id)` (human-specific compatibility wrapper)
+- `get_sibling_ids_for(actor_id)`
 - `add_place(place_id, name, kind, parent_place_id=None, metadata=None)`
 - `get_place(place_id)`
 - `get_place_name(place_id)`
@@ -84,6 +86,8 @@ Current methods:
 - `mark_actor_dead(actor_id, year=None, month=None, reason=None)`
 - `build_monthly_mortality_profile_for(actor_id)`
 - `resolve_monthly_mortality()`
+- `bootstrap_older_siblings_for_newborn(mother_id, father_id, player_birth_year, player_birth_month)`
+- `resolve_monthly_family_events(focused_actor_id=None)`
 - `simulate_advance_turn(player_id, months_to_advance)`
 
 ### Human (`human.py`)
@@ -147,22 +151,24 @@ Minimal link record shape:
 
 `metadata` remains an optional input when constructing links, and `World.links` remains the storage truth for current relationship data. Stored link records are now normalized so `metadata` is always present as a dictionary.
 
-Current startup parent records still use directional family roles (`mother`, `father`, and reverse `child`), but startup bootstrap links created through `create_human_child_with_parents(...)` now also carry explicit semantic metadata:
-- `is_origin_family` — marks that the startup link is expressing origin semantics
-- `is_caregiver_family` — marks that the startup link is expressing current caregiving semantics
-- `bootstrap_source="startup_family"` — marks that the link came from the current startup family bootstrap path
+Current family parent/child records still use directional family roles (`mother`, `father`, and reverse `child`), but child creation through `create_human_child_with_parents(...)` now carries explicit semantic metadata for both startup bootstrap and later family births:
+- `is_origin_family` — marks that the link is expressing origin semantics
+- `is_caregiver_family` — marks that the link is expressing current caregiving semantics
+- `bootstrap_source="startup_family"` or `bootstrap_source="family_birth"` — marks whether the link came from startup bootstrap or later family birth flow
 
-Current startup examples therefore look like:
+Current family examples therefore look like:
 - `{"source_id": "startup_player_ab12cd34", "target_id": "startup_mother_ef56gh78", "type": "family", "role": "mother", "metadata": {"is_origin_family": True, "is_caregiver_family": True, "bootstrap_source": "startup_family"}}`
 - `{"source_id": "startup_mother_ef56gh78", "target_id": "startup_player_ab12cd34", "type": "family", "role": "child", "metadata": {"is_origin_family": True, "is_caregiver_family": True, "bootstrap_source": "startup_family"}}`
+- `{"source_id": "family_child_qr34st56", "target_id": "startup_player_ab12cd34", "type": "family", "role": "sibling", "metadata": {"is_close_family": True, "family_relation": "sibling", "bootstrap_source": "shared_parents"}}`
 - `{"source_id": "startup_mother_ef56gh78", "target_id": "startup_father_ij90kl12", "type": "association", "role": "coparent", "metadata": {"bootstrap_source": "startup_coparent_association"}}`
 
-Reverse family links are still stored explicitly, link records still reference entity IDs present in `World.actors`, and this remains a narrow startup-family semantic clarification rather than a broader relationship framework. It does not implement adoption, guardianship, household simulation, or species-general relationship architecture.
+Reverse family links are still stored explicitly, direct sibling links are now also stored explicitly once siblings exist, link records still reference entity IDs present in `World.actors`, and this remains a narrow family semantic clarification rather than a broader relationship framework. It does not implement adoption, guardianship, household simulation, or species-general relationship architecture.
 
 Current continuity-candidate boundary:
 - `get_continuity_candidates_for(actor_id)` scans current related links, resolves the linked living actors, excludes the actor itself, dedupes candidates, and returns small structured candidate objects
 - current candidate objects contain `actor_id`, `full_name`, `link_type`, `link_role`, `relationship_label`, `structural_status`, `is_alive`, `age`, `life_stage`, and `current_place_name`
-- current candidate labeling and ordering are deterministic: candidate-defining link context is chosen by a stable link sort key, and final candidate ordering uses (`full_name`, `link_type`, `link_role`, `actor_id`) rather than relying on incidental link iteration order
+- sibling candidates are now recognized from shared-parent truth and rendered with direct simple labels (`Brother` / `Sister`) instead of generic link text
+- current candidate labeling and ordering are deterministic: candidate-defining link context is chosen by a stable link sort key, and final candidate ordering now applies a small closeness priority before (`full_name`, `link_type`, `link_role`, `actor_id`) so siblings rank ahead of less-close linked actors
 - continuity candidate gathering now delegates through the generic world-owned `get_links(...)` seam, so current candidates can come from any stored link type even though startup only seeds family links plus one direct parent-to-parent `association/coparent` pair
 - `handoff_focus_to_continuation(...)` is the current world-owned validation/mutation seam for switching focus after the focused actor is dead
 - `get_lineage_entries_for(actor_id, *, filter_mode="all", search_text="")` and `get_lineage_detail_for(actor_id, linked_actor_id, recent_record_limit=5)` now provide the lineage/archive access seam on top of the current actor/link/record truth without splitting dead actors into a separate physical archive store
@@ -207,7 +213,7 @@ Actor entry helpers:
 
 - `update_actor_spatial_identity(...)` is the current world-owned mutation seam for actor spatial identity. It validates actor existence, validates any provided non-`None` place IDs against the world place registry, allows explicit `None` where current structure permits it, leaves unspecified fields untouched through an internal `UNSET` sentinel, and returns a small structured change summary.
 - `create_human_actor(...)` is the current world-owned actor creation/registration path for startup actors, and it is explicitly human-backed. It directly constructs a `Human`, optionally randomizes starting stats, registers the actor via `add_actor(...)`, applies any startup spatial identity through `update_actor_spatial_identity(...)`, writes an `actor_entry` record with `entry_method="create_human_actor"`, and returns the created actor.
-- `create_human_child_with_parents(...)` remains a narrow human-startup helper layered on top of `create_human_actor(...)`. It creates the child in the provided place, currently assigns the same startup place as both current and residence, optionally assigns separate jurisdiction and temporary occupancy context, adds startup family link pairs for mother/father when IDs are provided, writes explicit origin/care/bootstrap metadata onto those directional links, and writes a `family_bootstrap` record for the current startup family-link bootstrap. No generic actor constructor, species framework, adoption system, guardianship system, or broader origin framework is currently implemented.
+- `create_human_child_with_parents(...)` remains a narrow human-family helper layered on top of `create_human_actor(...)`. It creates the child in the provided place, currently assigns the same place as both current and residence, optionally assigns separate jurisdiction and temporary occupancy context, adds explicit mother/father family link pairs when IDs are provided, creates direct sibling links from shared-parent truth, and writes either startup-bootstrap or ordinary birth records depending on the caller. No generic actor constructor, species framework, adoption system, guardianship system, or broader origin framework is currently implemented.
 
 Basic world link helper contract:
 
@@ -323,7 +329,7 @@ Current shell-level functions:
 - `run_game_tui(...)` — curses wrapper entry point for ordinary play
 - `start_game()` — top-level orchestration (banner, then delegates to the above)
 
-Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Once startup completes, ordinary play now lives inside a narrow curses shell: the split `Life View` keeps identity/location/stats/relationships on the left, keeps recent activity visible on the right, allows simple left-side vertical scrolling under terminal-height pressure, still opens lineage with `L`, and still preserves the dead-focus interrupt before any continuation choices are shown.
+Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Startup parent ages now vary within a narrow adult range, some worlds now generate older siblings before the player is born through `World.bootstrap_older_siblings_for_newborn(...)`, and only-child worlds still remain possible. Once startup completes, ordinary play now lives inside a narrow curses shell: the split `Life View` keeps identity/location/stats/relationships on the left, keeps recent activity visible on the right, allows simple left-side vertical scrolling under terminal-height pressure, still opens lineage with `L`, and still preserves the dead-focus interrupt before any continuation choices are shown.
 
 ### `identity.py`
 Responsible for:
@@ -352,6 +358,7 @@ Responsible for:
 - month advancement
 - centralized application of event stat outcomes (`World.apply_outcome(...)`)
 - world-owned continuity candidate resolution from the current link graph
+- world-owned narrow family birth simulation for current coparent pairs using explicit simple age/spacing/family-size heuristics
 - world-owned structural death transition handling (`World.mark_actor_dead(...)`)
 - world-owned authoritative simulation-step boundary via `World.simulate_advance_turn(...)`, which advances month-by-month for the current living focused actor, requests monthly event data through the current human-scoped event seam, applies outcomes centrally, writes event records, and assembles the structured turn result
 

@@ -1,7 +1,9 @@
 import random
+from uuid import uuid4
 
 from events import get_human_monthly_event_from_lifecycle
 from human import Human
+from identity import FATHER_FIRST_NAME_POOL, MOTHER_FIRST_NAME_POOL
 
 
 UNSET = object()
@@ -214,6 +216,10 @@ class World:
         """Returns records for one actor by delegating to the world record store helper."""
         return self.get_records(actor_id=actor_id, record_type=record_type)
 
+    def generate_actor_id(self, role):
+        """Builds one narrow world-owned actor ID for generated family actors."""
+        return f"{role}_{uuid4().hex[:8]}"
+
     def get_latest_record(self, actor_id=None, record_type=None):
         """Returns the latest matching record from the insertion-ordered world record store."""
         for record in reversed(self.records):
@@ -301,6 +307,11 @@ class World:
         jurisdiction_place_id=None,
         temporary_occupancy_place_id=None,
         randomize_stats=False,
+        family_link_source="startup_family",
+        birth_record_type="family_bootstrap",
+        birth_record_text=None,
+        birth_record_tags=None,
+        birth_record_metadata=None,
     ):
         """Creates a human child actor and optional mother/father family links."""
         child = self.create_human_actor(
@@ -319,10 +330,10 @@ class World:
             randomize_stats=randomize_stats,
         )
 
-        startup_family_metadata = {
+        child_family_metadata = {
             "is_origin_family": True,
             "is_caregiver_family": True,
-            "bootstrap_source": "startup_family",
+            "bootstrap_source": family_link_source,
         }
 
         if mother_id is not None:
@@ -333,8 +344,8 @@ class World:
                 forward_role="mother",
                 reverse_type="family",
                 reverse_role="child",
-                forward_metadata=dict(startup_family_metadata),
-                reverse_metadata=dict(startup_family_metadata),
+                forward_metadata=dict(child_family_metadata),
+                reverse_metadata=dict(child_family_metadata),
             )
         if father_id is not None:
             self.add_link_pair(
@@ -344,33 +355,369 @@ class World:
                 forward_role="father",
                 reverse_type="family",
                 reverse_role="child",
-                forward_metadata=dict(startup_family_metadata),
-                reverse_metadata=dict(startup_family_metadata),
+                forward_metadata=dict(child_family_metadata),
+                reverse_metadata=dict(child_family_metadata),
             )
+
+        sibling_ids = self._link_child_to_existing_siblings(child_id)
 
         actor_ids = [child_id]
         if mother_id is not None:
             actor_ids.append(mother_id)
         if father_id is not None:
             actor_ids.append(father_id)
+        actor_ids.extend(sibling_ids)
+        deduped_actor_ids = list(dict.fromkeys(actor_ids))
+        record_text = birth_record_text
+        if record_text is None:
+            record_text = f"{child.get_full_name()} was born into the family."
         self.add_record(
-            record_type="family_bootstrap",
+            record_type=birth_record_type,
             scope="actor",
-            text=(
-                f"{child.get_full_name()} was bootstrapped with current startup family links."
-            ),
+            text=record_text,
             year=birth_year,
             month=birth_month,
-            actor_ids=actor_ids,
-            tags=["family", "bootstrap"],
+            actor_ids=deduped_actor_ids,
+            tags=list(birth_record_tags) if birth_record_tags is not None else ["family", "birth"],
             metadata={
                 "mother_id": mother_id,
                 "father_id": father_id,
+                "sibling_ids": sibling_ids,
                 "entry_method": "create_human_child_with_parents",
+                "family_link_source": family_link_source,
+                **(birth_record_metadata or {}),
             },
         )
 
         return child
+
+    def _link_child_to_existing_siblings(self, child_id):
+        """Creates direct sibling links between one child and the family's other children."""
+        sibling_ids = self.get_sibling_ids_for(child_id)
+        for sibling_id in sibling_ids:
+            if self.get_links(
+                source_id=child_id,
+                target_id=sibling_id,
+                link_type="family",
+                roles=["sibling"],
+            ):
+                continue
+            self.add_link_pair(
+                source_id=child_id,
+                target_id=sibling_id,
+                forward_type="family",
+                forward_role="sibling",
+                reverse_type="family",
+                reverse_role="sibling",
+                forward_metadata={
+                    "is_close_family": True,
+                    "family_relation": "sibling",
+                    "bootstrap_source": "shared_parents",
+                },
+                reverse_metadata={
+                    "is_close_family": True,
+                    "family_relation": "sibling",
+                    "bootstrap_source": "shared_parents",
+                },
+            )
+
+        return sibling_ids
+
+    def get_sibling_ids_for(self, actor_id):
+        """Returns sibling actor IDs inferred from shared origin parents."""
+        actor = self.get_actor(actor_id)
+        if actor is None:
+            raise ValueError(f"get_sibling_ids_for: unknown actor_id '{actor_id}'")
+
+        parent_ids = self.get_parent_ids_for(actor_id)
+        actor_parent_ids = {
+            parent_id
+            for parent_id in (parent_ids["mother_id"], parent_ids["father_id"])
+            if parent_id is not None
+        }
+        if not actor_parent_ids:
+            return []
+
+        sibling_ids = []
+        for other_actor_id in sorted(self.actors):
+            if other_actor_id == actor_id:
+                continue
+            other_parent_ids = self.get_parent_ids_for(other_actor_id)
+            other_parent_set = {
+                parent_id
+                for parent_id in (other_parent_ids["mother_id"], other_parent_ids["father_id"])
+                if parent_id is not None
+            }
+            if actor_parent_ids.intersection(other_parent_set):
+                sibling_ids.append(other_actor_id)
+        return sibling_ids
+
+    def _generate_human_child_identity(self, family_last_name):
+        """Builds one narrow placeholder identity for a generated sibling or newborn."""
+        if random.random() < 0.5:
+            return {
+                "first_name": random.choice(MOTHER_FIRST_NAME_POOL),
+                "last_name": family_last_name,
+                "sex": "Female",
+                "gender": "Female",
+            }
+        return {
+            "first_name": random.choice(FATHER_FIRST_NAME_POOL),
+            "last_name": family_last_name,
+            "sex": "Male",
+            "gender": "Male",
+        }
+
+    def _get_actor_age_in_months(self, actor_id, year=None, month=None):
+        """Returns one actor's age in months against the requested simulation date."""
+        actor = self.get_actor(actor_id)
+        if actor is None:
+            raise ValueError(f"_get_actor_age_in_months: unknown actor_id '{actor_id}'")
+        age_year = self.current_year if year is None else year
+        age_month = self.current_month if month is None else month
+        return actor.get_age_in_months(age_year, age_month)
+
+    def _resolve_coparent_pair_roles(self, actor_id_a, actor_id_b):
+        """Resolves the current mother/father assignment for a coparent pair when possible."""
+        actor_a = self.get_actor(actor_id_a)
+        actor_b = self.get_actor(actor_id_b)
+        if actor_a is None or actor_b is None:
+            return None
+
+        if actor_a.sex == "Female" and actor_b.sex == "Male":
+            return {"mother_id": actor_id_a, "father_id": actor_id_b}
+        if actor_a.sex == "Male" and actor_b.sex == "Female":
+            return {"mother_id": actor_id_b, "father_id": actor_id_a}
+        return None
+
+    def _get_children_for_parents(self, mother_id, father_id):
+        """Returns current children who match the provided current mother/father IDs."""
+        child_ids = []
+        for actor_id in sorted(self.actors):
+            parent_ids = self.get_parent_ids_for(actor_id)
+            if parent_ids["mother_id"] == mother_id and parent_ids["father_id"] == father_id:
+                child_ids.append(actor_id)
+        return child_ids
+
+    def _build_family_birth_profile_for(self, mother_id, father_id):
+        """Builds a narrow monthly birth profile for one current coparent pair."""
+        mother = self.get_actor(mother_id)
+        father = self.get_actor(father_id)
+        if mother is None or father is None:
+            return None
+        if not mother.is_alive() or not father.is_alive():
+            return None
+
+        mother_age_months = mother.get_age_in_months(self.current_year, self.current_month)
+        father_age_months = father.get_age_in_months(self.current_year, self.current_month)
+        if mother_age_months < (18 * 12) or mother_age_months > (43 * 12):
+            return None
+        if father_age_months < (18 * 12) or father_age_months > (60 * 12):
+            return None
+
+        current_child_ids = self._get_children_for_parents(mother_id, father_id)
+        child_count = len(current_child_ids)
+        youngest_child_age_months = None
+        if current_child_ids:
+            youngest_child_age_months = min(
+                self._get_actor_age_in_months(child_id)
+                for child_id in current_child_ids
+            )
+            if youngest_child_age_months < 12:
+                return None
+
+        if mother_age_months <= (30 * 12):
+            mother_factor = 1.0
+        elif mother_age_months <= (35 * 12):
+            mother_factor = 0.72
+        elif mother_age_months <= (40 * 12):
+            mother_factor = 0.36
+        else:
+            mother_factor = 0.14
+
+        if father_age_months <= (40 * 12):
+            father_factor = 1.0
+        elif father_age_months <= (50 * 12):
+            father_factor = 0.8
+        else:
+            father_factor = 0.55
+
+        spacing_factor = 1.0
+        if youngest_child_age_months is not None and youngest_child_age_months < 24:
+            spacing_factor = 0.45
+
+        family_size_factor = max(0.2, 1.0 - (0.22 * child_count))
+        monthly_birth_probability = 0.0055 * mother_factor * father_factor * spacing_factor * family_size_factor
+        if monthly_birth_probability <= 0:
+            return None
+
+        return {
+            "mother_id": mother_id,
+            "father_id": father_id,
+            "current_child_ids": current_child_ids,
+            "child_count": child_count,
+            "mother_age_years": mother.get_age(self.current_year, self.current_month),
+            "father_age_years": father.get_age(self.current_year, self.current_month),
+            "youngest_child_age_months": youngest_child_age_months,
+            "monthly_birth_probability": monthly_birth_probability,
+            "rule": "narrow_family_birth",
+        }
+
+    def _create_family_child_birth(self, mother_id, father_id, *, birth_year, birth_month, birth_source):
+        """Creates one real family child actor for a current coparent pair."""
+        mother = self.get_actor(mother_id)
+        father = self.get_actor(father_id)
+        if mother is None or father is None:
+            raise ValueError("_create_family_child_birth: unresolved parents")
+
+        family_last_name = mother.last_name or father.last_name
+        identity = self._generate_human_child_identity(family_last_name)
+        child_id = self.generate_actor_id("family_child")
+        child = self.create_human_child_with_parents(
+            child_id=child_id,
+            first_name=identity["first_name"],
+            last_name=identity["last_name"],
+            sex=identity["sex"],
+            gender=identity["gender"],
+            mother_id=mother_id,
+            father_id=father_id,
+            birth_year=birth_year,
+            birth_month=birth_month,
+            place_id=mother.residence_place_id or mother.current_place_id or father.current_place_id,
+            jurisdiction_place_id=(
+                mother.jurisdiction_place_id
+                or father.jurisdiction_place_id
+            ),
+            randomize_stats=True,
+            family_link_source=birth_source,
+            birth_record_type="birth",
+            birth_record_text=f"{identity['first_name']} {identity['last_name']} was born into the family.",
+            birth_record_tags=["family", "birth"],
+            birth_record_metadata={"birth_source": birth_source},
+        )
+        return child_id, child
+
+    def bootstrap_older_siblings_for_newborn(
+        self,
+        *,
+        mother_id,
+        father_id,
+        player_birth_year,
+        player_birth_month,
+    ):
+        """Creates a small plausible set of older siblings before the player is born."""
+        mother = self.get_actor(mother_id)
+        father = self.get_actor(father_id)
+        if mother is None or father is None:
+            raise ValueError("bootstrap_older_siblings_for_newborn: unresolved parents")
+
+        mother_age_months = mother.get_age_in_months(player_birth_year, player_birth_month)
+        father_age_months = father.get_age_in_months(player_birth_year, player_birth_month)
+        if mother_age_months < (20 * 12) or father_age_months < (20 * 12):
+            return []
+        if random.random() < 0.58:
+            return []
+
+        max_possible_count = 1
+        if mother_age_months >= (29 * 12):
+            max_possible_count = 2
+        if mother_age_months >= (35 * 12) and random.random() < 0.3:
+            max_possible_count = 3
+        sibling_count = random.randint(1, max_possible_count)
+
+        birth_points = []
+        months_before_player = random.randint(14, 36)
+        for _ in range(sibling_count):
+            sibling_total_months = (player_birth_year * 12) + player_birth_month - months_before_player
+            if sibling_total_months <= ((mother.birth_year * 12) + mother.birth_month + (18 * 12)):
+                break
+            birth_year, birth_month = divmod(sibling_total_months - 1, 12)
+            birth_points.append((birth_year, birth_month + 1))
+            months_before_player += random.randint(18, 36)
+
+        created_sibling_ids = []
+        for birth_year, birth_month in reversed(birth_points):
+            sibling_id, _ = self._create_family_child_birth(
+                mother_id,
+                father_id,
+                birth_year=birth_year,
+                birth_month=birth_month,
+                birth_source="startup_family",
+            )
+            created_sibling_ids.append(sibling_id)
+
+        return created_sibling_ids
+
+    def resolve_monthly_family_events(self, focused_actor_id=None):
+        """Runs narrow family background simulation such as later sibling births."""
+        coparent_pairs = []
+        seen_pairs = set()
+        for link in self.get_links(link_type="association", roles=["coparent"]):
+            source_id = link.get("source_id")
+            target_id = link.get("target_id")
+            pair_key = tuple(sorted((source_id, target_id)))
+            if None in pair_key or pair_key in seen_pairs:
+                continue
+            seen_pairs.add(pair_key)
+            coparent_pairs.append(pair_key)
+
+        background_events = []
+        surfaced_events = []
+        for actor_id_a, actor_id_b in coparent_pairs:
+            parent_roles = self._resolve_coparent_pair_roles(actor_id_a, actor_id_b)
+            if parent_roles is None:
+                continue
+
+            birth_profile = self._build_family_birth_profile_for(
+                parent_roles["mother_id"],
+                parent_roles["father_id"],
+            )
+            if birth_profile is None:
+                continue
+            if random.random() >= birth_profile["monthly_birth_probability"]:
+                continue
+
+            child_id, child = self._create_family_child_birth(
+                parent_roles["mother_id"],
+                parent_roles["father_id"],
+                birth_year=self.current_year,
+                birth_month=self.current_month,
+                birth_source="family_birth",
+            )
+            sibling_ids = self.get_sibling_ids_for(child_id)
+            event_payload = {
+                "event_id": "family_sibling_birth",
+                "type": "family_birth",
+                "actor_id": child_id,
+                "child_id": child_id,
+                "child_name": child.get_full_name(),
+                "mother_id": parent_roles["mother_id"],
+                "father_id": parent_roles["father_id"],
+                "sibling_ids": sibling_ids,
+                "year": self.current_year,
+                "month": self.current_month,
+                "rule": birth_profile["rule"],
+                "quiet_by_default": True,
+            }
+            background_events.append(event_payload)
+
+            if focused_actor_id in sibling_ids:
+                relationship_label = "Sister" if child.sex == "Female" else "Brother"
+                surfaced_events.append(
+                    {
+                        "event_id": "family_sibling_birth",
+                        "text": f"Your family welcomed a new {relationship_label.lower()}, {child.first_name}.",
+                        "outcome": {"stat_changes": {}},
+                        "tags": ["family", "birth", "sibling"],
+                        "year": self.current_year,
+                        "month": self.current_month,
+                    }
+                )
+
+        return {
+            "background_events": background_events,
+            "surfaced_events": surfaced_events,
+        }
     
     def get_actor(self, actor_id):
         """Returns an actor object from the world by ID."""
@@ -625,8 +972,27 @@ class World:
         year_body = f"{abs(year):04d}"
         return f"{year_prefix}{year_body}-{month:02d}"
 
+    def _get_sibling_relationship_label(self, actor_id, linked_actor_id):
+        """Returns a direct simple sibling label when two actors share origin parents."""
+        sibling_ids = self.get_sibling_ids_for(actor_id)
+        if linked_actor_id not in sibling_ids:
+            return None
+
+        linked_actor = self.get_actor(linked_actor_id)
+        if linked_actor is None:
+            return "Sibling"
+        if linked_actor.sex == "Female":
+            return "Sister"
+        if linked_actor.sex == "Male":
+            return "Brother"
+        return "Sibling"
+
     def _build_lineage_relationship_label(self, actor_id, linked_actor_id, links):
         """Builds one display-ready relationship label for lineage surfaces."""
+        sibling_label = self._get_sibling_relationship_label(actor_id, linked_actor_id)
+        if sibling_label is not None:
+            return sibling_label
+
         actor_perspective_links = [
             link for link in links
             if link.get("source_id") == actor_id and link.get("target_id") == linked_actor_id
@@ -830,8 +1196,15 @@ class World:
 
     def _get_continuity_link_sort_key(self, link):
         """Returns the deterministic current ordering key for candidate-defining links."""
+        role_priority_map = {
+            "child": 0,
+            "sibling": 1,
+            "mother": 2,
+            "father": 2,
+        }
         return (
             link.get("type") or "",
+            role_priority_map.get(link.get("role"), 9),
             link.get("role") or "",
             link.get("source_id") or "",
             link.get("target_id") or "",
@@ -856,7 +1229,11 @@ class World:
         defining_link = sorted(defining_link_pool, key=self._get_continuity_link_sort_key)[0]
         link_type = defining_link.get("type")
         link_role = defining_link.get("role")
-        relationship_label = f"{link_type}/{link_role}" if link_role else str(link_type)
+        sibling_label = self._get_sibling_relationship_label(actor_id, candidate_actor_id)
+        if sibling_label is not None:
+            relationship_label = sibling_label
+        else:
+            relationship_label = f"{link_type}/{link_role}" if link_role else str(link_type)
         lifecycle = candidate_actor.get_lifecycle_state(self.current_year, self.current_month)
         current_place_name = self.get_place_name(candidate_actor.current_place_id)
         return {
@@ -865,6 +1242,12 @@ class World:
             "link_type": link_type,
             "link_role": link_role,
             "relationship_label": relationship_label,
+            "relationship_priority": self._get_continuity_relationship_priority(
+                actor_id,
+                candidate_actor_id,
+                link_type,
+                link_role,
+            ),
             "family_branch_label": self._derive_family_branch_label(actor_id, links),
             "structural_status": candidate_actor.structural_status,
             "is_alive": True,
@@ -873,9 +1256,22 @@ class World:
             "current_place_name": current_place_name,
         }
 
+    def _get_continuity_relationship_priority(self, actor_id, candidate_actor_id, link_type, link_role):
+        """Returns a small closeness ordering for current continuation candidates."""
+        if candidate_actor_id in self.get_sibling_ids_for(actor_id):
+            return 1
+        if link_type == "family" and link_role == "child":
+            return 0
+        if link_type == "family" and link_role in {"mother", "father"}:
+            return 2
+        if link_type == "family":
+            return 3
+        return 9
+
     def _get_continuity_candidate_sort_key(self, candidate):
         """Returns the deterministic current ordering key for continuity candidates."""
         return (
+            candidate.get("relationship_priority", 9),
             candidate.get("full_name", "").casefold(),
             candidate.get("link_type") or "",
             candidate.get("link_role") or "",
@@ -1143,6 +1539,24 @@ class World:
             if focused_actor is None or not focused_actor.is_alive():
                 continuity_state = self.build_continuity_state_for(focused_actor_id)
                 break
+
+            family_event_result = self.resolve_monthly_family_events(focused_actor_id=focused_actor_id)
+            for surfaced_event in family_event_result["surfaced_events"]:
+                self.apply_outcome(focused_actor_id, surfaced_event.get("outcome"))
+                self.add_record(
+                    record_type="event",
+                    scope="actor",
+                    text=surfaced_event.get("text"),
+                    year=surfaced_event.get("year"),
+                    month=surfaced_event.get("month"),
+                    actor_ids=[focused_actor_id],
+                    tags=surfaced_event.get("tags") or [],
+                    metadata={
+                        "event_id": surfaced_event.get("event_id"),
+                        "entry_method": "World.resolve_monthly_family_events",
+                    },
+                )
+                collected_structured_events.append(surfaced_event)
 
             lifecycle_state_for_event = focused_actor.get_lifecycle_state(
                 self.current_year,

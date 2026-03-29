@@ -1125,6 +1125,8 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
 
     mother_id = generate_startup_actor_id("mother")
     father_id = generate_startup_actor_id("father")
+    mother_age_years = random.randint(22, 36)
+    father_age_years = max(mother_age_years + random.randint(1, 5), 24)
     world.create_human_actor(
         actor_id=mother_id,
         species="Human",
@@ -1132,7 +1134,7 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         last_name=mother_identity["last_name"],
         sex=mother_identity["sex"],
         gender=mother_identity["gender"],
-        birth_year=world.current_year - 25,
+        birth_year=world.current_year - mother_age_years,
         birth_month=random.randint(1, 12),
         current_place_id=startup_place_id,
         residence_place_id=startup_place_id,
@@ -1145,7 +1147,7 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         last_name=father_identity["last_name"],
         sex=father_identity["sex"],
         gender=father_identity["gender"],
-        birth_year=world.current_year - 27,
+        birth_year=world.current_year - father_age_years,
         birth_month=random.randint(1, 12),
         current_place_id=startup_place_id,
         residence_place_id=startup_place_id,
@@ -1162,6 +1164,13 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         reverse_metadata={"bootstrap_source": "startup_coparent_association"},
     )
 
+    world.bootstrap_older_siblings_for_newborn(
+        mother_id=mother_id,
+        father_id=father_id,
+        player_birth_year=world.current_year,
+        player_birth_month=1,
+    )
+
     player_id = generate_startup_actor_id("player")
     world.create_human_child_with_parents(
         child_id=player_id,
@@ -1176,6 +1185,14 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         place_id=startup_place_id,
         jurisdiction_place_id=startup_jurisdiction_place_id,
         randomize_stats=True,
+        family_link_source="startup_family",
+        birth_record_type="family_bootstrap",
+        birth_record_text=(
+            f"{player_first_name} {player_last_name}".strip()
+            + " was bootstrapped with current startup family links."
+        ),
+        birth_record_tags=["family", "bootstrap"],
+        birth_record_metadata={"is_startup_player": True},
     )
     world.set_focused_actor(player_id)
 

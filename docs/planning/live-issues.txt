@@ -33,3 +33,11 @@ Purpose: repo-local parking lot for current bugs, regressions, and revisit items
 - old-age mortality still missing as real simulation truth
   Status: resolved in v0.36.8
   Note: baseline old-age mortality now resolves in simulation via world-owned monthly checks and surfaces through ordinary death/lineage truth.
+
+- continuation substrate too narrow around startup-only parents
+  Status: resolved in v0.36.9
+  Note: startup can now include older siblings, later sibling births can occur through narrow family-event simulation, and siblings now surface directly in lineage/continuation truth.
+
+- sibling/family birth tuning still needs later balancing
+  Status: open revisit
+  Note: the new age/spacing/family-size fertility heuristic is intentionally simple first-pass logic and may need probability tuning once more long-run play data exists.

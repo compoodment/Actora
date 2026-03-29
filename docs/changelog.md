@@ -1,5 +1,15 @@
 # Actora Changelog
 
+## Version 0.36.9 (Patch) - 2026-03-29
+- **Family Continuity Groundwork:**
+    - Expanded startup family generation so some runs now begin with one or more older siblings created as real actors before the player is born, while only-child starts still remain common.
+    - Replaced the fixed startup parent ages in `main.py` with a narrow randomized parent-age range so sibling plausibility and later family births are not detached from parent age truth.
+    - Extended `World.create_human_child_with_parents(...)` so it can serve both startup family bootstrap and ordinary family births without falling back to fake placeholder relatives.
+    - Added direct sibling link creation in `world.py` based on shared parents, so siblings are first-class close family actors that show up in lineage truth and continuation truth through the same current actor/link depth as parents.
+    - Added a narrow world-owned monthly family-event seam that checks current coparent pairs, applies explicit simple fertility heuristics with age/spacing/family-size factors, and can produce later younger sibling births in the background.
+    - Surfaced later sibling births to the focused actor only when they are directly meaningful, while otherwise leaving them as quiet background family records.
+    - Tightened lineage/continuation relationship labeling so siblings now render with simple direct labels (`Brother` / `Sister`) and continuation ordering now prefers siblings ahead of less-close family/other linked actors by default.
+
 ## Version 0.36.8 (Patch) - 2026-03-29
 - **Ordinary Mortality / Old-Age Death Truth:**
     - Added world-owned monthly old-age mortality in `world.py` so living actors now face baseline later-life death risk during ordinary simulation instead of surviving indefinitely by default.
