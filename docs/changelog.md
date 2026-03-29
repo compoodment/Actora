@@ -1,5 +1,11 @@
 # Actora Changelog
 
+## Version 0.36.4 (Patch) - 2026-03-29
+- **Lineage Row Truncation Hygiene:**
+    - Tightened left-pane lineage browser rendering in `main.py` so lineage rows now stay single-line and truncate with an ellipsis instead of wrapping awkwardly across multiple lines.
+    - Kept right-pane detail text wrapped normally, so the browser now distinguishes compact list scanning from fuller detail reading more cleanly.
+    - Preserved the `v0.36.3` lineage browser behavior, filters, search flow, skip-time flow, and continuation/death handling while eliminating a small visibility bug before it could turn into normalized UI sludge.
+
 ## Version 0.36.3 (Patch) - 2026-03-29
 - **Lineage Browser Foundation Strengthening:**
     - Reworked lineage browsing in `main.py` from a page-flip list/detail flow into a structured two-pane lineage browser so family-linked actors can be inspected inside one persistent archive surface.

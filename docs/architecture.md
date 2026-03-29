@@ -1,6 +1,6 @@
 # Actora Architecture Summary
 
-**Version:** 0.36.3
+**Version:** 0.36.4
 **Last Updated:** 2026-03-29
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.

@@ -222,8 +222,19 @@ def draw_box(stdscr, top, left, height, width, *, title=None):
         stdscr.addnstr(top, left + 2, title_text[: max(0, width - 4)], max(0, width - 4), curses.A_BOLD)
 
 
-def draw_panel_text(stdscr, top, left, height, width, lines, *, highlight_index=None):
-    """Draws wrapped text inside a boxed panel."""
+def truncate_for_width(text, width):
+    """Truncates one line to fit the available width with a small ellipsis."""
+    if width <= 0:
+        return ""
+    if len(text) <= width:
+        return text
+    if width == 1:
+        return "…"
+    return text[: width - 1] + "…"
+
+
+def draw_panel_text(stdscr, top, left, height, width, lines, *, highlight_index=None, wrap=True):
+    """Draws text inside a boxed panel, with optional wrapping or one-line truncation."""
     if height < 3 or width < 3:
         return
 
@@ -231,12 +242,12 @@ def draw_panel_text(stdscr, top, left, height, width, lines, *, highlight_index=
     inner_height = height - 2
     inner_width = width - 2
     for index, raw_line in enumerate(lines):
-        wrapped_lines = wrap_text_line(raw_line, inner_width)
+        rendered_lines = wrap_text_line(raw_line, inner_width) if wrap else [truncate_for_width(raw_line, inner_width)]
         attr = curses.A_REVERSE if highlight_index == index else curses.A_NORMAL
-        for wrapped_line in wrapped_lines:
+        for rendered_line in rendered_lines:
             if y >= top + 1 + inner_height:
                 return
-            stdscr.addnstr(y, left + 1, wrapped_line.ljust(inner_width), inner_width, attr)
+            stdscr.addnstr(y, left + 1, rendered_line.ljust(inner_width), inner_width, attr)
             y += 1
 
 
@@ -673,7 +684,16 @@ class ActoraTUI:
                     highlight_index = len(left_lines)
                 left_lines.append(build_lineage_row(entry))
 
-        draw_panel_text(stdscr, top, 0, body_height, left_width, left_lines, highlight_index=highlight_index)
+        draw_panel_text(
+            stdscr,
+            top,
+            0,
+            body_height,
+            left_width,
+            left_lines,
+            highlight_index=highlight_index,
+            wrap=False,
+        )
 
         draw_box(stdscr, top, left_width, body_height, right_width, title="Selected Person")
         if selected_detail is None:
