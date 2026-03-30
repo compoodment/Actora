@@ -64,7 +64,7 @@ HUMAN_MONTHLY_EVENTS = [
     _event("child_bug_observation", "You spent a while studying a tiny bug with serious concentration.", life_stages=["Child"], outcome={"stat_changes": {"intelligence": 1}}, tags=["neutral", "child"]),
     _event("child_bedtime_story", "Your {family_role} told you a bedtime story.", life_stages=["Child"], min_age_months=36, outcome={"stat_changes": {"happiness": 2}}, tags=["positive", "child", "family"], family_context=True, family_roles=["mother", "father"]),
     _event("child_sibling_race", "Your {family_role} challenged you to see who could run faster.", life_stages=["Child"], min_age_months=48, outcome={"stat_changes": {"health": 1}}, tags=["positive", "child", "family"], family_context=True, family_roles=["sibling"]),
-    _event("child_wrong_snack", "You tried to eat something you definitely should not have eaten.", life_stages=["Child"], min_age_months=36, outcome={"stat_changes": {"health": -1}}, tags=["goofy", "child"]),
+    _event("child_wrong_snack", "You put something questionable in your mouth. Regret followed immediately.", life_stages=["Child"], min_age_months=36, outcome={"stat_changes": {"health": -1}}, tags=["goofy", "child"]),
     _event("child_secret_word", "You invented a secret word that seemed brilliant at the time.", life_stages=["Child"], outcome={"stat_changes": {}}, tags=["goofy", "child"]),
 
     # Teenager-specific events (Age 10-17)
@@ -115,9 +115,9 @@ HUMAN_MONTHLY_EVENTS = [
     _event("adult_window_weather", "You spent a moment just watching the weather move past.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {}}, tags=["neutral"]),
     _event("adult_nice_conversation", "A brief conversation leaves you in a better mood than expected.", life_stages=["Adult"], outcome={"stat_changes": {"happiness": 1}}, tags=["positive", "adult"]),
     _event("adult_misplaced_item", "You lost track of a necessary object and found it in an obvious place.", life_stages=["Adult"], outcome={"stat_changes": {"happiness": -1}}, tags=["negative", "adult"]),
-    _event("adult_called_family", "You called your {family_role} just to chat.", life_stages=["Adult"], outcome={"stat_changes": {"happiness": 1}}, tags=["family", "adult"], family_context=True, family_roles=["mother", "father", "sibling"]),
+    _event("adult_called_family", "Your {family_role} called you out of nowhere. It was nice.", life_stages=["Adult"], outcome={"stat_changes": {"happiness": 1}}, tags=["family", "adult"], family_context=True, family_roles=["mother", "father", "sibling"]),
     _event("adult_checked_on_family", "You checked in on your {family_role}, and the conversation mattered more than expected.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {"happiness": 1}}, tags=["family"], family_context=True, family_roles=["mother", "father", "sibling", "child"]),
-    _event("adult_self_argument", "You had an argument with yourself. You lost.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {}}, tags=["goofy"]),
+    _event("adult_self_argument", "You debated yourself in the mirror. Both sides made valid points.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {}}, tags=["goofy"]),
     _event("adult_fixed_small_problem", "You solved a small problem that had been annoying you for too long.", life_stages=["Adult"], outcome={"stat_changes": {"intelligence": 1}}, tags=["positive", "adult"]),
     _event("adult_evening_stretch", "You gave your body a little care and felt the difference.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {"health": 1}}, tags=["positive"]),
     _event("adult_unnecessary_worry", "You worried about something that never actually happened.", life_stages=["Adult"], outcome={"stat_changes": {"happiness": -1}}, tags=["negative", "adult"]),

@@ -128,6 +128,8 @@ def format_history_entry(entry, width):
     """Formats one event-log entry for the full history screen."""
     if entry["kind"] == "year_header":
         return build_history_separator(entry["year"], width)
+    if entry["kind"] == "life_separator":
+        return build_centered_rule(entry["text"], width, fill_char="═")
     if entry["kind"] == "skip_marker":
         return entry["text"]
     if entry["kind"] == "event":
@@ -148,6 +150,9 @@ def build_live_feed_lines(event_log):
         if entry["kind"] == "year_header":
             if lines:
                 lines.append("")
+            lines.append(entry["text"])
+        elif entry["kind"] == "life_separator":
+            lines.append("")
             lines.append(entry["text"])
         elif entry["kind"] == "event":
             marker = get_event_log_marker(entry.get("record_type"))
@@ -844,6 +849,14 @@ class ActoraTUI:
         handoff_result = self.world.handoff_focus_to_continuation(
             self.get_focused_actor_id(),
             successor_actor_id,
+        )
+        self.player_id = successor_actor_id
+        self.last_logged_year = 0
+        self.event_log.append(
+            {
+                "kind": "life_separator",
+                "text": f"New Life: {handoff_result['new_focused_actor_name']}",
+            }
         )
         self.selected_continuation_actor_id = None
         self.screen_name = "main"

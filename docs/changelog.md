@@ -1,5 +1,12 @@
 # Actora Changelog
 
+## Version 0.37.7 (Patch) - 2026-03-29
+- **Continuation + Event Log Cleanup:**
+    - Updated three duplicate monthly event texts in `events.py` to keep the full 100-event pool while removing repeated player-facing copy.
+    - Fixed `ActoraTUI.choose_continuation()` in `main.py` so successful continuation handoff now also updates `self.player_id` to the new focused actor instead of leaving the shell pointed at the dead original actor ID.
+    - Added a shell-owned `life_separator` event-log entry after continuation handoff, rendered in both the live feed and full history view so multi-life runs read as distinct chapters.
+    - Reset `last_logged_year` on continuation so year headers begin cleanly for the new focused life without changing simulation-core behavior or handoff order.
+
 ## Version 0.37.6 (Patch) - 2026-03-29
 - **Playtest Follow-Up Fixes:**
     - Increased the main-screen advance-key hold throttle in `main.py` from 100ms to 200ms so held `A` / `Enter` advances less aggressively during ordinary play.
