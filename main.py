@@ -1,5 +1,6 @@
 import curses
 import random
+import time
 import textwrap
 from uuid import uuid4
 
@@ -149,7 +150,10 @@ def build_live_feed_lines(event_log):
             lines.append(entry["text"])
         elif entry["kind"] == "event":
             marker = get_event_log_marker(entry.get("record_type"))
-            lines.append(f"{marker}{entry['text']}")
+            if entry.get("record_type") in {"birth", "death"} and entry.get("year") is not None:
+                lines.append(f"{marker}[Year {entry['year']}] {entry['text']}")
+            else:
+                lines.append(f"{marker}{entry['text']}")
         else:
             lines.append(entry["text"])
     return lines
@@ -464,6 +468,7 @@ class ActoraTUI:
         self.last_message = MAIN_IDLE_MESSAGE
         self.event_log = []
         self.last_logged_year = 0
+        self.last_advance_time = 0.0
 
     def get_focused_actor_id(self):
         return self.world.get_focused_actor_id() or self.player_id
@@ -586,34 +591,33 @@ class ActoraTUI:
                 f"{months_to_advance} {label} Skipped",
             )
 
+        visible_record_types = {"birth", "death"}
+        merged_entries = []
         event_identity_keys = set()
-        for structured_event in turn_result["events"]:
+
+        for sequence, structured_event in enumerate(turn_result["events"]):
             event_year = structured_event.get("year")
             event_month = structured_event.get("month")
-            if event_year is not None and event_year > self.last_logged_year:
-                for year in range(self.last_logged_year + 1, event_year + 1):
-                    self.append_event_log_entry(
-                        "year_header",
-                        f"Year {year}",
-                        year=year,
-                    )
-                self.last_logged_year = event_year
-
-            self.append_event_log_entry(
-                "event",
-                structured_event.get("text", ""),
-                year=event_year,
-                month=event_month,
-            )
-            event_identity_keys.add(
-                (
-                    event_year,
-                    event_month,
-                    structured_event.get("text"),
-                )
+            event_text = structured_event.get("text", "")
+            event_key = (event_year, event_month, event_text)
+            event_identity_keys.add(event_key)
+            merged_entries.append(
+                {
+                    "sort_key": (
+                        event_year if event_year is not None else -1,
+                        event_month if event_month is not None else -1,
+                        sequence,
+                        0,
+                    ),
+                    "kind": "event",
+                    "text": event_text,
+                    "year": event_year,
+                    "month": event_month,
+                    "record_type": None,
+                }
             )
 
-        visible_record_types = {"birth", "death"}
+        structural_sequence = len(merged_entries)
         for record in new_records:
             if record.get("record_type") in HIDDEN_PLAYER_RECORD_TYPES:
                 continue
@@ -630,23 +634,41 @@ class ActoraTUI:
             if record_key in event_identity_keys:
                 continue
 
-            record_year = record.get("year")
-            record_month = record.get("month")
-            if record_year is not None and record_year > self.last_logged_year:
-                for year in range(self.last_logged_year + 1, record_year + 1):
+            merged_entries.append(
+                {
+                    "sort_key": (
+                        record.get("year") if record.get("year") is not None else -1,
+                        record.get("month") if record.get("month") is not None else -1,
+                        structural_sequence,
+                        1,
+                    ),
+                    "kind": "event",
+                    "text": record.get("text", ""),
+                    "year": record.get("year"),
+                    "month": record.get("month"),
+                    "record_type": record.get("record_type"),
+                }
+            )
+            structural_sequence += 1
+
+        merged_entries.sort(key=lambda entry: entry["sort_key"])
+        for entry in merged_entries:
+            entry_year = entry.get("year")
+            if entry_year is not None and entry_year > self.last_logged_year:
+                for year in range(self.last_logged_year + 1, entry_year + 1):
                     self.append_event_log_entry(
                         "year_header",
                         f"Year {year}",
                         year=year,
                     )
-                self.last_logged_year = record_year
+                self.last_logged_year = entry_year
 
             self.append_event_log_entry(
-                "event",
-                record.get("text", ""),
-                year=record_year,
-                month=record_month,
-                record_type=record.get("record_type"),
+                entry["kind"],
+                entry["text"],
+                year=entry.get("year"),
+                month=entry.get("month"),
+                record_type=entry.get("record_type"),
             )
 
     def open_history(self):
@@ -797,6 +819,10 @@ class ActoraTUI:
         if key in (ord("q"), ord("Q")):
             self.running = False
         elif key in (curses.KEY_ENTER, 10, 13, ord("a"), ord("A")):
+            now = time.monotonic()
+            if now - self.last_advance_time < 0.1:
+                return
+            self.last_advance_time = now
             self.advance_one_month()
         elif key in (ord("s"), ord("S")):
             self.open_skip_time()
@@ -1104,20 +1130,23 @@ class ActoraTUI:
         self._history_body_height = body_height
         content_left, content_width = get_content_bounds(width, max_width=104)
         history_lines = expand_render_lines(self.get_history_lines(content_width), content_width)
+        content_body_height = body_height
+        if len(history_lines) > body_height:
+            content_body_height = max(1, body_height - 1)
         visible_lines, self.history_scroll, _, total_lines = get_scroll_window(
             history_lines,
-            body_height,
+            content_body_height,
             self.history_scroll,
         )
-        draw_text_block(stdscr, top, content_left, content_width, body_height, visible_lines)
+        draw_text_block(stdscr, top, content_left, content_width, content_body_height, visible_lines)
 
-        if total_lines > body_height:
+        if total_lines > content_body_height:
             scroll_label = (
                 f"History: {self.history_scroll + 1}-"
                 f"{self.history_scroll + len(visible_lines)} / {total_lines}"
             )
             stdscr.addnstr(
-                min(height - 3, top + body_height - 1),
+                min(height - 3, top + content_body_height),
                 content_left,
                 truncate_for_width(scroll_label, content_width),
                 content_width,

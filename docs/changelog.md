@@ -1,5 +1,12 @@
 # Actora Changelog
 
+## Version 0.37.5 (Patch) - 2026-03-29
+- **Playtest Bug Fixes:**
+    - Updated all family-aware monthly event text in `events.py` to refer to relatives by role (`Your mother`, `your brother`, etc.) instead of rendering full names, and normalized `{family_role}` substitution to lowercase during event text rendering.
+    - Fixed `main.py` history-browser footer rendering so the scroll indicator now reserves its own line and no longer overlaps the last visible history entry.
+    - Changed shell event-log population in `main.py` to merge focused-actor monthly events with newly written `birth` and `death` records by simulation date before appending, preserving chronological order and year-header placement; structural live-feed entries now also show their actual year as `[Year N]`.
+    - Added a 100ms `time.monotonic()` throttle to the main-screen advance action in `main.py`, preventing held `A`/`Enter` input from immediately punching through the death acknowledgment screen or causing excessive redraw jitter while leaving other navigation input unchanged.
+
 ## Version 0.37.4 (Patch) - 2026-03-29
 - **History + Lineage Polish:**
     - Added structural event markers in `main.py` so focused-actor `birth` and `death` records carried into the shell-owned event log now render as `★` and `✦` in both the full `History` browser and the live right-pane feed, while ordinary monthly events remain unmarked.

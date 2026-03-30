@@ -42,9 +42,9 @@ HUMAN_MONTHLY_EVENTS = [
     _event("infant_spit_take", "You tried to eat something you definitely should not have eaten.", life_stages=["Infant"], min_age_months=4, outcome={"stat_changes": {"health": -1}}, tags=["goofy", "infant"]),
     _event("infant_roll_over", "You roll over with great effort and immediate pride.", life_stages=["Infant"], min_age_months=4, max_age_months=10, outcome={"stat_changes": {"health": 1}}, tags=["positive", "infant"]),
     _event("infant_shadow_game", "Light and shadows on the wall hold your full attention for a while.", life_stages=["Infant"], outcome={"stat_changes": {"intelligence": 1}}, tags=["neutral", "infant"]),
-    _event("infant_sibling_garden_play", "{family_name} played with you in the garden.", life_stages=["Infant"], min_age_months=3, outcome={"stat_changes": {"happiness": 1}}, tags=["positive", "infant", "family"], family_context=True, family_roles=["sibling"]),
+    _event("infant_sibling_garden_play", "Your {family_role} played with you in the garden.", life_stages=["Infant"], min_age_months=3, outcome={"stat_changes": {"happiness": 1}}, tags=["positive", "infant", "family"], family_context=True, family_roles=["sibling"]),
     _event("infant_bubble_laugh", "A strange noise sends you into unstoppable baby laughter.", life_stages=["Infant"], outcome={"stat_changes": {"happiness": 2}}, tags=["positive", "infant"]),
-    _event("infant_peekaboo_delight", "{family_name} played peekaboo with you until you squealed.", life_stages=["Infant"], min_age_months=4, outcome={"stat_changes": {"happiness": 2}}, tags=["positive", "infant", "family"], family_context=True, family_roles=["mother", "father", "sibling"]),
+    _event("infant_peekaboo_delight", "Your {family_role} played peekaboo with you until you squealed.", life_stages=["Infant"], min_age_months=4, outcome={"stat_changes": {"happiness": 2}}, tags=["positive", "infant", "family"], family_context=True, family_roles=["mother", "father", "sibling"]),
     _event("infant_lost_sock", "One of your socks vanished under circumstances nobody could explain.", life_stages=["Infant"], outcome={"stat_changes": {}}, tags=["goofy", "infant"]),
     _event("infant_scary_noise", "A sudden loud noise left you crying for a while.", life_stages=["Infant"], min_age_months=2, outcome={"stat_changes": {"happiness": -1}}, tags=["negative", "infant"]),
     _event("infant_first_wave", "You made something close enough to a wave that everyone decided it counted.", life_stages=["Infant"], min_age_months=6, outcome={"stat_changes": {"intelligence": 1}}, tags=["positive", "infant"]),
@@ -62,8 +62,8 @@ HUMAN_MONTHLY_EVENTS = [
     _event("child_cardboard_fort", "You turned ordinary clutter into an impressive fortress.", life_stages=["Child"], min_age_months=42, outcome={"stat_changes": {"intelligence": 1}}, tags=["neutral", "child"]),
     _event("child_lost_treasure", "You misplaced something extremely important to you for nearly a whole day.", life_stages=["Child"], outcome={"stat_changes": {"happiness": -1}}, tags=["negative", "child"]),
     _event("child_bug_observation", "You spent a while studying a tiny bug with serious concentration.", life_stages=["Child"], outcome={"stat_changes": {"intelligence": 1}}, tags=["neutral", "child"]),
-    _event("child_bedtime_story", "{family_name} told you a bedtime story.", life_stages=["Child"], min_age_months=36, outcome={"stat_changes": {"happiness": 2}}, tags=["positive", "child", "family"], family_context=True, family_roles=["mother", "father"]),
-    _event("child_sibling_race", "{family_name} challenged you to see who could run faster.", life_stages=["Child"], min_age_months=48, outcome={"stat_changes": {"health": 1}}, tags=["positive", "child", "family"], family_context=True, family_roles=["sibling"]),
+    _event("child_bedtime_story", "Your {family_role} told you a bedtime story.", life_stages=["Child"], min_age_months=36, outcome={"stat_changes": {"happiness": 2}}, tags=["positive", "child", "family"], family_context=True, family_roles=["mother", "father"]),
+    _event("child_sibling_race", "Your {family_role} challenged you to see who could run faster.", life_stages=["Child"], min_age_months=48, outcome={"stat_changes": {"health": 1}}, tags=["positive", "child", "family"], family_context=True, family_roles=["sibling"]),
     _event("child_wrong_snack", "You tried to eat something you definitely should not have eaten.", life_stages=["Child"], min_age_months=36, outcome={"stat_changes": {"health": -1}}, tags=["goofy", "child"]),
     _event("child_secret_word", "You invented a secret word that seemed brilliant at the time.", life_stages=["Child"], outcome={"stat_changes": {}}, tags=["goofy", "child"]),
 
@@ -75,12 +75,12 @@ HUMAN_MONTHLY_EVENTS = [
     _event("teen_new_style", "You tried a new look and felt unexpectedly confident about it.", life_stages=["Teenager"], outcome={"stat_changes": {"happiness": 1}}, tags=["positive", "teenager"]),
     _event("teen_embarrassing_memory", "An old embarrassing moment returns to haunt you at the worst possible time.", life_stages=["Teenager"], outcome={"stat_changes": {"happiness": -1}}, tags=["negative", "teenager"]),
     _event("teen_long_thought", "You stayed up late thinking about who you want to become.", life_stages=["Teenager"], outcome={"stat_changes": {"intelligence": 1}}, tags=["neutral", "teenager"]),
-    _event("teen_silly_argument", "You had a silly argument with {family_name}.", life_stages=["Teenager"], outcome={"stat_changes": {"happiness": -1}}, tags=["family", "teenager"], family_context=True, family_roles=["sibling"]),
+    _event("teen_silly_argument", "You had a silly argument with your {family_role}.", life_stages=["Teenager"], outcome={"stat_changes": {"happiness": -1}}, tags=["family", "teenager"], family_context=True, family_roles=["sibling"]),
     _event("teen_quiet_bike_ride", "A quiet ride gave you space to clear your head.", life_stages=["Teenager"], outcome={"stat_changes": {"health": 1}}, tags=["positive", "teenager"]),
     _event("teen_overheard_advice", "You overheard adult advice that was either wise or completely useless.", life_stages=["Teenager"], outcome={"stat_changes": {}}, tags=["neutral", "teenager"]),
     _event("teen_room_rearrange", "You rearranged your space for no clear reason and somehow felt better after.", life_stages=["Teenager"], outcome={"stat_changes": {"happiness": 1}}, tags=["neutral", "teenager"]),
     _event("teen_social_stumble", "A small awkward moment lingers in your mind much longer than it should.", life_stages=["Teenager"], outcome={"stat_changes": {"happiness": -1}}, tags=["negative", "teenager"]),
-    _event("teen_hold_breath_contest", "{family_name} challenged you to see who could hold their breath longer.", life_stages=["Teenager"], outcome={"stat_changes": {"health": 1}}, tags=["family", "teenager"], family_context=True, family_roles=["sibling"]),
+    _event("teen_hold_breath_contest", "Your {family_role} challenged you to see who could hold their breath longer.", life_stages=["Teenager"], outcome={"stat_changes": {"health": 1}}, tags=["family", "teenager"], family_context=True, family_roles=["sibling"]),
     _event("teen_found_shortcut", "You discovered a shortcut that made you feel smarter than you probably were.", life_stages=["Teenager"], outcome={"stat_changes": {"intelligence": 1}}, tags=["neutral", "teenager"]),
     _event("teen_minor_sprain", "You picked up a minor sprain doing something you insisted was a good idea.", life_stages=["Teenager"], outcome={"stat_changes": {"health": -1}}, tags=["negative", "teenager"]),
     _event("teen_late_night_snack", "A ridiculous late-night snack somehow became the highlight of the month.", life_stages=["Teenager"], outcome={"stat_changes": {"happiness": 1}}, tags=["goofy", "teenager"]),
@@ -97,8 +97,8 @@ HUMAN_MONTHLY_EVENTS = [
     _event("young_adult_new_recipe", "You tried a new recipe and it turned out better than expected.", life_stages=["Young Adult", "Adult"], outcome={"stat_changes": {"health": 1}}, tags=["positive"]),
     _event("young_adult_bad_purchase", "You spent money on something that immediately felt unnecessary.", life_stages=["Young Adult"], outcome={"stat_changes": {"money": -1}}, tags=["negative", "young_adult"]),
     _event("young_adult_day_trip", "A small adventure breaks up the routine of the month.", life_stages=["Young Adult"], outcome={"stat_changes": {"happiness": 2}}, tags=["positive", "young_adult"]),
-    _event("young_adult_called_family", "You called {family_name} just to chat.", life_stages=["Young Adult", "Adult"], outcome={"stat_changes": {"happiness": 1}}, tags=["family"], family_context=True, family_roles=["mother", "father", "sibling"]),
-    _event("young_adult_family_recipe", "{family_name} passed along a family recipe with very strong opinions attached.", life_stages=["Young Adult", "Adult"], outcome={"stat_changes": {"happiness": 1}}, tags=["family"], family_context=True, family_roles=["mother", "father", "sibling"]),
+    _event("young_adult_called_family", "You called your {family_role} just to chat.", life_stages=["Young Adult", "Adult"], outcome={"stat_changes": {"happiness": 1}}, tags=["family"], family_context=True, family_roles=["mother", "father", "sibling"]),
+    _event("young_adult_family_recipe", "Your {family_role} passed along a family recipe with very strong opinions attached.", life_stages=["Young Adult", "Adult"], outcome={"stat_changes": {"happiness": 1}}, tags=["family"], family_context=True, family_roles=["mother", "father", "sibling"]),
     _event("young_adult_laundry_delay", "You put something off until it became mildly ridiculous.", life_stages=["Young Adult", "Adult"], outcome={"stat_changes": {}}, tags=["goofy"]),
     _event("young_adult_park_bench_thought", "You sat quietly for a while and let your thoughts settle.", life_stages=["Young Adult", "Adult", "Elder"], outcome={"stat_changes": {"intelligence": 1}}, tags=["neutral"]),
     _event("young_adult_peaceful_afternoon", "You enjoyed a peaceful afternoon.", life_stages=["Young Adult", "Adult", "Elder"], outcome={"stat_changes": {"happiness": 1}}, tags=["positive"]),
@@ -115,8 +115,8 @@ HUMAN_MONTHLY_EVENTS = [
     _event("adult_window_weather", "You spent a moment just watching the weather move past.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {}}, tags=["neutral"]),
     _event("adult_nice_conversation", "A brief conversation leaves you in a better mood than expected.", life_stages=["Adult"], outcome={"stat_changes": {"happiness": 1}}, tags=["positive", "adult"]),
     _event("adult_misplaced_item", "You lost track of a necessary object and found it in an obvious place.", life_stages=["Adult"], outcome={"stat_changes": {"happiness": -1}}, tags=["negative", "adult"]),
-    _event("adult_called_family", "You called {family_name} just to chat.", life_stages=["Adult"], outcome={"stat_changes": {"happiness": 1}}, tags=["family", "adult"], family_context=True, family_roles=["mother", "father", "sibling"]),
-    _event("adult_checked_on_family", "You checked in on {family_name}, and the conversation mattered more than expected.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {"happiness": 1}}, tags=["family"], family_context=True, family_roles=["mother", "father", "sibling", "child"]),
+    _event("adult_called_family", "You called your {family_role} just to chat.", life_stages=["Adult"], outcome={"stat_changes": {"happiness": 1}}, tags=["family", "adult"], family_context=True, family_roles=["mother", "father", "sibling"]),
+    _event("adult_checked_on_family", "You checked in on your {family_role}, and the conversation mattered more than expected.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {"happiness": 1}}, tags=["family"], family_context=True, family_roles=["mother", "father", "sibling", "child"]),
     _event("adult_self_argument", "You had an argument with yourself. You lost.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {}}, tags=["goofy"]),
     _event("adult_fixed_small_problem", "You solved a small problem that had been annoying you for too long.", life_stages=["Adult"], outcome={"stat_changes": {"intelligence": 1}}, tags=["positive", "adult"]),
     _event("adult_evening_stretch", "You gave your body a little care and felt the difference.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {"health": 1}}, tags=["positive"]),
@@ -131,7 +131,7 @@ HUMAN_MONTHLY_EVENTS = [
     _event("elder_rest_day", "You take an extra rest day and let yourself move a little more gently.", life_stages=["Elder"], outcome={"stat_changes": {}}, tags=["neutral", "elder"]),
     _event("elder_stiff_morning", "A stiff morning reminds you to take things slowly this month.", life_stages=["Elder"], outcome={"stat_changes": {"health": -1}}, tags=["negative", "elder"]),
     _event("elder_old_joke", "An old joke still makes you laugh.", life_stages=["Elder"], outcome={"stat_changes": {"happiness": 1}}, tags=["positive", "elder"]),
-    _event("elder_shared_stories", "You shared old stories with {family_name}.", life_stages=["Elder"], outcome={"stat_changes": {"happiness": 1}}, tags=["family", "elder"], family_context=True, family_roles=["mother", "father", "sibling"]),
+    _event("elder_shared_stories", "You shared old stories with your {family_role}.", life_stages=["Elder"], outcome={"stat_changes": {"happiness": 1}}, tags=["family", "elder"], family_context=True, family_roles=["mother", "father", "sibling"]),
     _event("elder_slow_morning", "You take your time starting the day and refuse to feel bad about it.", life_stages=["Elder"], outcome={"stat_changes": {}}, tags=["neutral", "elder"]),
     _event("elder_forgot_name", "A name sat just out of reach until much later.", life_stages=["Elder"], outcome={"stat_changes": {"intelligence": -1}}, tags=["negative", "elder"]),
     _event("elder_birdwatch", "You spent time quietly watching birds and felt content.", life_stages=["Elder"], outcome={"stat_changes": {"happiness": 1}}, tags=["positive", "elder"]),
@@ -222,9 +222,10 @@ def _render_event_text(chosen_event, family_context):
         return event_text
 
     family_member = random.choice(matching_family)
+    family_role = str(family_member.get("role") or "").strip().lower()
     return event_text.format(
         family_name=family_member["name"],
-        family_role=family_member["role"],
+        family_role=family_role,
     )
 
 
