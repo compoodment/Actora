@@ -1751,7 +1751,7 @@ class ActoraTUI:
         _, next_offset, _, _ = get_scroll_window(profile_lines, visible_height, self.profile_scroll + delta)
         if next_offset != self.profile_scroll:
             self.profile_scroll = next_offset
-            self.last_message = "Scrolled profile."
+            pass  # no message on scroll
 
     def scroll_main_left(self, delta):
         snapshot_sections = build_snapshot_sections(self.get_snapshot_data())
@@ -1762,7 +1762,7 @@ class ActoraTUI:
         _, next_offset, _, _ = get_scroll_window(scrollable_lines, visible_height, self.main_left_scroll + delta)
         if next_offset != self.main_left_scroll:
             self.main_left_scroll = next_offset
-            self.last_message = "Scrolled Life View details."
+            pass  # no message on scroll
 
     @property
     def main_body_height(self):
@@ -1851,9 +1851,9 @@ class ActoraTUI:
         self.selected_continuation_actor_id = None
         self.screen_name = "continuation"
         if continuity_state["had_continuity_candidates"]:
-            self.last_message = "Choose a continuation target."
+            self.last_message = "Choose who to continue as."
         else:
-            self.last_message = "No valid continuation target exists."
+            self.last_message = "No one is available to continue as."
 
     def get_selected_continuation_candidate(self):
         continuity_state = self.get_continuity_state()
@@ -2008,7 +2008,7 @@ class ActoraTUI:
         if self.lineage_search_active:
             if key == 27:
                 self.lineage_search_active = False
-                self.last_message = "Returned to lineage results."
+                self.last_message = "Returned to lineage."
                 return
             if key in (curses.KEY_ENTER, 10, 13):
                 self.lineage_search_active = False
@@ -2110,7 +2110,7 @@ class ActoraTUI:
             self.running = False
         elif key in (ord("b"), ord("B")) or key in BACK_KEYS:
             self.screen_name = "continuation"
-            self.last_message = "Returned to continuation candidates."
+            self.last_message = "Returned to available lives."
         elif key in (curses.KEY_ENTER, 10, 13):
             self.choose_continuation()
 
@@ -2522,7 +2522,7 @@ class ActoraTUI:
         highlight_index = None
 
         if not candidates:
-            lines.append("No living connected continuation candidates were found.")
+            lines.append("No living family members were found.")
             lines.append("Press Q to quit this run.")
         else:
             self.continuation_selection = max(
@@ -2553,7 +2553,7 @@ class ActoraTUI:
         )
         if selected_candidate is None:
             self.screen_name = "continuation"
-            self.last_message = "Selected continuation target is no longer available."
+            self.last_message = "This person is no longer available."
             self.render_continuation(stdscr, height, width)
             return
 
