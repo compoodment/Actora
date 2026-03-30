@@ -106,6 +106,9 @@ WORLD_GEOGRAPHY = [
         "cities": [
             {"city_id": "netherlands_amsterdam", "city_name": "Amsterdam"},
             {"city_id": "netherlands_rotterdam", "city_name": "Rotterdam"},
+            {"city_id": "netherlands_amersfoort", "city_name": "Amersfoort"},
+            {"city_id": "netherlands_utrecht", "city_name": "Utrecht"},
+            {"city_id": "netherlands_den_haag", "city_name": "Den Haag"},
         ],
     },
     {
@@ -126,6 +129,7 @@ WORLD_GEOGRAPHY = [
         "cities": [
             {"city_id": "kenya_nairobi", "city_name": "Nairobi"},
             {"city_id": "kenya_mombasa", "city_name": "Mombasa"},
+            {"city_id": "kenya_kisumu", "city_name": "Kisumu"},
         ],
     },
     {
