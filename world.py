@@ -1229,9 +1229,17 @@ class World:
         defining_link = sorted(defining_link_pool, key=self._get_continuity_link_sort_key)[0]
         link_type = defining_link.get("type")
         link_role = defining_link.get("role")
+        family_role_labels = {
+            "mother": "Mother",
+            "father": "Father",
+            "child": "Child",
+            "sibling": "Sibling",
+        }
         sibling_label = self._get_sibling_relationship_label(actor_id, candidate_actor_id)
         if sibling_label is not None:
             relationship_label = sibling_label
+        elif link_type == "family" and link_role in family_role_labels:
+            relationship_label = family_role_labels[link_role]
         else:
             relationship_label = f"{link_type}/{link_role}" if link_role else str(link_type)
         lifecycle = candidate_actor.get_lifecycle_state(self.current_year, self.current_month)

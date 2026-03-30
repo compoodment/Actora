@@ -1,6 +1,6 @@
 # Actora Architecture Summary
 
-**Version:** 0.36.9
+**Version:** 0.37.0
 **Last Updated:** 2026-03-29
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
@@ -168,6 +168,7 @@ Current continuity-candidate boundary:
 - `get_continuity_candidates_for(actor_id)` scans current related links, resolves the linked living actors, excludes the actor itself, dedupes candidates, and returns small structured candidate objects
 - current candidate objects contain `actor_id`, `full_name`, `link_type`, `link_role`, `relationship_label`, `structural_status`, `is_alive`, `age`, `life_stage`, and `current_place_name`
 - sibling candidates are now recognized from shared-parent truth and rendered with direct simple labels (`Brother` / `Sister`) instead of generic link text
+- family parents/children now also use direct fallback labels (`Mother`, `Father`, `Child`, `Sibling`) before any generic `type/role` rendering path
 - current candidate labeling and ordering are deterministic: candidate-defining link context is chosen by a stable link sort key, and final candidate ordering now applies a small closeness priority before (`full_name`, `link_type`, `link_role`, `actor_id`) so siblings rank ahead of less-close linked actors
 - continuity candidate gathering now delegates through the generic world-owned `get_links(...)` seam, so current candidates can come from any stored link type even though startup only seeds family links plus one direct parent-to-parent `association/coparent` pair
 - `handoff_focus_to_continuation(...)` is the current world-owned validation/mutation seam for switching focus after the focused actor is dead
@@ -322,7 +323,7 @@ Current shell-level functions:
 - `build_death_lines(...)` — shell-owned dead-focus interrupt copy assembly
 - `build_screen_chrome(...)` — shell-owned title/subtitle/date chrome assembly for the current TUI screen
 - `draw_text_block(...)` — small curses text rendering helper with wrapping support
-- `ActoraTUI` — narrow curses shell object managing the split Life View, styled header/footer chrome, lineage list/detail, skip-time selection, death acknowledgment, continuation selection, simple left-pane scrolling, and safe footer rendering that avoids writing into the terminal’s last column
+- `ActoraTUI` — narrow curses shell object managing the split Life View, styled header/footer chrome, lineage list/detail, skip-time selection, death acknowledgment, two-step continuation inspection/selection, simple left-pane scrolling, and safe footer rendering that avoids writing into the terminal’s last column
 - `safe_input(prompt)` — narrow shared CLI input boundary helper that exits cleanly on `EOFError` and `KeyboardInterrupt`
 - `create_character()` — character creation prompts and input validation
 - `setup_initial_world(...)` — World creation, parent identity generation, startup actor entry delegation through world-owned helpers (`create_human_actor(...)` and `create_human_child_with_parents(...)`), and initial focused-actor assignment through `World.set_focused_actor(...)`
@@ -547,7 +548,9 @@ Current structural-transition behavior:
 - continuity state can be built from the current linked living actors through `World.build_continuity_state_for(...)`
 - current continuity candidates are returned in deterministic order with display-ready relationship metadata
 - ordinary month advancement does not proceed once the focused actor is dead
-- `main.py` now renders a dedicated dead-focus interrupt led by `You are dead.`, shows current death context when available, requires acknowledgment before showing continuation choices, and renders each continuation candidate with relationship label, age, life stage, and current place before switching focus through the world-owned handoff method
+- `main.py` now renders a dedicated dead-focus interrupt led by `You are dead.`, shows current death context when available, adds a brief life-summary retrospective (age/place/stats plus recent meaningful records), and still requires acknowledgment before showing any continuation choices
+- `main.py` now renders continuation candidates as compact name/relationship/age/place rows, opens a dedicated continuation-detail inspect view on `Enter`, and only hands off focus after explicit confirmation from that detail screen
+- player-facing record surfaces in `main.py` now filter out implementation scaffolding records such as `actor_entry` and `family_bootstrap` while preserving those records in world storage
 - `main.py` now exposes lineage browsing through the curses shell so family-linked alive/dead actors can be inspected through a highlighted list + detail flow backed by current actors/links/records
 - if no valid continuation candidates exist, the shell reports that cleanly and leaves the run only through explicit quit
 

@@ -10,6 +10,7 @@ from world import World
 EVENT_DETAIL_THRESHOLD = 8
 EVENT_RECENT_DISPLAY_LIMIT = 5
 LINEAGE_RECORD_LIMIT = 6
+INSPECT_RECORD_LIMIT = 5
 SKIP_MONTH_PRESETS = (1, 3, 6, 12, 24, 60)
 INPUT_INTERRUPTED_MESSAGE = "Input interrupted. Exiting Actora."
 LINEAGE_FILTER_LABELS = {
@@ -18,6 +19,7 @@ LINEAGE_FILTER_LABELS = {
     "dead": "Dead",
 }
 MAIN_LEFT_SECTION_KEYS = ("identity", "location", "statistics", "relationships")
+HIDDEN_PLAYER_RECORD_TYPES = {"family_bootstrap", "actor_entry"}
 BACK_KEYS = {
     27,
 }
@@ -170,13 +172,15 @@ def build_screen_chrome(screen_name, world, focused_actor_name):
         "skip_time": "Skip Time",
         "death_ack": "Death Interrupt",
         "continuation": "Continuation",
+        "continuation_detail": "Continuation",
     }
     subtitle_map = {
         "main": focused_actor_name,
-        "lineage": f"Focused actor: {focused_actor_name}",
+        "lineage": focused_actor_name,
         "skip_time": "Choose a larger time jump or enter custom months",
-        "death_ack": "Death reveals before any continuation choice",
-        "continuation": "Continuation choices appear only after acknowledgment",
+        "death_ack": focused_actor_name,
+        "continuation": focused_actor_name,
+        "continuation_detail": focused_actor_name,
     }
     date_text = format_sim_date(world.current_year, world.current_month)
     return {
@@ -388,6 +392,27 @@ def build_lineage_row(entry):
     return f"{entry['full_name']} · {entry['relationship_label']} · {status_label} · Age {entry['age']}"
 
 
+def filter_player_facing_records(records):
+    """Removes implementation-scaffolding records from player-facing surfaces."""
+    return [
+        record
+        for record in records
+        if record.get("record_type") not in HIDDEN_PLAYER_RECORD_TYPES
+    ]
+
+
+def build_record_summary_lines(records):
+    """Builds compact record lines for inspectability surfaces."""
+    filtered_records = filter_player_facing_records(records)
+    if not filtered_records:
+        return ["No records found."]
+    return [
+        f"[{record['year']:04d}-{record['month']:02d}] "
+        f"({record['record_type']}) {record['text']}"
+        for record in filtered_records
+    ]
+
+
 class ActoraTUI:
     """Small actor-first curses shell layered on top of the existing world seams."""
 
@@ -405,6 +430,7 @@ class ActoraTUI:
         self.lineage_search_text = ""
         self.lineage_search_active = False
         self.main_left_scroll = 0
+        self.selected_continuation_actor_id = None
         self.last_message = "A/Enter advances one month."
         self.last_event_lines = [
             "Recent Activity",
@@ -431,11 +457,11 @@ class ActoraTUI:
         """Applies shell-level dead-focus flow selection before rendering."""
         focused_actor = self.get_focused_actor()
         if focused_actor is None or focused_actor.is_alive():
-            if self.screen_name in {"death_ack", "continuation"}:
+            if self.screen_name in {"death_ack", "continuation", "continuation_detail"}:
                 self.screen_name = "main"
             return
 
-        if self.screen_name not in {"death_ack", "continuation"}:
+        if self.screen_name not in {"death_ack", "continuation", "continuation_detail"}:
             self.screen_name = "death_ack"
 
     def get_lineage_browser_state(self):
@@ -585,28 +611,45 @@ class ActoraTUI:
     def acknowledge_death(self):
         continuity_state = self.get_continuity_state()
         self.continuation_selection = 0
+        self.selected_continuation_actor_id = None
         self.screen_name = "continuation"
         if continuity_state["had_continuity_candidates"]:
             self.last_message = "Choose a continuation target."
         else:
             self.last_message = "No valid continuation target exists."
 
-    def choose_continuation(self):
+    def get_selected_continuation_candidate(self):
         continuity_state = self.get_continuity_state()
         candidates = continuity_state["continuity_candidates"]
         if not candidates:
-            self.running = False
-            return
+            return None
 
         self.continuation_selection = max(
             0,
             min(self.continuation_selection, len(candidates) - 1),
         )
-        successor_actor_id = candidates[self.continuation_selection]["actor_id"]
+        return candidates[self.continuation_selection]
+
+    def open_continuation_detail(self):
+        selected_candidate = self.get_selected_continuation_candidate()
+        if selected_candidate is None:
+            return
+        self.selected_continuation_actor_id = selected_candidate["actor_id"]
+        self.screen_name = "continuation_detail"
+        self.last_message = f"Inspecting {selected_candidate['full_name']}."
+
+    def choose_continuation(self):
+        selected_candidate = self.get_selected_continuation_candidate()
+        if selected_candidate is None:
+            self.running = False
+            return
+
+        successor_actor_id = selected_candidate["actor_id"]
         handoff_result = self.world.handoff_focus_to_continuation(
             self.get_focused_actor_id(),
             successor_actor_id,
         )
+        self.selected_continuation_actor_id = None
         self.screen_name = "main"
         self.last_message = (
             f"Focus moved from {handoff_result['previous_actor_name']} "
@@ -730,6 +773,15 @@ class ActoraTUI:
                 self.continuation_selection + 1,
             )
         elif key in (curses.KEY_ENTER, 10, 13):
+            self.open_continuation_detail()
+
+    def handle_continuation_detail_key(self, key):
+        if key in (ord("q"), ord("Q")):
+            self.running = False
+        elif key in (ord("b"), ord("B")) or key in BACK_KEYS:
+            self.screen_name = "continuation"
+            self.last_message = "Returned to continuation candidates."
+        elif key in (curses.KEY_ENTER, 10, 13):
             self.choose_continuation()
 
     def handle_key(self, key):
@@ -744,6 +796,8 @@ class ActoraTUI:
             self.handle_death_ack_key(key)
         elif self.screen_name == "continuation":
             self.handle_continuation_key(key)
+        elif self.screen_name == "continuation_detail":
+            self.handle_continuation_detail_key(key)
 
     def render_footer(self, stdscr, height, width):
         footer_hints = {
@@ -752,7 +806,8 @@ class ActoraTUI:
             "lineage_search": "Type search   [Enter] Confirm   [Esc] Exit Search",
             "skip_time": "[↑↓] Preset   [0-9] Custom   [Bksp] Erase   [Enter] Confirm   [B] Back",
             "death_ack": "[Enter] Continue   [Q] Quit",
-            "continuation": "[↑↓] Move   [Enter] Continue   [Q] Quit",
+            "continuation": "[↑↓] Move   [Enter] Inspect   [Q] Quit",
+            "continuation_detail": "[Enter] Continue as this person   [B] Back to list   [Q] Quit",
         }
         footer_key = "lineage_search" if self.screen_name == "lineage" and self.lineage_search_active else self.screen_name
         footer_text = footer_hints.get(footer_key, "")
@@ -888,16 +943,37 @@ class ActoraTUI:
                     "Recent Records",
                 ]
             )
-            if not records:
-                right_lines.append("No records found.")
-            else:
-                for record in records:
-                    right_lines.append(
-                        f"[{record['year']:04d}-{record['month']:02d}] "
-                        f"({record['record_type']}) {record['text']}"
-                    )
+            right_lines.extend(build_record_summary_lines(records))
 
         draw_text_block(stdscr, top, right_left, right_width, body_height, right_lines)
+
+    def build_actor_inspect_detail(self, actor_id, *, relationship_label=None, recent_record_limit=INSPECT_RECORD_LIMIT):
+        """Builds one shell-owned inspectability payload for an actor."""
+        actor = self.world.get_actor(actor_id)
+        if actor is None:
+            return None
+
+        lifecycle_year = self.world.current_year
+        lifecycle_month = self.world.current_month
+        if not actor.is_alive() and actor.death_year is not None and actor.death_month is not None:
+            lifecycle_year = actor.death_year
+            lifecycle_month = actor.death_month
+
+        lifecycle = actor.get_lifecycle_state(lifecycle_year, lifecycle_month)
+        actor_records = self.world.get_actor_records(actor_id)
+        recent_records = list(reversed(filter_player_facing_records(actor_records)))[:recent_record_limit]
+        return {
+            "full_name": actor.get_full_name(),
+            "relationship_label": relationship_label or "Connected",
+            "age": lifecycle["age_years"],
+            "life_stage": lifecycle["life_stage"],
+            "current_place_name": self.world.get_place_name(actor.current_place_id) or "Unknown",
+            "health": actor.stats["health"],
+            "happiness": actor.stats["happiness"],
+            "intelligence": actor.stats["intelligence"],
+            "money": actor.money,
+            "records": recent_records,
+        }
 
     def render_skip_time(self, stdscr, height, width):
         custom_months = self.get_custom_skip_months()
@@ -935,12 +1011,33 @@ class ActoraTUI:
     def render_death_ack(self, stdscr, height, width):
         continuity_state = self.get_continuity_state()
         content_left, content_width = get_content_bounds(width, max_width=74)
+        death_detail = self.build_actor_inspect_detail(
+            self.get_focused_actor_id(),
+            relationship_label="Self",
+        )
         lines = [
             "",
             center_text("DEATH INTERRUPT", content_width),
             "",
         ]
         lines.extend(build_death_lines(continuity_state))
+        if death_detail is not None:
+            lines.extend(
+                [
+                    "",
+                    "Life Summary",
+                    f"Age at death: {death_detail['age']}",
+                    f"Place at death: {death_detail['current_place_name']}",
+                    (
+                        "At death: "
+                        f"Health {death_detail['health']}   Happiness {death_detail['happiness']}   "
+                        f"Intelligence {death_detail['intelligence']}   Money ${death_detail['money']}"
+                    ),
+                    "",
+                    "Recent Records",
+                ]
+            )
+            lines.extend(build_record_summary_lines(death_detail["records"]))
         lines.extend(
             [
                 "",
@@ -965,8 +1062,6 @@ class ActoraTUI:
             "",
             center_text(self.last_message, content_width),
             "",
-            center_text("CONNECTED LIVING CANDIDATES", content_width),
-            "",
         ]
         highlight_index = None
 
@@ -978,17 +1073,62 @@ class ActoraTUI:
                 0,
                 min(self.continuation_selection, len(candidates) - 1),
             )
-            for candidate in candidates:
-                summary = dict(candidate)
-                summary["birth_date"] = None
-                summary["death_date"] = None
-                summary["death_reason"] = None
-                line = " · ".join(build_person_card_lines(summary)[:4])
-                if len(lines) == 6 + self.continuation_selection:
+            for index, candidate in enumerate(candidates):
+                line = (
+                    f"{candidate['full_name']} · {candidate['relationship_label']} · "
+                    f"Age {candidate['age']} · {candidate.get('current_place_name') or 'Unknown'}"
+                )
+                if index == self.continuation_selection:
                     highlight_index = len(lines)
                 lines.append(line)
 
         draw_text_block(stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
+
+    def render_continuation_detail(self, stdscr, height, width):
+        continuity_state = self.get_continuity_state()
+        candidates = continuity_state["continuity_candidates"]
+        selected_candidate = next(
+            (
+                candidate
+                for candidate in candidates
+                if candidate["actor_id"] == self.selected_continuation_actor_id
+            ),
+            None,
+        )
+        if selected_candidate is None:
+            self.screen_name = "continuation"
+            self.last_message = "Selected continuation target is no longer available."
+            self.render_continuation(stdscr, height, width)
+            return
+
+        detail = self.build_actor_inspect_detail(
+            selected_candidate["actor_id"],
+            relationship_label=selected_candidate["relationship_label"],
+        )
+        content_left, content_width = get_content_bounds(width, max_width=86)
+        lines = [
+            center_text("CONTINUATION DETAIL", content_width),
+            "",
+            detail["full_name"],
+            (
+                f"{detail['relationship_label']}   Age {detail['age']}   "
+                f"Place: {detail['current_place_name']}"
+            ),
+            (
+                f"Health {detail['health']}   Happiness {detail['happiness']}   "
+                f"Intelligence {detail['intelligence']}   Money ${detail['money']}"
+            ),
+            "",
+            "Recent Records",
+        ]
+        lines.extend(build_record_summary_lines(detail["records"]))
+        lines.extend(
+            [
+                "",
+                "[Enter] Continue as this person   [B] Back to list",
+            ]
+        )
+        draw_text_block(stdscr, 5, content_left, content_width, height - 7, lines)
 
     def render(self, stdscr):
         stdscr.erase()
@@ -1008,6 +1148,8 @@ class ActoraTUI:
             self.render_death_ack(stdscr, height, width)
         elif self.screen_name == "continuation":
             self.render_continuation(stdscr, height, width)
+        elif self.screen_name == "continuation_detail":
+            self.render_continuation_detail(stdscr, height, width)
 
         self.render_footer(stdscr, height, width)
         stdscr.refresh()

@@ -1,5 +1,14 @@
 # Actora Changelog
 
+## Version 0.37.0 (Patch) - 2026-03-29
+- **Death / Continuation Inspectability Follow-Through:**
+    - Filtered implementation-scaffolding records (`family_bootstrap`, `actor_entry`) out of player-facing lineage detail and death/continuation inspect surfaces while preserving the records in world storage.
+    - Simplified lineage, death interrupt, and continuation header subtitles so they now show only the focused actor name instead of leaking flow-spec phrasing into the chrome.
+    - Reworked continuation list rows in `main.py` to a tighter one-line format of name, relationship, age, and place, and removed the extra continuation heading.
+    - Added a brief life-summary retrospective to the death interrupt showing age at death, place at death, key end-of-life stats, and recent meaningful records.
+    - Changed continuation selection to a two-step inspect-first flow with a dedicated candidate detail screen, explicit confirm/back actions, and recent meaningful records before handoff.
+    - Tightened world-owned parent continuation labels so family parents now render as `Mother` / `Father` instead of generic `family/mother` / `family/father`.
+
 ## Version 0.36.9 (Patch) - 2026-03-29
 - **Family Continuity Groundwork:**
     - Expanded startup family generation so some runs now begin with one or more older siblings created as real actors before the player is born, while only-child starts still remain common.
