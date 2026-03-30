@@ -1,4 +1,4 @@
-Actionable Ideas Summary — Rev38
+Actionable Ideas Summary — Rev39
 Date: 2026-03-30
 Role: temporary near-term operational planning snapshot for Actora
 Authority: non-authoritative; stable docs win, repo truth wins on implementation
@@ -7,7 +7,7 @@ Usage rule: keep this more distilled than the WIR and focused on the current wor
 
 === CURRENT WORKING POSITION ===
 
-Verified repo truth is through v0.40.0 with source-stack sync through:
+Verified repo truth is through v0.40.1 with source-stack sync through:
 - Master Context v9, Roadmap v10, Operator Guide v9 (+ section 18: player-facing text rule)
 
 The project has a materially strong early backbone:
@@ -24,6 +24,7 @@ The project has a materially strong early backbone:
 - Death inspectability (life summary, two-step continuation inspection)
 - Consistent TUI control language (Space=select, Enter=proceed, B=back, ↑↓=navigate)
 - 12 real countries with 39 cities, culture-aware name generation (400+ names)
+- Questionnaire-based character creation as alternative to manual (16 personality questions)
 - Player-facing text lint tool and operator guide rule (section 18)
 
 Recent milestone sequence:
@@ -38,13 +39,14 @@ Recent milestone sequence:
 - v0.39.0 — event-choice framework + gender/sexuality emergence
 - v0.39.1 — traits wired into events
 - v0.40.0 — real location content (12 countries, 39 cities, culture-aware names)
+- v0.40.1 — questionnaire-based character creation mode
 
 
 === CURRENT PLANNING QUESTION ===
 
-"Given repo truth through v0.40.0, what is the strongest next move: education foundation, further location/identity depth, or more current-layer polish?"
+"Given repo truth through v0.40.1, what is the strongest next move: education foundation, further polish from playtesting, or remaining open items?"
 
-User direction: tighten and polish before starting education. Real location content has landed. The game now has a meaningful geographic foundation.
+User direction: fix all remaining open items before education. Address everything found during playtesting. Questionnaire is now shipped.
 
 
 === LEADING PLANNING CANDIDATES ===

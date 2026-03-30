@@ -55,5 +55,5 @@ Purpose: repo-local parking lot for current bugs, regressions, and revisit items
 - v0.30.0 (planning): planning-doc simplification completed in v49 rewrite
 
 - questionnaire-based stat/trait generation as alternative to manual sliders
-  Status: open (design locked, not yet implemented)
-  Note: Alter Ego-style TRUE/FALSE personality test. Two modes on Stats step: Manual vs Questionnaire. Questionnaire determines both stats AND traits automatically. Results shown but not editable. ~15-20 questions. Professional game wording required for the mode-choice explanation and questions. Questions/mapping need careful design work before implementation.
+  Status: resolved in v0.40.1
+  Note: 16-question personality test with mixed styles (situational/spectrum/gut-pick). Two modes on Stats step: Manual vs Questionnaire. Questionnaire determines both stats AND traits automatically. Results shown but not editable.

@@ -1,4 +1,4 @@
-Actora Working Ideas Register v50
+Actora Working Ideas Register v51
 
 Date: 2026-03-30
 Role: broad working idea intake, staging, parking, interview-derived design retention, and rewrite-pressure tracking for Actora
@@ -9,7 +9,7 @@ Usage rule: preserve substantial design material and conversation-derived pressu
 
 === CURRENT WORKING READ ===
 
-Verified repo truth is through v0.40.0. The backbone is materially stronger than it was at the start of this development arc.
+Verified repo truth is through v0.40.1. The backbone is materially stronger than it was at the start of this development arc.
 
 Foundation layers realized:
 - World-owned actor registry, link storage, place registry (with parent-place hierarchy), record storage, simulation-step boundary
@@ -147,6 +147,7 @@ v0.38.1 — Character creation wizard + appearance + traits
 v0.39.0 — Event-choice framework + gender/sexuality identity emergence
 v0.39.1 — Traits wired into events (20 trait-gated events)
 v0.40.0 — Real location content (12 countries, 39 cities, culture-aware name generation)
+v0.40.1 — Questionnaire-based character creation mode (16 personality questions)
 
 Completed IDEAs (no longer active): IDEA-100, IDEA-105, IDEA-106, IDEA-107, IDEA-109, IDEA-110, IDEA-111, IDEA-112, IDEA-113, IDEA-114, IDEA-115, IDEA-116, IDEA-117, IDEA-118 (Slice 1+2)
 Also completed: IDEA-097, IDEA-098, IDEA-099 (CLI hardening, singleton IDs, rename)
