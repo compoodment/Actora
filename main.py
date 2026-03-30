@@ -249,7 +249,7 @@ def build_snapshot_sections(snapshot_data):
             "Location",
             [
                 f"Planet: {location['world_body_name']}",
-                f"Current Place: {location['current_place_name']}",
+                f"City: {location['current_place_name']}",
                 f"Country: {location['jurisdiction_place_name']}",
             ],
         ),
@@ -1835,7 +1835,7 @@ class ActoraTUI:
             "",
             "Location",
             f"  Planet: {location['world_body_name']}",
-            f"  Current Place: {location['current_place_name']}",
+            f"  City: {location['current_place_name']}",
             f"  Country: {location['jurisdiction_place_name']}",
             "",
             "Relationships",
