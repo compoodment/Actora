@@ -1,5 +1,11 @@
 # Actora Changelog
 
+## Version 0.37.4 (Patch) - 2026-03-29
+- **History + Lineage Polish:**
+    - Added structural event markers in `main.py` so focused-actor `birth` and `death` records carried into the shell-owned event log now render as `★` and `✦` in both the full `History` browser and the live right-pane feed, while ordinary monthly events remain unmarked.
+    - Verified the Life View `Relationships` section already handles the new list-based snapshot data correctly and continues to show `No living family.` whenever the structured relationships list is empty.
+    - Verified skip-time back UX in `main.py`: both `[B]` and `Esc` return immediately to the main screen, and `open_skip_time()` still resets preset selection and custom typed months each time the screen is reopened.
+
 ## Version 0.37.3 (Patch) - 2026-03-29
 - **UX Cleanup + Event Quality:**
     - Reset Life View status text back to the default idle prompt when backing out of history, lineage, or skip-time, while preserving the existing advance-time and continuation-handoff messages.

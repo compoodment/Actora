@@ -97,14 +97,24 @@ def build_snapshot_sections(snapshot_data):
     ]
 
 
-def build_event_log_entry(kind, text, *, year=None, month=None):
+def build_event_log_entry(kind, text, *, year=None, month=None, record_type=None):
     """Builds one normalized event-log entry for shell-owned history rendering."""
     return {
         "kind": kind,
         "text": text,
         "year": year,
         "month": month,
+        "record_type": record_type,
     }
+
+
+def get_event_log_marker(record_type):
+    """Returns the optional visual marker prefix for structural record entries."""
+    if record_type == "birth":
+        return "★ "
+    if record_type == "death":
+        return "✦ "
+    return ""
 
 
 def build_history_separator(year, width):
@@ -121,7 +131,8 @@ def format_history_entry(entry, width):
     if entry["kind"] == "event":
         year = entry["year"] if entry["year"] is not None else 0
         month = entry["month"] if entry["month"] is not None else 0
-        return f"[{year:04d}-{month:02d}] {entry['text']}"
+        marker = get_event_log_marker(entry.get("record_type"))
+        return f"[{year:04d}-{month:02d}] {marker}{entry['text']}"
     return entry["text"]
 
 
@@ -136,6 +147,9 @@ def build_live_feed_lines(event_log):
             if lines:
                 lines.append("")
             lines.append(entry["text"])
+        elif entry["kind"] == "event":
+            marker = get_event_log_marker(entry.get("record_type"))
+            lines.append(f"{marker}{entry['text']}")
         else:
             lines.append(entry["text"])
     return lines
@@ -547,10 +561,16 @@ class ActoraTUI:
     def get_continuity_state(self):
         return self.world.build_continuity_state_for(self.get_focused_actor_id())
 
-    def append_event_log_entry(self, kind, text, *, year=None, month=None):
+    def append_event_log_entry(self, kind, text, *, year=None, month=None, record_type=None):
         """Appends one event-log entry with normalized structure."""
         self.event_log.append(
-            build_event_log_entry(kind, text, year=year, month=month)
+            build_event_log_entry(
+                kind,
+                text,
+                year=year,
+                month=month,
+                record_type=record_type,
+            )
         )
 
     def append_event_log_turn(self, turn_result, months_to_advance, new_records):
@@ -626,6 +646,7 @@ class ActoraTUI:
                 record.get("text", ""),
                 year=record_year,
                 month=record_month,
+                record_type=record.get("record_type"),
             )
 
     def open_history(self):
