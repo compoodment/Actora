@@ -5,6 +5,7 @@ import textwrap
 from uuid import uuid4
 
 from banners import ACTORA_TITLE_BANNER, QUIT_BANNER
+from human import Human
 from identity import prepare_parent_identity_context, generate_parent_identity_from_context
 from world import World
 
@@ -24,6 +25,37 @@ BACK_KEYS = {
 }
 MAIN_IDLE_MESSAGE = "A/Enter advances one month."
 ADVANCE_THROTTLE_SECONDS = 0.2
+CREATION_SEX_OPTIONS = ["Male", "Female", "Intersex"]
+CREATION_EYE_COLOR_OPTIONS = ["Brown", "Blue", "Green", "Hazel", "Gray", "Amber", "Other"]
+CREATION_HAIR_COLOR_OPTIONS = ["Black", "Brown", "Blonde", "Red", "Auburn", "Other"]
+CREATION_SKIN_TONE_OPTIONS = ["Light", "Fair", "Medium", "Olive", "Tan", "Brown", "Dark", "Other"]
+CREATION_TRAIT_POOL = ["Curious", "Calm", "Fussy", "Bold", "Shy", "Cheerful", "Stubborn", "Gentle", "Restless", "Alert"]
+CREATION_STAT_ORDER = [
+    "health",
+    "happiness",
+    "intelligence",
+    "strength",
+    "charisma",
+    "creativity",
+    "wisdom",
+    "discipline",
+    "willpower",
+    "looks",
+    "fertility",
+]
+CREATION_STAT_LABELS = {
+    "health": "Health",
+    "happiness": "Happiness",
+    "intelligence": "Intelligence",
+    "strength": "Strength",
+    "charisma": "Charisma",
+    "creativity": "Creativity",
+    "wisdom": "Wisdom",
+    "discipline": "Discipline",
+    "willpower": "Willpower",
+    "looks": "Looks",
+    "fertility": "Fertility",
+}
 
 
 def generate_startup_actor_id(role):
@@ -459,6 +491,533 @@ def build_record_summary_lines(records):
     ]
 
 
+def build_randomized_starting_stats():
+    """Builds one startup stat block using the same Human randomization ranges."""
+    actor = Human("Human", "Temp", "", "Female", "Female", 1, 1)
+    actor.randomize_starting_statistics()
+    return dict(actor.stats)
+
+
+class CreationWizard:
+    """Curses-driven startup flow for building one player character payload."""
+
+    STEP_TITLES = [
+        "Step 1: Identity",
+        "Step 2: Appearance",
+        "Step 3: Traits",
+        "Step 4: Stats",
+        "Step 5: Confirm",
+    ]
+
+    def __init__(self, stdscr):
+        self.stdscr = stdscr
+        self.running = True
+        self.cancelled = False
+        self.step_index = 0
+
+        self.identity_field_index = 0
+        self.appearance_field_index = 0
+        self.appearance_option_index = 0
+        self.appearance_mode = "field"
+        self.trait_index = 0
+        self.stat_index = 0
+
+        self.data = {
+            "first_name": "",
+            "last_name": "",
+            "sex": CREATION_SEX_OPTIONS[0],
+            "gender": "Male",
+            "appearance": {
+                "eye_color": CREATION_EYE_COLOR_OPTIONS[0],
+                "hair_color": CREATION_HAIR_COLOR_OPTIONS[0],
+                "skin_tone": CREATION_SKIN_TONE_OPTIONS[2],
+            },
+            "traits": [],
+            "stats": build_randomized_starting_stats(),
+        }
+        self.custom_appearance_values = {
+            "eye_color": "",
+            "hair_color": "",
+            "skin_tone": "",
+        }
+
+    def get_step_title(self):
+        return self.STEP_TITLES[self.step_index]
+
+    def get_identity_fields(self):
+        return [
+            {"kind": "text", "key": "first_name", "label": "First Name", "optional": False},
+            {"kind": "text", "key": "last_name", "label": "Last Name", "optional": True},
+            {"kind": "select", "key": "sex", "label": "Sex", "options": CREATION_SEX_OPTIONS},
+        ]
+
+    def get_appearance_fields(self):
+        fields = [
+            {"kind": "select", "key": "eye_color", "label": "Eye Color", "options": CREATION_EYE_COLOR_OPTIONS},
+            {"kind": "select", "key": "hair_color", "label": "Hair Color", "options": CREATION_HAIR_COLOR_OPTIONS},
+            {"kind": "select", "key": "skin_tone", "label": "Skin Tone", "options": CREATION_SKIN_TONE_OPTIONS},
+        ]
+        expanded_fields = []
+        for field in fields:
+            expanded_fields.append(field)
+            if self.data["appearance"][field["key"]] == "Other":
+                expanded_fields.append(
+                    {
+                        "kind": "text",
+                        "key": field["key"],
+                        "label": f"Custom {field['label']}",
+                        "optional": False,
+                    }
+                )
+        return expanded_fields
+
+    def get_current_appearance_select_options(self):
+        selected_field = self.get_active_appearance_select_field()
+        return selected_field["options"]
+
+    def get_active_appearance_select_field(self):
+        fields = self.get_appearance_fields()
+        current_field = fields[self.appearance_field_index]
+        if current_field["kind"] == "select":
+            return current_field
+
+        for index in range(self.appearance_field_index - 1, -1, -1):
+            if fields[index]["kind"] == "select":
+                return fields[index]
+
+        return fields[0]
+
+    def get_visible_value_for_appearance(self, key):
+        value = self.data["appearance"][key]
+        if value == "Other":
+            return self.custom_appearance_values[key] or "Other"
+        return value
+
+    def sync_gender_to_sex(self):
+        sex = self.data["sex"]
+        self.data["gender"] = sex if sex in {"Male", "Female"} else "Non-binary"
+
+    def can_advance_identity(self):
+        return bool(self.data["first_name"].strip())
+
+    def can_advance_appearance(self):
+        for key, value in self.data["appearance"].items():
+            if value != "Other":
+                continue
+            if not self.custom_appearance_values[key].strip():
+                return False
+        return True
+
+    def can_advance_traits(self):
+        return len(self.data["traits"]) == 3
+
+    def build_result(self):
+        appearance = {}
+        for key, value in self.data["appearance"].items():
+            if value == "Other":
+                appearance[key] = self.custom_appearance_values[key].strip()
+            else:
+                appearance[key] = value
+        return {
+            "first_name": self.data["first_name"].strip(),
+            "last_name": self.data["last_name"].strip(),
+            "sex": self.data["sex"],
+            "gender": self.data["gender"],
+            "appearance": appearance,
+            "traits": list(self.data["traits"]),
+            "stats": dict(self.data["stats"]),
+        }
+
+    def render_header(self, width):
+        content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
+        title_text = build_centered_rule("Character Creation", content_width)
+        subtitle_text = center_text(self.get_step_title(), content_width)
+        self.stdscr.addnstr(0, content_left, title_text, content_width, curses.A_BOLD)
+        self.stdscr.addnstr(1, content_left, subtitle_text, content_width)
+        self.stdscr.addnstr(2, content_left, "═" * content_width, content_width, curses.A_BOLD)
+
+    def render_footer(self, height, width):
+        footer_map = {
+            0: "[Tab/↓] Next Field   [↑] Previous Field   [Enter/→] Continue   [Q] Quit",
+            1: "[↑↓] Move   [Enter] Select/Edit   [→] Continue   [B/←] Back   [Q] Quit",
+            2: "[↑↓] Move   [Enter] Toggle Trait   [→] Continue   [B/←] Back   [Q] Quit",
+            3: "[↑↓] Move   [←→ or +/-] Adjust   [R] Randomize   [Enter] Continue   [B] Back   [Q] Quit",
+            4: "[Enter] Start Game   [B/←] Back   [Q] Quit",
+        }
+        content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
+        hline_char = getattr(curses, "ACS_HLINE", ord("-"))
+        self.stdscr.hline(height - 2, content_left, hline_char, content_width)
+        self.stdscr.addnstr(
+            height - 1,
+            content_left,
+            center_text(footer_map[self.step_index], content_width),
+            content_width,
+            curses.A_NORMAL,
+        )
+
+    def render_identity(self, height, width):
+        content_left, content_width = get_content_bounds(width, max_width=84)
+        fields = self.get_identity_fields()
+        lines = [
+            "Create your character's identity.",
+            "",
+        ]
+        highlight_index = None
+        for index, field in enumerate(fields):
+            if index == self.identity_field_index:
+                highlight_index = len(lines)
+            value = self.data[field["key"]]
+            suffix = "_" if field["kind"] == "text" and index == self.identity_field_index else ""
+            optional_suffix = " (optional)" if field.get("optional") else ""
+            lines.append(f"{field['label']}{optional_suffix}: {value}{suffix}")
+        lines.extend(
+            [
+                "",
+                "Sex Options",
+            ]
+        )
+        for index, option in enumerate(CREATION_SEX_OPTIONS, start=1):
+            marker = "[x]" if self.data["sex"] == option else "[ ]"
+            lines.append(f"  {index}. {marker} {option}")
+        lines.extend(
+            [
+                "",
+                "Gender is not chosen here.",
+                f"It defaults to: {self.data['gender']}",
+            ]
+        )
+        draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
+
+    def render_appearance(self, height, width):
+        content_left, content_width = get_content_bounds(width, max_width=92)
+        fields = self.get_appearance_fields()
+        active_select_field = self.get_active_appearance_select_field()
+        lines = [
+            "Choose appearance details.",
+            "",
+        ]
+        highlight_index = None
+        for index, field in enumerate(fields):
+            if index == self.appearance_field_index and self.appearance_mode == "field":
+                highlight_index = len(lines)
+            if field["kind"] == "select":
+                value = self.get_visible_value_for_appearance(field["key"])
+                lines.append(f"{field['label']}: {value}")
+            else:
+                value = self.custom_appearance_values[field["key"]]
+                suffix = "_" if index == self.appearance_field_index and self.appearance_mode == "field" else ""
+                lines.append(f"{field['label']}: {value}{suffix}")
+
+        lines.extend(["", "Options"])
+        options = self.get_current_appearance_select_options()
+        for index, option in enumerate(options, start=1):
+            prefix = ">"
+            selected_marker = "[x]" if self.data["appearance"][active_select_field["key"]] == option else "[ ]"
+            if self.appearance_mode == "option" and (index - 1) == self.appearance_option_index:
+                highlight_index = len(lines)
+            else:
+                prefix = " "
+            lines.append(f"{prefix} {index}. {selected_marker} {option}")
+
+        if not self.can_advance_appearance():
+            lines.extend(["", "Custom values are required when 'Other' is selected."])
+
+        draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
+
+    def render_traits(self, height, width):
+        content_left, content_width = get_content_bounds(width, max_width=84)
+        lines = [
+            "Select exactly 3 traits.",
+            f"Selected: {len(self.data['traits'])}/3",
+            "",
+        ]
+        highlight_index = None
+        for index, trait in enumerate(CREATION_TRAIT_POOL):
+            if index == self.trait_index:
+                highlight_index = len(lines)
+            marker = "[x]" if trait in self.data["traits"] else "[ ]"
+            lines.append(f"{marker} {trait}")
+        if not self.can_advance_traits():
+            lines.extend(["", "You must choose exactly 3 traits to continue."])
+        draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
+
+    def render_stats(self, height, width):
+        content_left, content_width = get_content_bounds(width, max_width=92)
+        left_width, right_left, right_width = split_centered_columns(content_left, content_width, left_ratio=0.56)
+        body_height = height - 7
+
+        left_lines = [
+            "Primary Stats",
+            "",
+        ]
+        highlight_index = None
+        for index, stat_name in enumerate(CREATION_STAT_ORDER):
+            if index == 3:
+                left_lines.extend(["", "Secondary Stats", ""])
+            if index == self.stat_index:
+                highlight_index = len(left_lines)
+            left_lines.append(f"{CREATION_STAT_LABELS[stat_name]}: {self.data['stats'][stat_name]:>3}")
+
+        right_lines = [
+            "Controls",
+            "",
+            "Adjust any stat from 0 to 100.",
+            "Money starts at $0 and cannot be edited.",
+            "",
+            "[R] Randomize all stats",
+            "",
+            "Current Total",
+            f"{sum(self.data['stats'].values())} points across all stats",
+        ]
+
+        draw_text_block(self.stdscr, 5, content_left, left_width, body_height, left_lines, highlight_index=highlight_index)
+        draw_vertical_divider(self.stdscr, 5, right_left - 2, body_height)
+        draw_text_block(self.stdscr, 5, right_left, right_width, body_height, right_lines)
+
+    def render_confirm(self, height, width):
+        content_left, content_width = get_content_bounds(width, max_width=92)
+        result = self.build_result()
+        lines = [
+            "Review your character.",
+            "",
+            "Identity",
+            f"  Name: {result['first_name']} {result['last_name']}".strip(),
+            f"  Sex: {result['sex']}",
+            f"  Gender: {result['gender']}",
+            "",
+            "Appearance",
+            f"  Eye Color: {result['appearance']['eye_color']}",
+            f"  Hair Color: {result['appearance']['hair_color']}",
+            f"  Skin Tone: {result['appearance']['skin_tone']}",
+            "",
+            "Traits",
+            "  " + ", ".join(result["traits"]),
+            "",
+            "Stats",
+        ]
+        for stat_name in CREATION_STAT_ORDER:
+            lines.append(f"  {CREATION_STAT_LABELS[stat_name]}: {result['stats'][stat_name]}")
+        lines.append("  Money: $0")
+        draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines)
+
+    def render(self):
+        self.stdscr.erase()
+        height, width = self.stdscr.getmaxyx()
+        if height < 16 or width < 60:
+            self.stdscr.addnstr(0, 0, "Terminal too small for character creation. Resize and try again.", max(1, width - 1))
+            self.stdscr.refresh()
+            return
+
+        self.render_header(width)
+        if self.step_index == 0:
+            self.render_identity(height, width)
+        elif self.step_index == 1:
+            self.render_appearance(height, width)
+        elif self.step_index == 2:
+            self.render_traits(height, width)
+        elif self.step_index == 3:
+            self.render_stats(height, width)
+        else:
+            self.render_confirm(height, width)
+        self.render_footer(height, width)
+        self.stdscr.refresh()
+
+    def handle_quit_key(self, key):
+        if key in (ord("q"), ord("Q")):
+            self.running = False
+            self.cancelled = True
+            return True
+        return False
+
+    def handle_identity_key(self, key):
+        fields = self.get_identity_fields()
+        current_field = fields[self.identity_field_index]
+        if current_field["kind"] == "text":
+            if key == curses.KEY_UP:
+                self.identity_field_index = max(0, self.identity_field_index - 1)
+                return
+            if key in (curses.KEY_DOWN, 9):
+                self.identity_field_index = min(len(fields) - 1, self.identity_field_index + 1)
+                return
+            if key == curses.KEY_RIGHT and self.can_advance_identity():
+                self.step_index = 1
+                return
+            if key in (curses.KEY_ENTER, 10, 13):
+                if self.identity_field_index < len(fields) - 1:
+                    self.identity_field_index += 1
+                elif self.can_advance_identity():
+                    self.step_index = 1
+                return
+            if key in (curses.KEY_BACKSPACE, 127, 8):
+                self.data[current_field["key"]] = self.data[current_field["key"]][:-1]
+                return
+            if 32 <= key <= 126:
+                self.data[current_field["key"]] += chr(key)
+                return
+        if current_field["kind"] == "select":
+            current_index = current_field["options"].index(self.data["sex"])
+            if key == curses.KEY_UP:
+                self.data["sex"] = current_field["options"][max(0, current_index - 1)]
+                self.sync_gender_to_sex()
+                return
+            if key == curses.KEY_DOWN:
+                self.data["sex"] = current_field["options"][min(len(current_field["options"]) - 1, current_index + 1)]
+                self.sync_gender_to_sex()
+                return
+            if key == curses.KEY_LEFT and self.can_advance_identity():
+                self.identity_field_index = max(0, self.identity_field_index - 1)
+                return
+            if key == curses.KEY_RIGHT and self.can_advance_identity():
+                self.step_index = 1
+                return
+            if key in (curses.KEY_BACKSPACE, 127, 8):
+                self.identity_field_index = max(0, self.identity_field_index - 1)
+                return
+            if key == ord("-"):
+                current_index = max(0, current_index - 1)
+                self.data["sex"] = current_field["options"][current_index]
+                self.sync_gender_to_sex()
+                return
+            if key in (ord("+"), ord("=")):
+                current_index = min(len(current_field["options"]) - 1, current_index + 1)
+                self.data["sex"] = current_field["options"][current_index]
+                self.sync_gender_to_sex()
+                return
+            if key in (curses.KEY_ENTER, 10, 13) and self.can_advance_identity():
+                self.step_index = 1
+
+    def handle_appearance_key(self, key):
+        fields = self.get_appearance_fields()
+        self.appearance_field_index = max(0, min(self.appearance_field_index, len(fields) - 1))
+        current_field = fields[self.appearance_field_index]
+
+        if self.appearance_mode == "option":
+            options = current_field["options"]
+            if key == curses.KEY_UP:
+                self.appearance_option_index = max(0, self.appearance_option_index - 1)
+                return
+            if key == curses.KEY_DOWN:
+                self.appearance_option_index = min(len(options) - 1, self.appearance_option_index + 1)
+                return
+            if key in (curses.KEY_ENTER, 10, 13):
+                self.data["appearance"][current_field["key"]] = options[self.appearance_option_index]
+                self.appearance_mode = "field"
+                return
+            if key in (ord("b"), ord("B"), curses.KEY_LEFT, curses.KEY_BACKSPACE, 127, 8):
+                self.appearance_mode = "field"
+                return
+            return
+
+        if key in (ord("b"), ord("B"), curses.KEY_LEFT):
+            self.step_index = 0
+            return
+        if key == curses.KEY_UP:
+            self.appearance_field_index = max(0, self.appearance_field_index - 1)
+            return
+        if key == curses.KEY_DOWN:
+            self.appearance_field_index = min(len(fields) - 1, self.appearance_field_index + 1)
+            return
+        if key == curses.KEY_RIGHT and self.can_advance_appearance():
+            self.step_index = 2
+            return
+        if current_field["kind"] == "select":
+            if key in (curses.KEY_ENTER, 10, 13):
+                options = current_field["options"]
+                current_value = self.data["appearance"][current_field["key"]]
+                self.appearance_option_index = options.index(current_value)
+                self.appearance_mode = "option"
+            return
+        if key in (curses.KEY_ENTER, 10, 13):
+            if self.appearance_field_index < len(fields) - 1:
+                self.appearance_field_index += 1
+            elif self.can_advance_appearance():
+                self.step_index = 2
+            return
+        if key in (curses.KEY_BACKSPACE, 127, 8):
+            self.custom_appearance_values[current_field["key"]] = self.custom_appearance_values[current_field["key"]][:-1]
+            return
+        if 32 <= key <= 126:
+            self.custom_appearance_values[current_field["key"]] += chr(key)
+
+    def handle_traits_key(self, key):
+        if key in (ord("b"), ord("B"), curses.KEY_LEFT, curses.KEY_BACKSPACE, 127, 8):
+            self.step_index = 1
+            return
+        if key == curses.KEY_UP:
+            self.trait_index = max(0, self.trait_index - 1)
+            return
+        if key == curses.KEY_DOWN:
+            self.trait_index = min(len(CREATION_TRAIT_POOL) - 1, self.trait_index + 1)
+            return
+        if key in (curses.KEY_ENTER, 10, 13):
+            trait = CREATION_TRAIT_POOL[self.trait_index]
+            if trait in self.data["traits"]:
+                self.data["traits"].remove(trait)
+            elif len(self.data["traits"]) < 3:
+                self.data["traits"].append(trait)
+            return
+        if key == curses.KEY_RIGHT and self.can_advance_traits():
+            self.step_index = 3
+
+    def handle_stats_key(self, key):
+        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
+            self.step_index = 2
+            return
+        if key == curses.KEY_UP:
+            self.stat_index = max(0, self.stat_index - 1)
+            return
+        if key == curses.KEY_DOWN:
+            self.stat_index = min(len(CREATION_STAT_ORDER) - 1, self.stat_index + 1)
+            return
+        if key in (ord("r"), ord("R")):
+            self.data["stats"] = build_randomized_starting_stats()
+            return
+        if key in (curses.KEY_ENTER, 10, 13):
+            self.step_index = 4
+            return
+        if key in (curses.KEY_LEFT, ord("-")):
+            stat_name = CREATION_STAT_ORDER[self.stat_index]
+            self.data["stats"][stat_name] = max(0, self.data["stats"][stat_name] - 1)
+            return
+        if key in (curses.KEY_RIGHT, ord("+"), ord("=")):
+            stat_name = CREATION_STAT_ORDER[self.stat_index]
+            self.data["stats"][stat_name] = min(100, self.data["stats"][stat_name] + 1)
+
+    def handle_confirm_key(self, key):
+        if key in (ord("b"), ord("B"), curses.KEY_LEFT, curses.KEY_BACKSPACE, 127, 8):
+            self.step_index = 3
+            return None
+        if key in (curses.KEY_ENTER, 10, 13):
+            self.running = False
+            return self.build_result()
+        return None
+
+    def run(self):
+        curses.set_escdelay(25)
+        curses.curs_set(0)
+        self.stdscr.keypad(True)
+
+        while self.running:
+            self.render()
+            key = self.stdscr.getch()
+            if self.handle_quit_key(key):
+                continue
+            if self.step_index == 0:
+                self.handle_identity_key(key)
+            elif self.step_index == 1:
+                self.handle_appearance_key(key)
+            elif self.step_index == 2:
+                self.handle_traits_key(key)
+            elif self.step_index == 3:
+                self.handle_stats_key(key)
+            else:
+                result = self.handle_confirm_key(key)
+                if result is not None:
+                    return result
+
+        return None
+
+
 class ActoraTUI:
     """Small actor-first curses shell layered on top of the existing world seams."""
 
@@ -839,8 +1398,10 @@ class ActoraTUI:
     def build_profile_lines(self, snapshot_data):
         identity = snapshot_data["identity"]
         location = snapshot_data["location"]
+        appearance = snapshot_data["appearance"]
         statistics = snapshot_data["statistics"]
         secondary_statistics = snapshot_data["secondary_statistics"]
+        traits = snapshot_data["traits"]
         relationships = snapshot_data["relationships"]
 
         lines = [
@@ -852,6 +1413,22 @@ class ActoraTUI:
             f"  Age: {identity['age']}",
             f"  Life Stage: {identity['life_stage']}",
             "",
+            "Appearance",
+            f"  Eye Color: {appearance['eye_color']}",
+            f"  Hair Color: {appearance['hair_color']}",
+            f"  Skin Tone: {appearance['skin_tone']}",
+            "",
+            "Traits",
+        ]
+
+        if traits:
+            lines.append("  " + ", ".join(traits))
+        else:
+            lines.append("  None")
+
+        lines.extend(
+            [
+                "",
             "Primary Stats",
             format_stat_pair("Health", statistics["health"], "Happiness", statistics["happiness"]),
             format_stat_pair("Intelligence", statistics["intelligence"], "Money", f"${statistics['money']}"),
@@ -868,7 +1445,8 @@ class ActoraTUI:
             f"  Jurisdiction: {location['jurisdiction_place_name']}",
             "",
             "Relationships",
-        ]
+            ]
+        )
 
         if relationships:
             lines.extend([f"  {entry['label']}: {entry['name']}" for entry in relationships])
@@ -1580,61 +2158,8 @@ class ActoraTUI:
             self.handle_key(key)
 
 
-def create_character():
-    """Handles the character creation flow and returns player details."""
-    print("\n--- Character Creation ---")
-
-    while True:
-        player_first_name = safe_input("Enter your character's first name: ").strip()
-        if player_first_name:
-            break
-        print("First name cannot be empty. Please enter a name.")
-
-    player_last_name = safe_input("Enter your character's last name (optional): ").strip()
-
-    sex_options = ["Male", "Female", "Intersex"]
-    print("\nSelect biological sex:")
-    for i, option in enumerate(sex_options, 1):
-        print(f"  {i}) {option}")
-    while True:
-        try:
-            choice = int(safe_input(f"Enter choice (1-{len(sex_options)}): ").strip())
-            if 1 <= choice <= len(sex_options):
-                player_sex = sex_options[choice - 1]
-                break
-            print("Invalid number. Please choose from the options.")
-        except ValueError:
-            print("Invalid input. Please enter a number.")
-
-    gender_options = ["Male", "Female", "Non-binary", "Agender", "Genderfluid", "Other"]
-    print("\nSelect gender identity:")
-    for i, option in enumerate(gender_options, 1):
-        print(f"  {i}) {option}")
-    while True:
-        try:
-            choice = int(safe_input(f"Enter choice (1-{len(gender_options)}): ").strip())
-            if 1 <= choice <= len(gender_options):
-                selected_gender = gender_options[choice - 1]
-                if selected_gender == "Other":
-                    while True:
-                        custom_gender = safe_input("Enter your gender identity: ").strip()
-                        if custom_gender:
-                            player_gender = custom_gender
-                            break
-                        print("Gender identity cannot be empty. Please enter a value.")
-                else:
-                    player_gender = selected_gender
-                break
-            print("Invalid number. Please choose from the options.")
-        except ValueError:
-            print("Invalid input. Please enter a number.")
-
-    print("--------------------------")
-    return player_first_name, player_last_name, player_sex, player_gender
-
-
-def setup_initial_world(player_first_name, player_last_name, player_sex, player_gender):
-    """Initializes the world and sets up the player and parents."""
+def setup_initial_world_from_character(character_data):
+    """Initializes the startup world from one fully prepared character payload."""
     world = World(start_year=1, start_month=1)
     world.add_place(
         place_id="earth",
@@ -1663,7 +2188,7 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
 
     mother_identity_context = prepare_parent_identity_context(
         role="mother",
-        player_last_name=player_last_name,
+        player_last_name=character_data["last_name"],
         place_id=startup_place_id,
         world=world,
     )
@@ -1671,7 +2196,7 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
     father_identity_context = prepare_parent_identity_context(
         role="father",
         family_last_name=family_last_name,
-        player_last_name=player_last_name,
+        player_last_name=character_data["last_name"],
         place_id=startup_place_id,
         world=world,
     )
@@ -1695,6 +2220,7 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         current_place_id=startup_place_id,
         residence_place_id=startup_place_id,
         jurisdiction_place_id=startup_jurisdiction_place_id,
+        randomize_stats=True,
     )
     world.create_human_actor(
         actor_id=father_id,
@@ -1708,6 +2234,7 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         current_place_id=startup_place_id,
         residence_place_id=startup_place_id,
         jurisdiction_place_id=startup_jurisdiction_place_id,
+        randomize_stats=True,
     )
     world.add_link_pair(
         source_id=mother_id,
@@ -1728,31 +2255,65 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
     )
 
     player_id = generate_startup_actor_id("player")
-    world.create_human_child_with_parents(
+    player = world.create_human_child_with_parents(
         child_id=player_id,
-        first_name=player_first_name,
-        last_name=player_last_name,
-        sex=player_sex,
-        gender=player_gender,
+        first_name=character_data["first_name"],
+        last_name=character_data["last_name"],
+        sex=character_data["sex"],
+        gender=character_data["gender"],
         mother_id=mother_id,
         father_id=father_id,
         birth_year=world.current_year,
         birth_month=1,
         place_id=startup_place_id,
         jurisdiction_place_id=startup_jurisdiction_place_id,
-        randomize_stats=True,
+        randomize_stats=False,
         family_link_source="startup_family",
         birth_record_type="family_bootstrap",
         birth_record_text=(
-            f"{player_first_name} {player_last_name}".strip()
+            f"{character_data['first_name']} {character_data['last_name']}".strip()
             + " was bootstrapped with current startup family links."
         ),
         birth_record_tags=["family", "bootstrap"],
         birth_record_metadata={"is_startup_player": True},
     )
+    player.stats = dict(character_data["stats"])
+    player.appearance = dict(character_data["appearance"])
+    player.traits = list(character_data["traits"])
+    player.money = 0
     world.set_focused_actor(player_id)
 
     return world, player_id
+
+
+def setup_initial_world(player_first_name, player_last_name, player_sex, player_gender):
+    """Compatibility wrapper that delegates to character-data startup flow."""
+    default_character_data = {
+        "first_name": player_first_name,
+        "last_name": player_last_name,
+        "sex": player_sex,
+        "gender": player_gender,
+        "appearance": {
+            "eye_color": "Brown",
+            "hair_color": "Black",
+            "skin_tone": "Medium",
+        },
+        "traits": [],
+        "stats": build_randomized_starting_stats(),
+    }
+    return setup_initial_world_from_character(default_character_data)
+
+
+def run_creation_wizard():
+    """Runs the curses-based character creation wizard and returns character data or None."""
+    def _run(stdscr):
+        wizard = CreationWizard(stdscr)
+        return wizard.run()
+
+    try:
+        return curses.wrapper(_run)
+    except KeyboardInterrupt:
+        return None
 
 
 def print_post_tui_quit_banner():
@@ -1763,7 +2324,7 @@ def print_post_tui_quit_banner():
 
 
 def run_game_tui(world, player_id):
-    """Runs the actor-first curses TUI for ordinary play after plain-text startup completes."""
+    """Runs the actor-first curses TUI for ordinary play after startup creation completes."""
     tui = ActoraTUI(world, player_id)
     try:
         curses.wrapper(tui.run)
@@ -1773,16 +2334,14 @@ def run_game_tui(world, player_id):
 
 
 def start_game():
-    """Runs plain-text startup, then hands ordinary play to the curses TUI."""
+    """Runs startup banner, character creation, and the ordinary-play TUI."""
     print(ACTORA_TITLE_BANNER)
 
-    player_first_name, player_last_name, player_sex, player_gender = create_character()
-    world, player_id = setup_initial_world(
-        player_first_name,
-        player_last_name,
-        player_sex,
-        player_gender,
-    )
+    character_data = run_creation_wizard()
+    if character_data is None:
+        return
+
+    world, player_id = setup_initial_world_from_character(character_data)
     run_game_tui(world, player_id)
 
 

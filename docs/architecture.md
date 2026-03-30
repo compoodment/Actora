@@ -1,6 +1,6 @@
 # Actora Architecture Summary
 
-**Version:** 0.38.0
+**Version:** 0.38.1
 **Last Updated:** 2026-03-29
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
@@ -9,7 +9,7 @@ It is intended to support safe patching, review, and manual verification.
 ## 1. Stack
 
 - **Language:** Python
-- **Interface:** Terminal with a narrow curses TUI shell for ordinary play, a dedicated profile screen, structured lineage/archive browsing, a full-screen history browser, death/continuation interrupts, and skip-time utility flow
+- **Interface:** Terminal with a plain-text title banner, a curses-based startup character creation wizard, and a narrow curses TUI shell for ordinary play with a dedicated profile screen, structured lineage/archive browsing, a full-screen history browser, death/continuation interrupts, and skip-time utility flow
 - **Structure:** Small modular prototype with separated simulation and rendering responsibilities
 
 ## 2. Current File Structure
@@ -104,6 +104,8 @@ Current stored fields:
 - `birth_month`
 - `stats` (dictionary containing primary stats `health`, `happiness`, `intelligence` plus secondary stats `strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`)
 - `money`
+- `appearance` (dictionary containing `eye_color`, `hair_color`, `skin_tone`)
+- `traits` (list of up to three simple personality descriptors)
 - `current_place_id`
 - `residence_place_id`
 - `jurisdiction_place_id`
@@ -122,6 +124,7 @@ Current responsibilities:
 - spatial access/query boundary (`get_spatial_state(world)`)
 - structural life/death state query (`is_alive()`, `get_structural_state()`)
 - structured current-state snapshot data (`get_snapshot_data(current_year, current_month, world, actor_id)`)
+- startup-default and generated appearance/trait storage for actor-facing profile display and future systems
 
 Current Life View snapshot relationship details:
 - snapshot `relationships` is now a list of living linked-family entries with shape `{"label": "...", "name": "..."}` rather than a fixed parent-name dictionary
@@ -138,6 +141,12 @@ Current stat-mutation boundary details:
 - `modify_stat(...)` supports keys currently present in `self.stats` (`health`, `happiness`, `intelligence`) and applies clamped mutation in the inclusive range 0-100.
 - `modify_stat(...)` supports `"money"` through the separate unbounded money path (`self.money += change`).
 - Any unsupported stat name now fails explicitly with `ValueError` (including the bad stat name) instead of being silently ignored.
+
+Current startup creation flow details:
+- `start_game()` now prints the title banner in plain text, then enters curses for a dedicated `CreationWizard`, then builds the world from the returned character payload, and only then hands control to the ordinary-play TUI.
+- `CreationWizard` lives in `main.py` and currently owns five startup steps: identity, appearance, traits, stats, and confirmation.
+- startup character payloads now include `first_name`, `last_name`, `sex`, `gender`, `appearance`, `traits`, and `stats`
+- player startup world creation now routes through `setup_initial_world_from_character(...)`, while the older `setup_initial_world(...)` still exists as a compatibility wrapper for callers that pass only the older four identity values
 
 ## 4. Relationships
 

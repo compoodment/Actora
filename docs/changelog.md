@@ -1,5 +1,14 @@
 # Actora Changelog
 
+## Version 0.38.1 (Minor) - 2026-03-29
+- **Character Creation Wizard + Appearance + Traits:**
+    - Replaced the old plain-text startup `create_character()` flow in `main.py` with a curses-based `CreationWizard` that now runs inside the same overall TUI visual system before ordinary play begins.
+    - Added step-by-step startup creation for identity, appearance, traits, stat allocation, and confirmation, including `Other` appearance text entry, exact-three trait selection, and stat randomization from the existing newborn ranges.
+    - Added stored `appearance` and `traits` fields to `Human` in `human.py`, randomized them for non-player generated humans, and exposed both through `get_snapshot_data(...)`.
+    - Updated the `Profile` screen in `main.py` to show appearance and trait sections between identity and stats.
+    - Added `setup_initial_world_from_character(...)` in `main.py` so startup world creation can accept a fully prepared character payload while preserving the old `setup_initial_world(...)` wrapper for compatibility callers and tests.
+    - Verified existing startup-family randomization still routes parent and sibling creation through `Human.randomize_starting_statistics()`, so generated relatives continue to receive both primary and secondary randomized stats.
+
 ## Version 0.38.0 (Minor) - 2026-03-29
 - **Actor Stats Deepening + Profile Screen:**
     - Expanded `Human.stats` in `human.py` beyond the existing primary stats to include `strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, and `fertility`, all with newborn-oriented randomized starting ranges.

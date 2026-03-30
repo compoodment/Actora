@@ -47,6 +47,12 @@ class Human:
             "fertility": 50,
         }
         self.money = 0
+        self.appearance = {
+            "eye_color": "Brown",
+            "hair_color": "Black",
+            "skin_tone": "Medium",
+        }
+        self.traits = []
         self.current_place_id = None
         self.residence_place_id = None
         self.jurisdiction_place_id = None
@@ -74,6 +80,16 @@ class Human:
         self.stats["looks"] = random.randint(30, 90)
         self.stats["fertility"] = random.randint(50, 100)
         self.money = 0 # Money remains fixed at 0
+
+        eye_colors = ["Brown", "Blue", "Green", "Hazel", "Gray", "Amber"]
+        hair_colors = ["Black", "Brown", "Blonde", "Red", "Auburn"]
+        skin_tones = ["Light", "Fair", "Medium", "Olive", "Tan", "Brown", "Dark"]
+        self.appearance["eye_color"] = random.choice(eye_colors)
+        self.appearance["hair_color"] = random.choice(hair_colors)
+        self.appearance["skin_tone"] = random.choice(skin_tones)
+
+        trait_pool = ["Curious", "Calm", "Fussy", "Bold", "Shy", "Cheerful", "Stubborn", "Gentle", "Restless", "Alert"]
+        self.traits = random.sample(trait_pool, min(3, len(trait_pool)))
 
     def get_lifecycle_state(self, current_year, current_month):
         """
@@ -225,6 +241,8 @@ class Human:
                 "intelligence": self.stats["intelligence"],
                 "money": self.money,
             },
+            "appearance": dict(self.appearance),
+            "traits": list(self.traits),
             "secondary_statistics": {
                 "strength": self.stats["strength"],
                 "charisma": self.stats["charisma"],
