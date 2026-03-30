@@ -3,8 +3,8 @@ Date: 2026-03-29
 Purpose: repo-local parking lot for current bugs, regressions, and revisit items so they do not get lost between patches.
 
 - skip-time Esc/back UX lag concern
-  Status: open
-  Note: visible back guidance now favors `B`, but real-terminal feel around leaving skip-time should keep being watched during smoke passes.
+  Status: resolved in v0.37.4
+  Note: verified B and Esc both return immediately. Message resets to idle on return.
 
 - lineage search exit behavior
   Status: resolved in v0.36.7
@@ -43,8 +43,8 @@ Purpose: repo-local parking lot for current bugs, regressions, and revisit items
   Note: the new age/spacing/family-size fertility heuristic is intentionally simple first-pass logic and may need probability tuning once more long-run play data exists.
 
 - Life View relationships section only shows parents, not siblings or other living family
-  Status: open
-  Note: the Relationships section on the main Life View only renders Mother/Father. Siblings and other living linked actors should also appear. Dead actors should probably be excluded or marked. This is a snapshot rendering gap in main.py — the data already exists through world link helpers.
+  Status: resolved in v0.37.2
+  Note: Relationships now shows all living linked family with sex-aware labels (Brother/Sister). Dead actors excluded.
 
 - event history display is truncated and non-scrollable
   Status: resolved in v0.37.1

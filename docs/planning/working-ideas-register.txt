@@ -1,4 +1,4 @@
-Actora Working Ideas Register v44
+Actora Working Ideas Register v45
 
 Date: 2026-03-28
 Role: broad working idea intake, staging, parking, interview-derived design retention, and rewrite-pressure tracking for Actora
@@ -9,7 +9,7 @@ Usage rule: preserve substantial design material and conversation-derived pressu
 
 === CURRENT WORKING READ ===
 
-Verified repo truth is currently through v0.37.1, including:
+Verified repo truth is currently through v0.37.4, including:
 - world-owned actor registry
 - world-owned structured place registry with parent-place hierarchy
 - world-owned link truth
@@ -64,6 +64,10 @@ Verified repo truth is currently through v0.37.1, including:
 - family continuity groundwork through older siblings at startup, later younger sibling births via narrow family-event logic, direct sibling links, sibling-aware lineage labels, and sibling-priority continuation breadth
 - death/continuation inspectability follow-through through filtered implementation-scaffolding records, cleaner subtitles, dead-actor life summary, two-step continuation inspection with detail cards, clean parent relationship labels, and removal of internal-sounding UI filler
 - scrollable event history log through an accumulating live feed in the Life View right pane (compact format, year headers, skip markers, auto-scroll) plus a dedicated full-screen scrollable History browser via `[H]` (detailed format with date prefixes, year separators, ↑↓ scroll)
+- Life View relationships expanded to show all living linked family with sex-aware labels, not just parents
+- event pool expanded to 100 events with family-aware dynamic name insertion, cross-stage variety, goofy/dark content, and 3-event cooldown to prevent repetition
+- visual markers for structural events in history and live feed (★ birth, ✦ death)
+- minor UX polish: stale message reset on screen return, no-living-family edge case handled, skip-time back UX verified
 - clarified terminal-UI / death-flow intent: alive-state should remain implicit during ordinary play, death should interrupt with a dedicated message/context first, continuation options should follow only after acknowledgment, archived dead actors should remain explorable/reusable later, and terminal information density/timing should be treated as real design work rather than ignored because the interface is temporary
 
 The backbone is materially stronger and more honest than it was at the start of this patch run.

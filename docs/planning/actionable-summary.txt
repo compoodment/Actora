@@ -1,4 +1,4 @@
-Actionable Ideas Summary - Rev32
+Actionable Ideas Summary - Rev33
 Date: 2026-03-28
 Role: temporary near-term operational planning snapshot for Actora
 Authority: non-authoritative; stable docs win, repo truth wins on implementation
@@ -7,7 +7,7 @@ Usage rule: keep this more distilled than the WIR and focused on the current wor
 
 === CURRENT WORKING POSITION ===
 
-Actora now has a materially stronger early backbone, and verified repo truth is through v0.37.1, with source-stack sync carried through:
+Actora now has a materially stronger early backbone, and verified repo truth is through v0.37.4, with source-stack sync carried through:
 - Master Context v9
 - Roadmap v10
 - world-owned actor registry
@@ -101,8 +101,11 @@ The recent verified sequence is now:
 - v0.36.9 - family continuity groundwork
 - v0.37.0 - death/continuation inspectability follow-through
 - v0.37.1 - scrollable event history log
-- v0.37.0 - death/continuation inspectability follow-through
-- v0.37.1 - scrollable event history log
+- v0.37.0 — death/continuation inspectability follow-through
+- v0.37.1 — scrollable event history log
+- v0.37.2 — Life View relationships fix + event expansion + family-aware events
+- v0.37.3 — UX cleanup + event cooldown + more events
+- v0.37.4 — history markers + no-family edge case + skip-time UX verified
 
 So the immediate next move is no longer:
 - "what follows spatial identity separation?"
@@ -123,7 +126,7 @@ Why:
 - that means the next checkpoint is less "clean up the first TUI again" and more "what is the strongest next honest pressure after the first TUI/browser/Life View stabilization run?"
 
 So the current question is now:
-- "given repo truth through `v0.37.1`, is the strongest next move more event content/variety, deeper family event richness, further TUI polish, or pushing toward backbone 4.9/4.10?"
+- "given repo truth through `v0.37.4`, the current layer is mostly polished. Is the strongest next move pushing toward backbone 4.9/4.10, starting mid-stage domain layers, or finding more current-layer depth?"
 
 
 === WHAT THE RECENT SEQUENCE ACHIEVED ===
@@ -212,34 +215,24 @@ The terminal UI is not the forever final interface, but it is still the current 
 
 === LEADING PLANNING BUCKETS NOW ===
 
-1. Next real implementation/planning move after v0.37.1
+1. Next real implementation/planning move after v0.37.4
 Use:
-- choose the next honest follow-through now that death/continuation inspectability and event history presentation are real
-- user direction is to keep thickening the current layer (more events, richer family, polish) before pushing to backbone 4.9/4.10
-- avoid patch-number momentum theater
+- the current layer is mostly polished now: event history scrolls, events are varied with cooldown, family-aware events exist, relationships show all living family, death/continuation is inspectable, history has visual markers for structural events
+- user direction was to keep thickening until exhausted, then move to roadmap backbone/domain layers
+- next real depth unlocks likely come from backbone 4.9/4.10 or early mid-stage domain layers (education, work, health)
+- avoid inventing fake current-layer work just to avoid the next structural move
 
-2. Event content / variety expansion
+2. Event content / variety follow-through
 Use:
-- the event history log now exists as a proper accumulating scrollable surface, which means thin event content becomes more visible and more annoying
-- likely next content pressure is broader event variety, more life-stage coverage, and richer event outcomes
-- keep grounded in current event foundation rather than jumping to a full event-content cathedral
+- event pool is now 100 events with 11 family-aware, cooldown prevents repeats, but content will always want more as new systems unlock
+- further event expansion should wait until new systems (education, work, health, etc.) provide real context for richer events
+- do not stuff more generic flavor text just to inflate the pool
 
-3. Family event richness
+3. Mid-stage domain layers readiness
 Use:
-- family births now surface in the event log, but family-related gameplay depth is still early
-- likely follow-through may include richer family event content, family-aware event triggers, or family milestone visibility
-- keep disciplined about not jumping into household/romance/friendship systems too early
-
-4. Death / continuation follow-through (continued)
-Use:
-- death inspectability is now materially better than before v0.37.0
-- remaining continuation/archive depth is still intentionally narrow
-- further depth here should wait until it is clearly the strongest pressure again
-
-5. Family continuity follow-through
-Use:
-- family continuity substrate now exists, but sibling/family birth tuning and broader family depth are still early
-- likely follow-through may later expand or tune this system, but it no longer needs to be the immediate next move by default
+- backbone 4.1-4.8 are realized, 4.9 partially, 4.10 early
+- the current TUI, event, family, mortality, and continuation layers are materially stronger than before
+- the project may now be ready to consider the first mid-stage domain layer if backbone 4.9/4.10 gaps are not blocking
 
 4. Terminal UI / information reveal flow
 Use:
