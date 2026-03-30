@@ -100,6 +100,7 @@ Current stored fields:
 - `last_name`
 - `sex`
 - `gender`
+- `sexuality` (`None` until emergence during play for the focused player; randomized for generated NPC humans)
 - `birth_year`
 - `birth_month`
 - `stats` (dictionary containing primary stats `health`, `happiness`, `intelligence` plus secondary stats `strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`)
@@ -138,7 +139,7 @@ Current structural-state details:
 - this still does not implement archive state, inheritance, or broader lifecycle/death gameplay beyond the current baseline old-age mortality rule
 
 Current stat-mutation boundary details:
-- `modify_stat(...)` supports keys currently present in `self.stats` (`health`, `happiness`, `intelligence`) and applies clamped mutation in the inclusive range 0-100.
+- `modify_stat(...)` supports any key present in `self.stats` (currently `health`, `happiness`, `intelligence`, `strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`) and applies clamped mutation in the inclusive range 0-100.
 - `modify_stat(...)` supports `"money"` through the separate unbounded money path (`self.money += change`).
 - Any unsupported stat name now fails explicitly with `ValueError` (including the bad stat name) instead of being silently ignored.
 
@@ -249,22 +250,6 @@ Basic world link helper contract:
 - `get_caregiver_parent_ids_for(entity_id)` resolves caregiver-marked mother/father links from outgoing family links.
 - `get_parent_ids_for(entity_id)` remains the compatibility wrapper for current mother/father access and falls back to bare family roles when explicit origin metadata is absent.
 
-## 6. Event Layer
-
-Monthly event content is currently human-scoped in `events.py`.
-
-Current event-definition details:
-- `HUMAN_MONTHLY_EVENTS` remains a flat pool of dictionaries
-- each event definition now uses explicit `outcome={"stat_changes": {...}}` storage instead of internal `stat` / `change` shorthand
-- event definitions can optionally declare `family_context=True` plus `family_roles=[...]`
-- some monthly events intentionally have empty stat changes for pure life texture
-
-Current event-selection details:
-- `get_human_monthly_event_from_lifecycle(...)` still applies the same 50% monthly trigger gate and lifecycle filtering
-- lifecycle filtering now also respects family-context requirements when present
-- family-aware events render actual living family names into the selected event text at selection time
-- the external structured event contract remains unchanged (`event_id`, `text`, `outcome`, `tags`, `year`, `month`)
-
 Basic world place helper contract:
 
 - `add_place(...)` stores place records in the world-owned registry with explicit `parent_place_id`.
@@ -363,12 +348,14 @@ Current shell-level functions:
 - `draw_text_block(...)` — small curses text rendering helper with wrapping support
 - `ActoraTUI` — narrow curses shell object managing the split Life View, dedicated profile screen, accumulating live event feed, full-screen history browser, styled header/footer chrome, lineage list/detail, skip-time selection, death acknowledgment, two-step continuation inspection/selection, simple left-pane/profile/history scrolling, a shell-owned pending-choice popup overlay for major player-facing decisions, and safe footer rendering that avoids writing into the terminal’s last column
 - `safe_input(prompt)` — narrow shared CLI input boundary helper that exits cleanly on `EOFError` and `KeyboardInterrupt`
-- `create_character()` — character creation prompts and input validation
-- `setup_initial_world(...)` — World creation, parent identity generation, startup actor entry delegation through world-owned helpers (`create_human_actor(...)` and `create_human_child_with_parents(...)`), and initial focused-actor assignment through `World.set_focused_actor(...)`
+- `CreationWizard` — curses-based character creation wizard with five startup steps (identity, appearance, traits, stats, confirmation)
+- `setup_initial_world_from_character(character_data)` — primary world creation flow from one fully prepared startup character payload
+- `setup_initial_world(...)` — compatibility wrapper that delegates into `setup_initial_world_from_character(...)`
+- `run_creation_wizard()` — curses wrapper that runs `CreationWizard` and returns character data or `None`
 - `run_game_tui(...)` — curses wrapper entry point for ordinary play
 - `start_game()` — top-level orchestration (banner, then delegates to the above)
 
-Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Startup parent ages now vary within a narrow adult range, some worlds now generate older siblings before the player is born through `World.bootstrap_older_siblings_for_newborn(...)`, and only-child worlds still remain possible. Once startup completes, ordinary play now lives inside a narrow curses shell: the split `Life View` keeps identity/location/primary stats/relationships on the left, keeps an accumulating live event feed on the right, opens a dedicated full-detail `Profile` screen with `P`, allows simple left-side/profile/history vertical scrolling under terminal-height pressure, opens the full-screen history browser with `H`, still opens lineage with `L`, still preserves the dead-focus interrupt before any continuation choices are shown, and now allows shell-owned popup choices to interrupt long skips for major identity-emergence moments during adolescence.
+Current startup flow is human-only. `start_game()` prints the title banner in plain text, runs the curses-based `CreationWizard`, builds the world through `setup_initial_world_from_character(...)`, and only then hands control to the ordinary-play shell. Interactive CLI input still exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Startup parent ages now vary within a narrow adult range, some worlds now generate older siblings before the player is born through `World.bootstrap_older_siblings_for_newborn(...)`, and only-child worlds still remain possible. Once startup completes, ordinary play now lives inside a narrow curses shell: the split `Life View` keeps identity/location/primary stats/relationships on the left, keeps an accumulating live event feed on the right, opens a dedicated full-detail `Profile` screen with `P`, allows simple left-side/profile/history vertical scrolling under terminal-height pressure, opens the full-screen history browser with `H`, still opens lineage with `L`, still preserves the dead-focus interrupt before any continuation choices are shown, and now allows shell-owned popup choices to interrupt long skips for major identity-emergence moments during adolescence.
 
 ### `identity.py`
 Responsible for:
@@ -477,43 +464,45 @@ This function does not perform terminal input, output, or presentation formattin
 ## 8. Current Turn Flow
 
 1. Display ASCII art welcome title.
-2. Run character creation (`create_character()`).
-3. Set up initial world state (`setup_initial_world(...)`).
+2. Run the curses startup wizard (`run_creation_wizard()` / `CreationWizard`) and collect the startup character payload.
+3. Set up initial world state (`setup_initial_world_from_character(...)`).
 4. Set the startup player as the world-owned focused actor.
 5. Enter the curses shell (`run_game_tui(...)` / `ActoraTUI.run(...)`).
-6. Render the initial focused-actor snapshot screen.
+6. Render the initial `Life View` focused-actor snapshot screen.
 7. Read one key-driven TUI action.
-8. Resolve advance, lineage browse, continuation selection, back, or quit.
+8. Resolve advance, skip-time, profile, lineage, history, continuation selection, back, or quit.
 9. If the player requests a larger jump, resolve the shell-owned skip-time selection first.
 10. Call `World.simulate_advance_turn(...)` when advancing.
 11. Advance time internally month-by-month.
 12. Apply triggered event outcomes through `World.apply_outcome(...)`.
 13. Collect triggered structured events.
-14. Re-render the updated focused-actor snapshot screen.
-15. Render event output by combining structured `year`, `month`, and raw event `text`.
-    - Small event counts are shown as full dated lines.
-    - Large event counts are summarized with a total count, a recent-event subset, and an omitted-older-events line.
-    - Triggered monthly events are also preserved as structured world-owned records in addition to current terminal rendering.
-16. If the focused actor is dead, render the dedicated death interrupt first.
-17. Require acknowledgment before rendering any continuation choices.
-18. Resolve continuation handoff or end the run cleanly.
-19. Return to step 7.
+14. Fold triggered monthly events plus newly written relevant `birth` / `death` records into the shell-owned event log while filtering hidden scaffolding records such as `actor_entry` and `family_bootstrap`.
+15. If a major adolescence identity-emergence choice becomes due, open the shell-owned popup choice overlay and pause ordinary navigation.
+16. If skip-time was interrupted by that choice, resume the remaining skipped months after the choice is resolved.
+17. Re-render the updated `Life View`, `Profile`, `History`, or other active shell surface as needed.
+18. If the focused actor is dead, render the dedicated death interrupt first.
+19. Require acknowledgment before rendering any continuation choices.
+20. Resolve continuation handoff or end the run cleanly.
+21. Return to step 7.
 
 ## 9. Current Gameplay Behavior
 
 ### Character Creation
 Current player creation includes:
-- required first name
-- optional last name
-- sex selection (numbered choice: Male/Female/Intersex)
-- gender selection (numbered choice: Male/Female/Non-binary/Agender/Genderfluid/Other)
-- free-text gender entry when `Other` is selected
+- a curses-based `CreationWizard` with five steps: Identity, Appearance, Traits, Stats, Confirm
+- Identity step with required first name, optional last name, and sex selection (`Male`, `Female`, `Intersex`)
+- gender defaults to match sex and is deferred to puberty emergence during play
+- Appearance step with eye color, hair color, and skin tone; each appearance field supports `Other`, which requires a custom free-text value before continuing
+- Traits step requiring exactly 3 traits from `Curious`, `Calm`, `Fussy`, `Bold`, `Shy`, `Cheerful`, `Stubborn`, `Gentle`, `Restless`, `Alert`
+- Stats step with manual 0-100 adjustment across all 11 stats (`health`, `happiness`, `intelligence`, `strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`) plus `[R]` to randomize all startup stats
+- Confirm step showing the full character summary, with `Enter` to start the game and `B` to go back
+- current wizard controls are step-specific but centered on `Space` to select/toggle, `Enter` to proceed, `B` / `Backspace` to go back, `↑↓` to navigate, and `←→` to adjust stats
 
 ### Initial World Setup
 Current initialization behavior:
 - initial world setup creates a minimal startup place hierarchy: `"earth"` (`name="Earth"`, `kind="world_body"`) -> `"earth_country_01"` (`name="Starter Country"`, `kind="country"`) -> `"earth_city_01"` (`name="Starter City"`, `kind="city"`)
-- player is created in Year 1, Month 1 with randomized starting stats
-- two parent records are created through `World.create_human_actor(...)`
+- player is created in Year 1, Month 1 with startup stats copied from the creation payload
+- two parent actors are created through `World.create_human_actor(...)`
 - current actor entry through `create_human_actor(...)` writes preserved `actor_entry` records with `entry_method="create_human_actor"`
 - current human startup family bootstrap through `create_human_child_with_parents(...)` writes one preserved `family_bootstrap` record
 - player is created through `World.create_human_child_with_parents(...)` (current startup scenario: human child with mother/father bootstrap)
@@ -536,17 +525,22 @@ Current advancement behavior:
 - the skip-time screen currently offers clear preset jumps (`1`, `3`, `6`, `12`, `24`, `60` months) plus a small numeric custom-month input path
 - `Enter` in the skip-time screen advances using the typed custom month count when present; otherwise it advances using the currently highlighted preset
 - skip-time selection remains shell-owned and still delegates actual advancement to `World.simulate_advance_turn(...)`, so larger jumps continue to process month-by-month internally
+- if a pending identity-emergence choice interrupts a longer skip, remaining skipped months are resumed after the choice is resolved
+- `P` opens the dedicated full-detail Profile screen from Life View
 - `L` opens lineage browsing from the persistent actor screen
+- `H` opens the full-screen History browser from the persistent actor screen
 - `B` is the visible back hint in skip-time and lineage, while `Esc` remains a compatibility path
 - `Q` exits the run from the TUI
 - ordinary play no longer requires typed `lineage`, `back`, or `quit` command words
 
 ### Events
 Current event behavior:
-- Life View keeps recent activity visible in a stable right-hand pane while ordinary-play identity/location/stats/relationships stay on the left
+- Life View keeps an accumulating compact live event feed in the stable right-hand pane while ordinary-play identity/location/primary stats/relationships stay on the left
 - events are processed monthly
 - 50% chance to generate an event each month
 - events are filtered by life stage, min_age_months, and max_age_months
+- trait-gated events can also require one or more matching actor traits through `required_traits`
+- family-aware events can require living family context and dynamically render `{family_role}` into event text using the chosen living relative
 - `get_human_monthly_event_from_lifecycle(...)` is the implementation-facing seam for the current human-only event layer
 - `get_monthly_event(...)` remains as a compatibility wrapper for the same structured monthly event contract
 - monthly event results still contain `event_id`, `text`, `outcome`, `tags`, `year`, and `month`, or `None`
@@ -555,11 +549,12 @@ Current event behavior:
 - later-life practical event coverage still extends across the currently implemented post-Child human stages (`Teenager`, `Young Adult`, `Adult`, `Elder`)
 - the clarified seam remains honest about current human-only content and does not claim species-general event support
 - `World.simulate_advance_turn(...)` applies each returned event outcome centrally via `World.apply_outcome(...)` while collecting structured results
-- `main.py` renders display text by combining structured `year`, `month`, and raw `text`
-- only triggered events are displayed
-- small event counts are shown with full dated event lines
-- large event counts are compacted with a total summary, recent-event subset, and omitted-older-events line
-- fully quiet turns show a fallback line
+- `main.py` maintains a shell-owned event log that merges triggered monthly events with newly written relevant `birth` and `death` records
+- the Life View live feed is compact and omits normal date prefixes, but still inserts year headers and skip markers as the run progresses
+- the full-screen `History` browser opened with `H` renders the same accumulated log in detailed form with date prefixes, year separators, and scrolling
+- `family_bootstrap` and `actor_entry` records are filtered from current player-facing event surfaces while remaining preserved in world storage
+- `birth` and `death` records carry `★` and `✦` markers in both the live feed and the full history browser
+- a 3-event cooldown prevents the same event from repeating within the most recent three triggered events during one advancement
 - ordinary-play death remains structural rather than event-text-driven; later cause-specific event layers still do not exist
 
 ### Snapshot
@@ -569,8 +564,11 @@ Current snapshots display:
 - location (ancestry-resolved world body plus current place plus one clean jurisdiction line, resolved through `Human.get_snapshot_data(...)`, which currently reads `Human.get_spatial_state(world)` and world place helpers)
 - residence remains internal and is not rendered in the snapshot yet
 - temporary occupancy remains internal and is not rendered in the snapshot yet
-- statistics (health, happiness, intelligence, money)
-- family references (mother, father), still resolved from the world layer
+- Life View statistics (health, happiness, intelligence, money)
+- Profile screen secondary statistics (`strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`)
+- relationships as a list of all living linked family entries with sex-aware labels (`Mother`, `Father`, `Brother`, `Sister`, `Son`, `Daughter`, `Sibling`, `Child`)
+- dead relatives are excluded from Life View relationship output
+- `No living family.` is shown when the current living-family relationship list is empty
 - structural state remains internal to the current ordinary-play snapshot flow and is not rendered during ordinary alive play; structural death/continuity handling is surfaced separately when relevant
 - the curses shell now adds restrained chrome through a styled title/date header, bracketed section emphasis, screen-specific framing, and simple left-pane scrolling without restoring the older large shell banners inside ordinary play
 
@@ -610,7 +608,23 @@ The current event system is:
 
 This remains a narrow honesty-focused seam clarification. It does not implement species-general event architecture, non-human event content, or a broader entity/event framework.
 
-Current event pool: 120 grounded human-only events including 20 trait-gated events (2 per personality trait) and 11 family-aware events with dynamic name insertion. Events support optional `required_traits` filtering so trait-gated events only trigger for actors who have the matching personality trait. A 3-event cooldown prevents the same event from triggering within the last 3 triggered events during one advancement.
+Monthly event content is currently human-scoped in `events.py`.
+
+Current event-definition details:
+- `HUMAN_MONTHLY_EVENTS` remains a flat pool of dictionaries
+- each event definition now uses explicit `outcome={"stat_changes": {...}}` storage instead of internal `stat` / `change` shorthand
+- event definitions can optionally declare `family_context=True` plus `family_roles=[...]`
+- event definitions can optionally declare `required_traits=[...]`
+- some monthly events intentionally have empty stat changes for pure life texture
+
+Current event-selection details:
+- `get_human_monthly_event_from_lifecycle(...)` still applies the same 50% monthly trigger gate and lifecycle filtering
+- lifecycle filtering now also respects family-context requirements when present
+- event selection now also accepts `actor_traits` and filters out trait-gated events when the actor does not match
+- family-aware events render living relative context into the selected event text at selection time through `{family_role}` substitution
+- the external structured event contract remains unchanged (`event_id`, `text`, `outcome`, `tags`, `year`, `month`)
+
+Current event pool: 120 grounded human-only events including 20 trait-gated events (2 per personality trait) and 11 family-aware events with dynamic name insertion. Events support optional `required_traits` filtering so trait-gated events only trigger for actors who have the matching personality trait. Event selection also supports family-context input so family-aware events only become eligible when the needed living family roles exist. A 3-event cooldown prevents the same event from triggering within the last 3 triggered events during one advancement.
 
 ## 11. Patching Rules
 
