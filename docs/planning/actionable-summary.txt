@@ -1,4 +1,4 @@
-Actionable Ideas Summary — Rev37
+Actionable Ideas Summary — Rev38
 Date: 2026-03-30
 Role: temporary near-term operational planning snapshot for Actora
 Authority: non-authoritative; stable docs win, repo truth wins on implementation
@@ -7,8 +7,8 @@ Usage rule: keep this more distilled than the WIR and focused on the current wor
 
 === CURRENT WORKING POSITION ===
 
-Verified repo truth is through v0.39.1 with source-stack sync through:
-- Master Context v9, Roadmap v10, Operator Guide v9
+Verified repo truth is through v0.40.0 with source-stack sync through:
+- Master Context v9, Roadmap v10, Operator Guide v9 (+ section 18: player-facing text rule)
 
 The project has a materially strong early backbone:
 - World-owned actor registry, links, places (hierarchy), records, simulation step
@@ -23,6 +23,8 @@ The project has a materially strong early backbone:
 - Event-choice framework (popup overlay) with gender/sexuality identity emergence
 - Death inspectability (life summary, two-step continuation inspection)
 - Consistent TUI control language (Space=select, Enter=proceed, B=back, ↑↓=navigate)
+- 12 real countries with 39 cities, culture-aware name generation (400+ names)
+- Player-facing text lint tool and operator guide rule (section 18)
 
 Recent milestone sequence:
 - v0.36.8 — ordinary mortality
@@ -35,34 +37,34 @@ Recent milestone sequence:
 - v0.38.1 — character creation wizard + appearance + traits
 - v0.39.0 — event-choice framework + gender/sexuality emergence
 - v0.39.1 — traits wired into events
+- v0.40.0 — real location content (12 countries, 39 cities, culture-aware names)
 
 
 === CURRENT PLANNING QUESTION ===
 
-"Given repo truth through v0.39.1, what is the strongest next move: real location content (countries/cities/culture), planning doc simplification, or something else before pushing toward education?"
+"Given repo truth through v0.40.0, what is the strongest next move: education foundation, further location/identity depth, or more current-layer polish?"
 
-User direction: tighten and polish before starting education. Real location content is the agreed next structural move after traits-into-events.
+User direction: tighten and polish before starting education. Real location content has landed. The game now has a meaningful geographic foundation.
 
 
 === LEADING PLANNING CANDIDATES ===
 
-1. Real location content (next agreed move)
-- Place infrastructure is solid (hierarchy, spatial identity, mutation seams)
-- What's missing is real content: actual countries, cities, culture/ethnicity data
-- This is needed before education (school systems vary by location) and identity generation realism
-- Does not require new infrastructure — uses existing place registry
-
-2. Education foundation (after location content)
-- First mid-stage domain layer per roadmap
-- Needs location context to feel real (different countries = different systems)
+1. Education foundation (leading next structural move)
+- The first mid-stage domain layer per roadmap
+- Now has location context to support it (different countries could mean different school systems later)
 - Would give the actor something to DO during childhood/teenage years
 - Would unlock real event content tied to school/learning
+- Depends on: actor model (realized), event foundation (realized), place context (now realized)
 
-3. Further identity depth (deferred, post-education)
-- Gradual sexuality signal events
-- Culture/location-driven identity context
-- Profile editing with life events ("came out as...")
-- These become more meaningful with location and education context
+2. Further identity/location depth
+- More countries, regional variation within countries, ethnic diversity in name pools
+- Gradual sexuality signals, culture-driven identity emergence
+- These deepen what exists but don't add new gameplay systems
+
+3. Current-layer polish
+- More trait events (only 2 per trait currently)
+- Name pool genericness (noted in live-issues)
+- These are reactive to playtest findings
 
 
 === DESIGN READ ===
@@ -93,4 +95,4 @@ Key design locks:
 
 === ONE-LINE SUMMARY ===
 
-Actora has a materially strong TUI-driven prototype through v0.39.1 with real actor depth, and the next honest move is real location content before pushing toward education as the first mid-stage domain layer.
+Actora has a materially strong TUI-driven prototype through v0.40.0 with real actor depth, real geography, and culture-aware identity — and the next honest move is likely the education foundation as the first mid-stage domain layer.

@@ -1,4 +1,4 @@
-Actora Working Ideas Register v49
+Actora Working Ideas Register v50
 
 Date: 2026-03-30
 Role: broad working idea intake, staging, parking, interview-derived design retention, and rewrite-pressure tracking for Actora
@@ -9,7 +9,7 @@ Usage rule: preserve substantial design material and conversation-derived pressu
 
 === CURRENT WORKING READ ===
 
-Verified repo truth is through v0.39.1. The backbone is materially stronger than it was at the start of this development arc.
+Verified repo truth is through v0.40.0. The backbone is materially stronger than it was at the start of this development arc.
 
 Foundation layers realized:
 - World-owned actor registry, link storage, place registry (with parent-place hierarchy), record storage, simulation-step boundary
@@ -56,16 +56,13 @@ ID: IDEA-119
 Created: 2026-03-30
 Last Reviewed: 2026-03-30
 Title: Real location content — actual countries, cities, culture context
-Status: Leading next-step candidate
+Status: Materially realized in v0.40.0
 Priority: P1
 Roadmap fit: place foundation content + identity generation realism (backbone 4.10 area)
-Immediate roadmap-layer fit: yes, as the strongest grounded next move before education
-Summary: Place infrastructure is solid but content is still fake ("Starter Country," "Starter City"). Many future systems (education, identity generation, events, culture-driven identity emergence) need real location context to feel honest. The next move is to add real countries, real cities, and potentially culture/ethnicity data attached to places, using the existing place registry infrastructure.
-Why it matters: Without real locations, future systems build on fake geography and can't meaningfully use place context for events, identity, education rules, or culture.
-Dependencies: current place hierarchy and spatial identity separation (both realized)
-Risks: scope explosion into full country simulation, politics, or travel before the content layer exists; faking culture depth with weak data
-Suggested timing: next implementation move
-Next action: interview for scope (how many countries, what data per place, culture/ethnicity model)
+Summary: v0.40.0 replaced "Starter Country/Starter City" with 12 real countries and 39 cities, added culture-group metadata to places, culture-aware name generation with 400+ names across 12 cultures, and a creation wizard Location step for country/city selection.
+Why it matters: Future systems (education, identity generation, events) now have real geographic context to build on.
+Risks: name pools are generic/surface-level; deeper regional/ethnic/era variation is a later concern (IDEA-091)
+Next action: preserve as realized milestone; name pool depth tracked in live-issues
 
 ID: IDEA-120
 Created: 2026-03-30
@@ -149,6 +146,7 @@ v0.38.0 — Actor stats deepening + profile screen
 v0.38.1 — Character creation wizard + appearance + traits
 v0.39.0 — Event-choice framework + gender/sexuality identity emergence
 v0.39.1 — Traits wired into events (20 trait-gated events)
+v0.40.0 — Real location content (12 countries, 39 cities, culture-aware name generation)
 
 Completed IDEAs (no longer active): IDEA-100, IDEA-105, IDEA-106, IDEA-107, IDEA-109, IDEA-110, IDEA-111, IDEA-112, IDEA-113, IDEA-114, IDEA-115, IDEA-116, IDEA-117, IDEA-118 (Slice 1+2)
 Also completed: IDEA-097, IDEA-098, IDEA-099 (CLI hardening, singleton IDs, rename)
@@ -174,6 +172,8 @@ Core clarified points:
 - traits: structured (birth) + emergent (develop over time through events/systems)
 - gender deferred to puberty, sexuality emerges through events
 - Space=select/toggle, Enter=proceed, B=back across all TUI surfaces
+- player-facing text must never use internal/architecture language (operator guide section 18)
+- 12 real countries with culture-aware name generation; names should match the birth location
 
 Anti-drift read:
 Actora should not quietly collapse back into "deeper BitLife," "detached god sim," "spreadsheet world sim with humans taped on," or vague universe-scale handwaving. The intended shape is actor-anchored, zoomable, continuous, and simulation-real.
@@ -200,4 +200,4 @@ Actora should not quietly collapse back into "deeper BitLife," "detached god sim
 
 === ONE-LINE SUMMARY ===
 
-Actora has a materially strong prototype through v0.39.1 with real actor depth and TUI polish, and the next honest move is real location content before pushing toward education as the first mid-stage domain layer.
+Actora has a materially strong prototype through v0.40.0 with real actor depth, real geography, and culture-aware identity — and the next honest move is likely the education foundation as the first mid-stage domain layer.
