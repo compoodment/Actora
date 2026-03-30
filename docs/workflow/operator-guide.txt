@@ -589,3 +589,28 @@ Actora should be worked on with:
 	•	honest distinction between what exists, what is approved, and what is only being explored
 
 That discipline is part of the project foundation, not administrative overhead.
+
+⸻
+
+18. Player-facing text rule
+
+All text visible to the player should read like a game, not like a developer tool or database interface.
+
+The current implementation is human-only. Player-facing text should assume a human life experience until other species actually exist in the game.
+
+Forbidden in player-facing text:
+	•	internal field names (actor, entity, structural_status, record_type, link_type, bootstrap)
+	•	architecture jargon (continuation target, continuation candidate, connected actors, jurisdiction, world body, focused actor)
+	•	dev-facing abbreviations or labels that leak implementation structure
+
+Use instead:
+	•	"you" or the character's name, not "actor" or "focused actor"
+	•	"family" or "family members," not "connected actors" or "linked actors"
+	•	"choose who to continue as," not "select continuation target"
+	•	"country," not "jurisdiction" (on Earth)
+	•	"planet," not "world body" (on Earth)
+	•	human-natural phrasing that assumes the player is living a life, not inspecting a simulation
+
+Internal code, comments, architecture docs, and variable names may still use the full internal vocabulary. Only the rendered display text must follow this rule.
+
+When dispatching implementation work, include this rule in the prompt or reference it explicitly so automated workers do not reintroduce internal jargon into player-facing surfaces.
