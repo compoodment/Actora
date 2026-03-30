@@ -1,5 +1,13 @@
 # Actora Changelog
 
+## Version 0.38.0 (Minor) - 2026-03-29
+- **Actor Stats Deepening + Profile Screen:**
+    - Expanded `Human.stats` in `human.py` beyond the existing primary stats to include `strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, and `fertility`, all with newborn-oriented randomized starting ranges.
+    - Extended `Human.get_snapshot_data(...)` so the existing `statistics` block stays Life View-focused while a new `secondary_statistics` block exposes the deeper actor card data for richer shell surfaces.
+    - Added a new `Profile` screen to the curses TUI in `main.py`, opened from Life View with `P`, showing identity, primary stats, secondary stats, location, and living-family relationships in one scrollable actor detail view.
+    - Updated screen chrome and main footer hints in `main.py` to include the new `Profile` surface and shortened the main skip label to `[S] Skip`.
+    - Deepened a small set of existing monthly event outcomes in `events.py` so ordinary life events now also produce small secondary-stat effects without changing event selection logic or the structured event contract.
+
 ## Version 0.37.7 (Patch) - 2026-03-29
 - **Continuation + Event Log Cleanup:**
     - Updated three duplicate monthly event texts in `events.py` to keep the full 100-event pool while removing repeated player-facing copy.

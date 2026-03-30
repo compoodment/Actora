@@ -99,6 +99,11 @@ def build_snapshot_sections(snapshot_data):
     ]
 
 
+def format_stat_pair(left_label, left_value, right_label, right_value):
+    """Builds one compact two-column stat row for profile rendering."""
+    return f"  {left_label}: {left_value:<3}      {right_label}: {right_value}"
+
+
 def build_event_log_entry(kind, text, *, year=None, month=None, record_type=None):
     """Builds one normalized event-log entry for shell-owned history rendering."""
     return {
@@ -205,6 +210,7 @@ def build_screen_chrome(screen_name, world, focused_actor_name):
     """Builds shell-owned title/subtitle text for the current screen."""
     title_map = {
         "main": "Life View",
+        "profile": "Profile",
         "lineage": "Lineage Browser",
         "history": "History",
         "skip_time": "Skip Time",
@@ -214,6 +220,7 @@ def build_screen_chrome(screen_name, world, focused_actor_name):
     }
     subtitle_map = {
         "main": focused_actor_name,
+        "profile": focused_actor_name,
         "lineage": focused_actor_name,
         "history": focused_actor_name,
         "skip_time": "Choose a larger time jump or enter custom months",
@@ -469,6 +476,7 @@ class ActoraTUI:
         self.lineage_search_text = ""
         self.lineage_search_active = False
         self.main_left_scroll = 0
+        self.profile_scroll = 0
         self.history_scroll = 0
         self.history_search_active = False
         self.history_search_value = ""
@@ -686,6 +694,11 @@ class ActoraTUI:
         self.history_search_value = ""
         self.last_message = "Browsing event history."
 
+    def open_profile(self):
+        self.screen_name = "profile"
+        self.profile_scroll = 0
+        self.last_message = "Viewing full actor profile."
+
     def get_history_lines(self, width):
         """Builds the logical full-screen history line list."""
         if not self.event_log:
@@ -782,6 +795,16 @@ class ActoraTUI:
         self.screen_name = "lineage"
         self.last_message = "Browsing lineage archive."
 
+    def scroll_profile(self, delta):
+        profile_lines = self.build_profile_lines(self.get_snapshot_data())
+        visible_height = self.profile_body_height
+        if visible_height <= 0:
+            visible_height = 1
+        _, next_offset, _, _ = get_scroll_window(profile_lines, visible_height, self.profile_scroll + delta)
+        if next_offset != self.profile_scroll:
+            self.profile_scroll = next_offset
+            self.last_message = "Scrolled profile."
+
     def scroll_main_left(self, delta):
         snapshot_sections = build_snapshot_sections(self.get_snapshot_data())
         scrollable_lines = self.build_main_left_lines(snapshot_sections, include_time=False)
@@ -797,6 +820,10 @@ class ActoraTUI:
     def main_body_height(self):
         return getattr(self, "_main_body_height", 0)
 
+    @property
+    def profile_body_height(self):
+        return getattr(self, "_profile_body_height", 0)
+
     def build_main_left_lines(self, snapshot_sections, *, include_time):
         lines = []
         for section in snapshot_sections:
@@ -807,6 +834,47 @@ class ActoraTUI:
             lines.append("")
         if lines and lines[-1] == "":
             lines.pop()
+        return lines
+
+    def build_profile_lines(self, snapshot_data):
+        identity = snapshot_data["identity"]
+        location = snapshot_data["location"]
+        statistics = snapshot_data["statistics"]
+        secondary_statistics = snapshot_data["secondary_statistics"]
+        relationships = snapshot_data["relationships"]
+
+        lines = [
+            "Identity",
+            f"  Name: {identity['full_name']}",
+            f"  Species: {identity['species']}",
+            f"  Sex: {identity['sex']}",
+            f"  Gender: {identity['gender']}",
+            f"  Age: {identity['age']}",
+            f"  Life Stage: {identity['life_stage']}",
+            "",
+            "Primary Stats",
+            format_stat_pair("Health", statistics["health"], "Happiness", statistics["happiness"]),
+            format_stat_pair("Intelligence", statistics["intelligence"], "Money", f"${statistics['money']}"),
+            "",
+            "Secondary Stats",
+            format_stat_pair("Strength", secondary_statistics["strength"], "Charisma", secondary_statistics["charisma"]),
+            format_stat_pair("Creativity", secondary_statistics["creativity"], "Wisdom", secondary_statistics["wisdom"]),
+            format_stat_pair("Discipline", secondary_statistics["discipline"], "Willpower", secondary_statistics["willpower"]),
+            format_stat_pair("Looks", secondary_statistics["looks"], "Fertility", secondary_statistics["fertility"]),
+            "",
+            "Location",
+            f"  World Body: {location['world_body_name']}",
+            f"  Current Place: {location['current_place_name']}",
+            f"  Jurisdiction: {location['jurisdiction_place_name']}",
+            "",
+            "Relationships",
+        ]
+
+        if relationships:
+            lines.extend([f"  {entry['label']}: {entry['name']}" for entry in relationships])
+        else:
+            lines.append("  No living family.")
+
         return lines
 
     def acknowledge_death(self):
@@ -876,6 +944,8 @@ class ActoraTUI:
             self.advance_one_month()
         elif key in (ord("s"), ord("S")):
             self.open_skip_time()
+        elif key in (ord("p"), ord("P")):
+            self.open_profile()
         elif key in (ord("l"), ord("L")):
             self.open_lineage()
         elif key in (ord("h"), ord("H")):
@@ -921,6 +991,17 @@ class ActoraTUI:
             self.history_scroll = max(0, self.history_scroll - 1)
         elif key == curses.KEY_DOWN:
             self.history_scroll += 1
+
+    def handle_profile_key(self, key):
+        if key in (ord("q"), ord("Q")):
+            self.running = False
+        elif key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8) or key in BACK_KEYS:
+            self.screen_name = "main"
+            self.last_message = MAIN_IDLE_MESSAGE
+        elif key == curses.KEY_UP:
+            self.scroll_profile(-1)
+        elif key == curses.KEY_DOWN:
+            self.scroll_profile(1)
 
     def handle_lineage_key(self, key):
         if self.lineage_search_active:
@@ -1036,6 +1117,8 @@ class ActoraTUI:
         self.sync_focus_state()
         if self.screen_name == "main":
             self.handle_main_key(key)
+        elif self.screen_name == "profile":
+            self.handle_profile_key(key)
         elif self.screen_name == "lineage":
             self.handle_lineage_key(key)
         elif self.screen_name == "history":
@@ -1051,7 +1134,8 @@ class ActoraTUI:
 
     def render_footer(self, stdscr, height, width):
         footer_hints = {
-            "main": "[A] Advance   [S] Skip Time   [L] Lineage   [H] History   [Q] Quit",
+            "main": "[A] Advance   [S] Skip   [P] Profile   [L] Lineage   [H] History   [Q] Quit",
+            "profile": "[↑↓] Scroll   [B] Back",
             "lineage": "[↑↓] Move   [A] All   [L] Living   [D] Dead   [/] Search   [B] Back",
             "history": "[↑↓] Scroll   [/] Jump to Year   [B] Back",
             "history_search": "Type year [0-9]   [Enter] Jump   [Esc] Cancel",
@@ -1138,6 +1222,35 @@ class ActoraTUI:
                 content_left,
                 truncate_for_width(scroll_label, left_width),
                 left_width,
+                curses.A_DIM,
+            )
+
+    def render_profile(self, stdscr, height, width):
+        top = 4
+        body_height = height - 6
+        self._profile_body_height = body_height
+        content_left, content_width = get_content_bounds(width, max_width=88)
+        profile_lines = expand_render_lines(self.build_profile_lines(self.get_snapshot_data()), content_width)
+        content_body_height = body_height
+        if len(profile_lines) > body_height:
+            content_body_height = max(1, body_height - 1)
+        visible_lines, self.profile_scroll, _, total_lines = get_scroll_window(
+            profile_lines,
+            content_body_height,
+            self.profile_scroll,
+        )
+        draw_text_block(stdscr, top, content_left, content_width, content_body_height, visible_lines)
+
+        if total_lines > content_body_height:
+            scroll_label = (
+                f"Profile: {self.profile_scroll + 1}-"
+                f"{self.profile_scroll + len(visible_lines)} / {total_lines}"
+            )
+            stdscr.addnstr(
+                min(height - 3, top + content_body_height),
+                content_left,
+                truncate_for_width(scroll_label, content_width),
+                content_width,
                 curses.A_DIM,
             )
 
@@ -1436,6 +1549,8 @@ class ActoraTUI:
         self.render_header(stdscr, width)
         if self.screen_name == "main":
             self.render_main(stdscr, height, width)
+        elif self.screen_name == "profile":
+            self.render_profile(stdscr, height, width)
         elif self.screen_name == "lineage":
             self.render_lineage(stdscr, height, width)
         elif self.screen_name == "history":

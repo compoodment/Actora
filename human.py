@@ -36,7 +36,15 @@ class Human:
         self.stats = {
             "health": 100, # Default values, will be randomized for player
             "happiness": 100, # Default values
-            "intelligence": 50 # Default values
+            "intelligence": 50, # Default values
+            "strength": 50,
+            "charisma": 50,
+            "creativity": 50,
+            "wisdom": 50,
+            "discipline": 50,
+            "willpower": 50,
+            "looks": 50,
+            "fertility": 50,
         }
         self.money = 0
         self.current_place_id = None
@@ -57,6 +65,14 @@ class Human:
         self.stats["health"] = random.randint(85, 100) # Tighter range for human infant
         self.stats["happiness"] = random.randint(80, 100) # Tighter range for human infant
         self.stats["intelligence"] = random.randint(45, 60) # Tighter range for human infant
+        self.stats["strength"] = random.randint(30, 70)
+        self.stats["charisma"] = random.randint(30, 70)
+        self.stats["creativity"] = random.randint(30, 70)
+        self.stats["wisdom"] = random.randint(20, 50)
+        self.stats["discipline"] = random.randint(20, 50)
+        self.stats["willpower"] = random.randint(30, 70)
+        self.stats["looks"] = random.randint(30, 90)
+        self.stats["fertility"] = random.randint(50, 100)
         self.money = 0 # Money remains fixed at 0
 
     def get_lifecycle_state(self, current_year, current_month):
@@ -208,6 +224,16 @@ class Human:
                 "happiness": self.stats["happiness"],
                 "intelligence": self.stats["intelligence"],
                 "money": self.money,
+            },
+            "secondary_statistics": {
+                "strength": self.stats["strength"],
+                "charisma": self.stats["charisma"],
+                "creativity": self.stats["creativity"],
+                "wisdom": self.stats["wisdom"],
+                "discipline": self.stats["discipline"],
+                "willpower": self.stats["willpower"],
+                "looks": self.stats["looks"],
+                "fertility": self.stats["fertility"],
             },
             "relationships": relationship_entries,
             "structural": structural_state,

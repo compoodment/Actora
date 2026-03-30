@@ -1,6 +1,6 @@
 # Actora Architecture Summary
 
-**Version:** 0.37.2
+**Version:** 0.38.0
 **Last Updated:** 2026-03-29
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
@@ -9,7 +9,7 @@ It is intended to support safe patching, review, and manual verification.
 ## 1. Stack
 
 - **Language:** Python
-- **Interface:** Terminal with a narrow curses TUI shell for ordinary play, structured lineage/archive browsing, a full-screen history browser, death/continuation interrupts, and skip-time utility flow
+- **Interface:** Terminal with a narrow curses TUI shell for ordinary play, a dedicated profile screen, structured lineage/archive browsing, a full-screen history browser, death/continuation interrupts, and skip-time utility flow
 - **Structure:** Small modular prototype with separated simulation and rendering responsibilities
 
 ## 2. Current File Structure
@@ -102,7 +102,7 @@ Current stored fields:
 - `gender`
 - `birth_year`
 - `birth_month`
-- `stats` (dictionary containing `health`, `happiness`, `intelligence`)
+- `stats` (dictionary containing primary stats `health`, `happiness`, `intelligence` plus secondary stats `strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`)
 - `money`
 - `current_place_id`
 - `residence_place_id`
@@ -323,10 +323,11 @@ Current snapshot access is formalized through `Human.get_snapshot_data(current_y
 - `time` (`year`, `month`)
 - `location` (`world_body_name`, `current_place_name`, `current_place_kind`, `jurisdiction_place_name`, `jurisdiction_place_kind`)
 - `statistics` (`health`, `happiness`, `intelligence`, `money`)
-- `relationships` (`mother_name`, `father_name`)
+- `secondary_statistics` (`strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`)
+- `relationships` (list of living-family entries with `label` and `name`)
 - `structural` (`structural_status`, `is_alive`, `death_year`, `death_month`, `death_reason`)
 
-This helper is read-only, resolves parent names through world semantic link/actor lookup helpers, resolves `world_body_name` through place ancestry rather than assuming the current place is itself a world body, and preserves the current `"Unknown"` fallback for unresolved parents and unresolved place names. The shell currently renders one added `Jurisdiction` line from this expanded spatial state so snapshot output stays narrow.
+This helper is read-only, resolves living family relationships through current world links, resolves `world_body_name` through place ancestry rather than assuming the current place is itself a world body, and preserves the current `"Unknown"` fallback for unresolved place names. The shell keeps Life View narrow by rendering only the primary `statistics` block there, while the dedicated profile screen consumes both `statistics` and `secondary_statistics`.
 
 ## 6. Module Responsibilities
 
@@ -350,14 +351,14 @@ Current shell-level functions:
 - `build_death_lines(...)` — shell-owned dead-focus interrupt copy assembly
 - `build_screen_chrome(...)` — shell-owned title/subtitle/date chrome assembly for the current TUI screen, including the history browser
 - `draw_text_block(...)` — small curses text rendering helper with wrapping support
-- `ActoraTUI` — narrow curses shell object managing the split Life View, accumulating live event feed, full-screen history browser, styled header/footer chrome, lineage list/detail, skip-time selection, death acknowledgment, two-step continuation inspection/selection, simple left-pane/history scrolling, and safe footer rendering that avoids writing into the terminal’s last column
+- `ActoraTUI` — narrow curses shell object managing the split Life View, dedicated profile screen, accumulating live event feed, full-screen history browser, styled header/footer chrome, lineage list/detail, skip-time selection, death acknowledgment, two-step continuation inspection/selection, simple left-pane/profile/history scrolling, and safe footer rendering that avoids writing into the terminal’s last column
 - `safe_input(prompt)` — narrow shared CLI input boundary helper that exits cleanly on `EOFError` and `KeyboardInterrupt`
 - `create_character()` — character creation prompts and input validation
 - `setup_initial_world(...)` — World creation, parent identity generation, startup actor entry delegation through world-owned helpers (`create_human_actor(...)` and `create_human_child_with_parents(...)`), and initial focused-actor assignment through `World.set_focused_actor(...)`
 - `run_game_tui(...)` — curses wrapper entry point for ordinary play
 - `start_game()` — top-level orchestration (banner, then delegates to the above)
 
-Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Startup parent ages now vary within a narrow adult range, some worlds now generate older siblings before the player is born through `World.bootstrap_older_siblings_for_newborn(...)`, and only-child worlds still remain possible. Once startup completes, ordinary play now lives inside a narrow curses shell: the split `Life View` keeps identity/location/stats/relationships on the left, keeps an accumulating live event feed on the right, allows simple left-side vertical scrolling under terminal-height pressure, opens the full-screen history browser with `H`, still opens lineage with `L`, and still preserves the dead-focus interrupt before any continuation choices are shown.
+Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Startup parent ages now vary within a narrow adult range, some worlds now generate older siblings before the player is born through `World.bootstrap_older_siblings_for_newborn(...)`, and only-child worlds still remain possible. Once startup completes, ordinary play now lives inside a narrow curses shell: the split `Life View` keeps identity/location/primary stats/relationships on the left, keeps an accumulating live event feed on the right, opens a dedicated full-detail `Profile` screen with `P`, allows simple left-side/profile/history vertical scrolling under terminal-height pressure, opens the full-screen history browser with `H`, still opens lineage with `L`, and still preserves the dead-focus interrupt before any continuation choices are shown.
 
 ### `identity.py`
 Responsible for:
