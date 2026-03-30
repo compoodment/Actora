@@ -1,4 +1,4 @@
-Actora Working Ideas Register v45
+Actora Working Ideas Register v46
 
 Date: 2026-03-28
 Role: broad working idea intake, staging, parking, interview-derived design retention, and rewrite-pressure tracking for Actora
@@ -9,7 +9,7 @@ Usage rule: preserve substantial design material and conversation-derived pressu
 
 === CURRENT WORKING READ ===
 
-Verified repo truth is currently through v0.37.4, including:
+Verified repo truth is currently through v0.37.7, including:
 - world-owned actor registry
 - world-owned structured place registry with parent-place hierarchy
 - world-owned link truth
@@ -68,6 +68,10 @@ Verified repo truth is currently through v0.37.4, including:
 - event pool expanded to 100 events with family-aware dynamic name insertion, cross-stage variety, goofy/dark content, and 3-event cooldown to prevent repetition
 - visual markers for structural events in history and live feed (★ birth, ✦ death)
 - minor UX polish: stale message reset on screen return, no-living-family edge case handled, skip-time back UX verified
+- playtest-driven fixes: family event text uses role not full name, history scroll indicator no longer overlaps entries, birth/death records chronologically placed with date reference in live feed, advance key throttle (200ms) prevents death screen bypass and visual jitter
+- history year-jump via `/` with clamped year input, conditional continuation footer (no inspect hint when no candidates)
+- event text deduplication, player_id correctly updated after continuation handoff, life separator in event log after continuation
+- responsive Esc handling via curses.set_escdelay(25)
 - clarified terminal-UI / death-flow intent: alive-state should remain implicit during ordinary play, death should interrupt with a dedicated message/context first, continuation options should follow only after acknowledgment, archived dead actors should remain explorable/reusable later, and terminal information density/timing should be treated as real design work rather than ignored because the interface is temporary
 
 The backbone is materially stronger and more honest than it was at the start of this patch run.

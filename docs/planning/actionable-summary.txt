@@ -1,4 +1,4 @@
-Actionable Ideas Summary - Rev33
+Actionable Ideas Summary - Rev34
 Date: 2026-03-28
 Role: temporary near-term operational planning snapshot for Actora
 Authority: non-authoritative; stable docs win, repo truth wins on implementation
@@ -7,7 +7,7 @@ Usage rule: keep this more distilled than the WIR and focused on the current wor
 
 === CURRENT WORKING POSITION ===
 
-Actora now has a materially stronger early backbone, and verified repo truth is through v0.37.4, with source-stack sync carried through:
+Actora now has a materially stronger early backbone, and verified repo truth is through v0.37.7, with source-stack sync carried through:
 - Master Context v9
 - Roadmap v10
 - world-owned actor registry
@@ -101,11 +101,14 @@ The recent verified sequence is now:
 - v0.36.9 - family continuity groundwork
 - v0.37.0 - death/continuation inspectability follow-through
 - v0.37.1 - scrollable event history log
-- v0.37.0 — death/continuation inspectability follow-through
-- v0.37.1 — scrollable event history log
-- v0.37.2 — Life View relationships fix + event expansion + family-aware events
-- v0.37.3 — UX cleanup + event cooldown + more events
+- v0.37.0 - death/continuation inspectability follow-through
+- v0.37.1 - scrollable event history log
+- v0.37.2 - Life View relationships fix + event expansion + family-aware events
+- v0.37.3 - UX cleanup + event cooldown + more events
 - v0.37.4 — history markers + no-family edge case + skip-time UX verified
+- v0.37.5 — playtest fixes (family text, history overlap, chronological births, advance throttle)
+- v0.37.6 — slower advance throttle, history year-jump, conditional continuation footer
+- v0.37.7 — event dedup, player_id continuation fix, life separator
 
 So the immediate next move is no longer:
 - "what follows spatial identity separation?"
@@ -126,7 +129,7 @@ Why:
 - that means the next checkpoint is less "clean up the first TUI again" and more "what is the strongest next honest pressure after the first TUI/browser/Life View stabilization run?"
 
 So the current question is now:
-- "given repo truth through `v0.37.4`, the current layer is mostly polished. Is the strongest next move pushing toward backbone 4.9/4.10, starting mid-stage domain layers, or finding more current-layer depth?"
+- "given repo truth through `v0.37.7`, the current layer is polished and bug-swept. The strongest next move is either pushing toward backbone 4.9/4.10 or starting the first mid-stage domain layer."
 
 
 === WHAT THE RECENT SEQUENCE ACHIEVED ===
