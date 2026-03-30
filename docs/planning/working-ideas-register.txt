@@ -1,4 +1,4 @@
-Actora Working Ideas Register v47
+Actora Working Ideas Register v48
 
 Date: 2026-03-28
 Role: broad working idea intake, staging, parking, interview-derived design retention, and rewrite-pressure tracking for Actora
@@ -9,7 +9,7 @@ Usage rule: preserve substantial design material and conversation-derived pressu
 
 === CURRENT WORKING READ ===
 
-Verified repo truth is currently through v0.38.0, including:
+Verified repo truth is currently through v0.38.1, including:
 - world-owned actor registry
 - world-owned structured place registry with parent-place hierarchy
 - world-owned link truth
@@ -73,6 +73,8 @@ Verified repo truth is currently through v0.38.0, including:
 - event text deduplication, player_id correctly updated after continuation handoff, life separator in event log after continuation
 - responsive Esc handling via curses.set_escdelay(25)
 - actor stats deepened to include 8 secondary stats (strength, charisma, creativity, wisdom, discipline, willpower, looks, fertility) alongside 3 primary stats and money, with a dedicated scrollable Profile screen via `[P]` and 12 existing events now touching secondary stats
+- full curses character creation wizard (Identity → Appearance → Traits → Stats → Confirm) with Space/Enter/B control language, appearance traits (eye color, hair color, skin tone with Other/free-text), structured personality traits (pick 3 from pool), manual stat sliders 0-100, and gender deferred to puberty
+- parents and siblings now get randomized appearance, traits, and secondary stats through the existing randomize path
 - clarified terminal-UI / death-flow intent: alive-state should remain implicit during ordinary play, death should interrupt with a dedicated message/context first, continuation options should follow only after acknowledgment, archived dead actors should remain explorable/reusable later, and terminal information density/timing should be treated as real design work rather than ignored because the interface is temporary
 
 The backbone is materially stronger and more honest than it was at the start of this patch run.
@@ -262,25 +264,16 @@ ID: IDEA-118
 Created: 2026-03-30
 Last Reviewed: 2026-03-30
 Title: Actor deepening — character creation expansion, appearance, traits, deferred identity
-Status: Leading next-step candidate (Slice 2: creation wizard)
+Status: Slice 1+2 realized in v0.38.0-v0.38.1; Slice 3 (deferred identity) remains open
 Priority: P1
 Roadmap fit: actor structural cleanup (4.5) + identity generation (4.10) deepening before mid-stage domain layers
-Immediate roadmap-layer fit: yes, as the strongest grounded next product pressure from actor-deepening interview
-Summary: The actor model now has 11 stats and a Profile screen, but character creation still only asks name/sex/gender and randomizes everything else. The next move is a curses-based step-by-step creation wizard (Identity → Appearance → Traits → Stats → Confirm) with full sandbox customization, appearance traits at birth, structured personality traits, and gender identity deferred to puberty. Parents and siblings should also get randomized secondary stats.
-Why it matters: Before education/work/health systems can meaningfully use actor attributes, the actor needs to actually have those attributes set deliberately at creation rather than silently randomized.
-Dependencies: current actor model with secondary stats, current Profile screen, current curses TUI patterns
-Risks: overbuilding the creation wizard before downstream systems exist to use the data, or treating stored-but-inert traits as if they already affect gameplay
-Suggested timing: immediate candidate for the next implementation pass
-Next action: implement Slice 2 (creation wizard) as v0.38.1, keeping traits stored but inert and deferring gender/sexuality emergence to Slice 3
-Design locks from interview:
-  - step-by-step wizard in curses (future expandable)
-  - sex chosen at birth, gender deferred to puberty (defaults to match sex)
-  - sexuality emerges through events/life stage later
-  - appearance at birth: eye color, hair color, skin tone, each with Other/free-text
-  - traits: pick 3 from ~10 pool, rest develop emergently later
-  - stats: manual 0-100, full sandbox, no artificial limits
-  - confirm screen before game starts
-  - parents/siblings also get randomized secondary stats
+Immediate roadmap-layer fit: yes, as a realized actor-deepening milestone and guardrail for future creation/identity work
+Summary: v0.38.0 added 8 secondary stats and a Profile screen. v0.38.1 replaced the old plain-text creation with a full curses wizard (Identity → Appearance → Traits → Stats → Confirm) with sandbox customization, appearance traits, structured personality traits, and consistent Space/Enter/B controls. Gender identity deferred to puberty. Slice 3 (deferred identity emergence — gender at puberty, sexuality through events, event-choice framework) remains open.
+Why it matters: The actor is now a real character with meaningful attributes, not just a name and 4 numbers. Future domain systems (education, work, health) have a richer actor to build on.
+Dependencies: current actor model, current TUI patterns, current event foundation
+Risks: treating stored-but-inert traits as if they already affect gameplay, or building Slice 3 before an event-choice framework can support it
+Suggested timing: Slice 3 is a candidate for next work, but first mid-stage domain layer (education) may be a better near-term move
+Next action: evaluate whether Slice 3 or first domain layer is the stronger next move based on playtest feedback
 
 ID: IDEA-104
 Created: 2026-03-27
