@@ -1,6 +1,6 @@
 # Actora Changelog
 
-## Version 0.38.1 (Minor) - 2026-03-29
+## Version 0.38.1 (Minor) - 2026-03-30
 - **Character Creation Wizard + Appearance + Traits:**
     - Replaced the old plain-text startup `create_character()` flow in `main.py` with a curses-based `CreationWizard` that now runs inside the same overall TUI visual system before ordinary play begins.
     - Added step-by-step startup creation for identity, appearance, traits, stat allocation, and confirmation, including `Other` appearance text entry, exact-three trait selection, and stat randomization from the existing newborn ranges.
@@ -9,7 +9,7 @@
     - Added `setup_initial_world_from_character(...)` in `main.py` so startup world creation can accept a fully prepared character payload while preserving the old `setup_initial_world(...)` wrapper for compatibility callers and tests.
     - Verified existing startup-family randomization still routes parent and sibling creation through `Human.randomize_starting_statistics()`, so generated relatives continue to receive both primary and secondary randomized stats.
 
-## Version 0.38.0 (Minor) - 2026-03-29
+## Version 0.38.0 (Minor) - 2026-03-30
 - **Actor Stats Deepening + Profile Screen:**
     - Expanded `Human.stats` in `human.py` beyond the existing primary stats to include `strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, and `fertility`, all with newborn-oriented randomized starting ranges.
     - Extended `Human.get_snapshot_data(...)` so the existing `statistics` block stays Life View-focused while a new `secondary_statistics` block exposes the deeper actor card data for richer shell surfaces.
@@ -17,41 +17,41 @@
     - Updated screen chrome and main footer hints in `main.py` to include the new `Profile` surface and shortened the main skip label to `[S] Skip`.
     - Deepened a small set of existing monthly event outcomes in `events.py` so ordinary life events now also produce small secondary-stat effects without changing event selection logic or the structured event contract.
 
-## Version 0.37.7 (Patch) - 2026-03-29
+## Version 0.37.7 (Patch) - 2026-03-30
 - **Continuation + Event Log Cleanup:**
     - Updated three duplicate monthly event texts in `events.py` to keep the full 100-event pool while removing repeated player-facing copy.
     - Fixed `ActoraTUI.choose_continuation()` in `main.py` so successful continuation handoff now also updates `self.player_id` to the new focused actor instead of leaving the shell pointed at the dead original actor ID.
     - Added a shell-owned `life_separator` event-log entry after continuation handoff, rendered in both the live feed and full history view so multi-life runs read as distinct chapters.
     - Reset `last_logged_year` on continuation so year headers begin cleanly for the new focused life without changing simulation-core behavior or handoff order.
 
-## Version 0.37.6 (Patch) - 2026-03-29
+## Version 0.37.6 (Patch) - 2026-03-30
 - **Playtest Follow-Up Fixes:**
     - Increased the main-screen advance-key hold throttle in `main.py` from 100ms to 200ms so held `A` / `Enter` advances less aggressively during ordinary play.
     - Added a shell-owned year-jump mode to the `History` browser in `main.py`, opened with `/` or `G`, with digit input, `Backspace`, `Enter`, and `Esc`, clamped to `1..current simulation year`, and falling back to the nearest available logged year header when the exact year is absent.
     - Updated `main.py` History footer hints so normal browsing now advertises `[ / ] Jump to Year`, while active year-jump mode shows the dedicated input hint strip.
     - Made the continuation footer in `main.py` dynamic so it only shows `[Enter] Inspect` when continuation candidates actually exist, and collapses to `[Q] Quit` when none do.
 
-## Version 0.37.5 (Patch) - 2026-03-29
+## Version 0.37.5 (Patch) - 2026-03-30
 - **Playtest Bug Fixes:**
     - Updated all family-aware monthly event text in `events.py` to refer to relatives by role (`Your mother`, `your brother`, etc.) instead of rendering full names, and normalized `{family_role}` substitution to lowercase during event text rendering.
     - Fixed `main.py` history-browser footer rendering so the scroll indicator now reserves its own line and no longer overlaps the last visible history entry.
     - Changed shell event-log population in `main.py` to merge focused-actor monthly events with newly written `birth` and `death` records by simulation date before appending, preserving chronological order and year-header placement; structural live-feed entries now also show their actual year as `[Year N]`.
     - Added a 100ms `time.monotonic()` throttle to the main-screen advance action in `main.py`, preventing held `A`/`Enter` input from immediately punching through the death acknowledgment screen or causing excessive redraw jitter while leaving other navigation input unchanged.
 
-## Version 0.37.4 (Patch) - 2026-03-29
+## Version 0.37.4 (Patch) - 2026-03-30
 - **History + Lineage Polish:**
     - Added structural event markers in `main.py` so focused-actor `birth` and `death` records carried into the shell-owned event log now render as `★` and `✦` in both the full `History` browser and the live right-pane feed, while ordinary monthly events remain unmarked.
     - Verified the Life View `Relationships` section already handles the new list-based snapshot data correctly and continues to show `No living family.` whenever the structured relationships list is empty.
     - Verified skip-time back UX in `main.py`: both `[B]` and `Esc` return immediately to the main screen, and `open_skip_time()` still resets preset selection and custom typed months each time the screen is reopened.
 
-## Version 0.37.3 (Patch) - 2026-03-29
+## Version 0.37.3 (Patch) - 2026-03-30
 - **UX Cleanup + Event Quality:**
     - Reset Life View status text back to the default idle prompt when backing out of history, lineage, or skip-time, while preserving the existing advance-time and continuation-handoff messages.
     - Kept the existing left-pane scroll hint behavior in `main.py`, which already shows a `More details:` indicator on first render whenever Life View content exceeds the visible area.
     - Added a simple per-turn monthly-event cooldown in `events.py` and `world.py`, excluding the last three triggered event IDs during one `simulate_advance_turn(...)` run but falling back to the full eligible pool if cooldown would empty it.
     - Expanded the human monthly event pool with more infant and teenager coverage plus additional family-aware, goofy, and slightly darker grounded events without changing the event-result contract.
 
-## Version 0.37.2 (Patch) - 2026-03-29
+## Version 0.37.2 (Minor) - 2026-03-30
 - **Life View Relationships + Event-Pool Thickening:**
     - Changed `Human.get_snapshot_data(...)` so Life View relationships now derive from all current outgoing `family` links, dedupe linked actors, skip dead relatives, and emit a structured list of living family entries instead of fixed `mother_name` / `father_name` fields.
     - Updated `main.py` Life View rendering to iterate the new relationships list directly and show `No living family.` when no linked living relatives are present.
@@ -59,14 +59,14 @@
     - Added optional event-definition support for `family_context` and `family_roles`, allowing some monthly events to require living family and render actual relative names into event text.
     - Updated `World.simulate_advance_turn(...)` to build current living sibling/parent event context and pass it into monthly event selection without changing mortality, continuation, lineage, history, or skip-time flow.
 
-## Version 0.37.1 (Patch) - 2026-03-29
+## Version 0.37.1 (Minor) - 2026-03-30
 - **Scrollable Event History Log:**
     - Replaced the Life View right pane in `main.py` with a shell-owned accumulating live event feed that now persists meaningful events, skip markers, and year headers across the full run instead of only summarizing the latest turn.
     - Added a full-screen `History` browser opened from Life View with `[H]`, auto-positioned at the newest entries and scrollable with `↑↓` while preserving existing lineage, skip-time, death, and continuation flows.
     - Expanded shell-side event-log population so focused-actor structured events plus newly written relevant `birth` and `death` records from each advance are folded into the same history stream while filtering hidden scaffolding record types (`family_bootstrap`, `actor_entry`).
     - Updated screen chrome and footer hints to include the new history surface and the revised main hint strip (`[A] Advance   [S] Skip Time   [L] Lineage   [H] History   [Q] Quit`).
 
-## Version 0.37.0 (Patch) - 2026-03-29
+## Version 0.37.0 (Minor) - 2026-03-30
 - **Death / Continuation Inspectability Follow-Through:**
     - Filtered implementation-scaffolding records (`family_bootstrap`, `actor_entry`) out of player-facing lineage detail and death/continuation inspect surfaces while preserving the records in world storage.
     - Simplified lineage, death interrupt, and continuation header subtitles so they now show only the focused actor name instead of leaking flow-spec phrasing into the chrome.
@@ -75,7 +75,7 @@
     - Changed continuation selection to a two-step inspect-first flow with a dedicated candidate detail screen, explicit confirm/back actions, and recent meaningful records before handoff.
     - Tightened world-owned parent continuation labels so family parents now render as `Mother` / `Father` instead of generic `family/mother` / `family/father`.
 
-## Version 0.36.9 (Patch) - 2026-03-29
+## Version 0.36.9 (Minor) - 2026-03-30
 - **Family Continuity Groundwork:**
     - Expanded startup family generation so some runs now begin with one or more older siblings created as real actors before the player is born, while only-child starts still remain common.
     - Replaced the fixed startup parent ages in `main.py` with a narrow randomized parent-age range so sibling plausibility and later family births are not detached from parent age truth.
@@ -85,7 +85,7 @@
     - Surfaced later sibling births to the focused actor only when they are directly meaningful, while otherwise leaving them as quiet background family records.
     - Tightened lineage/continuation relationship labeling so siblings now render with simple direct labels (`Brother` / `Sister`) and continuation ordering now prefers siblings ahead of less-close family/other linked actors by default.
 
-## Version 0.36.8 (Patch) - 2026-03-29
+## Version 0.36.8 (Minor) - 2026-03-29
 - **Ordinary Mortality / Old-Age Death Truth:**
     - Added world-owned monthly old-age mortality in `world.py` so living actors now face baseline later-life death risk during ordinary simulation instead of surviving indefinitely by default.
     - Resolved mortality across all living actors each simulated month, not only the focused actor, so family-lineage truth can accumulate ordinary deaths as world time advances.
@@ -111,6 +111,13 @@
     - Removed the heavy box dependence introduced by the lineage browser foundation and replaced it with lighter centered layout composition plus a narrow vertical divider, preserving compact one-line lineage rows while making the browser/detail split easier to read.
     - Strengthened spacing rhythm in ordinary play, made continuation/death utility screens feel more staged, and preserved current functionality across startup, lineage filters/search, skip-time flow, death acknowledgment, and continuation selection.
     - Fixed visual-pass follow-up issues before release, including skip-time highlight indexing and a small helper-shape cleanup in the centered column splitter.
+
+## Version 0.36.5 (Patch) - 2026-03-29
+- **TUI-Aware Repo Cleanup / Shell-Era Drift Reduction:**
+    - Removed the dead `TIME_ADVANCED_BANNER` constant from `banners.py` since ordinary advancement and skip-time now live inside the TUI and the old shell-era banner path is gone.
+    - Clarified startup-vs-curses boundary wording in `main.py` so the transition from plain-text startup into the curses shell is no longer ambiguously documented.
+    - Tightened repo-local comments and file-level documentation to reflect that Actora is now TUI-driven in ordinary play rather than typed-command-driven.
+    - Preserved all current TUI behavior, lineage browsing, skip-time flow, death/continuation handling, and simulation-core ownership.
 
 ## Version 0.36.4 (Patch) - 2026-03-29
 - **Lineage Row Truncation Hygiene:**
