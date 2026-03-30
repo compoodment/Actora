@@ -1643,12 +1643,14 @@ class World:
                 self.current_month,
             )
             family_context_for_event = self._build_family_event_context_for(focused_actor_id)
+            actor_traits_for_event = list(getattr(focused_actor, "traits", []) or [])
             structured_event_for_month = get_human_monthly_event_from_lifecycle(
                 lifecycle_state_for_event,
                 self.current_year,
                 self.current_month,
                 family_context=family_context_for_event,
                 recent_event_ids=recent_event_ids,
+                actor_traits=actor_traits_for_event,
             )
             if structured_event_for_month:
                 self.apply_outcome(focused_actor_id, structured_event_for_month.get("outcome"))

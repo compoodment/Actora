@@ -1,5 +1,12 @@
 # Actora Changelog
 
+## Version 0.39.1 (Minor) - 2026-03-30
+- **Traits Wired Into Monthly Events:**
+    - Added `required_traits` support to human monthly event definitions in `events.py`, preserving the existing event contract while allowing trait-gated eligibility.
+    - Extended human monthly event selection to accept actor traits and exclude trait-gated events unless the focused actor has at least one required trait.
+    - Passed the focused actor's `traits` from `World.simulate_advance_turn(...)` into monthly event selection so personality now affects which events can surface.
+    - Added 20 new trait-gated monthly events across life stages, covering Curious, Calm, Fussy, Bold, Shy, Cheerful, Stubborn, Gentle, Restless, and Alert.
+
 ## Version 0.39.0 (Minor) - 2026-03-30
 - **Event-Choice Framework + Gender/Sexuality Identity Emergence:**
     - Added a general-purpose pending-choice popup overlay to the curses TUI in `main.py`, with centered boxed rendering, selection movement, skip support, and full input capture while a choice is active.
