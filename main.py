@@ -65,6 +65,137 @@ SEXUALITY_OPTION_LABELS = [
     ("People regardless of gender (Pansexual)", "Pansexual"),
     ("It is hard to define (Queer)", "Queer"),
 ]
+WORLD_GEOGRAPHY = [
+    {
+        "country_id": "us",
+        "country_name": "United States",
+        "metadata": {"region": "North America", "culture_group": "American", "primary_language": "English"},
+        "cities": [
+            {"city_id": "us_new_york", "city_name": "New York"},
+            {"city_id": "us_los_angeles", "city_name": "Los Angeles"},
+            {"city_id": "us_chicago", "city_name": "Chicago"},
+            {"city_id": "us_houston", "city_name": "Houston"},
+            {"city_id": "us_phoenix", "city_name": "Phoenix"},
+        ],
+    },
+    {
+        "country_id": "brazil",
+        "country_name": "Brazil",
+        "metadata": {"region": "South America", "culture_group": "Brazilian", "primary_language": "Portuguese"},
+        "cities": [
+            {"city_id": "brazil_sao_paulo", "city_name": "São Paulo"},
+            {"city_id": "brazil_rio_de_janeiro", "city_name": "Rio de Janeiro"},
+            {"city_id": "brazil_brasilia", "city_name": "Brasília"},
+            {"city_id": "brazil_salvador", "city_name": "Salvador"},
+        ],
+    },
+    {
+        "country_id": "uk",
+        "country_name": "United Kingdom",
+        "metadata": {"region": "Europe", "culture_group": "British", "primary_language": "English"},
+        "cities": [
+            {"city_id": "uk_london", "city_name": "London"},
+            {"city_id": "uk_manchester", "city_name": "Manchester"},
+            {"city_id": "uk_birmingham", "city_name": "Birmingham"},
+        ],
+    },
+    {
+        "country_id": "netherlands",
+        "country_name": "Netherlands",
+        "metadata": {"region": "Europe", "culture_group": "Dutch", "primary_language": "Dutch"},
+        "cities": [
+            {"city_id": "netherlands_amsterdam", "city_name": "Amsterdam"},
+            {"city_id": "netherlands_rotterdam", "city_name": "Rotterdam"},
+        ],
+    },
+    {
+        "country_id": "germany",
+        "country_name": "Germany",
+        "metadata": {"region": "Europe", "culture_group": "German", "primary_language": "German"},
+        "cities": [
+            {"city_id": "germany_berlin", "city_name": "Berlin"},
+            {"city_id": "germany_munich", "city_name": "Munich"},
+            {"city_id": "germany_hamburg", "city_name": "Hamburg"},
+            {"city_id": "germany_frankfurt", "city_name": "Frankfurt"},
+        ],
+    },
+    {
+        "country_id": "kenya",
+        "country_name": "Kenya",
+        "metadata": {"region": "East Africa", "culture_group": "Kenyan", "primary_language": "Swahili/English"},
+        "cities": [
+            {"city_id": "kenya_nairobi", "city_name": "Nairobi"},
+            {"city_id": "kenya_mombasa", "city_name": "Mombasa"},
+        ],
+    },
+    {
+        "country_id": "colombia",
+        "country_name": "Colombia",
+        "metadata": {"region": "South America", "culture_group": "Colombian", "primary_language": "Spanish"},
+        "cities": [
+            {"city_id": "colombia_bogota", "city_name": "Bogotá"},
+            {"city_id": "colombia_medellin", "city_name": "Medellín"},
+            {"city_id": "colombia_cali", "city_name": "Cali"},
+        ],
+    },
+    {
+        "country_id": "japan",
+        "country_name": "Japan",
+        "metadata": {"region": "East Asia", "culture_group": "Japanese", "primary_language": "Japanese"},
+        "cities": [
+            {"city_id": "japan_tokyo", "city_name": "Tokyo"},
+            {"city_id": "japan_osaka", "city_name": "Osaka"},
+            {"city_id": "japan_kyoto", "city_name": "Kyoto"},
+        ],
+    },
+    {
+        "country_id": "india",
+        "country_name": "India",
+        "metadata": {"region": "South Asia", "culture_group": "Indian", "primary_language": "Hindi/English"},
+        "cities": [
+            {"city_id": "india_mumbai", "city_name": "Mumbai"},
+            {"city_id": "india_delhi", "city_name": "Delhi"},
+            {"city_id": "india_bangalore", "city_name": "Bangalore"},
+            {"city_id": "india_kolkata", "city_name": "Kolkata"},
+        ],
+    },
+    {
+        "country_id": "indonesia",
+        "country_name": "Indonesia",
+        "metadata": {"region": "Southeast Asia", "culture_group": "Indonesian", "primary_language": "Indonesian"},
+        "cities": [
+            {"city_id": "indonesia_jakarta", "city_name": "Jakarta"},
+            {"city_id": "indonesia_surabaya", "city_name": "Surabaya"},
+            {"city_id": "indonesia_bandung", "city_name": "Bandung"},
+        ],
+    },
+    {
+        "country_id": "philippines",
+        "country_name": "Philippines",
+        "metadata": {"region": "Southeast Asia", "culture_group": "Filipino", "primary_language": "Filipino/English"},
+        "cities": [
+            {"city_id": "philippines_manila", "city_name": "Manila"},
+            {"city_id": "philippines_cebu_city", "city_name": "Cebu City"},
+            {"city_id": "philippines_davao_city", "city_name": "Davao City"},
+        ],
+    },
+    {
+        "country_id": "australia",
+        "country_name": "Australia",
+        "metadata": {"region": "Oceania", "culture_group": "Australian", "primary_language": "English"},
+        "cities": [
+            {"city_id": "australia_sydney", "city_name": "Sydney"},
+            {"city_id": "australia_melbourne", "city_name": "Melbourne"},
+            {"city_id": "australia_brisbane", "city_name": "Brisbane"},
+        ],
+    },
+]
+WORLD_GEOGRAPHY_BY_COUNTRY_ID = {
+    country["country_id"]: country
+    for country in WORLD_GEOGRAPHY
+}
+DEFAULT_COUNTRY_ID = WORLD_GEOGRAPHY[0]["country_id"]
+DEFAULT_CITY_ID = WORLD_GEOGRAPHY[0]["cities"][0]["city_id"]
 
 
 def generate_startup_actor_id(role):
@@ -512,10 +643,11 @@ class CreationWizard:
 
     STEP_TITLES = [
         "Step 1: Identity",
-        "Step 2: Appearance",
-        "Step 3: Traits",
-        "Step 4: Stats",
-        "Step 5: Confirm",
+        "Step 2: Location",
+        "Step 3: Appearance",
+        "Step 4: Traits",
+        "Step 5: Stats",
+        "Step 6: Confirm",
     ]
 
     def __init__(self, stdscr):
@@ -525,6 +657,9 @@ class CreationWizard:
         self.step_index = 0
 
         self.identity_field_index = 0
+        self.location_mode = "country"
+        self.country_index = 0
+        self.city_index = 0
         self.appearance_field_index = 0
         self.appearance_option_index = 0
         self.appearance_mode = "field"
@@ -536,6 +671,8 @@ class CreationWizard:
             "last_name": "",
             "sex": CREATION_SEX_OPTIONS[0],
             "gender": "Male",
+            "country_id": DEFAULT_COUNTRY_ID,
+            "city_id": DEFAULT_CITY_ID,
             "appearance": {
                 "eye_color": CREATION_EYE_COLOR_OPTIONS[0],
                 "hair_color": CREATION_HAIR_COLOR_OPTIONS[0],
@@ -579,6 +716,47 @@ class CreationWizard:
                     }
                 )
         return expanded_fields
+
+    def get_location_country(self):
+        return WORLD_GEOGRAPHY_BY_COUNTRY_ID[self.data["country_id"]]
+
+    def get_location_cities(self):
+        return self.get_location_country()["cities"]
+
+    def sync_location_indexes(self):
+        self.country_index = next(
+            (
+                index
+                for index, country in enumerate(WORLD_GEOGRAPHY)
+                if country["country_id"] == self.data["country_id"]
+            ),
+            0,
+        )
+        self.city_index = next(
+            (
+                index
+                for index, city in enumerate(self.get_location_cities())
+                if city["city_id"] == self.data["city_id"]
+            ),
+            0,
+        )
+
+    def set_selected_country(self, country_index):
+        country = WORLD_GEOGRAPHY[country_index]
+        self.country_index = country_index
+        self.data["country_id"] = country["country_id"]
+        cities = country["cities"]
+        city_ids = {city["city_id"] for city in cities}
+        if self.data["city_id"] not in city_ids:
+            self.data["city_id"] = cities[0]["city_id"]
+            self.city_index = 0
+            return
+        self.sync_location_indexes()
+
+    def set_selected_city(self, city_index):
+        cities = self.get_location_cities()
+        self.city_index = city_index
+        self.data["city_id"] = cities[city_index]["city_id"]
 
     def get_current_appearance_select_options(self):
         selected_field = self.get_active_appearance_select_field()
@@ -632,6 +810,8 @@ class CreationWizard:
             "last_name": self.data["last_name"].strip(),
             "sex": self.data["sex"],
             "gender": self.data["gender"],
+            "country_id": self.data["country_id"],
+            "city_id": self.data["city_id"],
             "appearance": appearance,
             "traits": list(self.data["traits"]),
             "stats": dict(self.data["stats"]),
@@ -649,9 +829,10 @@ class CreationWizard:
         footer_map = {
             0: "[↑↓] Move   [Enter] Continue   [Q] Quit",
             1: "[↑↓] Move   [Space] Select   [Enter] Continue   [B] Back   [Q] Quit",
-            2: "[↑↓] Move   [Space] Toggle   [Enter] Continue   [B] Back   [Q] Quit",
-            3: "[↑↓] Move   [←→] Adjust   [R] Randomize   [Enter] Continue   [B] Back   [Q] Quit",
-            4: "[Enter] Start Game   [B] Back   [Q] Quit",
+            2: "[↑↓] Move   [Space] Select   [Enter] Continue   [B] Back   [Q] Quit",
+            3: "[↑↓] Move   [Space] Toggle   [Enter] Continue   [B] Back   [Q] Quit",
+            4: "[↑↓] Move   [←→] Adjust   [R] Randomize   [Enter] Continue   [B] Back   [Q] Quit",
+            5: "[Enter] Start Game   [B] Back   [Q] Quit",
         }
         content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
         hline_char = getattr(curses, "ACS_HLINE", ord("-"))
@@ -729,6 +910,54 @@ class CreationWizard:
 
         draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
 
+    def render_location(self, height, width):
+        content_left, content_width = get_content_bounds(width, max_width=96)
+        left_width, right_left, right_width = split_centered_columns(content_left, content_width, left_ratio=0.5)
+        body_height = height - 7
+
+        selected_country = self.get_location_country()
+        selected_city = next(
+            city for city in self.get_location_cities() if city["city_id"] == self.data["city_id"]
+        )
+
+        country_lines = [
+            "Choose a birth country.",
+            "",
+        ]
+        country_highlight_index = None
+        for index, country in enumerate(WORLD_GEOGRAPHY):
+            if self.location_mode == "country" and index == self.country_index:
+                country_highlight_index = len(country_lines)
+            marker = "[x]" if self.data["country_id"] == country["country_id"] else "[ ]"
+            country_lines.append(f"{marker} {country['country_name']}")
+
+        city_lines = [
+            f"Cities in {selected_country['country_name']}",
+            "",
+        ]
+        city_highlight_index = None
+        for index, city in enumerate(selected_country["cities"]):
+            if self.location_mode == "city" and index == self.city_index:
+                city_highlight_index = len(city_lines)
+            marker = "[x]" if self.data["city_id"] == city["city_id"] else "[ ]"
+            city_lines.append(f"{marker} {city['city_name']}")
+
+        city_lines.extend(
+            [
+                "",
+                "Selection",
+                f"  Country: {selected_country['country_name']}",
+                f"  City: {selected_city['city_name']}",
+                f"  Region: {selected_country['metadata']['region']}",
+                f"  Culture: {selected_country['metadata']['culture_group']}",
+                f"  Language: {selected_country['metadata']['primary_language']}",
+            ]
+        )
+
+        draw_text_block(self.stdscr, 5, content_left, left_width, body_height, country_lines, highlight_index=country_highlight_index)
+        draw_vertical_divider(self.stdscr, 5, right_left - 2, body_height)
+        draw_text_block(self.stdscr, 5, right_left, right_width, body_height, city_lines, highlight_index=city_highlight_index)
+
     def render_traits(self, height, width):
         content_left, content_width = get_content_bounds(width, max_width=84)
         lines = [
@@ -787,6 +1016,10 @@ class CreationWizard:
             f"  Sex: {result['sex']}",
             f"  Gender: {result['gender']}",
             "",
+            "Location",
+            f"  Country: {WORLD_GEOGRAPHY_BY_COUNTRY_ID[result['country_id']]['country_name']}",
+            f"  City: {next(city['city_name'] for city in WORLD_GEOGRAPHY_BY_COUNTRY_ID[result['country_id']]['cities'] if city['city_id'] == result['city_id'])}",
+            "",
             "Appearance",
             f"  Eye Color: {result['appearance']['eye_color']}",
             f"  Hair Color: {result['appearance']['hair_color']}",
@@ -814,10 +1047,12 @@ class CreationWizard:
         if self.step_index == 0:
             self.render_identity(height, width)
         elif self.step_index == 1:
-            self.render_appearance(height, width)
+            self.render_location(height, width)
         elif self.step_index == 2:
-            self.render_traits(height, width)
+            self.render_appearance(height, width)
         elif self.step_index == 3:
+            self.render_traits(height, width)
+        elif self.step_index == 4:
             self.render_stats(height, width)
         else:
             self.render_confirm(height, width)
@@ -882,6 +1117,44 @@ class CreationWizard:
             if key in (curses.KEY_ENTER, 10, 13) and self.can_advance_identity():
                 self.step_index = 1
 
+    def handle_location_key(self, key):
+        if self.location_mode == "country":
+            if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
+                self.step_index = 0
+                return
+            if key == curses.KEY_UP:
+                self.set_selected_country(max(0, self.country_index - 1))
+                return
+            if key == curses.KEY_DOWN:
+                self.set_selected_country(min(len(WORLD_GEOGRAPHY) - 1, self.country_index + 1))
+                return
+            if key == ord(" "):
+                self.location_mode = "city"
+                self.sync_location_indexes()
+                return
+            if key in (curses.KEY_ENTER, 10, 13):
+                self.location_mode = "city"
+                self.sync_location_indexes()
+                return
+            return
+
+        cities = self.get_location_cities()
+        if key == curses.KEY_UP:
+            self.set_selected_city(max(0, self.city_index - 1))
+            return
+        if key == curses.KEY_DOWN:
+            self.set_selected_city(min(len(cities) - 1, self.city_index + 1))
+            return
+        if key == ord(" "):
+            self.set_selected_city(self.city_index)
+            return
+        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
+            self.location_mode = "country"
+            return
+        if key in (curses.KEY_ENTER, 10, 13):
+            self.step_index = 2
+            self.location_mode = "country"
+
     def handle_appearance_key(self, key):
         fields = self.get_appearance_fields()
         self.appearance_field_index = max(0, min(self.appearance_field_index, len(fields) - 1))
@@ -905,7 +1178,7 @@ class CreationWizard:
             return
 
         if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
-            self.step_index = 0
+            self.step_index = 1
             return
         if key == curses.KEY_UP:
             self.appearance_field_index = max(0, self.appearance_field_index - 1)
@@ -916,7 +1189,7 @@ class CreationWizard:
         if current_field["kind"] == "select":
             if key in (curses.KEY_ENTER, 10, 13):
                 if self.can_advance_appearance():
-                    self.step_index = 2
+                    self.step_index = 3
                     return
                 options = current_field["options"]
                 current_value = self.data["appearance"][current_field["key"]]
@@ -932,7 +1205,7 @@ class CreationWizard:
             if self.appearance_field_index < len(fields) - 1:
                 self.appearance_field_index += 1
             elif self.can_advance_appearance():
-                self.step_index = 2
+                self.step_index = 3
             return
         if key in (curses.KEY_BACKSPACE, 127, 8):
             self.custom_appearance_values[current_field["key"]] = self.custom_appearance_values[current_field["key"]][:-1]
@@ -942,7 +1215,7 @@ class CreationWizard:
 
     def handle_traits_key(self, key):
         if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
-            self.step_index = 1
+            self.step_index = 2
             return
         if key == curses.KEY_UP:
             self.trait_index = max(0, self.trait_index - 1)
@@ -958,12 +1231,12 @@ class CreationWizard:
                 self.data["traits"].append(trait)
             return
         if key in (curses.KEY_ENTER, 10, 13) and self.can_advance_traits():
-            self.step_index = 3
+            self.step_index = 4
             return
 
     def handle_stats_key(self, key):
         if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
-            self.step_index = 2
+            self.step_index = 3
             return
         if key == curses.KEY_UP:
             self.stat_index = max(0, self.stat_index - 1)
@@ -975,7 +1248,7 @@ class CreationWizard:
             self.data["stats"] = build_randomized_starting_stats()
             return
         if key in (curses.KEY_ENTER, 10, 13):
-            self.step_index = 4
+            self.step_index = 5
             return
         if key in (curses.KEY_LEFT, ord("-")):
             stat_name = CREATION_STAT_ORDER[self.stat_index]
@@ -987,7 +1260,7 @@ class CreationWizard:
 
     def handle_confirm_key(self, key):
         if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
-            self.step_index = 3
+            self.step_index = 4
             return None
         if key in (curses.KEY_ENTER, 10, 13):
             self.running = False
@@ -1007,10 +1280,12 @@ class CreationWizard:
             if self.step_index == 0:
                 self.handle_identity_key(key)
             elif self.step_index == 1:
-                self.handle_appearance_key(key)
+                self.handle_location_key(key)
             elif self.step_index == 2:
-                self.handle_traits_key(key)
+                self.handle_appearance_key(key)
             elif self.step_index == 3:
+                self.handle_traits_key(key)
+            elif self.step_index == 4:
                 self.handle_stats_key(key)
             else:
                 result = self.handle_confirm_key(key)
@@ -2364,29 +2639,39 @@ def setup_initial_world_from_character(character_data):
         parent_place_id=None,
         metadata={},
     )
-    world.add_place(
-        place_id="earth_country_01",
-        name="Starter Country",
-        kind="country",
-        parent_place_id="earth",
-        metadata={},
-    )
-    world.add_place(
-        place_id="earth_city_01",
-        name="Starter City",
-        kind="city",
-        parent_place_id="earth_country_01",
-        metadata={},
-    )
+    for country in WORLD_GEOGRAPHY:
+        world.add_place(
+            place_id=country["country_id"],
+            name=country["country_name"],
+            kind="country",
+            parent_place_id="earth",
+            metadata=dict(country["metadata"]),
+        )
+        for city in country["cities"]:
+            world.add_place(
+                place_id=city["city_id"],
+                name=city["city_name"],
+                kind="city",
+                parent_place_id=country["country_id"],
+                metadata={},
+            )
 
-    startup_place_id = "earth_city_01"
-    startup_jurisdiction_place_id = "earth_country_01"
+    startup_jurisdiction_place_id = character_data.get("country_id") or DEFAULT_COUNTRY_ID
+    startup_place_id = character_data.get("city_id") or DEFAULT_CITY_ID
+    startup_country = WORLD_GEOGRAPHY_BY_COUNTRY_ID.get(startup_jurisdiction_place_id)
+    if startup_country is None:
+        raise ValueError(f"Unknown startup country_id '{startup_jurisdiction_place_id}'")
+    if startup_place_id not in {city["city_id"] for city in startup_country["cities"]}:
+        raise ValueError(
+            f"Unknown or mismatched startup city_id '{startup_place_id}' for country_id '{startup_jurisdiction_place_id}'"
+        )
 
     mother_identity_context = prepare_parent_identity_context(
         role="mother",
         player_last_name=character_data["last_name"],
         place_id=startup_place_id,
         world=world,
+        culture_group=startup_country["metadata"]["culture_group"],
     )
     family_last_name = mother_identity_context["family_last_name"]
     father_identity_context = prepare_parent_identity_context(
@@ -2395,6 +2680,7 @@ def setup_initial_world_from_character(character_data):
         player_last_name=character_data["last_name"],
         place_id=startup_place_id,
         world=world,
+        culture_group=startup_country["metadata"]["culture_group"],
     )
 
     mother_identity = generate_parent_identity_from_context(mother_identity_context)
@@ -2489,6 +2775,8 @@ def setup_initial_world(player_first_name, player_last_name, player_sex, player_
         "last_name": player_last_name,
         "sex": player_sex,
         "gender": player_gender,
+        "country_id": DEFAULT_COUNTRY_ID,
+        "city_id": DEFAULT_CITY_ID,
         "appearance": {
             "eye_color": "Brown",
             "hair_color": "Black",

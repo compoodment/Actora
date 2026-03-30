@@ -145,9 +145,9 @@ Current stat-mutation boundary details:
 
 Current startup creation flow details:
 - `start_game()` now prints the title banner in plain text, then enters curses for a dedicated `CreationWizard`, then builds the world from the returned character payload, and only then hands control to the ordinary-play TUI.
-- `CreationWizard` lives in `main.py` and currently owns five startup steps: identity, appearance, traits, stats, and confirmation.
-- startup character payloads now include `first_name`, `last_name`, `sex`, `gender`, `appearance`, `traits`, and `stats`
-- player startup world creation now routes through `setup_initial_world_from_character(...)`, while the older `setup_initial_world(...)` still exists as a compatibility wrapper for callers that pass only the older four identity values
+- `CreationWizard` lives in `main.py` and currently owns six startup steps: identity, location, appearance, traits, stats, and confirmation.
+- startup character payloads now include `first_name`, `last_name`, `sex`, `gender`, `country_id`, `city_id`, `appearance`, `traits`, and `stats`
+- player startup world creation now routes through `setup_initial_world_from_character(...)`, which hydrates the full real-world place registry from module-level `WORLD_GEOGRAPHY`, while the older `setup_initial_world(...)` still exists as a compatibility wrapper for callers that pass only the older four identity values
 
 ## 4. Relationships
 
@@ -360,6 +360,7 @@ Current startup flow is human-only. `start_game()` prints the title banner in pl
 ### `identity.py`
 Responsible for:
 - approved parent first-name pools (`MOTHER_FIRST_NAME_POOL`, `FATHER_FIRST_NAME_POOL`)
+- culture-aware parent naming pools (`CULTURE_NAME_POOLS`)
 - approved fallback surname pool (`FALLBACK_LAST_NAME_POOL`)
 - family surname resolution via `resolve_family_last_name(player_last_name)`
 - structured identity-generation context prep via `prepare_parent_identity_context(...)`
@@ -369,9 +370,9 @@ Responsible for:
 Current boundary:
 - returns small structured identity dictionaries for current mother/father generation
 - now exposes a small structured context-prep seam so startup identity generation no longer depends only on loose positional inputs
-- still resolves current names through placeholder/global pools beneath that seam
+- now resolves startup parent names through culture-specific first-name and surname pools when a supported `culture_group` is present, with the older global pools preserved as fallback
 - does not construct `Human` objects
-- does not yet implement place-aware, culture-aware, era-aware, or world-aware identity generation
+- does not yet implement era-aware or world-simulated identity generation beyond current startup culture selection
 - remains human-only for the current startup identity path
 
 ### `world.py`
@@ -489,8 +490,9 @@ This function does not perform terminal input, output, or presentation formattin
 
 ### Character Creation
 Current player creation includes:
-- a curses-based `CreationWizard` with five steps: Identity, Appearance, Traits, Stats, Confirm
+- a curses-based `CreationWizard` with six steps: Identity, Location, Appearance, Traits, Stats, Confirm
 - Identity step with required first name, optional last name, and sex selection (`Male`, `Female`, `Intersex`)
+- Location step with country selection first, then city selection within the chosen country; the selected `country_id` / `city_id` are stored in the startup payload
 - gender defaults to match sex and is deferred to puberty emergence during play
 - Appearance step with eye color, hair color, and skin tone; each appearance field supports `Other`, which requires a custom free-text value before continuing
 - Traits step requiring exactly 3 traits from `Curious`, `Calm`, `Fussy`, `Bold`, `Shy`, `Cheerful`, `Stubborn`, `Gentle`, `Restless`, `Alert`
@@ -500,8 +502,9 @@ Current player creation includes:
 
 ### Initial World Setup
 Current initialization behavior:
-- initial world setup creates a minimal startup place hierarchy: `"earth"` (`name="Earth"`, `kind="world_body"`) -> `"earth_country_01"` (`name="Starter Country"`, `kind="country"`) -> `"earth_city_01"` (`name="Starter City"`, `kind="city"`)
+- initial world setup creates `"earth"` plus the full startup place registry from `WORLD_GEOGRAPHY`: 12 real countries and their configured real cities, with country metadata for `region`, `culture_group`, and `primary_language`
 - player is created in Year 1, Month 1 with startup stats copied from the creation payload
+- player, parents, and bootstrapped older siblings all begin in the selected real startup city/country
 - two parent actors are created through `World.create_human_actor(...)`
 - current actor entry through `create_human_actor(...)` writes preserved `actor_entry` records with `entry_method="create_human_actor"`
 - current human startup family bootstrap through `create_human_child_with_parents(...)` writes one preserved `family_bootstrap` record

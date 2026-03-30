@@ -1,5 +1,13 @@
 # Actora Changelog
 
+## Version 0.40.0 (Minor) - 2026-03-30
+- **Real Location Content + Culture-Aware Name Generation:**
+    - Replaced the placeholder startup geography in `main.py` with module-level `WORLD_GEOGRAPHY`, adding `Earth`, 12 real countries, and their configured real cities to the world place registry at startup.
+    - Inserted a new `Location` step into the curses `CreationWizard` between Identity and Appearance, storing `country_id` and `city_id` in the startup character payload and shifting the remaining step indexes accordingly.
+    - Updated `setup_initial_world_from_character(...)` to place the player, parents, and startup siblings in the selected real city/country while preserving the existing compatibility wrapper `setup_initial_world(...)`.
+    - Added `CULTURE_NAME_POOLS` in `identity.py` with culture-specific mother names, father names, and surnames for the configured country culture groups, and threaded `culture_group` through the parent identity context helpers with fallback to the older global pools.
+    - Verified the existing profile/location display path continues to resolve real place names through the world place registry without new simulation systems.
+
 ## Version 0.39.1 (Minor) - 2026-03-30
 - **Traits Wired Into Monthly Events:**
     - Added `required_traits` support to human monthly event definitions in `events.py`, preserving the existing event contract while allowing trait-gated eligibility.

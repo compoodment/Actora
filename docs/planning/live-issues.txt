@@ -17,6 +17,10 @@ Purpose: repo-local parking lot for current bugs, regressions, and revisit items
   Status: open revisit
   Note: v0.39.1 wired traits into events with required_traits field and 20 trait-gated events (2 per trait). More trait events should follow naturally as content expands. Traits still don't affect simulation outcomes beyond event eligibility.
 
+- name pools are generic/surface-level per culture
+  Status: open revisit
+  Note: current culture name pools are top-20 common names per country with no regional variation within countries, no ethnic/religious diversity, no era awareness, and no family naming conventions (patronymic, compound surnames, etc). Fine for first pass but should deepen with IDEA-091 (identity generation realism) later.
+
 
 === DEFERRED ===
 
