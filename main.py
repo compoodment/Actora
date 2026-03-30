@@ -7,8 +7,6 @@ from banners import ACTORA_TITLE_BANNER, QUIT_BANNER
 from identity import prepare_parent_identity_context, generate_parent_identity_from_context
 from world import World
 
-EVENT_DETAIL_THRESHOLD = 8
-EVENT_RECENT_DISPLAY_LIMIT = 5
 LINEAGE_RECORD_LIMIT = 6
 INSPECT_RECORD_LIMIT = 5
 SKIP_MONTH_PRESETS = (1, 3, 6, 12, 24, 60)
@@ -101,39 +99,56 @@ def build_snapshot_sections(snapshot_data):
     ]
 
 
-def build_event_lines(turn_result):
-    """Builds shell-owned event summary lines for the current turn result."""
-    if not turn_result["had_any_events"]:
-        return [
-            "Recent Activity",
-            "No notable events occurred during this period.",
-        ]
+def build_event_log_entry(kind, text, *, year=None, month=None):
+    """Builds one normalized event-log entry for shell-owned history rendering."""
+    return {
+        "kind": kind,
+        "text": text,
+        "year": year,
+        "month": month,
+    }
 
-    total_events = len(turn_result["events"])
-    if total_events <= EVENT_DETAIL_THRESHOLD:
-        lines = ["Recent Activity"]
-        for structured_event in turn_result["events"]:
-            lines.append(
-                f"[Year {structured_event['year']}, Month {structured_event['month']}] "
-                f"{structured_event['text']}"
-            )
-        return lines
 
-    recent_events = turn_result["events"][-EVENT_RECENT_DISPLAY_LIMIT:]
-    omitted_count = total_events - len(recent_events)
-    lines = [
-        "Recent Activity",
-        f"{total_events} notable events occurred.",
-        f"Showing the most recent {len(recent_events)}:",
-    ]
-    for structured_event in recent_events:
-        lines.append(
-            f"[Year {structured_event['year']}, Month {structured_event['month']}] "
-            f"{structured_event['text']}"
-        )
-    if omitted_count > 0:
-        lines.append(f"... {omitted_count} older events omitted.")
+def build_history_separator(year, width):
+    """Builds one centered year separator for the history browser."""
+    return build_centered_rule(f"Year {year}", width, fill_char="─")
+
+
+def format_history_entry(entry, width):
+    """Formats one event-log entry for the full history screen."""
+    if entry["kind"] == "year_header":
+        return build_history_separator(entry["year"], width)
+    if entry["kind"] == "skip_marker":
+        return entry["text"]
+    if entry["kind"] == "event":
+        year = entry["year"] if entry["year"] is not None else 0
+        month = entry["month"] if entry["month"] is not None else 0
+        return f"[{year:04d}-{month:02d}] {entry['text']}"
+    return entry["text"]
+
+
+def build_live_feed_lines(event_log):
+    """Builds the logical line list for the non-scrollable live event feed."""
+    if not event_log:
+        return ["No events yet."]
+
+    lines = []
+    for entry in event_log:
+        if entry["kind"] == "year_header":
+            if lines:
+                lines.append("")
+            lines.append(entry["text"])
+        else:
+            lines.append(entry["text"])
     return lines
+
+
+def expand_render_lines(lines, width):
+    """Expands logical lines into wrapped render lines for scrolling surfaces."""
+    render_lines = []
+    for line in lines:
+        render_lines.extend(wrap_text_line(line, width))
+    return render_lines
 
 
 def build_death_lines(continuity_state):
@@ -169,6 +184,7 @@ def build_screen_chrome(screen_name, world, focused_actor_name):
     title_map = {
         "main": "Life View",
         "lineage": "Lineage Browser",
+        "history": "History",
         "skip_time": "Skip Time",
         "death_ack": "Death Interrupt",
         "continuation": "Continuation",
@@ -177,6 +193,7 @@ def build_screen_chrome(screen_name, world, focused_actor_name):
     subtitle_map = {
         "main": focused_actor_name,
         "lineage": focused_actor_name,
+        "history": focused_actor_name,
         "skip_time": "Choose a larger time jump or enter custom months",
         "death_ack": focused_actor_name,
         "continuation": focused_actor_name,
@@ -430,12 +447,11 @@ class ActoraTUI:
         self.lineage_search_text = ""
         self.lineage_search_active = False
         self.main_left_scroll = 0
+        self.history_scroll = 0
         self.selected_continuation_actor_id = None
         self.last_message = "A/Enter advances one month."
-        self.last_event_lines = [
-            "Recent Activity",
-            "No time has passed yet.",
-        ]
+        self.event_log = []
+        self.last_logged_year = 0
 
     def get_focused_actor_id(self):
         return self.world.get_focused_actor_id() or self.player_id
@@ -533,10 +549,112 @@ class ActoraTUI:
     def get_continuity_state(self):
         return self.world.build_continuity_state_for(self.get_focused_actor_id())
 
+    def append_event_log_entry(self, kind, text, *, year=None, month=None):
+        """Appends one event-log entry with normalized structure."""
+        self.event_log.append(
+            build_event_log_entry(kind, text, year=year, month=month)
+        )
+
+    def append_event_log_turn(self, turn_result, months_to_advance, new_records):
+        """Extends the event log from one completed advance."""
+        actual_months_advanced = turn_result["months_advanced"]
+        if actual_months_advanced <= 0:
+            return
+
+        if months_to_advance > 1:
+            label = "Month" if months_to_advance == 1 else "Months"
+            self.append_event_log_entry(
+                "skip_marker",
+                f"{months_to_advance} {label} Skipped",
+            )
+
+        event_identity_keys = set()
+        for structured_event in turn_result["events"]:
+            event_year = structured_event.get("year")
+            event_month = structured_event.get("month")
+            if event_year is not None and event_year > self.last_logged_year:
+                for year in range(self.last_logged_year + 1, event_year + 1):
+                    self.append_event_log_entry(
+                        "year_header",
+                        f"Year {year}",
+                        year=year,
+                    )
+                self.last_logged_year = event_year
+
+            self.append_event_log_entry(
+                "event",
+                structured_event.get("text", ""),
+                year=event_year,
+                month=event_month,
+            )
+            event_identity_keys.add(
+                (
+                    event_year,
+                    event_month,
+                    structured_event.get("text"),
+                )
+            )
+
+        visible_record_types = {"birth", "death"}
+        for record in new_records:
+            if record.get("record_type") in HIDDEN_PLAYER_RECORD_TYPES:
+                continue
+            if record.get("record_type") not in visible_record_types:
+                continue
+            if self.get_focused_actor_id() not in (record.get("actor_ids") or []):
+                continue
+
+            record_key = (
+                record.get("year"),
+                record.get("month"),
+                record.get("text"),
+            )
+            if record_key in event_identity_keys:
+                continue
+
+            record_year = record.get("year")
+            record_month = record.get("month")
+            if record_year is not None and record_year > self.last_logged_year:
+                for year in range(self.last_logged_year + 1, record_year + 1):
+                    self.append_event_log_entry(
+                        "year_header",
+                        f"Year {year}",
+                        year=year,
+                    )
+                self.last_logged_year = record_year
+
+            self.append_event_log_entry(
+                "event",
+                record.get("text", ""),
+                year=record_year,
+                month=record_month,
+            )
+
+    def open_history(self):
+        self.screen_name = "history"
+        self.history_scroll = 10**9
+        self.last_message = "Browsing event history."
+
+    def get_history_lines(self, width):
+        """Builds the logical full-screen history line list."""
+        if not self.event_log:
+            return ["No events yet."]
+        return [format_history_entry(entry, width) for entry in self.event_log]
+
+    def scroll_history_to_bottom(self):
+        """Pins history view to the latest available entry."""
+        self.history_scroll = 10**9
+
+    @property
+    def history_body_height(self):
+        return getattr(self, "_history_body_height", 0)
+
     def advance_time(self, months_to_advance):
         """Advances time using the existing world-owned simulation seam."""
+        prior_record_count = len(self.world.records)
         turn_result = self.world.simulate_advance_turn(self.player_id, months_to_advance)
-        self.last_event_lines = build_event_lines(turn_result)
+        new_records = self.world.records[prior_record_count:]
+        self.append_event_log_turn(turn_result, months_to_advance, new_records)
         actual_months_advanced = turn_result["months_advanced"]
         if actual_months_advanced == 1:
             self.last_message = "Advanced 1 month."
@@ -655,10 +773,6 @@ class ActoraTUI:
             f"Focus moved from {handoff_result['previous_actor_name']} "
             f"to {handoff_result['new_focused_actor_name']}."
         )
-        self.last_event_lines = [
-            "Recent Activity",
-            self.last_message,
-        ]
 
     def handle_main_key(self, key):
         if key in (ord("q"), ord("Q")):
@@ -669,10 +783,23 @@ class ActoraTUI:
             self.open_skip_time()
         elif key in (ord("l"), ord("L")):
             self.open_lineage()
+        elif key in (ord("h"), ord("H")):
+            self.open_history()
         elif key == curses.KEY_UP:
             self.scroll_main_left(-1)
         elif key == curses.KEY_DOWN:
             self.scroll_main_left(1)
+
+    def handle_history_key(self, key):
+        if key in (ord("q"), ord("Q")):
+            self.running = False
+        elif key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8) or key in BACK_KEYS:
+            self.screen_name = "main"
+            self.last_message = "Returned to actor view."
+        elif key == curses.KEY_UP:
+            self.history_scroll = max(0, self.history_scroll - 1)
+        elif key == curses.KEY_DOWN:
+            self.history_scroll += 1
 
     def handle_lineage_key(self, key):
         if self.lineage_search_active:
@@ -790,6 +917,8 @@ class ActoraTUI:
             self.handle_main_key(key)
         elif self.screen_name == "lineage":
             self.handle_lineage_key(key)
+        elif self.screen_name == "history":
+            self.handle_history_key(key)
         elif self.screen_name == "skip_time":
             self.handle_skip_time_key(key)
         elif self.screen_name == "death_ack":
@@ -801,8 +930,9 @@ class ActoraTUI:
 
     def render_footer(self, stdscr, height, width):
         footer_hints = {
-            "main": "[A] Advance   [S] Skip Time   [L] Lineage   [Q] Quit",
+            "main": "[A] Advance   [S] Skip Time   [L] Lineage   [H] History   [Q] Quit",
             "lineage": "[↑↓] Move   [A] All   [L] Living   [D] Dead   [/] Search   [B] Back",
+            "history": "[↑↓] Scroll   [B] Back",
             "lineage_search": "Type search   [Enter] Confirm   [Esc] Exit Search",
             "skip_time": "[↑↓] Preset   [0-9] Custom   [Bksp] Erase   [Enter] Confirm   [B] Back",
             "death_ack": "[Enter] Continue   [Q] Quit",
@@ -859,14 +989,16 @@ class ActoraTUI:
             body_height,
             self.main_left_scroll,
         )
-        right_lines = ["Recent Activity", ""]
-        right_lines.extend(
-            self.last_event_lines[1:] if self.last_event_lines[:1] == ["Recent Activity"] else self.last_event_lines
+        right_lines = expand_render_lines(build_live_feed_lines(self.event_log), right_width)
+        visible_right_lines, _, _, _ = get_scroll_window(
+            right_lines,
+            body_height,
+            max(0, len(right_lines) - body_height),
         )
 
         draw_text_block(stdscr, top, content_left, left_width, body_height, visible_left_lines)
         draw_vertical_divider(stdscr, top, divider_x, body_height)
-        draw_text_block(stdscr, top, right_left, right_width, body_height, right_lines)
+        draw_text_block(stdscr, top, right_left, right_width, body_height, visible_right_lines)
 
         if main_left_max_offset > 0:
             scroll_label = f"More details: {self.main_left_scroll + 1}-{self.main_left_scroll + len(visible_left_lines)} / {total_left_lines}"
@@ -946,6 +1078,32 @@ class ActoraTUI:
             right_lines.extend(build_record_summary_lines(records))
 
         draw_text_block(stdscr, top, right_left, right_width, body_height, right_lines)
+
+    def render_history(self, stdscr, height, width):
+        top = 4
+        body_height = height - 6
+        self._history_body_height = body_height
+        content_left, content_width = get_content_bounds(width, max_width=104)
+        history_lines = expand_render_lines(self.get_history_lines(content_width), content_width)
+        visible_lines, self.history_scroll, _, total_lines = get_scroll_window(
+            history_lines,
+            body_height,
+            self.history_scroll,
+        )
+        draw_text_block(stdscr, top, content_left, content_width, body_height, visible_lines)
+
+        if total_lines > body_height:
+            scroll_label = (
+                f"History: {self.history_scroll + 1}-"
+                f"{self.history_scroll + len(visible_lines)} / {total_lines}"
+            )
+            stdscr.addnstr(
+                min(height - 3, top + body_height - 1),
+                content_left,
+                truncate_for_width(scroll_label, content_width),
+                content_width,
+                curses.A_DIM,
+            )
 
     def build_actor_inspect_detail(self, actor_id, *, relationship_label=None, recent_record_limit=INSPECT_RECORD_LIMIT):
         """Builds one shell-owned inspectability payload for an actor."""
@@ -1142,6 +1300,8 @@ class ActoraTUI:
             self.render_main(stdscr, height, width)
         elif self.screen_name == "lineage":
             self.render_lineage(stdscr, height, width)
+        elif self.screen_name == "history":
+            self.render_history(stdscr, height, width)
         elif self.screen_name == "skip_time":
             self.render_skip_time(stdscr, height, width)
         elif self.screen_name == "death_ack":

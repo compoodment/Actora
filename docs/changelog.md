@@ -1,5 +1,12 @@
 # Actora Changelog
 
+## Version 0.37.1 (Patch) - 2026-03-29
+- **Scrollable Event History Log:**
+    - Replaced the Life View right pane in `main.py` with a shell-owned accumulating live event feed that now persists meaningful events, skip markers, and year headers across the full run instead of only summarizing the latest turn.
+    - Added a full-screen `History` browser opened from Life View with `[H]`, auto-positioned at the newest entries and scrollable with `↑↓` while preserving existing lineage, skip-time, death, and continuation flows.
+    - Expanded shell-side event-log population so focused-actor structured events plus newly written relevant `birth` and `death` records from each advance are folded into the same history stream while filtering hidden scaffolding record types (`family_bootstrap`, `actor_entry`).
+    - Updated screen chrome and footer hints to include the new history surface and the revised main hint strip (`[A] Advance   [S] Skip Time   [L] Lineage   [H] History   [Q] Quit`).
+
 ## Version 0.37.0 (Patch) - 2026-03-29
 - **Death / Continuation Inspectability Follow-Through:**
     - Filtered implementation-scaffolding records (`family_bootstrap`, `actor_entry`) out of player-facing lineage detail and death/continuation inspect surfaces while preserving the records in world storage.

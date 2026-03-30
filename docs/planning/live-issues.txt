@@ -41,3 +41,7 @@ Purpose: repo-local parking lot for current bugs, regressions, and revisit items
 - sibling/family birth tuning still needs later balancing
   Status: open revisit
   Note: the new age/spacing/family-size fertility heuristic is intentionally simple first-pass logic and may need probability tuning once more long-run play data exists.
+
+- event history display is truncated and non-scrollable
+  Status: open
+  Note: the right pane currently shows only a few recent events. Next patch should replace this with an accumulating live feed (compact, year headers, skip markers, auto-scroll to latest) plus a dedicated full-screen scrollable history browser via `[H]`.
