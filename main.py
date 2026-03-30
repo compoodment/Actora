@@ -23,6 +23,7 @@ BACK_KEYS = {
     27,
 }
 MAIN_IDLE_MESSAGE = "A/Enter advances one month."
+ADVANCE_THROTTLE_SECONDS = 0.2
 
 
 def generate_startup_actor_id(role):
@@ -464,6 +465,8 @@ class ActoraTUI:
         self.lineage_search_active = False
         self.main_left_scroll = 0
         self.history_scroll = 0
+        self.history_search_active = False
+        self.history_search_value = ""
         self.selected_continuation_actor_id = None
         self.last_message = MAIN_IDLE_MESSAGE
         self.event_log = []
@@ -674,6 +677,8 @@ class ActoraTUI:
     def open_history(self):
         self.screen_name = "history"
         self.history_scroll = 10**9
+        self.history_search_active = False
+        self.history_search_value = ""
         self.last_message = "Browsing event history."
 
     def get_history_lines(self, width):
@@ -681,6 +686,38 @@ class ActoraTUI:
         if not self.event_log:
             return ["No events yet."]
         return [format_history_entry(entry, width) for entry in self.event_log]
+
+    def get_history_search_status(self):
+        if not self.history_search_active:
+            return None
+        typed_year = self.history_search_value or ""
+        return f"Jump to year: {typed_year}_"
+
+    def jump_history_to_year(self, typed_year):
+        clamped_year = max(1, min(typed_year, self.world.current_year))
+        year_header_index = None
+        fallback_index = None
+        for index, entry in enumerate(self.event_log):
+            if entry["kind"] != "year_header":
+                continue
+            fallback_index = index
+            if entry["year"] >= clamped_year:
+                year_header_index = index
+                break
+
+        if year_header_index is None:
+            year_header_index = fallback_index
+        if year_header_index is None:
+            self.history_scroll = 0
+            self.last_message = "No history entries are available yet."
+            return
+
+        history_width = getattr(self, "_history_content_width", 80)
+        self.history_scroll = len(
+            expand_render_lines(self.get_history_lines(history_width)[:year_header_index], history_width)
+        )
+        target_year = self.event_log[year_header_index]["year"]
+        self.last_message = f"Jumped to Year {target_year}."
 
     def scroll_history_to_bottom(self):
         """Pins history view to the latest available entry."""
@@ -820,7 +857,7 @@ class ActoraTUI:
             self.running = False
         elif key in (curses.KEY_ENTER, 10, 13, ord("a"), ord("A")):
             now = time.monotonic()
-            if now - self.last_advance_time < 0.1:
+            if now - self.last_advance_time < ADVANCE_THROTTLE_SECONDS:
                 return
             self.last_advance_time = now
             self.advance_one_month()
@@ -836,11 +873,37 @@ class ActoraTUI:
             self.scroll_main_left(1)
 
     def handle_history_key(self, key):
+        if self.history_search_active:
+            if key == 27:
+                self.history_search_active = False
+                self.history_search_value = ""
+                self.last_message = "Year jump canceled."
+                return
+            if key in (curses.KEY_ENTER, 10, 13):
+                typed_year = int(self.history_search_value) if self.history_search_value else 1
+                self.jump_history_to_year(typed_year)
+                self.history_search_active = False
+                self.history_search_value = ""
+                return
+            if key == curses.KEY_BACKSPACE or key in (127, 8):
+                self.history_search_value = self.history_search_value[:-1]
+                return
+            if ord("0") <= key <= ord("9") and len(self.history_search_value) < 9:
+                self.history_search_value += chr(key)
+                return
+            return
+
         if key in (ord("q"), ord("Q")):
             self.running = False
         elif key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8) or key in BACK_KEYS:
             self.screen_name = "main"
+            self.history_search_active = False
+            self.history_search_value = ""
             self.last_message = MAIN_IDLE_MESSAGE
+        elif key in (ord("/"), ord("g"), ord("G")):
+            self.history_search_active = True
+            self.history_search_value = ""
+            self.last_message = "Type a year number. Enter jumps. Esc cancels."
         elif key == curses.KEY_UP:
             self.history_scroll = max(0, self.history_scroll - 1)
         elif key == curses.KEY_DOWN:
@@ -977,15 +1040,25 @@ class ActoraTUI:
         footer_hints = {
             "main": "[A] Advance   [S] Skip Time   [L] Lineage   [H] History   [Q] Quit",
             "lineage": "[↑↓] Move   [A] All   [L] Living   [D] Dead   [/] Search   [B] Back",
-            "history": "[↑↓] Scroll   [B] Back",
+            "history": "[↑↓] Scroll   [/] Jump to Year   [B] Back",
+            "history_search": "Type year [0-9]   [Enter] Jump   [Esc] Cancel",
             "lineage_search": "Type search   [Enter] Confirm   [Esc] Exit Search",
             "skip_time": "[↑↓] Preset   [0-9] Custom   [Bksp] Erase   [Enter] Confirm   [B] Back",
             "death_ack": "[Enter] Continue   [Q] Quit",
-            "continuation": "[↑↓] Move   [Enter] Inspect   [Q] Quit",
             "continuation_detail": "[Enter] Continue as this person   [B] Back to list   [Q] Quit",
         }
-        footer_key = "lineage_search" if self.screen_name == "lineage" and self.lineage_search_active else self.screen_name
-        footer_text = footer_hints.get(footer_key, "")
+        if self.screen_name == "lineage" and self.lineage_search_active:
+            footer_text = footer_hints["lineage_search"]
+        elif self.screen_name == "history" and self.history_search_active:
+            footer_text = footer_hints["history_search"]
+        elif self.screen_name == "continuation":
+            continuity_state = self.get_continuity_state()
+            if continuity_state["continuity_candidates"]:
+                footer_text = "[↑↓] Move   [Enter] Inspect   [Q] Quit"
+            else:
+                footer_text = "[Q] Quit"
+        else:
+            footer_text = footer_hints.get(self.screen_name, "")
         content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
         hline_char = getattr(curses, "ACS_HLINE", ord("-"))
         stdscr.hline(height - 2, content_left, hline_char, content_width)
@@ -1129,7 +1202,11 @@ class ActoraTUI:
         body_height = height - 6
         self._history_body_height = body_height
         content_left, content_width = get_content_bounds(width, max_width=104)
+        self._history_content_width = content_width
         history_lines = expand_render_lines(self.get_history_lines(content_width), content_width)
+        search_status = self.get_history_search_status()
+        if search_status:
+            history_lines = [search_status, ""] + history_lines
         content_body_height = body_height
         if len(history_lines) > body_height:
             content_body_height = max(1, body_height - 1)

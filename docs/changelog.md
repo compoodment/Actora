@@ -1,5 +1,12 @@
 # Actora Changelog
 
+## Version 0.37.6 (Patch) - 2026-03-29
+- **Playtest Follow-Up Fixes:**
+    - Increased the main-screen advance-key hold throttle in `main.py` from 100ms to 200ms so held `A` / `Enter` advances less aggressively during ordinary play.
+    - Added a shell-owned year-jump mode to the `History` browser in `main.py`, opened with `/` or `G`, with digit input, `Backspace`, `Enter`, and `Esc`, clamped to `1..current simulation year`, and falling back to the nearest available logged year header when the exact year is absent.
+    - Updated `main.py` History footer hints so normal browsing now advertises `[ / ] Jump to Year`, while active year-jump mode shows the dedicated input hint strip.
+    - Made the continuation footer in `main.py` dynamic so it only shows `[Enter] Inspect` when continuation candidates actually exist, and collapses to `[Q] Quit` when none do.
+
 ## Version 0.37.5 (Patch) - 2026-03-29
 - **Playtest Bug Fixes:**
     - Updated all family-aware monthly event text in `events.py` to refer to relatives by role (`Your mother`, `your brother`, etc.) instead of rendering full names, and normalized `{family_role}` substitution to lowercase during event text rendering.
