@@ -3,17 +3,17 @@
 
 ## What this repo contains
 
-- terminal prototype code for Actora's current plain-text startup flow plus curses TUI ordinary-play surface
+- terminal prototype code for Actora's curses-based character creation wizard and ordinary-play TUI
 - stable source documents for project identity, workflow, and sequencing
 - planning documents for active pressure and near-term direction
 - repo-local implementation docs and changelog
 
 ## Repo structure
 
-- `main.py` — plain-text startup flow, curses TUI ordinary-play shell, and current interface orchestration
+- `main.py` — character creation wizard, curses TUI ordinary-play shell, and current interface orchestration
 - `world.py` — shared simulation state and simulation-step boundary
-- `human.py` — current human actor model
-- `events.py` — current human monthly event layer
+- `human.py` — current human actor model (11 stats, appearance, traits, sexuality)
+- `events.py` — current human monthly event layer (120 events including trait-gated and family-aware)
 - `identity.py` — current startup identity generation helpers
 - `banners.py` — non-curses startup / exit banner text
 - `docs/` — source docs, planning docs, workflow docs, and repo-local documentation
@@ -28,16 +28,30 @@
 6. `docs/planning/actionable-summary.txt` — near-term planning snapshot
 7. `docs/architecture.md` / `docs/changelog.md` — current repo truth and implementation history
 
+## Doc roles (quick reference)
+
+- **Master Context** — what Actora is (durable identity/architecture)
+- **Operator Guide** — how work is done (workflow/patch discipline)
+- **Roadmap** — what comes before what (dependency order)
+- **Source Index** — how the doc system is organized
+- **Working Ideas Register** — where active ideas live (flexible)
+- **Actionable Summary** — near-term planning snapshot (flexible)
+- **architecture.md** — current repo structure and behavior
+- **changelog.md** — implementation history
+- **live-issues.txt** — current bugs and revisit items
+
 ## Current implementation reality
 
-The current prototype is still terminal-first and still structurally narrow, but the repo now splits interface responsibility more explicitly into plain-text startup plus a curses TUI for ordinary play, lineage browsing, skip-time flow, and continuity/death navigation. It currently has:
-- a world-owned simulation-step boundary
-- structured records, links, and places, plus a small startup place hierarchy
-- focused-actor tracking and structural death / continuity foundation
-- plain-text character creation followed by actor-first curses ordinary play
-- structured lineage/archive browsing inside the TUI
-- cleaner death/continuation reveal flow and clearer age-vs-simulation-date snapshot presentation
-- expanded human character-creation options for sex and gender
-- current human-only event content
+The prototype is terminal-first with a curses TUI. It currently has:
+- a curses character creation wizard (Identity → Appearance → Traits → Stats → Confirm)
+- an actor-first curses TUI with Life View, Profile, Lineage Browser, History Browser, and Skip Time screens
+- 11 actor stats (3 primary + 8 secondary), appearance traits, personality traits, and sexuality emergence
+- 120 human monthly events including trait-gated and family-aware events with cooldown
+- an event-choice popup framework for interactive decisions during play (gender identity at puberty, sexuality in late teens)
+- a world-owned simulation-step boundary with structured records, links, and place hierarchy
+- focused-actor tracking with structural death, ordinary old-age mortality, and continuation handoff
+- family continuity substrate with sibling generation, direct sibling links, and family-aware events
+- death inspectability with life summary, two-step continuation inspection, and clean relationship labels
+- consistent TUI control language (Space=select, Enter=proceed, B=back, ↑↓=navigate)
 
 This repo is the live working Actora codebase on the VPS. Historical naming may still exist in old changelog entries or older git history where preserving history is the correct move.
