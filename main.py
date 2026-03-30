@@ -638,7 +638,7 @@ class CreationWizard:
 
     def render_footer(self, height, width):
         footer_map = {
-            0: "[Tab/↓] Next Field   [↑] Previous Field   [Enter/→] Continue   [Q] Quit",
+            0: "[↑↓] Move   [Enter/→] Continue   [Q] Quit",
             1: "[↑↓] Move   [Enter] Select/Edit   [→] Continue   [B/←] Back   [Q] Quit",
             2: "[↑↓] Move   [Enter] Toggle Trait   [→] Continue   [B/←] Back   [Q] Quit",
             3: "[↑↓] Move   [←→ or +/-] Adjust   [R] Randomize   [Enter] Continue   [B] Back   [Q] Quit",
@@ -682,8 +682,7 @@ class CreationWizard:
         lines.extend(
             [
                 "",
-                "Gender is not chosen here.",
-                f"It defaults to: {self.data['gender']}",
+                f"Gender defaults to: {self.data['gender']}  (chosen later in life)",
             ]
         )
         draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
@@ -836,7 +835,7 @@ class CreationWizard:
             if key == curses.KEY_UP:
                 self.identity_field_index = max(0, self.identity_field_index - 1)
                 return
-            if key in (curses.KEY_DOWN, 9):
+            if key in (curses.KEY_DOWN,):
                 self.identity_field_index = min(len(fields) - 1, self.identity_field_index + 1)
                 return
             if key == curses.KEY_RIGHT and self.can_advance_identity():
@@ -857,14 +856,17 @@ class CreationWizard:
         if current_field["kind"] == "select":
             current_index = current_field["options"].index(self.data["sex"])
             if key == curses.KEY_UP:
-                self.data["sex"] = current_field["options"][max(0, current_index - 1)]
-                self.sync_gender_to_sex()
+                if current_index == 0:
+                    self.identity_field_index = max(0, self.identity_field_index - 1)
+                else:
+                    self.data["sex"] = current_field["options"][current_index - 1]
+                    self.sync_gender_to_sex()
                 return
             if key == curses.KEY_DOWN:
                 self.data["sex"] = current_field["options"][min(len(current_field["options"]) - 1, current_index + 1)]
                 self.sync_gender_to_sex()
                 return
-            if key == curses.KEY_LEFT and self.can_advance_identity():
+            if key == curses.KEY_LEFT:
                 self.identity_field_index = max(0, self.identity_field_index - 1)
                 return
             if key == curses.KEY_RIGHT and self.can_advance_identity():
