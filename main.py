@@ -1047,8 +1047,11 @@ class ActoraTUI:
         self.last_logged_year = 0
         self.last_advance_time = 0.0
         self.pending_choice = None
+        self.remaining_skip_months = 0
         self.gender_choice_offered = False
         self.sexuality_choice_offered = False
+        self.gender_choice_age = random.randint(12, 15)
+        self.sexuality_choice_age = random.randint(14, 17)
 
     def get_focused_actor_id(self):
         return self.world.get_focused_actor_id() or self.player_id
@@ -1260,7 +1263,7 @@ class ActoraTUI:
         age_years = lifecycle["age_years"]
         current_gender = actor.gender or "Other"
 
-        if 10 <= age_years < 18 and not self.gender_choice_offered:
+        if age_years >= self.gender_choice_age and not self.gender_choice_offered:
             selected_index = (
                 GENDER_IDENTITY_OPTIONS.index(current_gender)
                 if current_gender in GENDER_IDENTITY_OPTIONS
@@ -1280,7 +1283,7 @@ class ActoraTUI:
             self.last_message = "A personal choice needs your attention."
             return True
 
-        if 16 <= age_years < 25 and not self.sexuality_choice_offered:
+        if age_years >= self.sexuality_choice_age and not self.sexuality_choice_offered:
             self.pending_choice = {
                 "title": "A new kind of awareness",
                 "text": "You have started noticing things about yourself you had not thought about before.",
@@ -1330,6 +1333,10 @@ class ActoraTUI:
             )
 
         self.pending_choice = None
+        remaining = self.remaining_skip_months
+        self.remaining_skip_months = 0
+        if remaining > 0:
+            self.advance_time(remaining)
 
     def open_history(self):
         self.screen_name = "history"
@@ -1411,6 +1418,9 @@ class ActoraTUI:
             if month_turn_result["months_advanced"] <= 0 or not month_turn_result["focused_actor_alive"]:
                 break
             if self.maybe_offer_identity_choice():
+                remaining = months_to_advance - aggregated_turn_result["months_advanced"]
+                if remaining > 0:
+                    self.remaining_skip_months = remaining
                 break
 
         self.append_event_log_turn(aggregated_turn_result, months_to_advance, new_records)
@@ -1418,8 +1428,10 @@ class ActoraTUI:
         if actual_months_advanced == 1:
             self.last_message = "Advanced 1 month."
         elif actual_months_advanced != months_to_advance:
-            reason = "before a major choice." if self.pending_choice is not None else "before death."
-            self.last_message = f"Advanced {actual_months_advanced} of {months_to_advance} months {reason}"
+            if self.pending_choice is not None:
+                self.last_message = "A personal choice needs your attention."
+            else:
+                self.last_message = f"Advanced {actual_months_advanced} of {months_to_advance} months before death."
         else:
             self.last_message = f"Advanced {actual_months_advanced} months."
         if aggregated_turn_result["continuity_state"] is not None and not aggregated_turn_result["focused_actor_alive"]:
@@ -1609,8 +1621,11 @@ class ActoraTUI:
             }
         )
         self.pending_choice = None
+        self.remaining_skip_months = 0
         self.gender_choice_offered = False
         self.sexuality_choice_offered = False
+        self.gender_choice_age = random.randint(12, 15)
+        self.sexuality_choice_age = random.randint(14, 17)
         self.selected_continuation_actor_id = None
         self.screen_name = "main"
         self.last_message = (
