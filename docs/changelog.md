@@ -1,5 +1,12 @@
 # Actora Changelog
 
+## Version 0.40.1 (Minor) - 2026-03-30
+- **Questionnaire-Based Character Creation Mode:**
+    - Added `QUESTIONNAIRE_QUESTIONS` in `main.py` with 16 one-at-a-time personality prompts, per-answer stat deltas, and optional trait suggestions for a new alternative startup flow.
+    - Inserted a creation-mode selection step into the curses `CreationWizard` after appearance so players can choose questionnaire-based generation or the existing manual setup path.
+    - Added a questionnaire-only startup branch in `main.py` that runs without backtracking, starts all creation stats at `50`, applies cumulative answer effects with final `0-100` clamping, and derives the top three traits from suggested-trait frequency with random tie breaks/fill.
+    - Kept the confirm screen and output payload shape unchanged so the generated questionnaire result still hands the same `appearance`, `traits`, and `stats` data into ordinary world setup without simulation-core changes.
+
 ## Version 0.40.0 (Minor) - 2026-03-30
 - **Real Location Content + Culture-Aware Name Generation:**
     - Replaced the placeholder startup geography in `main.py` with module-level `WORLD_GEOGRAPHY`, adding `Earth`, 12 real countries, and their configured real cities to the world place registry at startup.

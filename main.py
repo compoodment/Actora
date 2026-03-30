@@ -30,6 +30,168 @@ CREATION_EYE_COLOR_OPTIONS = ["Brown", "Blue", "Green", "Hazel", "Gray", "Amber"
 CREATION_HAIR_COLOR_OPTIONS = ["Black", "Brown", "Blonde", "Red", "Auburn", "Other"]
 CREATION_SKIN_TONE_OPTIONS = ["Light", "Fair", "Medium", "Olive", "Tan", "Brown", "Dark", "Other"]
 CREATION_TRAIT_POOL = ["Curious", "Calm", "Fussy", "Bold", "Shy", "Cheerful", "Stubborn", "Gentle", "Restless", "Alert"]
+QUESTIONNAIRE_QUESTIONS = [
+    {
+        "style": "situational",
+        "text": "You find something on the ground that isn't yours.",
+        "options": [
+            {"text": "Try to find who it belongs to", "stat_changes": {"charisma": 6, "wisdom": 4}, "trait_suggest": "Gentle"},
+            {"text": "Keep it - finders keepers", "stat_changes": {"willpower": 5, "looks": 3}},
+            {"text": "Look at it, put it back", "stat_changes": {"intelligence": 5, "creativity": 4}, "trait_suggest": "Curious"},
+            {"text": "Walk past it", "stat_changes": {"discipline": 4, "willpower": 3}},
+        ],
+    },
+    {
+        "style": "spectrum",
+        "text": "When plans suddenly change...",
+        "options": [
+            {"text": "I get excited about what might happen instead", "stat_changes": {"creativity": 6, "happiness": 4}, "trait_suggest": "Cheerful"},
+            {"text": "I feel annoyed but go with it", "stat_changes": {"willpower": 5, "discipline": 4}, "trait_suggest": "Stubborn"},
+            {"text": "I need a minute before I can deal with it", "stat_changes": {"wisdom": 5, "intelligence": 3}, "trait_suggest": "Calm"},
+            {"text": "I just wish things stayed how they were", "stat_changes": {"discipline": 6, "health": 3}},
+        ],
+    },
+    {
+        "style": "gut_pick",
+        "text": "Which one is more you?",
+        "options": [
+            {"text": "I jump in first and think later", "stat_changes": {"strength": 5, "willpower": 5}, "trait_suggest": "Bold"},
+            {"text": "I watch first, then decide", "stat_changes": {"intelligence": 5, "wisdom": 4}, "trait_suggest": "Alert"},
+            {"text": "I ask someone else what they think", "stat_changes": {"charisma": 6, "happiness": 3}},
+            {"text": "I overthink it until the moment passes", "stat_changes": {"intelligence": 6, "creativity": 3}, "trait_suggest": "Restless"},
+        ],
+    },
+    {
+        "style": "situational",
+        "text": "A stranger starts talking to you out of nowhere.",
+        "options": [
+            {"text": "I talk back like we have been friends for years", "stat_changes": {"charisma": 8, "happiness": 3}, "trait_suggest": "Cheerful"},
+            {"text": "I smile and keep it short", "stat_changes": {"charisma": 4, "discipline": 4}},
+            {"text": "I freeze up a little", "stat_changes": {"intelligence": 4, "wisdom": 3}, "trait_suggest": "Shy"},
+            {"text": "I pretend I did not hear them", "stat_changes": {"willpower": 5, "creativity": 3}},
+        ],
+    },
+    {
+        "style": "spectrum",
+        "text": "When someone near you is upset...",
+        "options": [
+            {"text": "I feel it like it is happening to me", "stat_changes": {"happiness": 3, "charisma": 4, "wisdom": 4}, "trait_suggest": "Gentle"},
+            {"text": "I want to help but I keep my distance", "stat_changes": {"wisdom": 5, "discipline": 4}, "trait_suggest": "Calm"},
+            {"text": "I try to fix the problem", "stat_changes": {"intelligence": 5, "strength": 3}, "trait_suggest": "Bold"},
+            {"text": "I do not really notice unless they tell me", "stat_changes": {"willpower": 5, "discipline": 4}},
+        ],
+    },
+    {
+        "style": "gut_pick",
+        "text": "Pick the one that fits:",
+        "options": [
+            {"text": "I have taken something apart just to see how it works", "stat_changes": {"intelligence": 7, "creativity": 4}, "trait_suggest": "Curious"},
+            {"text": "I have never understood why people break things on purpose", "stat_changes": {"discipline": 5, "health": 4}, "trait_suggest": "Calm"},
+            {"text": "I would rather build something new than fix something old", "stat_changes": {"creativity": 7, "intelligence": 3}, "trait_suggest": "Restless"},
+            {"text": "I do not really care how things work as long as they do", "stat_changes": {"willpower": 5, "happiness": 3}},
+        ],
+    },
+    {
+        "style": "situational",
+        "text": "You are given a set of rules you think are stupid.",
+        "options": [
+            {"text": "I follow them anyway", "stat_changes": {"discipline": 7, "willpower": 3}},
+            {"text": "I ignore the ones I disagree with", "stat_changes": {"willpower": 6, "creativity": 3}, "trait_suggest": "Stubborn"},
+            {"text": "I try to change them", "stat_changes": {"charisma": 5, "intelligence": 4}, "trait_suggest": "Bold"},
+            {"text": "I follow them while complaining the entire time", "stat_changes": {"happiness": -3, "willpower": 4}, "trait_suggest": "Fussy"},
+        ],
+    },
+    {
+        "style": "spectrum",
+        "text": "If I want something, I want it...",
+        "options": [
+            {"text": "Right now, no waiting", "stat_changes": {"willpower": 5, "strength": 4}, "trait_suggest": "Restless"},
+            {"text": "Soon, but I can be patient", "stat_changes": {"discipline": 5, "happiness": 4}},
+            {"text": "I will plan for it and get it eventually", "stat_changes": {"wisdom": 6, "discipline": 5}, "trait_suggest": "Calm"},
+            {"text": "I think about it so long I sometimes forget I wanted it", "stat_changes": {"creativity": 5, "intelligence": 4}},
+        ],
+    },
+    {
+        "style": "gut_pick",
+        "text": "Honestly?",
+        "options": [
+            {"text": "I say what I think, even if people do not want to hear it", "stat_changes": {"willpower": 7, "charisma": -2}, "trait_suggest": "Stubborn"},
+            {"text": "I keep most of my real opinions to myself", "stat_changes": {"wisdom": 5, "discipline": 4}, "trait_suggest": "Shy"},
+            {"text": "I adjust what I say depending on who I am talking to", "stat_changes": {"charisma": 6, "creativity": 3}},
+            {"text": "I do not really have strong opinions about most things", "stat_changes": {"happiness": 4, "health": 3}},
+        ],
+    },
+    {
+        "style": "situational",
+        "text": "Someone dares you to do something risky.",
+        "options": [
+            {"text": "Already doing it", "stat_changes": {"strength": 5, "willpower": 5, "health": -3}, "trait_suggest": "Bold"},
+            {"text": "I think about it, then probably do it", "stat_changes": {"intelligence": 4, "willpower": 4}},
+            {"text": "I laugh it off and say no", "stat_changes": {"wisdom": 5, "discipline": 4}, "trait_suggest": "Calm"},
+            {"text": "I dare them to do it first", "stat_changes": {"charisma": 5, "creativity": 4}, "trait_suggest": "Cheerful"},
+        ],
+    },
+    {
+        "style": "spectrum",
+        "text": "Losing at something makes me...",
+        "options": [
+            {"text": "Want to try again immediately", "stat_changes": {"willpower": 7, "strength": 4}, "trait_suggest": "Stubborn"},
+            {"text": "Frustrated, but I get over it", "stat_changes": {"discipline": 5, "wisdom": 3}},
+            {"text": "Question whether it was worth trying", "stat_changes": {"intelligence": 5, "creativity": 3}},
+            {"text": "Not care that much honestly", "stat_changes": {"happiness": 5, "looks": 3}},
+        ],
+    },
+    {
+        "style": "gut_pick",
+        "text": "I notice...",
+        "options": [
+            {"text": "Details that other people miss completely", "stat_changes": {"intelligence": 6, "wisdom": 4}, "trait_suggest": "Alert"},
+            {"text": "How people are feeling before they say anything", "stat_changes": {"charisma": 5, "wisdom": 5}, "trait_suggest": "Gentle"},
+            {"text": "When something is about to go wrong", "stat_changes": {"wisdom": 6, "intelligence": 4}, "trait_suggest": "Alert"},
+            {"text": "Mostly whatever is right in front of me", "stat_changes": {"strength": 4, "happiness": 4}},
+        ],
+    },
+    {
+        "style": "situational",
+        "text": "You have one free afternoon with nothing planned.",
+        "options": [
+            {"text": "I am already outside doing something", "stat_changes": {"health": 5, "strength": 4}, "trait_suggest": "Restless"},
+            {"text": "I make something - draw, write, build, whatever", "stat_changes": {"creativity": 7, "intelligence": 3}, "trait_suggest": "Curious"},
+            {"text": "I find someone to hang out with", "stat_changes": {"charisma": 6, "happiness": 4}, "trait_suggest": "Cheerful"},
+            {"text": "I sit somewhere quiet and do absolutely nothing", "stat_changes": {"wisdom": 5, "happiness": 4}, "trait_suggest": "Calm"},
+        ],
+    },
+    {
+        "style": "spectrum",
+        "text": "How much do I care about how I look?",
+        "options": [
+            {"text": "More than I would ever admit", "stat_changes": {"looks": 8, "discipline": 3}, "trait_suggest": "Fussy"},
+            {"text": "Enough to make an effort most days", "stat_changes": {"looks": 5, "charisma": 3}},
+            {"text": "Only when it matters", "stat_changes": {"wisdom": 4, "willpower": 3}},
+            {"text": "Genuinely not that much", "stat_changes": {"happiness": 4, "creativity": 3}},
+        ],
+    },
+    {
+        "style": "gut_pick",
+        "text": "My gut feeling is usually...",
+        "options": [
+            {"text": "Right, and I trust it completely", "stat_changes": {"willpower": 7, "wisdom": 4}, "trait_suggest": "Bold"},
+            {"text": "Right, but I double check anyway", "stat_changes": {"intelligence": 6, "wisdom": 4}, "trait_suggest": "Alert"},
+            {"text": "Hit or miss honestly", "stat_changes": {"creativity": 4, "happiness": 3}},
+            {"text": "Something I mostly ignore", "stat_changes": {"discipline": 6, "intelligence": 3}},
+        ],
+    },
+    {
+        "style": "situational",
+        "text": "A friend gives you something you hate.",
+        "options": [
+            {"text": "I smile and say thank you", "stat_changes": {"charisma": 6, "discipline": 3}},
+            {"text": "I tell them honestly", "stat_changes": {"willpower": 5, "charisma": -2}, "trait_suggest": "Stubborn"},
+            {"text": "I keep it but never use it", "stat_changes": {"wisdom": 4, "discipline": 4}, "trait_suggest": "Shy"},
+            {"text": "I feel bad about not liking it for way too long", "stat_changes": {"happiness": -3, "wisdom": 4}, "trait_suggest": "Gentle"},
+        ],
+    },
+]
 CREATION_STAT_ORDER = [
     "health",
     "happiness",
@@ -643,15 +805,7 @@ def build_randomized_starting_stats():
 
 class CreationWizard:
     """Curses-driven startup flow for building one player character payload."""
-
-    STEP_TITLES = [
-        "Step 1: Identity",
-        "Step 2: Location",
-        "Step 3: Appearance",
-        "Step 4: Traits",
-        "Step 5: Stats",
-        "Step 6: Confirm",
-    ]
+    CREATION_MODES = ["questionnaire", "manual"]
 
     def __init__(self, stdscr):
         self.stdscr = stdscr
@@ -668,6 +822,11 @@ class CreationWizard:
         self.appearance_mode = "field"
         self.trait_index = 0
         self.stat_index = 0
+        self.mode_index = 0
+        self.selected_mode = None
+        self.question_index = 0
+        self.question_option_index = 0
+        self.questionnaire_answers = []
 
         self.data = {
             "first_name": "",
@@ -691,7 +850,70 @@ class CreationWizard:
         }
 
     def get_step_title(self):
-        return self.STEP_TITLES[self.step_index]
+        title_map = {
+            0: "Step 1: Identity",
+            1: "Step 2: Location",
+            2: "Step 3: Appearance",
+            3: "Step 4: Creation Mode",
+        }
+        if self.step_index in title_map:
+            return title_map[self.step_index]
+        if self.step_index == 4:
+            return "Step 5: Questionnaire" if self.selected_mode == "questionnaire" else "Step 5: Stats"
+        if self.step_index == 5:
+            return "Step 6: Confirm" if self.selected_mode == "questionnaire" else "Step 6: Traits"
+        return "Step 7: Confirm"
+
+    def get_confirm_step_index(self):
+        return 5 if self.selected_mode == "questionnaire" else 6
+
+    def build_questionnaire_starting_stats(self):
+        return {stat_name: 50 for stat_name in CREATION_STAT_ORDER}
+
+    def reset_questionnaire_progress(self):
+        self.question_index = 0
+        self.question_option_index = 0
+        self.questionnaire_answers = []
+
+    def begin_questionnaire(self):
+        self.selected_mode = "questionnaire"
+        self.reset_questionnaire_progress()
+        self.step_index = 4
+
+    def begin_manual(self):
+        self.selected_mode = "manual"
+        self.step_index = 4
+
+    def finalize_questionnaire_results(self):
+        stats = self.build_questionnaire_starting_stats()
+        trait_counts = {}
+        for option in self.questionnaire_answers:
+            for stat_name, delta in option["stat_changes"].items():
+                stats[stat_name] = stats.get(stat_name, 50) + delta
+            suggested_trait = option.get("trait_suggest")
+            if suggested_trait:
+                trait_counts[suggested_trait] = trait_counts.get(suggested_trait, 0) + 1
+
+        for stat_name in stats:
+            stats[stat_name] = max(0, min(100, stats[stat_name]))
+
+        ranked_traits = []
+        count_groups = {}
+        for trait_name, count in trait_counts.items():
+            count_groups.setdefault(count, []).append(trait_name)
+        for count in sorted(count_groups.keys(), reverse=True):
+            tied_traits = list(count_groups[count])
+            random.shuffle(tied_traits)
+            ranked_traits.extend(tied_traits)
+
+        selected_traits = ranked_traits[:3]
+        if len(selected_traits) < 3:
+            remaining_pool = [trait for trait in CREATION_TRAIT_POOL if trait not in selected_traits]
+            random.shuffle(remaining_pool)
+            selected_traits.extend(remaining_pool[: 3 - len(selected_traits)])
+
+        self.data["stats"] = stats
+        self.data["traits"] = selected_traits
 
     def get_identity_fields(self):
         return [
@@ -829,21 +1051,25 @@ class CreationWizard:
         self.stdscr.addnstr(2, content_left, "═" * content_width, content_width, curses.A_BOLD)
 
     def render_footer(self, height, width):
-        footer_map = {
-            0: "[↑↓] Move   [Enter] Continue   [Q] Quit",
-            1: "[↑↓] Move   [Space] Select   [Enter] Continue   [B] Back   [Q] Quit",
-            2: "[↑↓] Move   [Space] Select   [Enter] Continue   [B] Back   [Q] Quit",
-            3: "[↑↓] Move   [Space] Toggle   [Enter] Continue   [B] Back   [Q] Quit",
-            4: "[↑↓] Move   [←→] Adjust   [R] Randomize   [Enter] Continue   [B] Back   [Q] Quit",
-            5: "[Enter] Start Game   [B] Back   [Q] Quit",
-        }
+        if self.step_index == 0:
+            footer_text = "[↑↓] Move   [Enter] Continue   [Q] Quit"
+        elif self.step_index in {1, 2, 3}:
+            footer_text = "[↑↓] Move   [Space] Select   [Enter] Continue   [B] Back   [Q] Quit"
+        elif self.step_index == 4 and self.selected_mode == "questionnaire":
+            footer_text = "[↑↓] Move   [Space] Select   [Q] Quit"
+        elif self.step_index == 4:
+            footer_text = "[↑↓] Move   [←→] Adjust   [R] Randomize   [Enter] Continue   [B] Back   [Q] Quit"
+        elif self.step_index == 5 and self.selected_mode == "manual":
+            footer_text = "[↑↓] Move   [Space] Toggle   [Enter] Continue   [B] Back   [Q] Quit"
+        else:
+            footer_text = "[Enter] Start Game   [B] Back   [Q] Quit"
         content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
         hline_char = getattr(curses, "ACS_HLINE", ord("-"))
         self.stdscr.hline(height - 2, content_left, hline_char, content_width)
         self.stdscr.addnstr(
             height - 1,
             content_left,
-            center_text(footer_map[self.step_index], content_width),
+            center_text(footer_text, content_width),
             content_width,
             curses.A_NORMAL,
         )
@@ -978,6 +1204,34 @@ class CreationWizard:
             lines.extend(["", "You must choose exactly 3 traits to continue."])
         draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
 
+    def render_mode_selection(self, height, width):
+        content_left, content_width = get_content_bounds(width, max_width=86)
+        mode_descriptions = {
+            "questionnaire": [
+                "Answer questions about yourself",
+                "Your answers determine your stats and personality traits.",
+                "You will see the results but cannot change them.",
+            ],
+            "manual": [
+                "Set everything manually",
+                "Choose your own stats and pick your personality traits.",
+            ],
+        }
+        lines = [
+            "How would you like to shape your character?",
+            "",
+        ]
+        highlight_index = None
+        for index, mode_name in enumerate(self.CREATION_MODES):
+            if index == self.mode_index:
+                highlight_index = len(lines)
+            marker = "[x]" if self.selected_mode == mode_name else "[ ]"
+            lines.append(f"{marker} {mode_descriptions[mode_name][0]}")
+            for detail_line in mode_descriptions[mode_name][1:]:
+                lines.append(f"    {detail_line}")
+            lines.append("")
+        draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
+
     def render_stats(self, height, width):
         content_left, content_width = get_content_bounds(width, max_width=92)
         left_width, right_left, right_width = split_centered_columns(content_left, content_width, left_ratio=0.56)
@@ -1007,6 +1261,23 @@ class CreationWizard:
         draw_text_block(self.stdscr, 5, content_left, left_width, body_height, left_lines, highlight_index=highlight_index)
         draw_vertical_divider(self.stdscr, 5, right_left - 2, body_height)
         draw_text_block(self.stdscr, 5, right_left, right_width, body_height, right_lines)
+
+    def render_questionnaire(self, height, width):
+        content_left, content_width = get_content_bounds(width, max_width=92)
+        question = QUESTIONNAIRE_QUESTIONS[self.question_index]
+        lines = [
+            center_text(f"Question {self.question_index + 1} of {len(QUESTIONNAIRE_QUESTIONS)}", content_width).strip(),
+            "",
+            question["text"],
+            "",
+        ]
+        highlight_index = None
+        for index, option in enumerate(question["options"]):
+            if index == self.question_option_index:
+                highlight_index = len(lines)
+            lines.append(f"[ ] {option['text']}")
+            lines.append("")
+        draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
 
     def render_confirm(self, height, width):
         content_left, content_width = get_content_bounds(width, max_width=92)
@@ -1054,9 +1325,14 @@ class CreationWizard:
         elif self.step_index == 2:
             self.render_appearance(height, width)
         elif self.step_index == 3:
-            self.render_traits(height, width)
+            self.render_mode_selection(height, width)
         elif self.step_index == 4:
-            self.render_stats(height, width)
+            if self.selected_mode == "questionnaire":
+                self.render_questionnaire(height, width)
+            else:
+                self.render_stats(height, width)
+        elif self.step_index == 5 and self.selected_mode == "manual":
+            self.render_traits(height, width)
         else:
             self.render_confirm(height, width)
         self.render_footer(height, width)
@@ -1216,9 +1492,30 @@ class CreationWizard:
         if 32 <= key <= 126:
             self.custom_appearance_values[current_field["key"]] += chr(key)
 
-    def handle_traits_key(self, key):
+    def handle_mode_key(self, key):
         if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
             self.step_index = 2
+            return
+        if key == curses.KEY_UP:
+            self.mode_index = max(0, self.mode_index - 1)
+            return
+        if key == curses.KEY_DOWN:
+            self.mode_index = min(len(self.CREATION_MODES) - 1, self.mode_index + 1)
+            return
+        if key == ord(" "):
+            self.selected_mode = self.CREATION_MODES[self.mode_index]
+            return
+        if key in (curses.KEY_ENTER, 10, 13):
+            confirmed_mode = self.selected_mode or self.CREATION_MODES[self.mode_index]
+            if confirmed_mode == "questionnaire":
+                self.begin_questionnaire()
+            else:
+                self.begin_manual()
+            return
+
+    def handle_traits_key(self, key):
+        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
+            self.step_index = 4
             return
         if key == curses.KEY_UP:
             self.trait_index = max(0, self.trait_index - 1)
@@ -1234,7 +1531,7 @@ class CreationWizard:
                 self.data["traits"].append(trait)
             return
         if key in (curses.KEY_ENTER, 10, 13) and self.can_advance_traits():
-            self.step_index = 4
+            self.step_index = 6
             return
 
     def handle_stats_key(self, key):
@@ -1261,9 +1558,27 @@ class CreationWizard:
             stat_name = CREATION_STAT_ORDER[self.stat_index]
             self.data["stats"][stat_name] = min(100, self.data["stats"][stat_name] + 1)
 
+    def handle_questionnaire_key(self, key):
+        question = QUESTIONNAIRE_QUESTIONS[self.question_index]
+        if key == curses.KEY_UP:
+            self.question_option_index = max(0, self.question_option_index - 1)
+            return
+        if key == curses.KEY_DOWN:
+            self.question_option_index = min(len(question["options"]) - 1, self.question_option_index + 1)
+            return
+        if key == ord(" "):
+            selected_option = question["options"][self.question_option_index]
+            self.questionnaire_answers.append(selected_option)
+            if self.question_index >= len(QUESTIONNAIRE_QUESTIONS) - 1:
+                self.finalize_questionnaire_results()
+                self.step_index = 5
+                return
+            self.question_index += 1
+            self.question_option_index = 0
+
     def handle_confirm_key(self, key):
         if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
-            self.step_index = 4
+            self.step_index = 3 if self.selected_mode == "questionnaire" else 5
             return None
         if key in (curses.KEY_ENTER, 10, 13):
             self.running = False
@@ -1287,9 +1602,14 @@ class CreationWizard:
             elif self.step_index == 2:
                 self.handle_appearance_key(key)
             elif self.step_index == 3:
-                self.handle_traits_key(key)
+                self.handle_mode_key(key)
             elif self.step_index == 4:
-                self.handle_stats_key(key)
+                if self.selected_mode == "questionnaire":
+                    self.handle_questionnaire_key(key)
+                else:
+                    self.handle_stats_key(key)
+            elif self.step_index == 5 and self.selected_mode == "manual":
+                self.handle_traits_key(key)
             else:
                 result = self.handle_confirm_key(key)
                 if result is not None:
