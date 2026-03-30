@@ -44,6 +44,10 @@ HUMAN_MONTHLY_EVENTS = [
     _event("infant_shadow_game", "Light and shadows on the wall hold your full attention for a while.", life_stages=["Infant"], outcome={"stat_changes": {"intelligence": 1}}, tags=["neutral", "infant"]),
     _event("infant_sibling_garden_play", "{family_name} played with you in the garden.", life_stages=["Infant"], min_age_months=3, outcome={"stat_changes": {"happiness": 1}}, tags=["positive", "infant", "family"], family_context=True, family_roles=["sibling"]),
     _event("infant_bubble_laugh", "A strange noise sends you into unstoppable baby laughter.", life_stages=["Infant"], outcome={"stat_changes": {"happiness": 2}}, tags=["positive", "infant"]),
+    _event("infant_peekaboo_delight", "{family_name} played peekaboo with you until you squealed.", life_stages=["Infant"], min_age_months=4, outcome={"stat_changes": {"happiness": 2}}, tags=["positive", "infant", "family"], family_context=True, family_roles=["mother", "father", "sibling"]),
+    _event("infant_lost_sock", "One of your socks vanished under circumstances nobody could explain.", life_stages=["Infant"], outcome={"stat_changes": {}}, tags=["goofy", "infant"]),
+    _event("infant_scary_noise", "A sudden loud noise left you crying for a while.", life_stages=["Infant"], min_age_months=2, outcome={"stat_changes": {"happiness": -1}}, tags=["negative", "infant"]),
+    _event("infant_first_wave", "You made something close enough to a wave that everyone decided it counted.", life_stages=["Infant"], min_age_months=6, outcome={"stat_changes": {"intelligence": 1}}, tags=["positive", "infant"]),
 
     # Child-specific events (Age 3-9 = Months 36-119)
     _event("child_imaginary_friend", "You made a new imaginary friend!", life_stages=["Child"], outcome={"stat_changes": {"happiness": 2}}, tags=["positive", "child"]),
@@ -77,6 +81,10 @@ HUMAN_MONTHLY_EVENTS = [
     _event("teen_room_rearrange", "You rearranged your space for no clear reason and somehow felt better after.", life_stages=["Teenager"], outcome={"stat_changes": {"happiness": 1}}, tags=["neutral", "teenager"]),
     _event("teen_social_stumble", "A small awkward moment lingers in your mind much longer than it should.", life_stages=["Teenager"], outcome={"stat_changes": {"happiness": -1}}, tags=["negative", "teenager"]),
     _event("teen_hold_breath_contest", "{family_name} challenged you to see who could hold their breath longer.", life_stages=["Teenager"], outcome={"stat_changes": {"health": 1}}, tags=["family", "teenager"], family_context=True, family_roles=["sibling"]),
+    _event("teen_found_shortcut", "You discovered a shortcut that made you feel smarter than you probably were.", life_stages=["Teenager"], outcome={"stat_changes": {"intelligence": 1}}, tags=["neutral", "teenager"]),
+    _event("teen_minor_sprain", "You picked up a minor sprain doing something you insisted was a good idea.", life_stages=["Teenager"], outcome={"stat_changes": {"health": -1}}, tags=["negative", "teenager"]),
+    _event("teen_late_night_snack", "A ridiculous late-night snack somehow became the highlight of the month.", life_stages=["Teenager"], outcome={"stat_changes": {"happiness": 1}}, tags=["goofy", "teenager"]),
+    _event("teen_got_lost_briefly", "You took a wrong turn and were briefly, stubbornly lost.", life_stages=["Teenager"], outcome={"stat_changes": {"happiness": -1, "intelligence": 1}}, tags=["negative", "teenager"]),
     _event("teen_lost_argument_with_self", "You had an argument with yourself. You lost.", life_stages=["Teenager", "Young Adult"], outcome={"stat_changes": {}}, tags=["goofy"]),
 
     # Young-adult-specific events (Age 18-24)
@@ -90,10 +98,13 @@ HUMAN_MONTHLY_EVENTS = [
     _event("young_adult_bad_purchase", "You spent money on something that immediately felt unnecessary.", life_stages=["Young Adult"], outcome={"stat_changes": {"money": -1}}, tags=["negative", "young_adult"]),
     _event("young_adult_day_trip", "A small adventure breaks up the routine of the month.", life_stages=["Young Adult"], outcome={"stat_changes": {"happiness": 2}}, tags=["positive", "young_adult"]),
     _event("young_adult_called_family", "You called {family_name} just to chat.", life_stages=["Young Adult", "Adult"], outcome={"stat_changes": {"happiness": 1}}, tags=["family"], family_context=True, family_roles=["mother", "father", "sibling"]),
+    _event("young_adult_family_recipe", "{family_name} passed along a family recipe with very strong opinions attached.", life_stages=["Young Adult", "Adult"], outcome={"stat_changes": {"happiness": 1}}, tags=["family"], family_context=True, family_roles=["mother", "father", "sibling"]),
     _event("young_adult_laundry_delay", "You put something off until it became mildly ridiculous.", life_stages=["Young Adult", "Adult"], outcome={"stat_changes": {}}, tags=["goofy"]),
     _event("young_adult_park_bench_thought", "You sat quietly for a while and let your thoughts settle.", life_stages=["Young Adult", "Adult", "Elder"], outcome={"stat_changes": {"intelligence": 1}}, tags=["neutral"]),
     _event("young_adult_peaceful_afternoon", "You enjoyed a peaceful afternoon.", life_stages=["Young Adult", "Adult", "Elder"], outcome={"stat_changes": {"happiness": 1}}, tags=["positive"]),
     _event("young_adult_tiny_victory", "A small personal victory carries you farther than expected.", life_stages=["Young Adult"], outcome={"stat_changes": {"happiness": 1, "intelligence": 1}}, tags=["positive", "young_adult"]),
+    _event("young_adult_scary_dream", "A vivid, unsettling dream stuck with you for days.", life_stages=["Young Adult", "Adult"], outcome={"stat_changes": {"happiness": -1}}, tags=["negative", "dark"]),
+    _event("young_adult_weird_bird_judgment", "A bird watched you fail at something simple and seemed deeply judgmental.", life_stages=["Young Adult", "Adult", "Elder"], outcome={"stat_changes": {}}, tags=["goofy"]),
 
     # Adult-specific events (Age 25-64)
     _event("adult_home_cooked_meal", "You make time for a decent home-cooked meal and feel better for it.", life_stages=["Adult"], outcome={"stat_changes": {"health": 1}}, tags=["positive", "adult"]),
@@ -105,11 +116,14 @@ HUMAN_MONTHLY_EVENTS = [
     _event("adult_nice_conversation", "A brief conversation leaves you in a better mood than expected.", life_stages=["Adult"], outcome={"stat_changes": {"happiness": 1}}, tags=["positive", "adult"]),
     _event("adult_misplaced_item", "You lost track of a necessary object and found it in an obvious place.", life_stages=["Adult"], outcome={"stat_changes": {"happiness": -1}}, tags=["negative", "adult"]),
     _event("adult_called_family", "You called {family_name} just to chat.", life_stages=["Adult"], outcome={"stat_changes": {"happiness": 1}}, tags=["family", "adult"], family_context=True, family_roles=["mother", "father", "sibling"]),
+    _event("adult_checked_on_family", "You checked in on {family_name}, and the conversation mattered more than expected.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {"happiness": 1}}, tags=["family"], family_context=True, family_roles=["mother", "father", "sibling", "child"]),
     _event("adult_self_argument", "You had an argument with yourself. You lost.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {}}, tags=["goofy"]),
     _event("adult_fixed_small_problem", "You solved a small problem that had been annoying you for too long.", life_stages=["Adult"], outcome={"stat_changes": {"intelligence": 1}}, tags=["positive", "adult"]),
     _event("adult_evening_stretch", "You gave your body a little care and felt the difference.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {"health": 1}}, tags=["positive"]),
     _event("adult_unnecessary_worry", "You worried about something that never actually happened.", life_stages=["Adult"], outcome={"stat_changes": {"happiness": -1}}, tags=["negative", "adult"]),
     _event("adult_shared_meal_memory", "A familiar smell brings back a memory you had forgotten.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {}}, tags=["neutral"]),
+    _event("adult_drawer_mystery", "You opened a drawer to get one thing and forgot why halfway through.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {}}, tags=["goofy"]),
+    _event("adult_small_cut", "A minor cut from an ordinary task stung far longer than it should have.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {"health": -1}}, tags=["negative"]),
 
     # Elder-specific events (Age 65+)
     _event("elder_garden_walk", "You enjoy a gentle walk and appreciate the slower pace of the day.", life_stages=["Elder"], outcome={"stat_changes": {"happiness": 1}}, tags=["positive", "elder"]),
@@ -219,6 +233,7 @@ def get_human_monthly_event_from_lifecycle(
     current_year: int,
     current_month: int,
     family_context=None,
+    recent_event_ids=None,
 ) -> dict | None:
     """
     Selects a monthly event from the current human-only content pool using derived lifecycle state.
@@ -236,6 +251,14 @@ def get_human_monthly_event_from_lifecycle(
     if not eligible_events:
         return None
 
+    recent_event_ids = set(recent_event_ids or [])
+    cooled_eligible_events = [
+        event for event in eligible_events
+        if event["event_id"] not in recent_event_ids
+    ]
+    if cooled_eligible_events:
+        eligible_events = cooled_eligible_events
+
     chosen_event = random.choice(eligible_events)
 
     return {
@@ -250,7 +273,13 @@ def get_human_monthly_event_from_lifecycle(
     }
 
 
-def get_monthly_event(human_obj, current_year: int, current_month: int, family_context=None) -> dict | None:
+def get_monthly_event(
+    human_obj,
+    current_year: int,
+    current_month: int,
+    family_context=None,
+    recent_event_ids=None,
+) -> dict | None:
     """
     Compatibility wrapper for the current human monthly event contract.
     The current event content remains human-scoped and derives event eligibility from lifecycle state
@@ -262,4 +291,5 @@ def get_monthly_event(human_obj, current_year: int, current_month: int, family_c
         current_year,
         current_month,
         family_context=family_context,
+        recent_event_ids=recent_event_ids,
     )

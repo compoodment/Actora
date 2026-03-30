@@ -1,4 +1,5 @@
 import random
+from collections import deque
 from uuid import uuid4
 
 from events import get_human_monthly_event_from_lifecycle
@@ -1579,6 +1580,7 @@ class World:
         continuity_state = None
         focused_actor = self.get_actor(focused_actor_id)
         months_advanced = 0
+        recent_event_ids = deque(maxlen=3)
 
         if focused_actor is not None and not focused_actor.is_alive():
             continuity_state = self.build_continuity_state_for(focused_actor_id)
@@ -1632,6 +1634,9 @@ class World:
                     },
                 )
                 collected_structured_events.append(surfaced_event)
+                surfaced_event_id = surfaced_event.get("event_id")
+                if surfaced_event_id:
+                    recent_event_ids.append(surfaced_event_id)
 
             lifecycle_state_for_event = focused_actor.get_lifecycle_state(
                 self.current_year,
@@ -1643,6 +1648,7 @@ class World:
                 self.current_year,
                 self.current_month,
                 family_context=family_context_for_event,
+                recent_event_ids=recent_event_ids,
             )
             if structured_event_for_month:
                 self.apply_outcome(focused_actor_id, structured_event_for_month.get("outcome"))
@@ -1660,6 +1666,9 @@ class World:
                     },
                 )
                 collected_structured_events.append(structured_event_for_month)
+                structured_event_id = structured_event_for_month.get("event_id")
+                if structured_event_id:
+                    recent_event_ids.append(structured_event_id)
 
         focused_actor = self.get_actor(focused_actor_id)
         focused_actor_alive = focused_actor.is_alive() if focused_actor is not None else False

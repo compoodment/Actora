@@ -1,5 +1,12 @@
 # Actora Changelog
 
+## Version 0.37.3 (Patch) - 2026-03-29
+- **UX Cleanup + Event Quality:**
+    - Reset Life View status text back to the default idle prompt when backing out of history, lineage, or skip-time, while preserving the existing advance-time and continuation-handoff messages.
+    - Kept the existing left-pane scroll hint behavior in `main.py`, which already shows a `More details:` indicator on first render whenever Life View content exceeds the visible area.
+    - Added a simple per-turn monthly-event cooldown in `events.py` and `world.py`, excluding the last three triggered event IDs during one `simulate_advance_turn(...)` run but falling back to the full eligible pool if cooldown would empty it.
+    - Expanded the human monthly event pool with more infant and teenager coverage plus additional family-aware, goofy, and slightly darker grounded events without changing the event-result contract.
+
 ## Version 0.37.2 (Patch) - 2026-03-29
 - **Life View Relationships + Event-Pool Thickening:**
     - Changed `Human.get_snapshot_data(...)` so Life View relationships now derive from all current outgoing `family` links, dedupe linked actors, skip dead relatives, and emit a structured list of living family entries instead of fixed `mother_name` / `father_name` fields.

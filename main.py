@@ -21,6 +21,7 @@ HIDDEN_PLAYER_RECORD_TYPES = {"family_bootstrap", "actor_entry"}
 BACK_KEYS = {
     27,
 }
+MAIN_IDLE_MESSAGE = "A/Enter advances one month."
 
 
 def generate_startup_actor_id(role):
@@ -446,7 +447,7 @@ class ActoraTUI:
         self.main_left_scroll = 0
         self.history_scroll = 0
         self.selected_continuation_actor_id = None
-        self.last_message = "A/Enter advances one month."
+        self.last_message = MAIN_IDLE_MESSAGE
         self.event_log = []
         self.last_logged_year = 0
 
@@ -792,7 +793,7 @@ class ActoraTUI:
             self.running = False
         elif key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8) or key in BACK_KEYS:
             self.screen_name = "main"
-            self.last_message = "Returned to actor view."
+            self.last_message = MAIN_IDLE_MESSAGE
         elif key == curses.KEY_UP:
             self.history_scroll = max(0, self.history_scroll - 1)
         elif key == curses.KEY_DOWN:
@@ -829,7 +830,7 @@ class ActoraTUI:
         if key in (ord("b"), ord("B")) or key in BACK_KEYS or key in (ord("q"), ord("Q")):
             self.screen_name = "main"
             self.lineage_search_active = False
-            self.last_message = "Returned to actor view."
+            self.last_message = MAIN_IDLE_MESSAGE
             return
         if key in (ord("a"), ord("A")):
             self.set_lineage_filter_mode("all")
@@ -867,7 +868,7 @@ class ActoraTUI:
     def handle_skip_time_key(self, key):
         if key in (ord("b"), ord("B"), 27) or key in (ord("q"), ord("Q")):
             self.screen_name = "main"
-            self.last_message = "Returned to actor view."
+            self.last_message = MAIN_IDLE_MESSAGE
             return
         if key == curses.KEY_UP:
             self.skip_selection = max(0, self.skip_selection - 1)
