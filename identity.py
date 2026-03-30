@@ -29,6 +29,7 @@ CULTURE_NAME_POOLS = {
             "Ethan", "Jacob", "James", "Joseph", "Joshua", "Logan", "Matthew", "Michael",
             "Nicholas", "Ryan", "Tyler", "William",
         ],
+        "last_names": ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez"],
         "last_names": ["Anderson", "Brown", "Davis", "Garcia", "Harris", "Jackson", "Johnson", "Miller", "Smith", "Taylor"],
     },
     "Brazilian": {
@@ -42,6 +43,7 @@ CULTURE_NAME_POOLS = {
             "Gabriel", "Gustavo", "Henrique", "Joao", "Leonardo", "Lucas", "Marcelo", "Mateus",
             "Pedro", "Rafael", "Rodrigo", "Tiago",
         ],
+        "last_names": ["Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Alves", "Pereira", "Lima", "Ribeiro"],
         "last_names": ["Alves", "Barbosa", "Cardoso", "Costa", "Ferreira", "Gomes", "Lima", "Oliveira", "Pereira", "Silva"],
     },
     "British": {
@@ -55,6 +57,7 @@ CULTURE_NAME_POOLS = {
             "Henry", "Jack", "Jacob", "James", "Joseph", "Leo", "Lewis", "Mohammed",
             "Oliver", "Oscar", "Thomas", "William",
         ],
+        "last_names": ["Smith", "Jones", "Williams", "Taylor", "Brown", "Davies", "Wilson", "Evans", "Thomas", "Johnson"],
         "last_names": ["Brown", "Clarke", "Davies", "Evans", "Hughes", "Johnson", "Jones", "Patel", "Smith", "Taylor"],
     },
     "Dutch": {
@@ -68,6 +71,7 @@ CULTURE_NAME_POOLS = {
             "Joost", "Lars", "Levi", "Luuk", "Mats", "Milan", "Niels", "Ruben",
             "Sem", "Stijn", "Thijs", "Wouter",
         ],
+        "last_names": ["de Jong", "Jansen", "de Vries", "van den Berg", "Bakker", "Visser", "Smit", "Meijer", "de Boer", "Mulder"],
         "last_names": ["Bakker", "De Boer", "De Jong", "De Vries", "Jansen", "Mulder", "Prins", "Smit", "Van Dijk", "Visser"],
     },
     "German": {
@@ -81,6 +85,7 @@ CULTURE_NAME_POOLS = {
             "Julian", "Kai", "Leon", "Luca", "Luis", "Matteo", "Max", "Moritz",
             "Noah", "Paul", "Tim", "Tom",
         ],
+        "last_names": ["Müller", "Schmidt", "Schneider", "Fischer", "Weber", "Meyer", "Wagner", "Becker", "Hoffmann", "Schäfer"],
         "last_names": ["Becker", "Fischer", "Hoffmann", "Klein", "Koch", "Meyer", "Muller", "Neumann", "Schmidt", "Schneider"],
     },
     "Kenyan": {
@@ -94,6 +99,7 @@ CULTURE_NAME_POOLS = {
             "Joseph", "Kevin", "Martin", "Michael", "Moses", "Patrick", "Peter", "Samuel",
             "Stephen", "Victor", "Vincent", "William",
         ],
+        "last_names": ["Kimani", "Odhiambo", "Wanjala", "Muthoni", "Kariuki", "Omondi", "Chebet", "Njoroge", "Wekesa", "Atieno"],
         "last_names": ["Chebet", "Kamau", "Kariuki", "Kibet", "Kimani", "Mwangi", "Njeri", "Odhiambo", "Otieno", "Wanjala"],
     },
     "Colombian": {
@@ -107,6 +113,7 @@ CULTURE_NAME_POOLS = {
             "Felipe", "Gabriel", "Javier", "Juan", "Kevin", "Luis", "Mateo", "Nicolas",
             "Santiago", "Sebastian", "Steven", "William",
         ],
+        "last_names": ["García", "Rodríguez", "Martínez", "López", "González", "Hernández", "Díaz", "Morales", "Ramírez", "Torres"],
         "last_names": ["Arias", "Cardenas", "Castro", "Gomez", "Gonzalez", "Lopez", "Martinez", "Perez", "Rodriguez", "Torres"],
     },
     "Japanese": {
@@ -120,6 +127,7 @@ CULTURE_NAME_POOLS = {
             "Ren", "Riku", "Rin", "Ryota", "Sota", "Takumi", "Yamato", "Yudai",
             "Yuki", "Yuma", "Yuto", "Yuya",
         ],
+        "last_names": ["Sato", "Suzuki", "Takahashi", "Tanaka", "Watanabe", "Ito", "Yamamoto", "Nakamura", "Kobayashi", "Kato"],
         "last_names": ["Ito", "Kobayashi", "Kato", "Nakamura", "Saito", "Sasaki", "Suzuki", "Takahashi", "Tanaka", "Yamamoto"],
     },
     "Indian": {
@@ -133,6 +141,7 @@ CULTURE_NAME_POOLS = {
             "Nikhil", "Pranav", "Rahul", "Raj", "Rohan", "Sanjay", "Saurabh", "Shubham",
             "Vikram", "Vijay", "Virat", "Yash",
         ],
+        "last_names": ["Sharma", "Verma", "Gupta", "Singh", "Kumar", "Patel", "Reddy", "Nair", "Joshi", "Mishra"],
         "last_names": ["Agarwal", "Gupta", "Iyer", "Joshi", "Kapoor", "Patel", "Reddy", "Shah", "Sharma", "Singh"],
     },
     "Indonesian": {
@@ -146,6 +155,7 @@ CULTURE_NAME_POOLS = {
             "Rangga", "Rian", "Rizky", "Taufik", "Wahyu", "Yoga", "Yudi", "Yusuf",
             "Zaki", "Zulfan", "Bayu", "Arif",
         ],
+        "last_names": ["Wijaya", "Santoso", "Kusuma", "Hartono", "Saputra", "Pratama", "Putra", "Hidayat", "Nugraha", "Setiawan"],
         "last_names": ["Gunawan", "Hidayat", "Kusuma", "Lesmana", "Mahendra", "Nugroho", "Permana", "Pratama", "Saputra", "Wijaya"],
     },
     "Filipino": {
@@ -159,6 +169,7 @@ CULTURE_NAME_POOLS = {
             "Jerome", "Joshua", "Justin", "Kenneth", "Kevin", "Mark", "Miguel", "Paolo",
             "Rafael", "Ryan", "Vincent", "Xavier",
         ],
+        "last_names": ["Santos", "Reyes", "Cruz", "Bautista", "Gonzales", "Ramos", "Aquino", "Mendoza", "Torres", "Villanueva"],
         "last_names": ["Aquino", "Bautista", "Cruz", "Dela Cruz", "Garcia", "Mendoza", "Reyes", "Rizal", "Santos", "Torres"],
     },
     "Australian": {
@@ -172,6 +183,7 @@ CULTURE_NAME_POOLS = {
             "Jack", "Jacob", "James", "Joshua", "Lachlan", "Liam", "Lucas", "Mason",
             "Noah", "Oliver", "Thomas", "William",
         ],
+        "last_names": ["Smith", "Jones", "Williams", "Brown", "Wilson", "Taylor", "Johnson", "White", "Martin", "Anderson"],
         "last_names": ["Anderson", "Brown", "Campbell", "Collins", "Davies", "Evans", "Kelly", "Martin", "Smith", "Wilson"],
     },
 }
