@@ -639,8 +639,8 @@ class CreationWizard:
     def render_footer(self, height, width):
         footer_map = {
             0: "[↑↓] Move   [Enter] Continue   [Q] Quit",
-            1: "[↑↓] Move   [Enter] Select/Continue   [B] Back   [Q] Quit",
-            2: "[↑↓] Move   [Enter] Toggle   [B] Back   [Q] Quit",
+            1: "[↑↓] Move   [Enter] Select   [B] Back   [Q] Quit",
+            2: "[↑↓] Move   [Space] Toggle   [B] Back   [Q] Quit",
             3: "[↑↓] Move   [+/-] Adjust   [R] Randomize   [Enter] Continue   [B] Back   [Q] Quit",
             4: "[Enter] Start Game   [B] Back   [Q] Quit",
         }
@@ -676,9 +676,9 @@ class CreationWizard:
                 "Sex Options",
             ]
         )
-        for index, option in enumerate(CREATION_SEX_OPTIONS, start=1):
+        for option in CREATION_SEX_OPTIONS:
             marker = "[x]" if self.data["sex"] == option else "[ ]"
-            lines.append(f"  {index}. {marker} {option}")
+            lines.append(f"  {marker} {option}")
         lines.extend(
             [
                 "",
@@ -709,14 +709,11 @@ class CreationWizard:
 
         lines.extend(["", "Options"])
         options = self.get_current_appearance_select_options()
-        for index, option in enumerate(options, start=1):
-            prefix = ">"
+        for index, option in enumerate(options):
             selected_marker = "[x]" if self.data["appearance"][active_select_field["key"]] == option else "[ ]"
-            if self.appearance_mode == "option" and (index - 1) == self.appearance_option_index:
+            if self.appearance_mode == "option" and index == self.appearance_option_index:
                 highlight_index = len(lines)
-            else:
-                prefix = " "
-            lines.append(f"{prefix} {index}. {selected_marker} {option}")
+            lines.append(f"  {selected_marker} {option}")
 
         if not self.can_advance_appearance():
             lines.extend(["", "Custom values are required when 'Other' is selected."])
@@ -863,9 +860,6 @@ class CreationWizard:
                 self.data["sex"] = current_field["options"][min(len(current_field["options"]) - 1, current_index + 1)]
                 self.sync_gender_to_sex()
                 return
-            if key == curses.KEY_LEFT:
-                self.identity_field_index = max(0, self.identity_field_index - 1)
-                return
             if key in (curses.KEY_BACKSPACE, 127, 8):
                 self.identity_field_index = max(0, self.identity_field_index - 1)
                 return
@@ -895,11 +889,11 @@ class CreationWizard:
             if key == curses.KEY_DOWN:
                 self.appearance_option_index = min(len(options) - 1, self.appearance_option_index + 1)
                 return
-            if key in (curses.KEY_ENTER, 10, 13):
+            if key in (curses.KEY_ENTER, 10, 13, ord(" ")):
                 self.data["appearance"][current_field["key"]] = options[self.appearance_option_index]
                 self.appearance_mode = "field"
                 return
-            if key in (ord("b"), ord("B"), curses.KEY_LEFT, curses.KEY_BACKSPACE, 127, 8):
+            if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
                 self.appearance_mode = "field"
                 return
             return
@@ -915,6 +909,9 @@ class CreationWizard:
             return
         if current_field["kind"] == "select":
             if key in (curses.KEY_ENTER, 10, 13):
+                if self.can_advance_appearance() and self.appearance_field_index == len(fields) - 1:
+                    self.step_index = 2
+                    return
                 options = current_field["options"]
                 current_value = self.data["appearance"][current_field["key"]]
                 self.appearance_option_index = options.index(current_value)
@@ -942,7 +939,7 @@ class CreationWizard:
         if key == curses.KEY_DOWN:
             self.trait_index = min(len(CREATION_TRAIT_POOL) - 1, self.trait_index + 1)
             return
-        if key in (curses.KEY_ENTER, 10, 13):
+        if key in (curses.KEY_ENTER, 10, 13, ord(" ")):
             trait = CREATION_TRAIT_POOL[self.trait_index]
             if trait in self.data["traits"]:
                 self.data["traits"].remove(trait)
