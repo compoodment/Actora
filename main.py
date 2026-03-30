@@ -244,9 +244,9 @@ def build_snapshot_sections(snapshot_data):
             "location",
             "Location",
             [
-                f"World Body: {location['world_body_name']}",
+                f"Planet: {location['world_body_name']}",
                 f"Current Place: {location['current_place_name']}",
-                f"Jurisdiction: {location['jurisdiction_place_name']}",
+                f"Country: {location['jurisdiction_place_name']}",
             ],
         ),
         (
@@ -386,7 +386,7 @@ def build_screen_chrome(screen_name, world, focused_actor_name):
         "lineage": "Lineage Browser",
         "history": "History",
         "skip_time": "Skip Time",
-        "death_ack": "Death Interrupt",
+        "death_ack": "Death",
         "continuation": "Continuation",
         "continuation_detail": "Continuation",
     }
@@ -625,8 +625,7 @@ def build_record_summary_lines(records):
     if not filtered_records:
         return ["No records found."]
     return [
-        f"[{record['year']:04d}-{record['month']:02d}] "
-        f"({record['record_type']}) {record['text']}"
+        f"[{record['year']:04d}-{record['month']:02d}] {record['text']}"
         for record in filtered_records
     ]
 
@@ -1831,9 +1830,9 @@ class ActoraTUI:
             format_stat_pair("Looks", secondary_statistics["looks"], "Fertility", secondary_statistics["fertility"]),
             "",
             "Location",
-            f"  World Body: {location['world_body_name']}",
+            f"  Planet: {location['world_body_name']}",
             f"  Current Place: {location['current_place_name']}",
-            f"  Jurisdiction: {location['jurisdiction_place_name']}",
+            f"  Country: {location['jurisdiction_place_name']}",
             "",
             "Relationships",
             ]
@@ -2474,7 +2473,7 @@ class ActoraTUI:
         )
         lines = [
             "",
-            center_text("DEATH INTERRUPT", content_width),
+            center_text("DEATH", content_width),
             "",
         ]
         lines.extend(build_death_lines(continuity_state))
