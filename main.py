@@ -640,7 +640,7 @@ class CreationWizard:
         footer_map = {
             0: "[↑↓] Move   [Enter] Continue   [Q] Quit",
             1: "[↑↓] Move   [Enter] Select   [B] Back   [Q] Quit",
-            2: "[↑↓] Move   [Space] Toggle   [B] Back   [Q] Quit",
+            2: "[↑↓] Move   [Space] Toggle   [Enter] Continue   [B] Back   [Q] Quit",
             3: "[↑↓] Move   [+/-] Adjust   [R] Randomize   [Enter] Continue   [B] Back   [Q] Quit",
             4: "[Enter] Start Game   [B] Back   [Q] Quit",
         }
@@ -939,14 +939,15 @@ class CreationWizard:
         if key == curses.KEY_DOWN:
             self.trait_index = min(len(CREATION_TRAIT_POOL) - 1, self.trait_index + 1)
             return
-        if key in (curses.KEY_ENTER, 10, 13, ord(" ")):
+        if key == ord(" "):
             trait = CREATION_TRAIT_POOL[self.trait_index]
             if trait in self.data["traits"]:
                 self.data["traits"].remove(trait)
             elif len(self.data["traits"]) < 3:
                 self.data["traits"].append(trait)
-            if self.can_advance_traits() and len(self.data["traits"]) == 3:
-                self.step_index = 3
+            return
+        if key in (curses.KEY_ENTER, 10, 13) and self.can_advance_traits():
+            self.step_index = 3
             return
 
     def handle_stats_key(self, key):
