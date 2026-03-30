@@ -56,6 +56,15 @@ CREATION_STAT_LABELS = {
     "looks": "Looks",
     "fertility": "Fertility",
 }
+GENDER_IDENTITY_OPTIONS = ["Male", "Female", "Non-binary", "Agender", "Genderfluid", "Other"]
+SEXUALITY_OPTION_LABELS = [
+    ("Opposite gender (Heterosexual)", "Heterosexual"),
+    ("Same gender (Homosexual)", "Homosexual"),
+    ("Both genders (Bisexual)", "Bisexual"),
+    ("No one in particular (Asexual)", "Asexual"),
+    ("People regardless of gender (Pansexual)", "Pansexual"),
+    ("It is hard to define (Queer)", "Queer"),
+]
 
 
 def generate_startup_actor_id(role):
@@ -1037,6 +1046,9 @@ class ActoraTUI:
         self.event_log = []
         self.last_logged_year = 0
         self.last_advance_time = 0.0
+        self.pending_choice = None
+        self.gender_choice_offered = False
+        self.sexuality_choice_offered = False
 
     def get_focused_actor_id(self):
         return self.world.get_focused_actor_id() or self.player_id
@@ -1239,6 +1251,86 @@ class ActoraTUI:
                 record_type=entry.get("record_type"),
             )
 
+    def maybe_offer_identity_choice(self):
+        actor = self.get_focused_actor()
+        if actor is None or not actor.is_alive():
+            return False
+
+        lifecycle = actor.get_lifecycle_state(self.world.current_year, self.world.current_month)
+        age_years = lifecycle["age_years"]
+        current_gender = actor.gender or "Other"
+
+        if 10 <= age_years < 18 and not self.gender_choice_offered:
+            selected_index = (
+                GENDER_IDENTITY_OPTIONS.index(current_gender)
+                if current_gender in GENDER_IDENTITY_OPTIONS
+                else 0
+            )
+            self.pending_choice = {
+                "title": "A moment of self-reflection",
+                "text": "As you grow, you find yourself thinking more about who you are.",
+                "question": "Your gender identity feels like:",
+                "options": list(GENDER_IDENTITY_OPTIONS),
+                "selected_index": selected_index,
+                "skippable": True,
+                "choice_id": "gender_identity",
+                "default_value": current_gender,
+            }
+            self.gender_choice_offered = True
+            self.last_message = "A personal choice needs your attention."
+            return True
+
+        if 16 <= age_years < 25 and not self.sexuality_choice_offered:
+            self.pending_choice = {
+                "title": "A new kind of awareness",
+                "text": "You have started noticing things about yourself you had not thought about before.",
+                "question": "You feel attracted to:",
+                "options": [label for label, _ in SEXUALITY_OPTION_LABELS],
+                "selected_index": 0,
+                "skippable": True,
+                "choice_id": "sexuality",
+                "default_value": "Heterosexual",
+            }
+            self.sexuality_choice_offered = True
+            self.last_message = "A personal choice needs your attention."
+            return True
+
+        return False
+
+    def resolve_choice(self, choice_id, selected_value):
+        actor = self.get_focused_actor()
+        if actor is None:
+            self.pending_choice = None
+            return
+
+        if choice_id == "gender_identity":
+            old_gender = actor.gender
+            actor.gender = selected_value
+            if selected_value != old_gender:
+                self.append_event_log_entry(
+                    "event",
+                    f"You now identify as {selected_value}.",
+                    year=self.world.current_year,
+                    month=self.world.current_month,
+                )
+            else:
+                self.append_event_log_entry(
+                    "event",
+                    "You reflected on your identity.",
+                    year=self.world.current_year,
+                    month=self.world.current_month,
+                )
+        elif choice_id == "sexuality":
+            actor.sexuality = selected_value
+            self.append_event_log_entry(
+                "event",
+                f"You identify as {selected_value}.",
+                year=self.world.current_year,
+                month=self.world.current_month,
+            )
+
+        self.pending_choice = None
+
     def open_history(self):
         self.screen_name = "history"
         self.history_scroll = 10**9
@@ -1299,20 +1391,38 @@ class ActoraTUI:
 
     def advance_time(self, months_to_advance):
         """Advances time using the existing world-owned simulation seam."""
-        prior_record_count = len(self.world.records)
-        turn_result = self.world.simulate_advance_turn(self.player_id, months_to_advance)
-        new_records = self.world.records[prior_record_count:]
-        self.append_event_log_turn(turn_result, months_to_advance, new_records)
-        actual_months_advanced = turn_result["months_advanced"]
+        aggregated_turn_result = {
+            "months_advanced": 0,
+            "events": [],
+            "focused_actor_alive": True,
+            "continuity_state": None,
+        }
+        new_records = []
+
+        for _ in range(months_to_advance):
+            prior_record_count = len(self.world.records)
+            month_turn_result = self.world.simulate_advance_turn(self.player_id, 1)
+            new_records.extend(self.world.records[prior_record_count:])
+            aggregated_turn_result["months_advanced"] += month_turn_result["months_advanced"]
+            aggregated_turn_result["events"].extend(month_turn_result["events"])
+            aggregated_turn_result["focused_actor_alive"] = month_turn_result["focused_actor_alive"]
+            aggregated_turn_result["continuity_state"] = month_turn_result["continuity_state"]
+
+            if month_turn_result["months_advanced"] <= 0 or not month_turn_result["focused_actor_alive"]:
+                break
+            if self.maybe_offer_identity_choice():
+                break
+
+        self.append_event_log_turn(aggregated_turn_result, months_to_advance, new_records)
+        actual_months_advanced = aggregated_turn_result["months_advanced"]
         if actual_months_advanced == 1:
             self.last_message = "Advanced 1 month."
         elif actual_months_advanced != months_to_advance:
-            self.last_message = (
-                f"Advanced {actual_months_advanced} of {months_to_advance} months before death."
-            )
+            reason = "before a major choice." if self.pending_choice is not None else "before death."
+            self.last_message = f"Advanced {actual_months_advanced} of {months_to_advance} months {reason}"
         else:
             self.last_message = f"Advanced {actual_months_advanced} months."
-        if turn_result["continuity_state"] is not None and not turn_result["focused_actor_alive"]:
+        if aggregated_turn_result["continuity_state"] is not None and not aggregated_turn_result["focused_actor_alive"]:
             self.screen_name = "death_ack"
 
     def advance_one_month(self):
@@ -1403,6 +1513,7 @@ class ActoraTUI:
             f"  Species: {identity['species']}",
             f"  Sex: {identity['sex']}",
             f"  Gender: {identity['gender']}",
+            f"  Sexuality: {identity.get('sexuality') or 'Not yet known'}",
             f"  Age: {identity['age']}",
             f"  Life Stage: {identity['life_stage']}",
             "",
@@ -1497,12 +1608,42 @@ class ActoraTUI:
                 "text": f"New Life: {handoff_result['new_focused_actor_name']}",
             }
         )
+        self.pending_choice = None
+        self.gender_choice_offered = False
+        self.sexuality_choice_offered = False
         self.selected_continuation_actor_id = None
         self.screen_name = "main"
         self.last_message = (
             f"Focus moved from {handoff_result['previous_actor_name']} "
             f"to {handoff_result['new_focused_actor_name']}."
         )
+
+    def handle_pending_choice_key(self, key):
+        if key in (ord("q"), ord("Q")):
+            self.running = False
+            return
+
+        if self.pending_choice is None:
+            return
+
+        options = self.pending_choice["options"]
+        selected_index = self.pending_choice["selected_index"]
+        if key == curses.KEY_UP:
+            self.pending_choice["selected_index"] = max(0, selected_index - 1)
+        elif key == curses.KEY_DOWN:
+            self.pending_choice["selected_index"] = min(len(options) - 1, selected_index + 1)
+        elif key == ord(" "):
+            selected_option = options[self.pending_choice["selected_index"]]
+            if self.pending_choice["choice_id"] == "sexuality":
+                selected_value = dict(SEXUALITY_OPTION_LABELS)[selected_option]
+            else:
+                selected_value = selected_option
+            self.resolve_choice(self.pending_choice["choice_id"], selected_value)
+        elif self.pending_choice.get("skippable") and key in (ord("b"), ord("B")):
+            self.resolve_choice(
+                self.pending_choice["choice_id"],
+                self.pending_choice.get("default_value"),
+            )
 
     def handle_main_key(self, key):
         if key in (ord("q"), ord("Q")):
@@ -1686,6 +1827,9 @@ class ActoraTUI:
 
     def handle_key(self, key):
         self.sync_focus_state()
+        if self.pending_choice is not None:
+            self.handle_pending_choice_key(key)
+            return
         if self.screen_name == "main":
             self.handle_main_key(key)
         elif self.screen_name == "profile":
@@ -1736,6 +1880,49 @@ class ActoraTUI:
             center_text(footer_text, content_width),
             content_width,
             curses.A_NORMAL,
+        )
+
+    def build_choice_popup_lines(self, choice):
+        lines = [choice["text"], "", choice["question"], ""]
+        option_line_indexes = []
+        for index, option in enumerate(choice["options"]):
+            marker = "[x]" if index == choice["selected_index"] else "[ ]"
+            option_line_indexes.append(len(lines))
+            lines.append(f"{marker} {option}")
+        lines.extend(
+            [
+                "",
+                (
+                    "[↑↓] Move   [Space] Select   [B] Skip"
+                    if choice.get("skippable")
+                    else "[↑↓] Move   [Space] Select"
+                ),
+            ]
+        )
+        return lines, option_line_indexes
+
+    def render_pending_choice(self, stdscr, height, width):
+        if self.pending_choice is None:
+            return
+
+        box_width = min(max(40, width // 2), 50)
+        inner_width = max(1, box_width - 2)
+        popup_lines, option_line_indexes = self.build_choice_popup_lines(self.pending_choice)
+        rendered_line_count = sum(len(wrap_text_line(line, inner_width)) for line in popup_lines)
+        box_height = min(height - 4, max(9, rendered_line_count + 2))
+        top = max(2, (height - box_height) // 2)
+        left = max(0, (width - box_width) // 2)
+
+        draw_box(stdscr, top, left, box_height, box_width, title=self.pending_choice["title"])
+        highlighted_line = option_line_indexes[self.pending_choice["selected_index"]]
+        draw_panel_text(
+            stdscr,
+            top,
+            left,
+            box_height,
+            box_width,
+            popup_lines,
+            highlight_index=highlighted_line,
         )
 
     def render_header(self, stdscr, width):
@@ -2136,6 +2323,7 @@ class ActoraTUI:
             self.render_continuation_detail(stdscr, height, width)
 
         self.render_footer(stdscr, height, width)
+        self.render_pending_choice(stdscr, height, width)
         stdscr.refresh()
 
     def run(self, stdscr):

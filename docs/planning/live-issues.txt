@@ -69,3 +69,23 @@ Purpose: repo-local parking lot for current bugs, regressions, and revisit items
 - sexuality emergence not implemented
   Status: open revisit (Slice 3)
   Note: sexuality should emerge through events/life stage. Needs event-choice framework.
+
+- event-choice framework needed for interactive prompts during play
+  Status: open (Slice 3 next)
+  Note: popup overlay on Life View, ↑↓/Space/B controls, skip-time pauses for major choices, auto-resolves minor ones.
+
+- gradual sexuality signal events (3-5 small events building toward suggestion)
+  Status: deferred
+  Note: planned but deferred past Slice 3 minimum. First pass uses a single choice prompt.
+
+- culture/location-driven identity context for gender/sexuality prompts
+  Status: deferred
+  Note: eventually gender/sexuality emergence should be shaped by culture/location context. Requires place/context maturity.
+
+- gender/sexuality changeable through Profile triggering life event
+  Status: deferred (post Slice 3)
+  Note: changing gender or sexuality through Profile should trigger a "came out as..." life event. Requires event-choice framework first.
+
+- "Other" sexuality integration with future romance events
+  Status: deferred
+  Note: "Other" sexuality is complicated when events need to know attraction patterns. Park until romance events exist.

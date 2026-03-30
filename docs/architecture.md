@@ -328,7 +328,7 @@ Current structural-state access is formalized through `Human.get_structural_stat
 
 Current snapshot access is formalized through `Human.get_snapshot_data(current_year, current_month, world, actor_id)`, which returns a structured dictionary with the current shell-rendered sections:
 
-- `identity` (`full_name`, `species`, `sex`, `gender`, `age`, `life_stage`)
+- `identity` (`full_name`, `species`, `sex`, `gender`, `sexuality`, `age`, `life_stage`)
 - `time` (`year`, `month`)
 - `location` (`world_body_name`, `current_place_name`, `current_place_kind`, `jurisdiction_place_name`, `jurisdiction_place_kind`)
 - `statistics` (`health`, `happiness`, `intelligence`, `money`)
@@ -349,6 +349,7 @@ Responsible for:
 - curses-driven actor-first ordinary play flow
 - screen-level visual-system orchestration for the current TUI
 - post-turn rendering orchestration
+- shell-owned post-turn identity-choice emergence checks
 - rendering TUI snapshots from structured snapshot data
 - converting structured event results into display text
 - rendering the shell-owned dead-focus interrupt and continuation handoff flow when present
@@ -360,14 +361,14 @@ Current shell-level functions:
 - `build_death_lines(...)` — shell-owned dead-focus interrupt copy assembly
 - `build_screen_chrome(...)` — shell-owned title/subtitle/date chrome assembly for the current TUI screen, including the history browser
 - `draw_text_block(...)` — small curses text rendering helper with wrapping support
-- `ActoraTUI` — narrow curses shell object managing the split Life View, dedicated profile screen, accumulating live event feed, full-screen history browser, styled header/footer chrome, lineage list/detail, skip-time selection, death acknowledgment, two-step continuation inspection/selection, simple left-pane/profile/history scrolling, and safe footer rendering that avoids writing into the terminal’s last column
+- `ActoraTUI` — narrow curses shell object managing the split Life View, dedicated profile screen, accumulating live event feed, full-screen history browser, styled header/footer chrome, lineage list/detail, skip-time selection, death acknowledgment, two-step continuation inspection/selection, simple left-pane/profile/history scrolling, a shell-owned pending-choice popup overlay for major player-facing decisions, and safe footer rendering that avoids writing into the terminal’s last column
 - `safe_input(prompt)` — narrow shared CLI input boundary helper that exits cleanly on `EOFError` and `KeyboardInterrupt`
 - `create_character()` — character creation prompts and input validation
 - `setup_initial_world(...)` — World creation, parent identity generation, startup actor entry delegation through world-owned helpers (`create_human_actor(...)` and `create_human_child_with_parents(...)`), and initial focused-actor assignment through `World.set_focused_actor(...)`
 - `run_game_tui(...)` — curses wrapper entry point for ordinary play
 - `start_game()` — top-level orchestration (banner, then delegates to the above)
 
-Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Startup parent ages now vary within a narrow adult range, some worlds now generate older siblings before the player is born through `World.bootstrap_older_siblings_for_newborn(...)`, and only-child worlds still remain possible. Once startup completes, ordinary play now lives inside a narrow curses shell: the split `Life View` keeps identity/location/primary stats/relationships on the left, keeps an accumulating live event feed on the right, opens a dedicated full-detail `Profile` screen with `P`, allows simple left-side/profile/history vertical scrolling under terminal-height pressure, opens the full-screen history browser with `H`, still opens lineage with `L`, and still preserves the dead-focus interrupt before any continuation choices are shown.
+Current startup flow is human-only. `create_character()` returns player first/last name plus sex/gender, and `setup_initial_world(...)` no longer carries a dead `player_species` parameter. Interactive CLI input now exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Startup parent ages now vary within a narrow adult range, some worlds now generate older siblings before the player is born through `World.bootstrap_older_siblings_for_newborn(...)`, and only-child worlds still remain possible. Once startup completes, ordinary play now lives inside a narrow curses shell: the split `Life View` keeps identity/location/primary stats/relationships on the left, keeps an accumulating live event feed on the right, opens a dedicated full-detail `Profile` screen with `P`, allows simple left-side/profile/history vertical scrolling under terminal-height pressure, opens the full-screen history browser with `H`, still opens lineage with `L`, still preserves the dead-focus interrupt before any continuation choices are shown, and now allows shell-owned popup choices to interrupt long skips for major identity-emergence moments during adolescence.
 
 ### `identity.py`
 Responsible for:
@@ -563,7 +564,7 @@ Current event behavior:
 
 ### Snapshot
 Current snapshots display:
-- identity (full name, species, sex, gender, age, life stage)
+- identity (full name, species, sex, gender, sexuality, age, life stage)
 - time (simulation date only: year and month)
 - location (ancestry-resolved world body plus current place plus one clean jurisdiction line, resolved through `Human.get_snapshot_data(...)`, which currently reads `Human.get_spatial_state(world)` and world place helpers)
 - residence remains internal and is not rendered in the snapshot yet

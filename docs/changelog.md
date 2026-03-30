@@ -1,5 +1,14 @@
 # Actora Changelog
 
+## Version 0.39.0 (Minor) - 2026-03-30
+- **Event-Choice Framework + Gender/Sexuality Identity Emergence:**
+    - Added a general-purpose pending-choice popup overlay to the curses TUI in `main.py`, with centered boxed rendering, selection movement, skip support, and full input capture while a choice is active.
+    - Routed time advancement in `ActoraTUI.advance_time(...)` through TUI-owned month-by-month stepping so long skips now pause immediately when a major choice appears, preserving the existing world simulation boundary.
+    - Added adolescence identity-emergence events for the focused actor: a gender identity choice in the teen years and a sexuality choice in the later teen years, both surfaced during ordinary play and written into the live event log/history.
+    - Extended `Human` in `human.py` with a `sexuality` field, randomized sexuality for non-player generated humans, and exposed sexuality through the snapshot identity payload.
+    - Updated the `Profile` screen in `main.py` to show sexuality alongside sex and gender, with a `"Not yet known"` fallback before the player-facing emergence event has happened.
+    - Reset TUI-owned identity-choice offer flags on continuation handoff so the next focused life can surface its own adolescence identity moments when applicable.
+
 ## Version 0.38.1 (Minor) - 2026-03-30
 - **Character Creation Wizard + Appearance + Traits:**
     - Replaced the old plain-text startup `create_character()` flow in `main.py` with a curses-based `CreationWizard` that now runs inside the same overall TUI visual system before ordinary play begins.

@@ -31,6 +31,7 @@ class Human:
         self.last_name = last_name
         self.sex = sex
         self.gender = gender
+        self.sexuality = None
         self.birth_year = birth_year
         self.birth_month = birth_month
         self.stats = {
@@ -84,9 +85,11 @@ class Human:
         eye_colors = ["Brown", "Blue", "Green", "Hazel", "Gray", "Amber"]
         hair_colors = ["Black", "Brown", "Blonde", "Red", "Auburn"]
         skin_tones = ["Light", "Fair", "Medium", "Olive", "Tan", "Brown", "Dark"]
+        sexuality_options = ["Heterosexual", "Homosexual", "Bisexual", "Asexual", "Pansexual", "Queer"]
         self.appearance["eye_color"] = random.choice(eye_colors)
         self.appearance["hair_color"] = random.choice(hair_colors)
         self.appearance["skin_tone"] = random.choice(skin_tones)
+        self.sexuality = random.choice(sexuality_options)
 
         trait_pool = ["Curious", "Calm", "Fussy", "Bold", "Shy", "Cheerful", "Stubborn", "Gentle", "Restless", "Alert"]
         self.traits = random.sample(trait_pool, min(3, len(trait_pool)))
@@ -221,6 +224,7 @@ class Human:
                 "species": self.species,
                 "sex": self.sex,
                 "gender": self.gender,
+                "sexuality": self.sexuality,
                 "age": lifecycle["age_years"],
                 "life_stage": lifecycle["life_stage"],
             },
