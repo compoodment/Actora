@@ -1,7 +1,7 @@
 # Actora Architecture Summary
 
-**Version:** 0.38.1
-**Last Updated:** 2026-03-29
+**Version:** 0.39.1
+**Last Updated:** 2026-03-30
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
 It is intended to support safe patching, review, and manual verification.
@@ -610,7 +610,7 @@ The current event system is:
 
 This remains a narrow honesty-focused seam clarification. It does not implement species-general event architecture, non-human event content, or a broader entity/event framework.
 
-Current event pool: 32 grounded human-only events across Infant (8), Child (8), Teenager (4), Young Adult (4), Adult (4), and Elder (4) life stages.
+Current event pool: 120 grounded human-only events including 20 trait-gated events (2 per personality trait) and 11 family-aware events with dynamic name insertion. Events support optional `required_traits` filtering so trait-gated events only trigger for actors who have the matching personality trait. A 3-event cooldown prevents the same event from triggering within the last 3 triggered events during one advancement.
 
 ## 11. Patching Rules
 

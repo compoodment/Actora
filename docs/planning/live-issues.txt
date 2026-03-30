@@ -71,8 +71,8 @@ Purpose: repo-local parking lot for current bugs, regressions, and revisit items
   Note: sexuality should emerge through events/life stage. Needs event-choice framework.
 
 - event-choice framework needed for interactive prompts during play
-  Status: open (Slice 3 next)
-  Note: popup overlay on Life View, ↑↓/Space/B controls, skip-time pauses for major choices, auto-resolves minor ones.
+  Status: resolved in v0.39.0
+  Note: popup overlay on Life View with ↑↓/Space/B controls. Gender identity at ~12-15, sexuality at ~14-17. Skip-time pauses for major choices.
 
 - gradual sexuality signal events (3-5 small events building toward suggestion)
   Status: deferred

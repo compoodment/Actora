@@ -1,301 +1,96 @@
-Actionable Ideas Summary - Rev36
-Date: 2026-03-28
+Actionable Ideas Summary — Rev37
+Date: 2026-03-30
 Role: temporary near-term operational planning snapshot for Actora
 Authority: non-authoritative; stable docs win, repo truth wins on implementation
-Usage rule: keep this more distilled than the WIR and focused on the current working position, current clarified design read, and strongest near-term planning question
+Usage rule: keep this more distilled than the WIR and focused on the current working position, current planning question, and strongest near-term candidates
 
 
 === CURRENT WORKING POSITION ===
 
-Actora now has a materially stronger early backbone, and verified repo truth is through v0.38.1, with source-stack sync carried through:
-- Master Context v9
-- Roadmap v10
-- world-owned actor registry
-- world-owned links
-- structured place registry with parent-place hierarchy
-- actor-level separation between current place, residence, jurisdiction, and temporary occupancy context
-- dedicated identity-generation layer
-- centralized event outcome application
-- world-owned record storage
-- world-owned record query helpers
-- explicit record-shape normalization
-- explicitly human-backed world-owned constructor seam (`create_human_actor(...)`)
-- structured snapshot output via `Human.get_snapshot_data(...)` with shell-owned snapshot rendering in `main.py`
-- cleaned monthly event result contract, with `outcome.stat_changes` as the single authoritative mutation payload and no redundant top-level `stat_changes`
-- grounded human-only event coverage extending across Infant, Child, Teenager, Young Adult, Adult, and Elder
-- explicit startup-family semantic metadata for origin, caregiving, and bootstrap provenance on current family links in `World.links`
-- narrow world helper access for semantic family lookup while preserving compatibility parent lookup
-- a more honest human-scoped monthly event seam through `HUMAN_MONTHLY_EVENTS`, `_get_human_eligible_events(...)`, `get_human_monthly_event_from_lifecycle(...)`, and compatibility `get_monthly_event(...)`
-- a structured identity-generation context seam through `prepare_parent_identity_context(...)`, `generate_parent_identity_from_context(...)`, and compatibility `generate_parent_identity(...)`
-- a world-owned authoritative simulation-step boundary through `World.simulate_advance_turn(...)`
-- explicit invalid-actor boundary guarding on the world-owned simulation-step boundary
-- explicit unknown-stat mutation guarding in `Human.modify_stat(...)`
-- a narrow shared CLI input boundary helper in `main.py` that cleanly exits on `EOFError` and `KeyboardInterrupt`
-- startup actor IDs generated through `generate_startup_actor_id(...)` instead of fixed singleton IDs for mother, father, and player
-- structural death / continuity foundation through `structural_status`, `World.mark_actor_dead(...)`, `get_continuity_candidates_for(...)`, `build_continuity_state_for(...)`, and continuity-ready turn result fields
-- first playable continuity handoff flow through deterministic continuity candidate refinement, dead-focus advancement blocking, world-owned continuation handoff validation, and shell-level continuation choice / clean dead-end handling
-- link foundation strengthening through normalized `_build_link_record(...)`, small general `get_links(...)` query access, thinner compatibility link helpers, continuity candidate gathering routed through the generic link seam, and one startup parent-to-parent `association/coparent` proof link
-- structured place / place-hierarchy strengthening through ancestry-aware place lookup, startup `world_body -> country -> city` hierarchy, and cleaner current-place snapshot truth
-- spatial identity separation strengthening through explicit `jurisdiction_place_id` and `temporary_occupancy_place_id`, with startup actors now structurally living in the startup city while jurisdictionally belonging to the startup country
-- controlled spatial identity mutation through `World.update_actor_spatial_identity(...)`, with partial-update safety, place validation, and unchanged unspecified fields
-- tightened dead-focus transition flow in the terminal shell so death now lands as a dedicated interrupt led by `You are dead.`, shows current death context, and requires acknowledgment before continuation choices are shown
-- cleaned terminal snapshot time presentation so actor age/life-stage now live under identity while shared simulation clock data is rendered separately as explicit sim date
-- expanded visible human character-creation identity options so sex now includes `Intersex`, gender now includes `Agender`, `Genderfluid`, and `Other`, and `Other` supports free-text entry
-- improved continuation-choice inspectability so dead-focus candidate rendering now includes relationship label, age, life stage, and current place
-- added a first lineage/archive foundation through world-owned lineage access, a `lineage` terminal command, list-first family-linked actor inspection, and lineage detail views backed by the current actor/link/record truth without separate physical archive storage
-- replaced the old typed ordinary-play loop with a narrow actor-first curses TUI foundation for ordinary play
-- tightened the curses shell with a footer render safety fix so terminal-edge drawing no longer crashes on startup in real terminals
-- restored restrained TUI style and shell-owned multi-month time control through a styled header/date chrome plus a dedicated skip-time screen with preset and custom month jumps
-- clarified terminal-UI / death-flow intent now preserved more honestly in both planning and repo behavior: alive-state stays implicit during ordinary play, death interrupts first, continuation choices come only after acknowledgment, archived dead actors should eventually remain explorable/reusable later, and terminal info density/timing should be treated as a real design concern rather than hand-waved away because the UI is temporary
+Verified repo truth is through v0.39.1 with source-stack sync through:
+- Master Context v9, Roadmap v10, Operator Guide v9
+
+The project has a materially strong early backbone:
+- World-owned actor registry, links, places (hierarchy), records, simulation step
+- Structured snapshot/output contracts, centralized event outcome application
+- Spatial identity separation (location/residence/jurisdiction/temporary occupancy)
+- Structural death/continuity foundation with playable handoff
+- Ordinary old-age mortality, family continuity substrate (siblings at startup + later births)
+- Actor-first curses TUI with Life View, Profile, Lineage Browser, History Browser, Skip Time
+- Character creation wizard (Identity → Appearance → Traits → Stats → Confirm)
+- 120 events (100 general + 20 trait-gated) with family-aware dynamic text and cooldown
+- 11 stats (3 primary + 8 secondary), appearance traits, personality traits
+- Event-choice framework (popup overlay) with gender/sexuality identity emergence
+- Death inspectability (life summary, two-step continuation inspection)
+- Consistent TUI control language (Space=select, Enter=proceed, B=back, ↑↓=navigate)
+
+Recent milestone sequence:
+- v0.36.8 — ordinary mortality
+- v0.36.9 — family continuity groundwork
+- v0.37.0 — death/continuation inspectability
+- v0.37.1 — scrollable event history
+- v0.37.2 — relationships + event expansion + family-aware events
+- v0.37.3–v0.37.7 — UX cleanup, event quality, playtest fixes
+- v0.38.0 — actor stats deepening + profile screen
+- v0.38.1 — character creation wizard + appearance + traits
+- v0.39.0 — event-choice framework + gender/sexuality emergence
+- v0.39.1 — traits wired into events
 
 
-=== CURRENT CLARIFIED DESIGN READ ===
+=== CURRENT PLANNING QUESTION ===
 
-Actora is now more clearly understood as:
-- one continuous universe simulation per save
-- primarily actor-played rather than detached-overseer-first
-- full custom sandbox setup by default, followed by emergent simulation
-- same-save scope zoom from actor -> city -> country -> world -> star system -> galaxy -> universe
-- one game rather than a pile of hard-separated "modes"
-- exact inspectable information available throughout the simulation
-- actor switching allowed through relevant connected actors rather than forced child-only continuation
-- death as a structural transition, not a fail-state philosophy
-- economy as a pillar, not garnish
-- politics/world conditions as a pillar, not garnish
-- companies as eventual real hybrid simulation objects, especially when player-owned or player-relevant
-- modern + near-future as the earliest practical era target
-- world / country / city as the earliest practical place target
-- social perception as a later but important multi-axis layer rather than a dumb single karma score
+"Given repo truth through v0.39.1, what is the strongest next move: real location content (countries/cities/culture), planning doc simplification, or something else before pushing toward education?"
 
-Cleanest one-line read:
+User direction: tighten and polish before starting education. Real location content is the agreed next structural move after traits-into-events.
+
+
+=== LEADING PLANNING CANDIDATES ===
+
+1. Real location content (next agreed move)
+- Place infrastructure is solid (hierarchy, spatial identity, mutation seams)
+- What's missing is real content: actual countries, cities, culture/ethnicity data
+- This is needed before education (school systems vary by location) and identity generation realism
+- Does not require new infrastructure — uses existing place registry
+
+2. Education foundation (after location content)
+- First mid-stage domain layer per roadmap
+- Needs location context to feel real (different countries = different systems)
+- Would give the actor something to DO during childhood/teenage years
+- Would unlock real event content tied to school/learning
+
+3. Further identity depth (deferred, post-education)
+- Gradual sexuality signal events
+- Culture/location-driven identity context
+- Profile editing with life events ("came out as...")
+- These become more meaningful with location and education context
+
+
+=== DESIGN READ ===
+
 Actora is a single continuous universe simulation where the player primarily lives as the current actor, but can zoom across scopes, continue through connected lives, and interact with real economic, political, spatial, and later social systems inside the same save.
 
-
-=== CURRENT PLANNING READ ===
-
-The old post-v0.33.0 decision point is dead now too.
-It served its purpose, then the repo moved again.
-
-The recent verified sequence is now:
-- v0.28.0 - death / continuity structural transition foundation
-- v0.29.0 - Actora rename milestone
-- v0.30.0 - first playable continuity handoff flow
-- v0.31.0 - link foundation strengthening
-- v0.32.0 - structured place / place-hierarchy strengthening
-- v0.33.0 - spatial identity separation strengthening
-- v0.34.0 - controlled spatial identity mutation boundary
-- v0.35.0 - dead-focus transition flow tightening
-- v0.35.1 - time presentation cleanup
-- v0.35.2 - character identity options expansion
-- v0.35.3 - continuation choice inspectability improvement
-- v0.35.4 - lineage foundation
-- v0.36.0 - actor-first TUI foundation
-- v0.36.1 - curses footer render fix
-- v0.36.2 - TUI style + time-control follow-through
-- v0.36.3 - lineage browser foundation strengthening
-- v0.36.4 - lineage row truncation hygiene
-- v0.36.5 - TUI-aware repo cleanup / shell-era drift reduction
-- v0.36.6 - TUI visual-system consistency pass
-- v0.36.7 - Life View + lineage usability cleanup
-- v0.36.8 - ordinary mortality / old-age death truth
-- v0.36.9 - family continuity groundwork
-- v0.37.0 - death/continuation inspectability follow-through
-- v0.37.1 - scrollable event history log
-- v0.37.0 - death/continuation inspectability follow-through
-- v0.37.1 - scrollable event history log
-- v0.37.2 - Life View relationships fix + event expansion + family-aware events
-- v0.37.3 - UX cleanup + event cooldown + more events
-- v0.37.4 - history markers + no-family edge case + skip-time UX verified
-- v0.37.5 - playtest fixes (family text, history overlap, chronological births, advance throttle)
-- v0.37.6 - slower advance throttle, history year-jump, conditional continuation footer
-- v0.37.7 - event dedup, player_id continuation fix, life separator
-- v0.38.0 - actor stats deepening + profile screen
-- v0.38.1 - character creation wizard + appearance + traits
-
-So the immediate next move is no longer:
-- "what follows spatial identity separation?"
-- or "do we still need the world-owned spatial mutation seam?"
-- or "should the death interrupt / acknowledgment flow remain just a planning note?"
-
-Those questions have been answered already.
-
-The immediate next move is now:
-- choose the strongest honest post-`v0.36.7` follow-through without jumping into archive-browser overbuild, travel/property/politics expansion, or operator-tooling cosplay
-
-Why:
-- the place + spatial-identity layer is now materially more disciplined than it was before `v0.34.0`
-- the shell death flow is now materially more honest than it was before `v0.35.0`
-- the repo is no longer only dealing with "does the TUI exist?" pressure; it now has a real actor-first curses shell, a stronger lineage browser, repo-level TUI familiarization cleanup, a visual-system pass, and a split Life View with better lineage usability
-- the repo's main friction is no longer shell-era drift or basic TUI coherence; it is deciding what the next real gameplay/system or same-layer follow-through should be now that the current TUI is materially more credible
-- roadmap + master-context still protect future panel-based / richer interaction forms while explicitly requiring the simulation core to stay UI-agnostic
-- that means the next checkpoint is less "clean up the first TUI again" and more "what is the strongest next honest pressure after the first TUI/browser/Life View stabilization run?"
-
-So the current question is now:
-- "given repo truth through `v0.38.1`, character creation is now a real curses wizard with appearance, traits, and full stat customization. Next move is either Slice 3 (deferred identity emergence) or starting the first mid-stage domain layer."
+Key design locks:
+- Full custom sandbox setup by default
+- Death is a structural transition, not a fail-state
+- Economy and politics are pillars, not garnish
+- Social perception should be multi-axis, not a single karma score
+- Scope zoom: actor → city → country → world → star system → galaxy → universe
+- Earliest practical era: modern + near future
+- Traits: structured (pick at birth) + emergent (develop over time)
+- Stats: 0-100, full sandbox customization
+- Gender deferred to puberty, sexuality emerges through events
+- Space=select/toggle, Enter=proceed, B=back across all TUI
 
 
-=== WHAT THE RECENT SEQUENCE ACHIEVED ===
+=== REAL TENSIONS ===
 
-1. Spatial truth is now less fake.
-- startup place is no longer just one flattened `earth` node
-- world body, country, and city now exist in a real small hierarchy
-- snapshot output is more honest about where the actor is
-
-2. Spatial mutation discipline is now less sloppy.
-- current place, residence, jurisdiction, and temporary occupancy no longer have to be mutated by casual direct field pokes
-- the repo now has a narrow world-owned spatial updater with explicit actor/place validation and partial-update safety
-
-3. Continuity and death flow are more honest at the shell layer.
-- the project still has a real playable continuity handoff path
-- death now lands as a dedicated interrupt instead of a flat dump of continuity state
-- continuation choices now wait behind acknowledgment instead of appearing immediately like a vending machine
-
-4. The planning checkpoint changed shape again.
-- the project is no longer deciding whether lineage/archive foundation should exist
-- it is no longer deciding whether a narrow actor-first TUI foundation should replace the typed command loop either; that shell now exists
-- it is no longer deciding whether the first stronger lineage/archive browser should exist either; that foundation is now real
-- it is no longer deciding whether the repo still needs basic TUI familiarization or a first visual-system pass either; those also landed
-- it is deciding what the next honest follow-through should be after the first TUI/browser/Life View stabilization run
-
-
-=== MAIN THINGS THIS CURRENT POSITION NOW PROTECTS ===
-
-1. Player contract
-- The default fantasy is still "I am this actor right now."
-- The player is not tightly restricted; full sandbox authorship is the default start.
-- The sim then runs emergently rather than requiring constant micromanagement.
-- death can now hand play forward through connected actors in a real, though still narrow, implemented way.
-
-2. Scope identity
-- Scope zoom is core identity, not decorative future garnish.
-- The intended ladder is actor -> city -> country -> world -> star system -> galaxy -> universe.
-- Zoomed-out views should still act through real entities/systems where possible, not detached fake god buttons.
-
-3. Spatial model honesty
-- The project now has a more honest early spatial spine.
-- place hierarchy exists
-- current location is distinct from residence
-- jurisdiction exists as a separate structural field
-- temporary occupancy exists as a separate structural field, even though it is not used yet
-
-4. Economy/business importance
-- Economy is a pillar.
-- Politics/world conditions are a pillar.
-- Business/company/investment play is not side garnish and should eventually matter materially.
-
-5. Era/place practicality
-- Earliest practical era target: modern + near future.
-- Earliest practical place target: world / country / city.
-- Household/property depth should not jump the queue just because the long-term fantasy is larger.
-
-6. Social-perception direction
-- Later social systems should use multiple perception axes, not one karma number.
-- Knowledge, rumor, proof, and misinformation should matter.
-- Social perception should shape opportunities and access.
-
-
-=== REAL TENSIONS STILL PRESENT ===
-
-1. Actor-primary fantasy + exact inspectable info everywhere
-This remains a valid but unusual combination. It leans toward a playable simulation interface rather than strict in-character uncertainty.
-
-2. Full sandbox default + "real life" fantasy
-This is coherent, but only if the game stays emotionally anchored in actor life instead of collapsing into abstract god-sim behavior.
-
-3. Broad continuity after death lowers punishment stakes
-This appears intentional. Weight should come from records, continuity, lineage, archive meaning, and universe persistence rather than fail-state drama.
-
-4. Scope remains huge
-The vision is coherent, but the execution risk is still "feature landfill with delusions of grandeur" if sequencing discipline slips.
-
-5. Operator/dev tooling temptation is still rising before enough systems exist
-This is a real pressure, but a full dev mode right now could become premature tooling fluff if it gets built before enough repeated testing pain justifies a reusable operator layer.
-
-6. Continuity/death presentation is cleaner than continuity/archive depth
-The repo now has a better dead-focus interrupt and a first lineage surface, but archive depth is still intentionally narrow, and the shell should not pretend the whole continuity/afterlife-of-history experience is solved.
-
-7. Terminal UI intent is still under-documented relative to its importance
-The terminal UI is not the forever final interface, but it is still the current real play surface. Reveal timing, archive visibility, continuation inspectability, and navigation friction now need to be treated as real design work rather than ignored just because broader UI flexibility is protected in the architecture.
-
-
-=== LEADING PLANNING BUCKETS NOW ===
-
-1. Deferred identity emergence (Slice 3 — next candidate)
-Use:
-- character creation now exists as a real wizard, but gender identity still defaults to sex and sexuality doesn't exist yet
-- both need an event-choice framework (popups/prompts during play)
-- gender identity should emerge around puberty, sexuality through events/life stage
-- this is the most complex remaining actor-deepening slice
-
-2. First mid-stage domain layer (alternative next candidate)
-Use:
-- backbone 4.1-4.8 are realized, actor model is now materially richer
-- the project may now be ready for the first mid-stage domain layer (education or health)
-- education before work per roadmap dependency order
-- event content expansion should follow naturally from new domain systems
-
-3. Further creation/profile polish
-Use:
-- creation wizard may need further UX refinement based on playtesting
-- profile screen may need additional sections as new actor data is added
-- these should be reactive to playtest findings, not speculative
-
-4. Terminal UI / information reveal flow
-Use:
-- preserve that alive-state should remain implicit during ordinary play
-- preserve that death should interrupt with its own message/context before continuation options appear
-- preserve that continuation choice should eventually become more inspectable than a blind numbered list
-- preserve that archived dead actors should be explorable later rather than discarded
-- preserve that the recent time/identity cleanup was only one terminal clarity improvement, not the end of terminal UI work
-- do not force full pager/archive UI immediately just because the intent is now clearer
-
-4. Character-creation surface honesty
-Use:
-- preserve that visible player-facing improvements matter too, not only invisible backend correctness
-- the recent sex/gender expansion is a good example of small honest surface progress without pretending a full deeper identity system exists yet
-- similar visible improvements are allowed when they stay narrow, truthful, and architecture-safe
-
-5. Multi-axis social perception / opportunity layer
-Use:
-- keep visible as a real later vision component
-- do not let it vanish into vague "social stuff later" mush
-- also do not promote it into immediate foundation work
-
-6. Entity registry vs actor view layering
-Use:
-- still a real architectural guardrail
-- still not the next code patch automatically
-
-7. Identity generation realism / context-awareness
-Use:
-- still visible later
-- still blocked by stronger context/place/era maturity and by stronger mutation/creation discipline
-
-8. Operator tooling / scenario testing seam
-Use:
-- preserve as a valid future support/tooling pressure
-- do not let it jump ahead of real simulation/system growth
-- only promote it when repeated testing pain across multiple real systems justifies reusable operator infrastructure rather than patch-specific debug hacks
-
-
-=== DOCUMENT-SYSTEM RESULT OF THIS SYNC ===
-
-- stable docs still do not need a forced revision from the recent repo milestones alone
-- flexible planning docs now also capture the grounded possibility that a narrow actor-first TUI foundation is the strongest next move after `v0.35.4`
-- the current planning checkpoint is now about what follows lineage foundation, not whether lineage foundation should exist
-- operator/dev tooling remains preserved as a later planning pressure rather than a fake next milestone
-- identity-generation realism remains visible without being falsely promoted ahead of roadmap order
-
-
-=== NEXT BEST USE ===
-
-1. Use the aligned source stack plus repo truth through `v0.35.4` to choose the next real structural target.
-2. Treat a narrow actor-first TUI foundation as the leading current checkpoint unless a better same-layer target beats it honestly.
-3. Keep downstream temptations - travel, property, politics, tooling glamor, social perception, giant archive-browser sprawl - out of the immediate patch slot.
-4. Keep continuity follow-through honest: real, playable, cleaner, still narrow.
-5. Do not force another stable-doc cycle unless a real contradiction appears.
+1. Scope remains huge — execution risk is "feature landfill" if sequencing discipline slips
+2. Place content is still fake ("Starter Country") while many future systems need real location context
+3. Traits are wired into events but don't yet affect simulation outcomes beyond small stat bumps
+4. Identity depth (sexuality signals, culture-driven emergence) is stored but inert waiting for context systems
+5. Archive/lineage depth is still intentionally narrow
 
 
 === ONE-LINE SUMMARY ===
 
-Actora now has verified repo truth through the first lineage/archive foundation, and the strongest grounded next candidate looks like a narrow actor-first TUI foundation so the interaction layer stops fighting the player without infecting the simulation core.
+Actora has a materially strong TUI-driven prototype through v0.39.1 with real actor depth, and the next honest move is real location content before pushing toward education as the first mid-stage domain layer.
