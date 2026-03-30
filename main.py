@@ -1056,7 +1056,7 @@ class CreationWizard:
         elif self.step_index in {1, 2, 3}:
             footer_text = "[↑↓] Move   [Space] Select   [Enter] Continue   [B] Back   [Q] Quit"
         elif self.step_index == 4 and self.selected_mode == "questionnaire":
-            footer_text = "[↑↓] Move   [Space] Select   [Q] Quit"
+            footer_text = "[↑↓] Move   [Space] Select   [B] Back   [Q] Quit"
         elif self.step_index == 4:
             footer_text = "[↑↓] Move   [←→] Adjust   [R] Randomize   [Enter] Continue   [B] Back   [Q] Quit"
         elif self.step_index == 5 and self.selected_mode == "manual":
@@ -1560,6 +1560,19 @@ class CreationWizard:
 
     def handle_questionnaire_key(self, key):
         question = QUESTIONNAIRE_QUESTIONS[self.question_index]
+        if key in (ord("q"), ord("Q")):
+            self.running = False
+            self.cancelled = True
+            return
+        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
+            if self.question_index > 0:
+                self.question_index -= 1
+                self.questionnaire_answers.pop()
+                self.question_option_index = 0
+            else:
+                self.step_index = 3
+                self.selected_mode = None
+            return
         if key == curses.KEY_UP:
             self.question_option_index = max(0, self.question_option_index - 1)
             return
