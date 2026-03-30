@@ -1,4 +1,4 @@
-Actora Working Ideas Register v46
+Actora Working Ideas Register v47
 
 Date: 2026-03-28
 Role: broad working idea intake, staging, parking, interview-derived design retention, and rewrite-pressure tracking for Actora
@@ -9,7 +9,7 @@ Usage rule: preserve substantial design material and conversation-derived pressu
 
 === CURRENT WORKING READ ===
 
-Verified repo truth is currently through v0.37.7, including:
+Verified repo truth is currently through v0.38.0, including:
 - world-owned actor registry
 - world-owned structured place registry with parent-place hierarchy
 - world-owned link truth
@@ -72,6 +72,7 @@ Verified repo truth is currently through v0.37.7, including:
 - history year-jump via `/` with clamped year input, conditional continuation footer (no inspect hint when no candidates)
 - event text deduplication, player_id correctly updated after continuation handoff, life separator in event log after continuation
 - responsive Esc handling via curses.set_escdelay(25)
+- actor stats deepened to include 8 secondary stats (strength, charisma, creativity, wisdom, discipline, willpower, looks, fertility) alongside 3 primary stats and money, with a dedicated scrollable Profile screen via `[P]` and 12 existing events now touching secondary stats
 - clarified terminal-UI / death-flow intent: alive-state should remain implicit during ordinary play, death should interrupt with a dedicated message/context first, continuation options should follow only after acknowledgment, archived dead actors should remain explorable/reusable later, and terminal information density/timing should be treated as real design work rather than ignored because the interface is temporary
 
 The backbone is materially stronger and more honest than it was at the start of this patch run.
@@ -256,6 +257,30 @@ Dependencies: current mortality truth, current lineage browser, current continua
 Risks: overreading the inspectability pass as if full archive/succession depth were already solved
 Suggested timing: keep as realized history plus depth guardrail
 Next action: preserve as a real milestone and choose the next pressure from the post-inspectability position
+
+ID: IDEA-118
+Created: 2026-03-30
+Last Reviewed: 2026-03-30
+Title: Actor deepening — character creation expansion, appearance, traits, deferred identity
+Status: Leading next-step candidate (Slice 2: creation wizard)
+Priority: P1
+Roadmap fit: actor structural cleanup (4.5) + identity generation (4.10) deepening before mid-stage domain layers
+Immediate roadmap-layer fit: yes, as the strongest grounded next product pressure from actor-deepening interview
+Summary: The actor model now has 11 stats and a Profile screen, but character creation still only asks name/sex/gender and randomizes everything else. The next move is a curses-based step-by-step creation wizard (Identity → Appearance → Traits → Stats → Confirm) with full sandbox customization, appearance traits at birth, structured personality traits, and gender identity deferred to puberty. Parents and siblings should also get randomized secondary stats.
+Why it matters: Before education/work/health systems can meaningfully use actor attributes, the actor needs to actually have those attributes set deliberately at creation rather than silently randomized.
+Dependencies: current actor model with secondary stats, current Profile screen, current curses TUI patterns
+Risks: overbuilding the creation wizard before downstream systems exist to use the data, or treating stored-but-inert traits as if they already affect gameplay
+Suggested timing: immediate candidate for the next implementation pass
+Next action: implement Slice 2 (creation wizard) as v0.38.1, keeping traits stored but inert and deferring gender/sexuality emergence to Slice 3
+Design locks from interview:
+  - step-by-step wizard in curses (future expandable)
+  - sex chosen at birth, gender deferred to puberty (defaults to match sex)
+  - sexuality emerges through events/life stage later
+  - appearance at birth: eye color, hair color, skin tone, each with Other/free-text
+  - traits: pick 3 from ~10 pool, rest develop emergently later
+  - stats: manual 0-100, full sandbox, no artificial limits
+  - confirm screen before game starts
+  - parents/siblings also get randomized secondary stats
 
 ID: IDEA-104
 Created: 2026-03-27

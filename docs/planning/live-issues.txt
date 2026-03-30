@@ -49,3 +49,23 @@ Purpose: repo-local parking lot for current bugs, regressions, and revisit items
 - event history display is truncated and non-scrollable
   Status: resolved in v0.37.1
   Note: Life View right pane is now an accumulating live feed with year headers and skip markers. Full-screen History browser added via `[H]` with ↑↓ scrolling.
+
+- character creation still only asks name/sex/gender despite actor model now having 11 stats + appearance + traits
+  Status: open (Slice 2 next)
+  Note: creation wizard interview locked: step-by-step curses wizard with Identity → Appearance → Traits → Stats → Confirm. Full sandbox customization, gender deferred to puberty, traits stored but inert.
+
+- parents/siblings don't get randomized secondary stats
+  Status: open
+  Note: create_human_actor randomize_stats only covers primary stats. Secondary stats need to be included too.
+
+- traits stored but inert — no gameplay impact yet
+  Status: open revisit (Slice 3+)
+  Note: traits will be picked at creation but have no effect until future systems (events, education, work) wire them in. Must remember to connect these.
+
+- gender identity defaults to sex at birth, needs puberty emergence system
+  Status: open revisit (Slice 3)
+  Note: gender deferred to puberty per interview. Needs event-choice framework to implement.
+
+- sexuality emergence not implemented
+  Status: open revisit (Slice 3)
+  Note: sexuality should emerge through events/life stage. Needs event-choice framework.
