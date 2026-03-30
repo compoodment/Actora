@@ -1,5 +1,13 @@
 # Actora Changelog
 
+## Version 0.37.2 (Patch) - 2026-03-29
+- **Life View Relationships + Event-Pool Thickening:**
+    - Changed `Human.get_snapshot_data(...)` so Life View relationships now derive from all current outgoing `family` links, dedupe linked actors, skip dead relatives, and emit a structured list of living family entries instead of fixed `mother_name` / `father_name` fields.
+    - Updated `main.py` Life View rendering to iterate the new relationships list directly and show `No living family.` when no linked living relatives are present.
+    - Expanded `events.py` from the original 32 human monthly events into a much thicker grounded pool across all life stages, keeping the original events while adding more mundane, mixed-tone, and occasionally goofy life texture with small varied outcomes and some zero-effect events.
+    - Added optional event-definition support for `family_context` and `family_roles`, allowing some monthly events to require living family and render actual relative names into event text.
+    - Updated `World.simulate_advance_turn(...)` to build current living sibling/parent event context and pass it into monthly event selection without changing mortality, continuation, lineage, history, or skip-time flow.
+
 ## Version 0.37.1 (Patch) - 2026-03-29
 - **Scrollable Event History Log:**
     - Replaced the Life View right pane in `main.py` with a shell-owned accumulating live event feed that now persists meaningful events, skip markers, and year headers across the full run instead of only summarizing the latest turn.

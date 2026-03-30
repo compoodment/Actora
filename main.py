@@ -87,10 +87,7 @@ def build_snapshot_sections(snapshot_data):
         (
             "relationships",
             "Relationships",
-            [
-                f"Mother: {relationships['mother_name']}",
-                f"Father: {relationships['father_name']}",
-            ],
+            [f"{entry['label']}: {entry['name']}" for entry in relationships] or ["No living family."],
         ),
     ]
     return [

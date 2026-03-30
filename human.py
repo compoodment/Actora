@@ -1,5 +1,29 @@
 import random # Keep random here for randomize_starting_statistics
 
+
+def _get_relationship_label_from_role(role, linked_actor):
+    """Builds one display-ready family relationship label for snapshot rendering."""
+    if role == "mother":
+        return "Mother"
+    if role == "father":
+        return "Father"
+    if role == "sibling":
+        if linked_actor is not None:
+            if linked_actor.sex == "Male":
+                return "Brother"
+            if linked_actor.sex == "Female":
+                return "Sister"
+        return "Sibling"
+    if role == "child":
+        if linked_actor is not None:
+            if linked_actor.sex == "Male":
+                return "Son"
+            if linked_actor.sex == "Female":
+                return "Daughter"
+        return "Child"
+    return str(role).replace("_", " ").title()
+
+
 class Human:
     def __init__(self, species, first_name, last_name, sex, gender, birth_year, birth_month=1):
         self.species = species
@@ -134,23 +158,30 @@ class Human:
         """Returns the current human snapshot as structured shell-renderable data."""
         lifecycle = self.get_lifecycle_state(current_year, current_month)
         spatial_state = self.get_spatial_state(world)
-        parent_ids = world.get_parent_ids_for(actor_id)
         structural_state = self.get_structural_state()
+        family_links = world.get_links(entity_id=actor_id, link_type="family")
 
-        mother_id = parent_ids["mother_id"]
-        father_id = parent_ids["father_id"]
+        relationship_entries = []
+        seen_actor_ids = set()
+        for link in family_links:
+            if link.get("source_id") != actor_id:
+                continue
 
-        mother_name = "Unknown"
-        if mother_id:
-            mother = world.get_actor(mother_id)
-            if mother is not None:
-                mother_name = mother.get_full_name()
+            linked_actor_id = link.get("target_id")
+            if linked_actor_id is None or linked_actor_id in seen_actor_ids:
+                continue
 
-        father_name = "Unknown"
-        if father_id:
-            father = world.get_actor(father_id)
-            if father is not None:
-                father_name = father.get_full_name()
+            linked_actor = world.get_actor(linked_actor_id)
+            if linked_actor is None or not linked_actor.is_alive():
+                continue
+
+            relationship_entries.append(
+                {
+                    "label": _get_relationship_label_from_role(link.get("role"), linked_actor),
+                    "name": linked_actor.get_full_name(),
+                }
+            )
+            seen_actor_ids.add(linked_actor_id)
 
         return {
             "identity": {
@@ -178,10 +209,7 @@ class Human:
                 "intelligence": self.stats["intelligence"],
                 "money": self.money,
             },
-            "relationships": {
-                "mother_name": mother_name,
-                "father_name": father_name,
-            },
+            "relationships": relationship_entries,
             "structural": structural_state,
         }
 

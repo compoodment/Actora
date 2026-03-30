@@ -987,6 +987,73 @@ class World:
             return "Brother"
         return "Sibling"
 
+    def _get_family_role_label_for(self, role, linked_actor):
+        """Builds one display-ready family relationship label for world-owned surfaces."""
+        if role == "mother":
+            return "Mother"
+        if role == "father":
+            return "Father"
+        if role == "sibling":
+            if linked_actor is not None:
+                if linked_actor.sex == "Female":
+                    return "Sister"
+                if linked_actor.sex == "Male":
+                    return "Brother"
+            return "Sibling"
+        if role == "child":
+            if linked_actor is not None:
+                if linked_actor.sex == "Female":
+                    return "Daughter"
+                if linked_actor.sex == "Male":
+                    return "Son"
+            return "Child"
+        return str(role).replace("_", " ").title()
+
+    def _build_family_event_context_for(self, actor_id):
+        """Builds the current living-family context for family-aware monthly events."""
+        actor = self.get_actor(actor_id)
+        if actor is None:
+            raise ValueError(f"_build_family_event_context_for: unknown actor_id '{actor_id}'")
+
+        sibling_entries = []
+        seen_sibling_ids = set()
+        for sibling_id in self.get_sibling_ids_for(actor_id):
+            if sibling_id in seen_sibling_ids:
+                continue
+            sibling = self.get_actor(sibling_id)
+            if sibling is None or not sibling.is_alive():
+                continue
+            sibling_entries.append(
+                {
+                    "name": sibling.get_full_name(),
+                    "role": self._get_family_role_label_for("sibling", sibling),
+                    "role_key": "sibling",
+                }
+            )
+            seen_sibling_ids.add(sibling_id)
+
+        parent_entries = []
+        parent_ids = self.get_parent_ids_for(actor_id)
+        for role in ("mother", "father"):
+            parent_id = parent_ids[f"{role}_id"]
+            if parent_id is None:
+                continue
+            parent = self.get_actor(parent_id)
+            if parent is None or not parent.is_alive():
+                continue
+            parent_entries.append(
+                {
+                    "name": parent.get_full_name(),
+                    "role": self._get_family_role_label_for(role, parent),
+                    "role_key": role,
+                }
+            )
+
+        return {
+            "siblings": sibling_entries,
+            "parents": parent_entries,
+        }
+
     def _build_lineage_relationship_label(self, actor_id, linked_actor_id, links):
         """Builds one display-ready relationship label for lineage surfaces."""
         sibling_label = self._get_sibling_relationship_label(actor_id, linked_actor_id)
@@ -1570,10 +1637,12 @@ class World:
                 self.current_year,
                 self.current_month,
             )
+            family_context_for_event = self._build_family_event_context_for(focused_actor_id)
             structured_event_for_month = get_human_monthly_event_from_lifecycle(
                 lifecycle_state_for_event,
                 self.current_year,
                 self.current_month,
+                family_context=family_context_for_event,
             )
             if structured_event_for_month:
                 self.apply_outcome(focused_actor_id, structured_event_for_month.get("outcome"))

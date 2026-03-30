@@ -1,6 +1,6 @@
 # Actora Architecture Summary
 
-**Version:** 0.37.1
+**Version:** 0.37.2
 **Last Updated:** 2026-03-29
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
@@ -88,6 +88,7 @@ Current methods:
 - `resolve_monthly_mortality()`
 - `bootstrap_older_siblings_for_newborn(mother_id, father_id, player_birth_year, player_birth_month)`
 - `resolve_monthly_family_events(focused_actor_id=None)`
+- `_build_family_event_context_for(actor_id)`
 - `simulate_advance_turn(player_id, months_to_advance)`
 
 ### Human (`human.py`)
@@ -121,6 +122,11 @@ Current responsibilities:
 - spatial access/query boundary (`get_spatial_state(world)`)
 - structural life/death state query (`is_alive()`, `get_structural_state()`)
 - structured current-state snapshot data (`get_snapshot_data(current_year, current_month, world, actor_id)`)
+
+Current Life View snapshot relationship details:
+- snapshot `relationships` is now a list of living linked-family entries with shape `{"label": "...", "name": "..."}` rather than a fixed parent-name dictionary
+- relationship entries are derived from the actor's current outgoing `family` links, deduped by linked actor ID, and dead relatives are omitted
+- current label derivation stays intentionally narrow and human-readable (`Mother`, `Father`, `Brother` / `Sister` / `Sibling`, `Son` / `Daughter` / `Child`)
 
 Current structural-state details:
 - `structural_status` is the current storage truth for narrow actor structural state and currently uses `"active"` / `"dead"`
@@ -163,6 +169,11 @@ Current family examples therefore look like:
 - `{"source_id": "startup_mother_ef56gh78", "target_id": "startup_father_ij90kl12", "type": "association", "role": "coparent", "metadata": {"bootstrap_source": "startup_coparent_association"}}`
 
 Reverse family links are still stored explicitly, direct sibling links are now also stored explicitly once siblings exist, link records still reference entity IDs present in `World.actors`, and this remains a narrow family semantic clarification rather than a broader relationship framework. It does not implement adoption, guardianship, household simulation, or species-general relationship architecture.
+
+Current monthly family-event context details:
+- `World._build_family_event_context_for(actor_id)` currently derives living `siblings` and `parents` lists for the focused actor before monthly event selection
+- each family-context member currently carries `name`, display `role`, and narrow matching key `role_key`
+- current family-aware monthly events only become eligible when at least one required living family role is present, and event text can render `{family_name}` / `{family_role}` placeholders from the chosen relative
 
 Current continuity-candidate boundary:
 - `get_continuity_candidates_for(actor_id)` scans current related links, resolves the linked living actors, excludes the actor itself, dedupes candidates, and returns small structured candidate objects
@@ -228,6 +239,22 @@ Basic world link helper contract:
 - `get_origin_parent_ids_for(entity_id)` resolves origin-marked mother/father links from outgoing family links.
 - `get_caregiver_parent_ids_for(entity_id)` resolves caregiver-marked mother/father links from outgoing family links.
 - `get_parent_ids_for(entity_id)` remains the compatibility wrapper for current mother/father access and falls back to bare family roles when explicit origin metadata is absent.
+
+## 6. Event Layer
+
+Monthly event content is currently human-scoped in `events.py`.
+
+Current event-definition details:
+- `HUMAN_MONTHLY_EVENTS` remains a flat pool of dictionaries
+- each event definition now uses explicit `outcome={"stat_changes": {...}}` storage instead of internal `stat` / `change` shorthand
+- event definitions can optionally declare `family_context=True` plus `family_roles=[...]`
+- some monthly events intentionally have empty stat changes for pure life texture
+
+Current event-selection details:
+- `get_human_monthly_event_from_lifecycle(...)` still applies the same 50% monthly trigger gate and lifecycle filtering
+- lifecycle filtering now also respects family-context requirements when present
+- family-aware events render actual living family names into the selected event text at selection time
+- the external structured event contract remains unchanged (`event_id`, `text`, `outcome`, `tags`, `year`, `month`)
 
 Basic world place helper contract:
 
