@@ -638,11 +638,11 @@ class CreationWizard:
 
     def render_footer(self, height, width):
         footer_map = {
-            0: "[↑↓] Move   [Enter/→] Continue   [Q] Quit",
-            1: "[↑↓] Move   [Enter] Select/Edit   [→] Continue   [B/←] Back   [Q] Quit",
-            2: "[↑↓] Move   [Enter] Toggle Trait   [→] Continue   [B/←] Back   [Q] Quit",
-            3: "[↑↓] Move   [←→ or +/-] Adjust   [R] Randomize   [Enter] Continue   [B] Back   [Q] Quit",
-            4: "[Enter] Start Game   [B/←] Back   [Q] Quit",
+            0: "[↑↓] Move   [Enter] Continue   [Q] Quit",
+            1: "[↑↓] Move   [Enter] Select/Continue   [B] Back   [Q] Quit",
+            2: "[↑↓] Move   [Enter] Toggle   [B] Back   [Q] Quit",
+            3: "[↑↓] Move   [+/-] Adjust   [R] Randomize   [Enter] Continue   [B] Back   [Q] Quit",
+            4: "[Enter] Start Game   [B] Back   [Q] Quit",
         }
         content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
         hline_char = getattr(curses, "ACS_HLINE", ord("-"))
@@ -838,9 +838,6 @@ class CreationWizard:
             if key in (curses.KEY_DOWN,):
                 self.identity_field_index = min(len(fields) - 1, self.identity_field_index + 1)
                 return
-            if key == curses.KEY_RIGHT and self.can_advance_identity():
-                self.step_index = 1
-                return
             if key in (curses.KEY_ENTER, 10, 13):
                 if self.identity_field_index < len(fields) - 1:
                     self.identity_field_index += 1
@@ -868,9 +865,6 @@ class CreationWizard:
                 return
             if key == curses.KEY_LEFT:
                 self.identity_field_index = max(0, self.identity_field_index - 1)
-                return
-            if key == curses.KEY_RIGHT and self.can_advance_identity():
-                self.step_index = 1
                 return
             if key in (curses.KEY_BACKSPACE, 127, 8):
                 self.identity_field_index = max(0, self.identity_field_index - 1)
@@ -910,7 +904,7 @@ class CreationWizard:
                 return
             return
 
-        if key in (ord("b"), ord("B"), curses.KEY_LEFT):
+        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
             self.step_index = 0
             return
         if key == curses.KEY_UP:
@@ -918,9 +912,6 @@ class CreationWizard:
             return
         if key == curses.KEY_DOWN:
             self.appearance_field_index = min(len(fields) - 1, self.appearance_field_index + 1)
-            return
-        if key == curses.KEY_RIGHT and self.can_advance_appearance():
-            self.step_index = 2
             return
         if current_field["kind"] == "select":
             if key in (curses.KEY_ENTER, 10, 13):
@@ -942,7 +933,7 @@ class CreationWizard:
             self.custom_appearance_values[current_field["key"]] += chr(key)
 
     def handle_traits_key(self, key):
-        if key in (ord("b"), ord("B"), curses.KEY_LEFT, curses.KEY_BACKSPACE, 127, 8):
+        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
             self.step_index = 1
             return
         if key == curses.KEY_UP:
@@ -957,9 +948,9 @@ class CreationWizard:
                 self.data["traits"].remove(trait)
             elif len(self.data["traits"]) < 3:
                 self.data["traits"].append(trait)
+            if self.can_advance_traits() and len(self.data["traits"]) == 3:
+                self.step_index = 3
             return
-        if key == curses.KEY_RIGHT and self.can_advance_traits():
-            self.step_index = 3
 
     def handle_stats_key(self, key):
         if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
@@ -986,7 +977,7 @@ class CreationWizard:
             self.data["stats"][stat_name] = min(100, self.data["stats"][stat_name] + 1)
 
     def handle_confirm_key(self, key):
-        if key in (ord("b"), ord("B"), curses.KEY_LEFT, curses.KEY_BACKSPACE, 127, 8):
+        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
             self.step_index = 3
             return None
         if key in (curses.KEY_ENTER, 10, 13):
