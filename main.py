@@ -639,9 +639,9 @@ class CreationWizard:
     def render_footer(self, height, width):
         footer_map = {
             0: "[↑↓] Move   [Enter] Continue   [Q] Quit",
-            1: "[↑↓] Move   [Enter] Select   [B] Back   [Q] Quit",
+            1: "[↑↓] Move   [Space] Select   [Enter] Continue   [B] Back   [Q] Quit",
             2: "[↑↓] Move   [Space] Toggle   [Enter] Continue   [B] Back   [Q] Quit",
-            3: "[↑↓] Move   [+/-] Adjust   [R] Randomize   [Enter] Continue   [B] Back   [Q] Quit",
+            3: "[↑↓] Move   [←→] Adjust   [R] Randomize   [Enter] Continue   [B] Back   [Q] Quit",
             4: "[Enter] Start Game   [B] Back   [Q] Quit",
         }
         content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
@@ -758,12 +758,9 @@ class CreationWizard:
             "Controls",
             "",
             "Adjust any stat from 0 to 100.",
-            "Money starts at $0 and cannot be edited.",
             "",
             "[R] Randomize all stats",
-            "",
-            "Current Total",
-            f"{sum(self.data['stats'].values())} points across all stats",
+            
         ]
 
         draw_text_block(self.stdscr, 5, content_left, left_width, body_height, left_lines, highlight_index=highlight_index)
@@ -889,7 +886,7 @@ class CreationWizard:
             if key == curses.KEY_DOWN:
                 self.appearance_option_index = min(len(options) - 1, self.appearance_option_index + 1)
                 return
-            if key in (curses.KEY_ENTER, 10, 13, ord(" ")):
+            if key == ord(" "):
                 self.data["appearance"][current_field["key"]] = options[self.appearance_option_index]
                 self.appearance_mode = "field"
                 return
@@ -909,9 +906,14 @@ class CreationWizard:
             return
         if current_field["kind"] == "select":
             if key in (curses.KEY_ENTER, 10, 13):
-                if self.can_advance_appearance() and self.appearance_field_index == len(fields) - 1:
+                if self.can_advance_appearance():
                     self.step_index = 2
                     return
+                options = current_field["options"]
+                current_value = self.data["appearance"][current_field["key"]]
+                self.appearance_option_index = options.index(current_value)
+                self.appearance_mode = "option"
+            if key == ord(" "):
                 options = current_field["options"]
                 current_value = self.data["appearance"][current_field["key"]]
                 self.appearance_option_index = options.index(current_value)
