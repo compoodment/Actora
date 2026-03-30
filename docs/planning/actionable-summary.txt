@@ -1,4 +1,4 @@
-Actionable Ideas Summary — Rev31
+Actionable Ideas Summary - Rev32
 Date: 2026-03-28
 Role: temporary near-term operational planning snapshot for Actora
 Authority: non-authoritative; stable docs win, repo truth wins on implementation
@@ -7,7 +7,7 @@ Usage rule: keep this more distilled than the WIR and focused on the current wor
 
 === CURRENT WORKING POSITION ===
 
-Actora now has a materially stronger early backbone, and verified repo truth is through v0.36.9, with source-stack sync carried through:
+Actora now has a materially stronger early backbone, and verified repo truth is through v0.37.1, with source-stack sync carried through:
 - Master Context v9
 - Roadmap v10
 - world-owned actor registry
@@ -56,7 +56,7 @@ Actora is now more clearly understood as:
 - primarily actor-played rather than detached-overseer-first
 - full custom sandbox setup by default, followed by emergent simulation
 - same-save scope zoom from actor -> city -> country -> world -> star system -> galaxy -> universe
-- one game rather than a pile of hard-separated “modes”
+- one game rather than a pile of hard-separated "modes"
 - exact inspectable information available throughout the simulation
 - actor switching allowed through relevant connected actors rather than forced child-only continuation
 - death as a structural transition, not a fail-state philosophy
@@ -77,33 +77,37 @@ The old post-v0.33.0 decision point is dead now too.
 It served its purpose, then the repo moved again.
 
 The recent verified sequence is now:
-- v0.28.0 — death / continuity structural transition foundation
-- v0.29.0 — Actora rename milestone
-- v0.30.0 — first playable continuity handoff flow
-- v0.31.0 — link foundation strengthening
-- v0.32.0 — structured place / place-hierarchy strengthening
-- v0.33.0 — spatial identity separation strengthening
-- v0.34.0 — controlled spatial identity mutation boundary
-- v0.35.0 — dead-focus transition flow tightening
-- v0.35.1 — time presentation cleanup
-- v0.35.2 — character identity options expansion
-- v0.35.3 — continuation choice inspectability improvement
-- v0.35.4 — lineage foundation
-- v0.36.0 — actor-first TUI foundation
-- v0.36.1 — curses footer render fix
-- v0.36.2 — TUI style + time-control follow-through
-- v0.36.3 — lineage browser foundation strengthening
-- v0.36.4 — lineage row truncation hygiene
-- v0.36.5 — TUI-aware repo cleanup / shell-era drift reduction
-- v0.36.6 — TUI visual-system consistency pass
-- v0.36.7 — Life View + lineage usability cleanup
-- v0.36.8 — ordinary mortality / old-age death truth
-- v0.36.9 — family continuity groundwork
+- v0.28.0 - death / continuity structural transition foundation
+- v0.29.0 - Actora rename milestone
+- v0.30.0 - first playable continuity handoff flow
+- v0.31.0 - link foundation strengthening
+- v0.32.0 - structured place / place-hierarchy strengthening
+- v0.33.0 - spatial identity separation strengthening
+- v0.34.0 - controlled spatial identity mutation boundary
+- v0.35.0 - dead-focus transition flow tightening
+- v0.35.1 - time presentation cleanup
+- v0.35.2 - character identity options expansion
+- v0.35.3 - continuation choice inspectability improvement
+- v0.35.4 - lineage foundation
+- v0.36.0 - actor-first TUI foundation
+- v0.36.1 - curses footer render fix
+- v0.36.2 - TUI style + time-control follow-through
+- v0.36.3 - lineage browser foundation strengthening
+- v0.36.4 - lineage row truncation hygiene
+- v0.36.5 - TUI-aware repo cleanup / shell-era drift reduction
+- v0.36.6 - TUI visual-system consistency pass
+- v0.36.7 - Life View + lineage usability cleanup
+- v0.36.8 - ordinary mortality / old-age death truth
+- v0.36.9 - family continuity groundwork
+- v0.37.0 - death/continuation inspectability follow-through
+- v0.37.1 - scrollable event history log
+- v0.37.0 - death/continuation inspectability follow-through
+- v0.37.1 - scrollable event history log
 
 So the immediate next move is no longer:
-- “what follows spatial identity separation?”
-- or “do we still need the world-owned spatial mutation seam?”
-- or “should the death interrupt / acknowledgment flow remain just a planning note?”
+- "what follows spatial identity separation?"
+- or "do we still need the world-owned spatial mutation seam?"
+- or "should the death interrupt / acknowledgment flow remain just a planning note?"
 
 Those questions have been answered already.
 
@@ -113,13 +117,13 @@ The immediate next move is now:
 Why:
 - the place + spatial-identity layer is now materially more disciplined than it was before `v0.34.0`
 - the shell death flow is now materially more honest than it was before `v0.35.0`
-- the repo is no longer only dealing with “does the TUI exist?” pressure; it now has a real actor-first curses shell, a stronger lineage browser, repo-level TUI familiarization cleanup, a visual-system pass, and a split Life View with better lineage usability
-- the repo’s main friction is no longer shell-era drift or basic TUI coherence; it is deciding what the next real gameplay/system or same-layer follow-through should be now that the current TUI is materially more credible
+- the repo is no longer only dealing with "does the TUI exist?" pressure; it now has a real actor-first curses shell, a stronger lineage browser, repo-level TUI familiarization cleanup, a visual-system pass, and a split Life View with better lineage usability
+- the repo's main friction is no longer shell-era drift or basic TUI coherence; it is deciding what the next real gameplay/system or same-layer follow-through should be now that the current TUI is materially more credible
 - roadmap + master-context still protect future panel-based / richer interaction forms while explicitly requiring the simulation core to stay UI-agnostic
-- that means the next checkpoint is less “clean up the first TUI again” and more “what is the strongest next honest pressure after the first TUI/browser/Life View stabilization run?”
+- that means the next checkpoint is less "clean up the first TUI again" and more "what is the strongest next honest pressure after the first TUI/browser/Life View stabilization run?"
 
 So the current question is now:
-- “given repo truth through `v0.36.9`, is the strongest next move death/continuation inspectability follow-through, broader family continuity follow-through, or another planning/workflow clarification pass?”
+- "given repo truth through `v0.37.1`, is the strongest next move more event content/variety, deeper family event richness, further TUI polish, or pushing toward backbone 4.9/4.10?"
 
 
 === WHAT THE RECENT SEQUENCE ACHIEVED ===
@@ -149,7 +153,7 @@ So the current question is now:
 === MAIN THINGS THIS CURRENT POSITION NOW PROTECTS ===
 
 1. Player contract
-- The default fantasy is still “I am this actor right now.”
+- The default fantasy is still "I am this actor right now."
 - The player is not tightly restricted; full sandbox authorship is the default start.
 - The sim then runs emergently rather than requiring constant micromanagement.
 - death can now hand play forward through connected actors in a real, though still narrow, implemented way.
@@ -187,14 +191,14 @@ So the current question is now:
 1. Actor-primary fantasy + exact inspectable info everywhere
 This remains a valid but unusual combination. It leans toward a playable simulation interface rather than strict in-character uncertainty.
 
-2. Full sandbox default + “real life” fantasy
+2. Full sandbox default + "real life" fantasy
 This is coherent, but only if the game stays emotionally anchored in actor life instead of collapsing into abstract god-sim behavior.
 
 3. Broad continuity after death lowers punishment stakes
 This appears intentional. Weight should come from records, continuity, lineage, archive meaning, and universe persistence rather than fail-state drama.
 
 4. Scope remains huge
-The vision is coherent, but the execution risk is still “feature landfill with delusions of grandeur” if sequencing discipline slips.
+The vision is coherent, but the execution risk is still "feature landfill with delusions of grandeur" if sequencing discipline slips.
 
 5. Operator/dev tooling temptation is still rising before enough systems exist
 This is a real pressure, but a full dev mode right now could become premature tooling fluff if it gets built before enough repeated testing pain justifies a reusable operator layer.
@@ -208,19 +212,31 @@ The terminal UI is not the forever final interface, but it is still the current 
 
 === LEADING PLANNING BUCKETS NOW ===
 
-1. Next real implementation/planning move after v0.36.9
+1. Next real implementation/planning move after v0.37.1
 Use:
-- choose the next honest follow-through after family continuity groundwork landed
+- choose the next honest follow-through now that death/continuation inspectability and event history presentation are real
+- user direction is to keep thickening the current layer (more events, richer family, polish) before pushing to backbone 4.9/4.10
 - avoid patch-number momentum theater
-- do not confuse “siblings now exist” with “death/continuation/archive inspectability is solved”
 
-2. Death / continuation inspectability follow-through
+2. Event content / variety expansion
 Use:
-- death is now materially real and family substrate is broader, which means the remaining weakness is no longer just candidate starvation
-- likely next pressure is now cleaner dead-life summary, richer successor inspection, and removal of implementation-leak/filler text from death/continuation surfaces
-- keep this grounded in current mortality/lineage/continuation truth rather than turning it into archive cathedral overbuild
+- the event history log now exists as a proper accumulating scrollable surface, which means thin event content becomes more visible and more annoying
+- likely next content pressure is broader event variety, more life-stage coverage, and richer event outcomes
+- keep grounded in current event foundation rather than jumping to a full event-content cathedral
 
-3. Family continuity follow-through
+3. Family event richness
+Use:
+- family births now surface in the event log, but family-related gameplay depth is still early
+- likely follow-through may include richer family event content, family-aware event triggers, or family milestone visibility
+- keep disciplined about not jumping into household/romance/friendship systems too early
+
+4. Death / continuation follow-through (continued)
+Use:
+- death inspectability is now materially better than before v0.37.0
+- remaining continuation/archive depth is still intentionally narrow
+- further depth here should wait until it is clearly the strongest pressure again
+
+5. Family continuity follow-through
 Use:
 - family continuity substrate now exists, but sibling/family birth tuning and broader family depth are still early
 - likely follow-through may later expand or tune this system, but it no longer needs to be the immediate next move by default
@@ -243,7 +259,7 @@ Use:
 5. Multi-axis social perception / opportunity layer
 Use:
 - keep visible as a real later vision component
-- do not let it vanish into vague “social stuff later” mush
+- do not let it vanish into vague "social stuff later" mush
 - also do not promote it into immediate foundation work
 
 6. Entity registry vs actor view layering
@@ -276,7 +292,7 @@ Use:
 
 1. Use the aligned source stack plus repo truth through `v0.35.4` to choose the next real structural target.
 2. Treat a narrow actor-first TUI foundation as the leading current checkpoint unless a better same-layer target beats it honestly.
-3. Keep downstream temptations — travel, property, politics, tooling glamor, social perception, giant archive-browser sprawl — out of the immediate patch slot.
+3. Keep downstream temptations - travel, property, politics, tooling glamor, social perception, giant archive-browser sprawl - out of the immediate patch slot.
 4. Keep continuity follow-through honest: real, playable, cleaner, still narrow.
 5. Do not force another stable-doc cycle unless a real contradiction appears.
 

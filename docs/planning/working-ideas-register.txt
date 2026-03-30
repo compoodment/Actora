@@ -1,4 +1,4 @@
-Actora Working Ideas Register v43
+Actora Working Ideas Register v44
 
 Date: 2026-03-28
 Role: broad working idea intake, staging, parking, interview-derived design retention, and rewrite-pressure tracking for Actora
@@ -9,7 +9,7 @@ Usage rule: preserve substantial design material and conversation-derived pressu
 
 === CURRENT WORKING READ ===
 
-Verified repo truth is currently through v0.36.9, including:
+Verified repo truth is currently through v0.37.1, including:
 - world-owned actor registry
 - world-owned structured place registry with parent-place hierarchy
 - world-owned link truth
@@ -62,6 +62,8 @@ Verified repo truth is currently through v0.36.9, including:
 - Life View + lineage usability cleanup through split ordinary-play layout, visible right-side recent activity, simple left-side scrolling, slimmer lineage rows, cleaner lineage identity formatting, clearer lineage search behavior, and explicit `B` back guidance
 - ordinary mortality / old-age death truth through world-owned monthly mortality resolution, `Old age` as a real baseline death cause, death-record cause visibility, frozen dead-actor death-age truth in lineage, and honest stop-on-death skip-time behavior
 - family continuity groundwork through older siblings at startup, later younger sibling births via narrow family-event logic, direct sibling links, sibling-aware lineage labels, and sibling-priority continuation breadth
+- death/continuation inspectability follow-through through filtered implementation-scaffolding records, cleaner subtitles, dead-actor life summary, two-step continuation inspection with detail cards, clean parent relationship labels, and removal of internal-sounding UI filler
+- scrollable event history log through an accumulating live feed in the Life View right pane (compact format, year headers, skip markers, auto-scroll) plus a dedicated full-screen scrollable History browser via `[H]` (detailed format with date prefixes, year separators, ↑↓ scroll)
 - clarified terminal-UI / death-flow intent: alive-state should remain implicit during ordinary play, death should interrupt with a dedicated message/context first, continuation options should follow only after acknowledgment, archived dead actors should remain explorable/reusable later, and terminal information density/timing should be treated as real design work rather than ignored because the interface is temporary
 
 The backbone is materially stronger and more honest than it was at the start of this patch run.
@@ -236,16 +238,16 @@ ID: IDEA-117
 Created: 2026-03-30
 Last Reviewed: 2026-03-30
 Title: Death / continuation inspectability follow-through
-Status: Leading next-step candidate
+Status: Materially realized in v0.37.0
 Priority: P1
 Roadmap fit: continuity/death follow-through after mortality and family substrate became materially real
-Immediate roadmap-layer fit: yes, as the strongest grounded next product pressure from post-v0.36.9 playtest reasoning
-Summary: Now that death is real and continuity has broader family substrate, the remaining weakness is less structural starvation and more inspectability/quality at the death-continuation seam. The next honest move may therefore be to remove implementation-leak/filler text, improve dead-actor life summary, improve continuation candidate summary quality, and allow richer inspection before choosing a successor.
-Why it matters: Without better inspectability, real mortality and broader family substrate still resolve through a UI that leaks implementation junk and underexplains the lives/successors it is asking the player to care about.
-Dependencies: current mortality truth, current lineage browser, current continuation flow, current family substrate, disciplined scope control
-Risks: turning an inspectability pass into archive cathedral overbuild, or polishing continuation presentation without preserving the now-improved structural truth beneath it
-Suggested timing: immediate candidate for the next deliberate implementation/spec pass
-Next action: define a narrow death/continuation inspectability patch that removes raw bootstrap record leakage, trims redundant filler text, improves dead-life summary, and enables richer continuation candidate inspection before selection
+Immediate roadmap-layer fit: yes, as a realized inspectability milestone and future depth guardrail
+Summary: `v0.37.0` removed implementation-leak/filler text from death/continuation surfaces, added a dead-actor life summary to the death interrupt, cleaned continuation candidate rendering, added two-step continuation inspection with detail cards, and fixed parent relationship labels. The death/continuation seam is now materially more inspectable and less internally-sounding.
+Why it matters: Death and continuation now feel like real product surfaces instead of leaking implementation scaffolding.
+Dependencies: current mortality truth, current lineage browser, current continuation flow, current family substrate
+Risks: overreading the inspectability pass as if full archive/succession depth were already solved
+Suggested timing: keep as realized history plus depth guardrail
+Next action: preserve as a real milestone and choose the next pressure from the post-inspectability position
 
 ID: IDEA-104
 Created: 2026-03-27
