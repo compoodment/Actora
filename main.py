@@ -1454,6 +1454,7 @@ class ActoraTUI:
 
     def run(self, stdscr):
         """Runs the narrow curses shell until the user quits or the run ends."""
+        curses.set_escdelay(25)
         curses.curs_set(0)
         stdscr.keypad(True)
 
