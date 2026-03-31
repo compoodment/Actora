@@ -9,7 +9,7 @@ It is intended to support safe patching, review, and manual verification.
 ## 1. Stack
 
 - **Language:** Python
-- **Interface:** Terminal with a plain-text title banner, a curses-based startup character creation wizard, and a narrow curses TUI shell for ordinary play with a dedicated profile screen, structured lineage/archive browsing, a full-screen history browser, death/continuation interrupts, and skip-time utility flow
+- **Interface:** Terminal with a curses-based startup character creation wizard and a narrow curses TUI shell for ordinary play with a dedicated profile screen, structured lineage/archive browsing, a full-screen history browser, death/continuation interrupts, and skip-time utility flow
 - **Structure:** Small modular prototype with separated simulation and rendering responsibilities
 
 ## 2. Current File Structure
@@ -20,7 +20,6 @@ It is intended to support safe patching, review, and manual verification.
     ├── identity.py
     ├── human.py
     ├── events.py
-    ├── banners.py
     └── docs/
         ├── architecture.md
         └── changelog.md
@@ -353,9 +352,9 @@ Current shell-level functions:
 - `setup_initial_world(...)` — compatibility wrapper that delegates into `setup_initial_world_from_character(...)`
 - `run_creation_wizard()` — curses wrapper that runs `CreationWizard` and returns character data or `None`
 - `run_game_tui(...)` — curses wrapper entry point for ordinary play
-- `start_game()` — top-level orchestration (banner, then delegates to the above)
+- `start_game()` — top-level orchestration (delegates to creation wizard and TUI)
 
-Current startup flow is human-only. `start_game()` prints the title banner in plain text, runs the curses-based `CreationWizard`, builds the world through `setup_initial_world_from_character(...)`, and only then hands control to the ordinary-play shell. Interactive CLI input still exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Startup parent ages now vary within a narrow adult range, some worlds now generate older siblings before the player is born through `World.bootstrap_older_siblings_for_newborn(...)`, and only-child worlds still remain possible. Once startup completes, ordinary play now lives inside a narrow curses shell: the split `Life View` keeps identity/location/primary stats/relationships on the left, keeps an accumulating live event feed on the right, opens a dedicated full-detail `Profile` screen with `P`, allows simple left-side/profile/history vertical scrolling under terminal-height pressure, opens the full-screen history browser with `H`, still opens lineage with `L`, still preserves the dead-focus interrupt before any continuation choices are shown, and now allows shell-owned popup choices to interrupt long skips for major identity-emergence moments during adolescence.
+Current startup flow is human-only. `start_game()` runs the curses-based `CreationWizard`, builds the world through `setup_initial_world_from_character(...)`, and only then hands control to the ordinary-play shell. Interactive CLI input still exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Startup parent ages now vary within a narrow adult range, some worlds now generate older siblings before the player is born through `World.bootstrap_older_siblings_for_newborn(...)`, and only-child worlds still remain possible. Once startup completes, ordinary play now lives inside a narrow curses shell: the split `Life View` keeps identity/location/primary stats/relationships on the left, keeps an accumulating live event feed on the right, opens a dedicated full-detail `Profile` screen with `P`, allows simple left-side/profile/history vertical scrolling under terminal-height pressure, opens the full-screen history browser with `H`, still opens lineage with `L`, still preserves the dead-focus interrupt before any continuation choices are shown, and now allows shell-owned popup choices to interrupt long skips for major identity-emergence moments during adolescence.
 
 ### `identity.py`
 Responsible for:
@@ -414,15 +413,8 @@ Current event boundary truth:
 - there is still no top-level `stat_changes`; `outcome["stat_changes"]` remains the sole authoritative mutation payload
 - ordinary-play mortality now comes from `world.py` structural checks rather than event payloads
 
-### `banners.py`
-Responsible for:
-- plain-text startup title branding shown before curses begins (`ACTORA_TITLE_BANNER`)
-- plain-text exit branding shown after curses has exited (`QUIT_BANNER`)
-
-Current banner-boundary truth:
-- `banners.py` is no longer an in-play UI surface
-- it currently exists only for non-curses startup/exit presentation
-- the old time-advance banner path is gone because ordinary advancement and skip-time now live inside the TUI
+### (banners removed)
+`banners.py` has been removed. Startup and exit no longer render ASCII art banners; the TUI handles all presentation.
 
 ## 7. Simulation Boundary
 

@@ -15,7 +15,6 @@
 - `human.py` — current human actor model (11 stats, appearance, traits, sexuality)
 - `events.py` — current human monthly event layer (120 events including trait-gated and family-aware)
 - `identity.py` — current startup identity generation helpers
-- `banners.py` — non-curses startup / exit banner text
 - `docs/` — source docs, planning docs, workflow docs, and repo-local documentation
 
 ## Where to start reading

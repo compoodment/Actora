@@ -4,7 +4,7 @@ import time
 import textwrap
 from uuid import uuid4
 
-from banners import ACTORA_TITLE_BANNER, QUIT_BANNER
+
 from human import Human
 from identity import prepare_parent_identity_context, generate_parent_identity_from_context
 from world import World
@@ -3161,12 +3161,6 @@ def run_creation_wizard():
         return None
 
 
-def print_post_tui_quit_banner():
-    """Prints one clean post-curses quit banner outside the TUI context."""
-    print()
-    print(QUIT_BANNER.rstrip())
-    print()
-
 
 def run_game_tui(world, player_id):
     """Runs the actor-first curses TUI for ordinary play after startup creation completes."""
@@ -3175,16 +3169,12 @@ def run_game_tui(world, player_id):
         curses.wrapper(tui.run)
     except KeyboardInterrupt:
         pass
-    print_post_tui_quit_banner()
 
 
 def start_game():
-    """Runs startup banner, character creation, and the ordinary-play TUI."""
-    print(ACTORA_TITLE_BANNER)
-
+    """Runs character creation and the ordinary-play TUI."""
     character_data = run_creation_wizard()
     if character_data is None:
-        print_post_tui_quit_banner()
         return
 
     world, player_id = setup_initial_world_from_character(character_data)
