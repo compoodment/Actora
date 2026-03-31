@@ -1679,6 +1679,7 @@ class ActoraTUI:
         self.last_advance_time = 0.0
         self.pending_choice = None
         self.remaining_skip_months = 0
+        self.quit_confirmation_active = False
         self.gender_choice_offered = False
         self.sexuality_choice_offered = False
         self.gender_choice_age = random.randint(12, 15)
