@@ -827,6 +827,7 @@ class CreationWizard:
         self.question_index = 0
         self.question_option_index = 0
         self.questionnaire_answers = []
+        self.quit_confirmation_active = False
 
         self.data = {
             "first_name": "",
@@ -1060,7 +1061,7 @@ class CreationWizard:
         elif self.step_index == 4:
             footer_text = "[↑↓] Move   [←→] Adjust   [R] Randomize   [Enter] Continue   [B] Back   [Q] Quit"
         elif self.step_index == 5 and self.selected_mode == "manual":
-            footer_text = "[↑↓] Move   [Space] Toggle   [Enter] Continue   [B] Back   [Q] Quit"
+            footer_text = "[↑↓] Move   [Space] Select   [Enter] Continue   [B] Back   [Q] Quit"
         else:
             footer_text = "[Enter] Start Game   [B] Back   [Q] Quit"
         content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
@@ -1279,6 +1280,19 @@ class CreationWizard:
             lines.append("")
         draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
 
+    def render_quit_confirmation(self, height, width):
+        box_width = min(max(36, width // 2), 44)
+        box_height = 7
+        top = max(2, (height - box_height) // 2)
+        left = max(0, (width - box_width) // 2)
+        lines = [
+            "Are you sure you want to quit?",
+            "",
+            "[Enter] Quit   [B] Cancel",
+        ]
+        draw_box(self.stdscr, top, left, box_height, box_width, title="Quit")
+        draw_panel_text(self.stdscr, top, left, box_height, box_width, lines)
+
     def render_confirm(self, height, width):
         content_left, content_width = get_content_bounds(width, max_width=92)
         result = self.build_result()
@@ -1336,12 +1350,22 @@ class CreationWizard:
         else:
             self.render_confirm(height, width)
         self.render_footer(height, width)
+        if self.quit_confirmation_active:
+            self.render_quit_confirmation(height, width)
         self.stdscr.refresh()
 
     def handle_quit_key(self, key):
+        if self.quit_confirmation_active:
+            if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8, 27):
+                self.quit_confirmation_active = False
+                return True
+            if key in (curses.KEY_ENTER, 10, 13):
+                self.running = False
+                self.cancelled = True
+                return True
+            return True
         if key in (ord("q"), ord("Q")):
-            self.running = False
-            self.cancelled = True
+            self.quit_confirmation_active = True
             return True
         return False
 
@@ -1560,10 +1584,6 @@ class CreationWizard:
 
     def handle_questionnaire_key(self, key):
         question = QUESTIONNAIRE_QUESTIONS[self.question_index]
-        if key in (ord("q"), ord("Q")):
-            self.running = False
-            self.cancelled = True
-            return
         if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
             if self.question_index > 0:
                 self.question_index -= 1
@@ -2239,6 +2259,7 @@ class ActoraTUI:
         self.sexuality_choice_age = random.randint(14, 17)
         self.selected_continuation_actor_id = None
         self.screen_name = "main"
+        self.quit_confirmation_active = False
         self.last_message = (
             f"Focus moved from {handoff_result['previous_actor_name']} "
             f"to {handoff_result['new_focused_actor_name']}."
@@ -2246,7 +2267,7 @@ class ActoraTUI:
 
     def handle_pending_choice_key(self, key):
         if key in (ord("q"), ord("Q")):
-            self.running = False
+            self.quit_confirmation_active = True
             return
 
         if self.pending_choice is None:
@@ -2273,7 +2294,7 @@ class ActoraTUI:
 
     def handle_main_key(self, key):
         if key in (ord("q"), ord("Q")):
-            self.running = False
+            self.quit_confirmation_active = True
         elif key in (curses.KEY_ENTER, 10, 13, ord("a"), ord("A")):
             now = time.monotonic()
             if now - self.last_advance_time < ADVANCE_THROTTLE_SECONDS:
@@ -2315,7 +2336,7 @@ class ActoraTUI:
             return
 
         if key in (ord("q"), ord("Q")):
-            self.running = False
+            self.quit_confirmation_active = True
         elif key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8) or key in BACK_KEYS:
             self.screen_name = "main"
             self.history_search_active = False
@@ -2332,7 +2353,7 @@ class ActoraTUI:
 
     def handle_profile_key(self, key):
         if key in (ord("q"), ord("Q")):
-            self.running = False
+            self.quit_confirmation_active = True
         elif key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8) or key in BACK_KEYS:
             self.screen_name = "main"
             self.last_message = MAIN_IDLE_MESSAGE
@@ -2369,7 +2390,10 @@ class ActoraTUI:
                 return
 
         lineage_entries = self.get_lineage_entries()
-        if key in (ord("b"), ord("B")) or key in BACK_KEYS or key in (ord("q"), ord("Q")):
+        if key in (ord("q"), ord("Q")):
+            self.quit_confirmation_active = True
+            return
+        if key in (ord("b"), ord("B")) or key in BACK_KEYS:
             self.screen_name = "main"
             self.lineage_search_active = False
             self.last_message = MAIN_IDLE_MESSAGE
@@ -2403,12 +2427,15 @@ class ActoraTUI:
 
     def handle_death_ack_key(self, key):
         if key in (ord("q"), ord("Q")):
-            self.running = False
+            self.quit_confirmation_active = True
         elif key in (curses.KEY_ENTER, 10, 13):
             self.acknowledge_death()
 
     def handle_skip_time_key(self, key):
-        if key in (ord("b"), ord("B"), 27) or key in (ord("q"), ord("Q")):
+        if key in (ord("q"), ord("Q")):
+            self.quit_confirmation_active = True
+            return
+        if key in (ord("b"), ord("B"), 27):
             self.screen_name = "main"
             self.last_message = MAIN_IDLE_MESSAGE
             return
@@ -2428,7 +2455,11 @@ class ActoraTUI:
         continuity_state = self.get_continuity_state()
         candidates = continuity_state["continuity_candidates"]
         if key in (ord("q"), ord("Q")):
-            self.running = False
+            self.quit_confirmation_active = True
+            return
+        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8) or key in BACK_KEYS:
+            self.screen_name = "death_ack"
+            self.last_message = "Returned to death summary."
             return
         if not candidates:
             return
@@ -2444,7 +2475,7 @@ class ActoraTUI:
 
     def handle_continuation_detail_key(self, key):
         if key in (ord("q"), ord("Q")):
-            self.running = False
+            self.quit_confirmation_active = True
         elif key in (ord("b"), ord("B")) or key in BACK_KEYS:
             self.screen_name = "continuation"
             self.last_message = "Returned to available lives."
@@ -2453,6 +2484,14 @@ class ActoraTUI:
 
     def handle_key(self, key):
         self.sync_focus_state()
+        if self.quit_confirmation_active:
+            if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8, 27):
+                self.quit_confirmation_active = False
+                return
+            if key in (curses.KEY_ENTER, 10, 13):
+                self.running = False
+                return
+            return
         if self.pending_choice is not None:
             self.handle_pending_choice_key(key)
             return
@@ -2476,14 +2515,14 @@ class ActoraTUI:
     def render_footer(self, stdscr, height, width):
         footer_hints = {
             "main": "[A] Advance   [S] Skip   [P] Profile   [L] Lineage   [H] History   [Q] Quit",
-            "profile": "[↑↓] Scroll   [B] Back",
-            "lineage": "[↑↓] Move   [A] All   [L] Living   [D] Dead   [/] Search   [B] Back",
-            "history": "[↑↓] Scroll   [/] Jump to Year   [B] Back",
-            "history_search": "Type year [0-9]   [Enter] Jump   [Esc] Cancel",
-            "lineage_search": "Type search   [Enter] Confirm   [Esc] Exit Search",
-            "skip_time": "[↑↓] Preset   [0-9] Custom   [Bksp] Erase   [Enter] Confirm   [B] Back",
+            "profile": "[↑↓] Scroll   [B] Back   [Q] Quit",
+            "lineage": "[↑↓] Move   [A] All   [L] Living   [D] Dead   [/] Search   [B] Back   [Q] Quit",
+            "history": "[↑↓] Scroll   [/] Jump to Year   [B] Back   [Q] Quit",
+            "history_search": "Type year [0-9]   [Enter] Continue   [Esc] Cancel   [Q] Quit",
+            "lineage_search": "Type search   [Enter] Continue   [Esc] Cancel   [Q] Quit",
+            "skip_time": "[↑↓] Move   [0-9] Custom   [Bksp] Erase   [Enter] Continue   [B] Back   [Q] Quit",
             "death_ack": "[Enter] Continue   [Q] Quit",
-            "continuation_detail": "[Enter] Continue as this person   [B] Back to list   [Q] Quit",
+            "continuation_detail": "[Enter] Continue   [B] Back   [Q] Quit",
         }
         if self.screen_name == "lineage" and self.lineage_search_active:
             footer_text = footer_hints["lineage_search"]
@@ -2492,9 +2531,9 @@ class ActoraTUI:
         elif self.screen_name == "continuation":
             continuity_state = self.get_continuity_state()
             if continuity_state["continuity_candidates"]:
-                footer_text = "[↑↓] Move   [Enter] Inspect   [Q] Quit"
+                footer_text = "[↑↓] Move   [Enter] Continue   [B] Back   [Q] Quit"
             else:
-                footer_text = "[Q] Quit"
+                footer_text = "[B] Back   [Q] Quit"
         else:
             footer_text = footer_hints.get(self.screen_name, "")
         content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
@@ -2550,6 +2589,19 @@ class ActoraTUI:
             popup_lines,
             highlight_index=highlighted_line,
         )
+
+    def render_quit_confirmation(self, stdscr, height, width):
+        box_width = min(max(36, width // 2), 44)
+        box_height = 7
+        top = max(2, (height - box_height) // 2)
+        left = max(0, (width - box_width) // 2)
+        lines = [
+            "Are you sure you want to quit?",
+            "",
+            "[Enter] Quit   [B] Cancel",
+        ]
+        draw_box(stdscr, top, left, box_height, box_width, title="Quit")
+        draw_panel_text(stdscr, top, left, box_height, box_width, lines)
 
     def render_header(self, stdscr, width):
         focused_actor = self.get_focused_actor()
@@ -2961,6 +3013,9 @@ class ActoraTUI:
         while self.running:
             self.sync_focus_state()
             self.render(stdscr)
+            if self.quit_confirmation_active:
+                self.render_quit_confirmation(stdscr, *stdscr.getmaxyx())
+                stdscr.refresh()
             key = stdscr.getch()
             self.handle_key(key)
 
@@ -3159,6 +3214,7 @@ def start_game():
 
     character_data = run_creation_wizard()
     if character_data is None:
+        print_post_tui_quit_banner()
         return
 
     world, player_id = setup_initial_world_from_character(character_data)

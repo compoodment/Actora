@@ -1,5 +1,10 @@
 # Actora Changelog
 
+## [Unreleased]
+- Unified TUI control language and footer labels across wizard and in-game screens.
+- Added quit confirmation prompt on `Q` to prevent accidental exits.
+- Restored post-TUI quit banner when exiting from character creation before entering the main game.
+
 ## Version 0.40.1 (Minor) - 2026-03-30
 - **Questionnaire-Based Character Creation Mode:**
     - Added `QUESTIONNAIRE_QUESTIONS` in `main.py` with 16 one-at-a-time personality prompts, per-answer stat deltas, and optional trait suggestions for a new alternative startup flow.
