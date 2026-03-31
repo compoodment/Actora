@@ -19,6 +19,7 @@ Consistent controls, navigation, and interaction patterns for all Actora TUI sur
 
 ### Selection behavior
 - **Single-choice lists:** moving the highlight changes the current choice immediately. Do not also require a separate commit state.
+- **Single-choice value fields:** when a row owns one value from a fixed set (for example appearance details), `←→` cycles the value directly on the row instead of opening a second nested chooser.
 - **Multi-select lists:** highlight shows focus; `[x]` shows toggled selections.
 - **Single-choice lists should not show `[x]` markers** unless there is a true separate committed state the player can change independently of focus.
 - **Enter should never be the primary selection key on list screens.** It is for continuing/proceeding.

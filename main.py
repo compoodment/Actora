@@ -1054,7 +1054,11 @@ class CreationWizard:
     def render_footer(self, height, width):
         if self.step_index == 0:
             footer_text = "[↑↓] Move   [Enter] Continue   [Q] Quit"
-        elif self.step_index in {1, 2, 3}:
+        elif self.step_index == 1:
+            footer_text = "[↑↓] Move   [Space] Select   [Enter] Continue   [B] Back   [Q] Quit"
+        elif self.step_index == 2:
+            footer_text = "[↑↓] Move   [←→] Adjust   [Enter] Continue   [B] Back   [Q] Quit"
+        elif self.step_index == 3:
             footer_text = "[↑↓] Move   [Space] Select   [Enter] Continue   [B] Back   [Q] Quit"
         elif self.step_index == 4 and self.selected_mode == "questionnaire":
             footer_text = "[↑↓] Move   [Space] Select   [B] Back   [Q] Quit"
@@ -1110,31 +1114,28 @@ class CreationWizard:
     def render_appearance(self, height, width):
         content_left, content_width = get_content_bounds(width, max_width=92)
         fields = self.get_appearance_fields()
-        active_select_field = self.get_active_appearance_select_field()
         lines = [
             "Choose appearance details.",
             "",
         ]
         highlight_index = None
         for index, field in enumerate(fields):
-            if index == self.appearance_field_index and self.appearance_mode == "field":
+            if index == self.appearance_field_index:
                 highlight_index = len(lines)
             if field["kind"] == "select":
                 value = self.get_visible_value_for_appearance(field["key"])
                 lines.append(f"{field['label']}: {value}")
             else:
                 value = self.custom_appearance_values[field["key"]]
-                suffix = "_" if index == self.appearance_field_index and self.appearance_mode == "field" else ""
+                suffix = "_" if index == self.appearance_field_index else ""
                 lines.append(f"{field['label']}: {value}{suffix}")
 
-        lines.extend(["", "Options"])
-        options = self.get_current_appearance_select_options()
-        for index, option in enumerate(options):
-            selected_marker = "[x]" if self.data["appearance"][active_select_field["key"]] == option else "[ ]"
-            if self.appearance_mode == "option" and index == self.appearance_option_index:
-                highlight_index = len(lines)
-            lines.append(f"  {selected_marker} {option}")
-
+        lines.extend(
+            [
+                "",
+                "Use ←→ to change listed values.",
+            ]
+        )
         if not self.can_advance_appearance():
             lines.extend(["", "Custom values are required when 'Other' is selected."])
 
@@ -1453,23 +1454,6 @@ class CreationWizard:
         self.appearance_field_index = max(0, min(self.appearance_field_index, len(fields) - 1))
         current_field = fields[self.appearance_field_index]
 
-        if self.appearance_mode == "option":
-            options = current_field["options"]
-            if key == curses.KEY_UP:
-                self.appearance_option_index = max(0, self.appearance_option_index - 1)
-                return
-            if key == curses.KEY_DOWN:
-                self.appearance_option_index = min(len(options) - 1, self.appearance_option_index + 1)
-                return
-            if key == ord(" "):
-                self.data["appearance"][current_field["key"]] = options[self.appearance_option_index]
-                self.appearance_mode = "field"
-                return
-            if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
-                self.appearance_mode = "field"
-                return
-            return
-
         if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
             self.step_index = 1
             return
@@ -1480,19 +1464,19 @@ class CreationWizard:
             self.appearance_field_index = min(len(fields) - 1, self.appearance_field_index + 1)
             return
         if current_field["kind"] == "select":
+            options = current_field["options"]
+            current_value = self.data["appearance"][current_field["key"]]
+            current_index = options.index(current_value)
+            if key in (curses.KEY_LEFT, ord("-")):
+                self.data["appearance"][current_field["key"]] = options[max(0, current_index - 1)]
+                return
+            if key in (curses.KEY_RIGHT, ord("+"), ord("="), ord(" ")):
+                self.data["appearance"][current_field["key"]] = options[min(len(options) - 1, current_index + 1)]
+                return
             if key in (curses.KEY_ENTER, 10, 13):
                 if self.can_advance_appearance():
                     self.step_index = 3
-                    return
-                options = current_field["options"]
-                current_value = self.data["appearance"][current_field["key"]]
-                self.appearance_option_index = options.index(current_value)
-                self.appearance_mode = "option"
-            if key == ord(" "):
-                options = current_field["options"]
-                current_value = self.data["appearance"][current_field["key"]]
-                self.appearance_option_index = options.index(current_value)
-                self.appearance_mode = "option"
+                return
             return
         if key in (curses.KEY_ENTER, 10, 13):
             if self.appearance_field_index < len(fields) - 1:
