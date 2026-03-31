@@ -55,13 +55,26 @@ The current pressure: what real content and domain systems should be added next 
 
 ID: IDEA-122
 Created: 2026-03-31
-Title: Non-family relationships — first social layer
-Status: Next structural move (confirmed)
+Title: Non-family relationships + action foundation — first social layer
+Status: Specced, ready to implement (v0.45.0)
 Priority: P1
 [[actora-roadmap|Actora Roadmap]] fit: social foundation before social space systems and education
-Summary: Friendships, acquaintances, rivals — the first non-family relationship layer. Dependency for social space systems, education context, and peer-driven events.
-Why it matters: Without non-family relationships, education and social systems have no social substrate to build on.
-Next action: scope and implement
+Summary: Acquaintance/friend/close_friend link types with numeric closeness score (0-100). Player-initiated meeting (event offers choice, no silent collection). Closeness increases via shared events, decays over time (long relationships decay slower). Drift events fire when closeness hits 0; link archived with status:former (universal — applies to family too). Friend deaths affect player stats scaled to closeness. Relationship Browser replaces Lineage Browser ([R] hotkey) with persistent filter sidebar (All/Family/Friends/Acquaintances/Former/Living/Dead). Active actions panel in Life View: first action is "Spend time with [friend]", queues and resolves on advance. NPCs generated at meeting moment with plausible context-seeded personality/stats.
+Why it matters: Without non-family relationships, education and social systems have no social substrate to build on. Action queue is the seed for the full action system.
+Design decisions locked:
+- `former` is a link status field, not a separate type — applies universally (friend, family, etc.)
+- [R] = Relationship Browser (replaces [L] Lineage)
+- Closeness score visible to player (number + derived label) for now
+- Meeting is always player-initiated — no silent actor collection
+- All introduced NPCs are real full actors (compressed/uncompressed tiers deferred to education milestone)
+- Action skip-time limits and multi-month active actions deferred
+Deferred:
+- Rival/negative relationship types
+- Pre-populated world NPCs (true "existed before")
+- Actor simulation depth tiers (compressed vs full)
+- Family tree visual
+- Cap on Life View relationship display
+- Action system depth beyond "spend time with friend"
 
 
 === ACTIVE DESIGN GUARDRAILS ===
