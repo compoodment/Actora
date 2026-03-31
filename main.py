@@ -1238,7 +1238,7 @@ class CreationWizard:
                 left_lines.extend(["", "Secondary Stats", ""])
             if index == self.stat_index:
                 highlight_index = len(left_lines)
-                left_lines.append(f"{CREATION_STAT_LABELS[stat_name]}: \u2190 {self.data['stats'][stat_name]:>3} \u2192")
+                left_lines.append(f"{CREATION_STAT_LABELS[stat_name]}: \u2190 {self.data['stats'][stat_name]} \u2192")
             else:
                 left_lines.append(f"{CREATION_STAT_LABELS[stat_name]}: {self.data['stats'][stat_name]:>3}")
 
