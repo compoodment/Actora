@@ -791,7 +791,7 @@ def build_record_summary_lines(records):
     if not filtered_records:
         return ["No records found."]
     return [
-        f"[{record['year']:04d}-{record['month']:02d}] {record['text']}"
+        f"[{record['year'] or 0:04d}-{record['month'] or 0:02d}] {record['text']}"
         for record in filtered_records
     ]
 
@@ -1547,7 +1547,7 @@ class CreationWizard:
 
     def handle_questionnaire_key(self, key):
         question = QUESTIONNAIRE_QUESTIONS[self.question_index]
-        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
+        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8, 27):
             if self.question_index > 0:
                 self.question_index -= 1
                 self.questionnaire_answers.pop()
@@ -1562,7 +1562,7 @@ class CreationWizard:
         if key == curses.KEY_DOWN:
             self.question_option_index = min(len(question["options"]) - 1, self.question_option_index + 1)
             return
-        if key == ord(" "):
+        if key in (ord(" "), curses.KEY_ENTER, 10, 13):
             selected_option = question["options"][self.question_option_index]
             self.questionnaire_answers.append(selected_option)
             if self.question_index >= len(QUESTIONNAIRE_QUESTIONS) - 1:
@@ -2255,7 +2255,7 @@ class ActoraTUI:
             self.pending_choice["selected_index"] = max(0, selected_index - 1)
         elif key == curses.KEY_DOWN:
             self.pending_choice["selected_index"] = min(len(options) - 1, selected_index + 1)
-        elif key == ord(" "):
+        elif key in (ord(" "), curses.KEY_ENTER, 10, 13):
             selected_option = options[self.pending_choice["selected_index"]]
             if self.pending_choice["choice_id"] == "sexuality":
                 selected_value = dict(SEXUALITY_OPTION_LABELS)[selected_option]
@@ -2925,6 +2925,10 @@ class ActoraTUI:
             selected_candidate["actor_id"],
             relationship_label=selected_candidate["relationship_label"],
         )
+        if detail is None:
+            content_left, content_width = get_content_bounds(width, max_width=86)
+            render_lines(stdscr, ["Actor data unavailable."], 0, content_left, height, width)
+            return
         content_left, content_width = get_content_bounds(width, max_width=86)
         lines = [
             center_text("CONTINUATION DETAIL", content_width),
