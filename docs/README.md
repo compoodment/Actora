@@ -2,7 +2,7 @@
 title: Actora Docs Index
 role: navigation
 stability: high
-tags: [index, navigation]
+layer: navigation
 ---
 
 # Actora Docs

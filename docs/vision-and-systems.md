@@ -2,7 +2,7 @@
 title: Vision & Systems
 role: creative-vision-and-system-intent
 stability: moderate
-tags: [vision, systems, design-intent, persistent-memory]
+layer: vision
 ---
 
 # Actora Vision & Systems
@@ -65,14 +65,14 @@ The player primarily lives through their current actor, but that actor exists in
 ### Actions
 - Two types: instant (happens now, no queue) and monthly (queued, resolves on advance)
 - Categorized: social, personal development, career, criminal, political, etc.
-- Dynamic — what's available depends on your age, location, relationships, commitments, era
-- Unavailable actions are silently hidden, not shown with a lock
-- Prerequisites exist: gym needs a gym in your city, club needs age 18+ (unless mischievous trait)
+- **Action visibility:** Age/era/context gates → silently hidden. Resource/prerequisite gates (no money, missing item, etc.) → shown as unavailable with reason. Rule: if you can never do it right now regardless of effort, hide it. If you could do it but currently can't, show it greyed.
+- **Action time budget:** Actions have a time cost. Free actions (texting a friend, quick errand) consume negligible time. Medium actions consume part of the month. Heavy commitments (job contract, military service, long voyage, expedition) consume most or all of the month's available time. The constraint on how many actions you can do in a month is emergent from time cost allocation, not an arbitrary cap.
+- **Multi-month actions are era-agnostic** — a sailing voyage in 1600, a research expedition in 2010, a space mission in 2300. Same mechanic, different context. Time-based commitment applies to any era where the scenario warrants it.
+- No forced constraints — player can queue freely, but time budget is real. Overcommitting means something gives.
+- Dynamic — what's available depends on age, location, relationships, commitments, era
 - Long commitments (education, job) live in Profile as "commitments", not in the action queue
 - Urgent surprise opportunities are popups (1-month window). Open-ended opportunities have their own persistent section (TBD location)
-- No forced constraints — player can overcommit freely, but consequences are real
 - Social actions can optionally bring friends who may decline based on context
-- Later: multi-month actions (space mission, long voyage)
 - Later: spiral side-quest chains — forced sequences of decisions with branching outcomes
 
 ### Education

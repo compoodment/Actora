@@ -2,7 +2,7 @@
 title: Actionable Summary
 role: near-term-planning-snapshot
 stability: low
-tags: [planning, snapshot, actionable]
+layer: planning
 ---
 
 Actionable Ideas Summary — Rev40

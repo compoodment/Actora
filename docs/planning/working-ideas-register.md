@@ -2,7 +2,7 @@
 title: Working Ideas Register
 role: flexible-idea-intake-and-staging
 stability: low
-tags: [planning, ideas, flexible]
+layer: planning
 ---
 
 Actora Working Ideas Register v52

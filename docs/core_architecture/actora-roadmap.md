@@ -2,7 +2,7 @@
 title: Actora Roadmap
 role: sequencing-and-dependency-order
 stability: high
-tags: [roadmap, sequencing, planning]
+layer: core
 ---
 
 Actora Roadmap v10

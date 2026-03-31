@@ -2,7 +2,7 @@
 title: Source Index
 role: document-system-navigation
 stability: moderate
-tags: [meta, navigation, source-system]
+layer: core
 ---
 
 Actora Source Index v9

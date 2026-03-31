@@ -2,7 +2,7 @@
 title: Architecture
 role: repo-implementation-truth
 stability: moderate
-tags: [implementation, repo-truth]
+layer: implementation
 ---
 
 # Actora Architecture Summary

@@ -2,7 +2,7 @@
 title: Live Issues
 role: bug-and-revisit-tracker
 stability: low
-tags: [bugs, issues, tracking]
+layer: planning
 ---
 
 Live Issues / Revisit Tracker

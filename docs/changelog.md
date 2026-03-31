@@ -2,7 +2,7 @@
 title: Changelog
 role: version-history
 stability: stable-as-history
-tags: [history, versions]
+layer: implementation
 ---
 
 # Actora Changelog

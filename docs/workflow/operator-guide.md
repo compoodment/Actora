@@ -2,7 +2,7 @@
 title: Operator Guide
 role: workflow-and-execution-discipline
 stability: high
-tags: [workflow, process, rules]
+layer: workflow
 ---
 
 Actora Operator Guide v9

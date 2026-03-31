@@ -2,7 +2,7 @@
 title: TUI Standards
 role: interaction-design-rules
 stability: high
-tags: [tui, standards, ux]
+layer: implementation
 ---
 
 # TUI Standards

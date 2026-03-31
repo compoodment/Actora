@@ -2,7 +2,7 @@
 title: Master Context
 role: core-architecture-anchor
 stability: high
-tags: [core, identity, architecture]
+layer: core
 ---
 
 Actora Master Context v9

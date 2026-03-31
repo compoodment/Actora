@@ -2,7 +2,7 @@
 title: UI Architecture
 role: interface-structure-and-navigation-blueprint
 stability: moderate
-tags: [ui, architecture, navigation, screens, tui]
+layer: implementation
 ---
 
 # Actora UI Architecture
@@ -121,8 +121,8 @@ All screens are reachable from Life View. Nested screens return to their parent 
 
 **Filtering/navigation:**
 - Category tabs or sections (Social / Personal / Career / etc.)
-- Unavailable actions are silently hidden (not shown, not locked)
-- Age/context/location gating — silently hidden when prerequisites not met
+- **Age/context/era gating** — silently hidden (if you literally cannot do it right now regardless of effort, don't show it)
+- **Resource/prerequisite gating** — shown as unavailable with reason (if you could do it but currently can't, e.g. no money, show it greyed with context)
 
 **Future:**
 - Cancel queued action
