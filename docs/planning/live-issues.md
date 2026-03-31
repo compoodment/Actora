@@ -19,6 +19,19 @@ Purpose: repo-local parking lot for current bugs, regressions, and revisit items
 
 === CURRENTLY OPEN ===
 
+- v0.45.0 playtest findings — polish pass required
+  Status: open
+  Bugs:
+  - "Friend: actor" leaking as raw text in Relationships section
+  - [T] Hang Out says "no one to hang out with" despite family existing — only checks social links, should include all valid targets or fix message
+  - Two NPC friends generated with same last name as each other (name pool collision in generate_meeting_npc)
+  - Search missing from Relationship Browser (was in Lineage Browser)
+  - [L] footer binding still shows Relationships label but underlying hotkey routing needs verification
+  Architecture changes needed:
+  - Remove Friends section and Actions section from Life View left panel — social links should be folded into the existing Relationships section (name + type in one place)
+  - Actions need their own screen ([T] key), not crammed into left panel
+  - Navigation restructure: [L] = Browser page containing Relationships + History tabs; [H] and [L] unified
+
 - sibling/family birth tuning still needs later balancing
   Status: open revisit
   Note: the age/spacing/family-size fertility heuristic is intentionally simple first-pass logic and may need probability tuning once more long-run play data exists.

@@ -72,16 +72,19 @@ Summary from interview:
 - Two action types: instant (happens now, no queue) and monthly (queued, resolves on advance)
 - Actions are categorized: social, personal development, career, etc.
 - Dynamic availability based on life situation, location, age, relationships, prerequisites
-- Prerequisites deferred for now (needs location/venue system to be meaningful)
+- Prerequisites silently hidden — unavailable actions don't show at all (age-gated, location-gated)
 - Long commitments (education, job) are NOT in the action queue — they live in Profile as a "commitments" section
 - Surprise opportunities: popup if urgent (1-month window), persistent "opportunities section" if open-ended. Location of that section TBD.
-- No forced constraints — player chooses freely even if overcommitting
+- No forced constraints — player chooses freely even if overcommitting (for now)
 - Action atoms: "call a friend", "go to the club" (social + stat changes + random events), "go to the gym", etc.
 - Venues/locations surface available actions (club in your city = action available)
-- Active/pending actions visible in Life View
+- Actions get their own screen/page (not crammed into Life View left panel)
+- Queued/pending actions visible in their own panel, not mixed into Life View sections
+- Social actions like "hang out" can optionally bring a friend — friend can decline based on context
+- Eventually: spiral side-quest chains where you are forced through a sequence of decisions with branching outcomes
 - Some future actions will span multiple months (space mission etc.) — shown as active commitments
 Why it matters: Without an action system, the game is purely passive — player just watches events tick by. Actions are what make it a life simulation.
-Deferred from this spec: prerequisites (needs venue system), multi-month actions, action skip-time caps, opportunity section placement
+Deferred from this spec: prerequisites (needs venue system), multi-month actions, action skip-time caps, opportunity section placement, cancel-action mechanic
 
 
 === ACTIVE DESIGN GUARDRAILS ===
