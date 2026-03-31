@@ -883,6 +883,7 @@ class CreationWizard:
 
     def begin_manual(self):
         self.selected_mode = "manual"
+        self.data["traits"] = []
         self.step_index = 4
 
     def finalize_questionnaire_results(self):
@@ -1091,9 +1092,12 @@ class CreationWizard:
             if index == self.identity_field_index:
                 highlight_index = len(lines)
             value = self.data[field["key"]]
-            suffix = "_" if field["kind"] == "text" and index == self.identity_field_index else ""
             optional_suffix = " (optional)" if field.get("optional") else ""
-            lines.append(f"{field['label']}{optional_suffix}: {value}{suffix}")
+            if field["kind"] == "select" and index == self.identity_field_index:
+                lines.append(f"{field['label']}{optional_suffix}: \u2190 {value} \u2192")
+            else:
+                suffix = "_" if field["kind"] == "text" and index == self.identity_field_index else ""
+                lines.append(f"{field['label']}{optional_suffix}: {value}{suffix}")
         lines.extend(
             [
                 "",
@@ -1260,6 +1264,7 @@ class CreationWizard:
             center_text(f"Question {self.question_index + 1} of {len(QUESTIONNAIRE_QUESTIONS)}", content_width).strip(),
             "",
             question["text"],
+            "",
             "",
         ]
         highlight_index = None
@@ -2485,7 +2490,7 @@ class ActoraTUI:
 
     def render_footer(self, stdscr, height, width):
         footer_hints = {
-            "main": "[A] Advance   [S] Skip   [P] Profile   [L] Lineage   [H] History   [Q] Quit",
+            "main": "[A] Advance Month   [S] Skip Time  |  [P] Profile   [L] Lineage   [H] History   [Q] Quit",
             "profile": "[↑↓] Scroll   [B] Back   [Q] Quit",
             "lineage": "[↑↓] Move   [A] All   [L] Living   [D] Dead   [/] Search   [B] Back   [Q] Quit",
             "history": "[↑↓] Scroll   [/] Jump to Year   [B] Back   [Q] Quit",
