@@ -1,5 +1,17 @@
 # Actora Changelog
 
+## Version 0.42.0 (Minor) - 2026-03-31
+- **Playtest Bug Fixes & Audit Fixes:**
+    - Fixed sex field not visually indicating it's adjustable — now renders `← Male →` when active.
+    - Fixed trait leak bug: completing the questionnaire then switching to manual mode no longer pre-populates the manual traits screen with questionnaire-derived traits.
+    - Added visual separator between question text and answer options in the questionnaire screen.
+    - Updated main TUI footer: `[A] Advance Month   [S] Skip Time  |  [P] Profile   [L] Lineage   [H] History   [Q] Quit`.
+    - Fixed crash in `render_continuation_detail` when actor data is missing — now renders a safe fallback instead of crashing.
+    - Fixed `TypeError` in `build_record_summary_lines` when year or month is `None` — now falls back to `0`.
+    - ESC now works as back in the questionnaire (mirrors B/backspace behavior).
+    - Enter now advances the questionnaire (previously only Space worked).
+    - Enter now confirms in-game pending choice popups (previously only Space worked).
+
 ## Version 0.41.0 (Minor) - 2026-03-31
 - **TUI Polish and Cleanup:**
     - Unified TUI control language and footer labels across wizard and in-game screens.
