@@ -1,6 +1,21 @@
 Live Issues / Revisit Tracker
-Date: 2026-03-30
+Date: 2026-03-31
 Purpose: repo-local parking lot for current bugs, regressions, and revisit items so they do not get lost between patches.
+
+
+=== NEEDS PLAYER TEST (cannot verify headlessly) ===
+
+- Popup guard vs held-Enter during skip time
+  Status: needs player test
+  Note: v0.43.0 added a one-keystroke input guard when gender/sexuality popup appears. Player needs to verify that holding Enter during skip no longer eats the popup. If it still leaks, a harder gate (block all input except popup keys while pending_choice is active) is the real fix.
+
+- Left panel scroll in main Life View
+  Status: needs player test
+  Note: scroll logic rewritten in v0.43.0. Needs real content overflow (relationships, jobs, etc.) to verify scrolling works correctly as panel grows.
+
+- Continuation screen text and flow
+  Status: needs player test
+  Note: wording fixed in v0.43.0. Player to verify "No one is available to continue." and "quit the game." read correctly in context.
 
 
 === CURRENTLY OPEN ===

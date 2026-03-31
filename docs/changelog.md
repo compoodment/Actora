@@ -1,5 +1,17 @@
 # Actora Changelog
 
+## Version 0.43.0 (Minor) - 2026-03-31
+- **Playtest Polish Round 2:**
+    - Appearance select fields now show `← value →` on the active row, consistent with identity fields.
+    - "First name is required." only appears after a failed continue attempt; hidden otherwise.
+    - Removed redundant "Use ←→ to change listed values." hint from appearance screen.
+    - Custom appearance field (Other) now shows inline prompt e.g. `Type custom skin tone:` instead of generic warning.
+    - Questionnaire question text rendered in uppercase with extra blank line for visual weight.
+    - Popup input guard added: first Enter/Space after a gender/sexuality popup is created is consumed to prevent held-Enter eating the popup.
+    - History browser year dividers now have a blank line before and after for breathing room.
+    - Continuation screen: "No one is available to continue as." → "No one is available to continue." and "quit this run" → "quit the game."
+    - Left panel in main Life View now scrollable in preparation for relationship/job/education growth.
+
 ## Version 0.42.0 (Minor) - 2026-03-31
 - **Playtest Bug Fixes & Audit Fixes:**
     - Fixed sex field not visually indicating it's adjustable — now renders `← Male →` when active.
