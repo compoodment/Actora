@@ -4,7 +4,12 @@ from uuid import uuid4
 
 from events import get_human_monthly_event_from_lifecycle
 from human import Human
-from identity import FATHER_FIRST_NAME_POOL, MOTHER_FIRST_NAME_POOL
+from identity import (
+    CULTURE_NAME_POOLS,
+    FALLBACK_LAST_NAME_POOL,
+    FATHER_FIRST_NAME_POOL,
+    MOTHER_FIRST_NAME_POOL,
+)
 
 
 UNSET = object()
@@ -726,12 +731,16 @@ class World:
 
     def _build_link_record(self, source_id, target_id, link_type, role, metadata=None):
         """Builds one normalized directional link record without mutating the link store."""
+        # status defaults to "active" for all link types; callers may override via metadata
+        merged_metadata = {"status": "active"}
+        if metadata is not None:
+            merged_metadata.update(metadata)
         return {
             "source_id": source_id,
             "target_id": target_id,
             "type": link_type,
             "role": role,
-            "metadata": dict(metadata) if metadata is not None else {},
+            "metadata": merged_metadata,
         }
 
     def add_link(self, source_id, target_id, link_type, role, metadata=None):
@@ -861,6 +870,121 @@ class World:
                 deduped_target_ids.append(target_id)
 
         return deduped_target_ids
+
+    # --- Social link helpers ---
+
+    _NPC_TRAIT_POOL = [
+        "Curious", "Calm", "Fussy", "Bold", "Shy",
+        "Cheerful", "Stubborn", "Gentle", "Restless", "Alert",
+    ]
+
+    def _get_social_link_category(self, closeness):
+        """Returns the social link role for a given closeness value (0–100)."""
+        if closeness >= 70:
+            return "close_friend"
+        if closeness >= 30:
+            return "friend"
+        return "acquaintance"
+
+    def create_social_link_pair(
+        self,
+        actor_a_id,
+        actor_b_id,
+        *,
+        closeness,
+        status="active",
+        closeness_history_months=0,
+    ):
+        """Creates a bidirectional social link between two actors.
+
+        The link role is derived from closeness:
+          acquaintance (1–29), friend (30–69), close_friend (70–100).
+        """
+        category = self._get_social_link_category(closeness)
+        metadata = {
+            "closeness": closeness,
+            "status": status,
+            "closeness_history_months": closeness_history_months,
+        }
+        self.add_link_pair(
+            source_id=actor_a_id,
+            target_id=actor_b_id,
+            forward_type="social",
+            forward_role=category,
+            reverse_type="social",
+            reverse_role=category,
+            forward_metadata=dict(metadata),
+            reverse_metadata=dict(metadata),
+        )
+        return category
+
+    def generate_meeting_npc(self, player_id, *, culture_group=None):
+        """Generates and registers a plausible NPC for a meeting event.
+
+        Age is within ±5 years of the player (minimum 8).
+        Stats are seeded in normal human ranges.
+        Name is drawn from the player's culture group when resolvable.
+        """
+        player = self.get_actor(player_id)
+        if player is None:
+            raise ValueError(f"generate_meeting_npc: unknown player_id '{player_id}'")
+
+        if culture_group is None:
+            jurisdiction_place = self.get_place(player.jurisdiction_place_id)
+            if jurisdiction_place:
+                culture_group = jurisdiction_place.get("metadata", {}).get("culture_group")
+
+        player_age = player.get_age(self.current_year, self.current_month)
+        age_min = max(8, player_age - 5)
+        age_max = max(8, player_age + 5)
+        npc_age = random.randint(age_min, age_max)
+        npc_birth_year = self.current_year - npc_age
+        npc_birth_month = random.randint(1, 12)
+
+        npc_sex = random.choice(["Male", "Female"])
+        culture_pool = CULTURE_NAME_POOLS.get(culture_group or "", {})
+        if npc_sex == "Female":
+            first_name_pool = culture_pool.get("mother_first_names", MOTHER_FIRST_NAME_POOL)
+        else:
+            first_name_pool = culture_pool.get("father_first_names", FATHER_FIRST_NAME_POOL)
+        last_name_pool = culture_pool.get("last_names", FALLBACK_LAST_NAME_POOL)
+
+        first_name = random.choice(first_name_pool)
+        last_name = random.choice(last_name_pool)
+
+        npc_actor_id = self.generate_actor_id("npc")
+        npc = self.create_human_actor(
+            actor_id=npc_actor_id,
+            species="Human",
+            first_name=first_name,
+            last_name=last_name,
+            sex=npc_sex,
+            gender=npc_sex,
+            birth_year=npc_birth_year,
+            birth_month=npc_birth_month,
+            current_place_id=player.current_place_id,
+            residence_place_id=player.residence_place_id,
+            jurisdiction_place_id=player.jurisdiction_place_id,
+        )
+
+        npc.stats.update({
+            "health": random.randint(70, 100),
+            "happiness": random.randint(50, 100),
+            "intelligence": random.randint(35, 75),
+            "strength": random.randint(30, 70),
+            "charisma": random.randint(30, 70),
+            "creativity": random.randint(30, 70),
+            "wisdom": random.randint(20, 60),
+            "discipline": random.randint(20, 60),
+            "willpower": random.randint(30, 70),
+            "looks": random.randint(30, 80),
+            "fertility": random.randint(40, 90),
+        })
+        npc.traits = random.sample(self._NPC_TRAIT_POOL, 3)
+
+        return npc_actor_id, npc
+
+    # --- End social link helpers ---
 
     def get_family_link_target_ids(
         self,

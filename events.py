@@ -328,3 +328,61 @@ def get_monthly_event(
         recent_event_ids=recent_event_ids,
         actor_traits=actor_traits,
     )
+
+
+# ---------------------------------------------------------------------------
+# Meeting events — player-choice popup pool (childhood / teenager only)
+# These are not auto-applied; the shell presents them as a pending choice.
+# ---------------------------------------------------------------------------
+
+MEETING_EVENT_POOL = [
+    {
+        "event_id": "meeting_park",
+        "text": "You cross paths with someone your age at the local park.",
+    },
+    {
+        "event_id": "meeting_neighborhood",
+        "text": "Someone new has moved nearby and you keep running into them.",
+    },
+    {
+        "event_id": "meeting_gathering",
+        "text": "A local gathering puts you face to face with someone you have never spoken to before.",
+    },
+    {
+        "event_id": "meeting_walk",
+        "text": "On your way home you fall into step with someone about your age heading the same direction.",
+    },
+    {
+        "event_id": "meeting_errand",
+        "text": "While out on an errand you notice someone your age lingering nearby, looking equally at loose ends.",
+    },
+]
+
+_MEETING_EVENT_MIN_AGE_MONTHS = 72  # age 6
+
+
+def get_meeting_event_for_player(lifecycle_state: dict) -> dict | None:
+    """Returns one random meeting event template or None.
+
+    Conditions checked here: minimum age (6) and life stage (Child/Teenager).
+    A ~20% monthly base chance applies. Cooldown enforcement is the caller's
+    responsibility (ActoraTUI.maybe_offer_meeting_event).
+    """
+    if lifecycle_state.get("life_stage_model") != "human_default":
+        return None
+
+    age_months = lifecycle_state.get("age_months", 0)
+    life_stage = lifecycle_state.get("life_stage", "")
+
+    if age_months < _MEETING_EVENT_MIN_AGE_MONTHS:
+        return None
+    if life_stage not in ("Child", "Teenager"):
+        return None
+    if random.random() >= 0.20:
+        return None
+
+    template = random.choice(MEETING_EVENT_POOL)
+    return {
+        "event_id": template["event_id"],
+        "text": template["text"],
+    }

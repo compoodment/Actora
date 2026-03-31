@@ -5,6 +5,7 @@ import textwrap
 from uuid import uuid4
 
 
+from events import get_meeting_event_for_player
 from human import Human
 from identity import prepare_parent_identity_context, generate_parent_identity_from_context
 from world import World
@@ -25,6 +26,7 @@ BACK_KEYS = {
 }
 MAIN_IDLE_MESSAGE = "A/Enter advances one month."
 ADVANCE_THROTTLE_SECONDS = 0.2
+MEETING_EVENT_COOLDOWN_MONTHS = 18
 CREATION_SEX_OPTIONS = ["Male", "Female", "Intersex"]
 CREATION_EYE_COLOR_OPTIONS = ["Brown", "Blue", "Green", "Hazel", "Gray", "Amber", "Other"]
 CREATION_HAIR_COLOR_OPTIONS = ["Black", "Brown", "Blonde", "Red", "Auburn", "Other"]
@@ -1659,6 +1661,7 @@ class ActoraTUI:
         self.sexuality_choice_offered = False
         self.gender_choice_age = random.randint(12, 15)
         self.sexuality_choice_age = random.randint(14, 17)
+        self.meeting_event_last_total_months = 0
 
     def get_focused_actor_id(self):
         return self.world.get_focused_actor_id() or self.player_id
@@ -1907,6 +1910,34 @@ class ActoraTUI:
 
         return False
 
+    def maybe_offer_meeting_event(self):
+        """Fires a meeting-event popup choice when conditions and cooldown allow."""
+        actor = self.get_focused_actor()
+        if actor is None or not actor.is_alive():
+            return False
+
+        lifecycle = actor.get_lifecycle_state(self.world.current_year, self.world.current_month)
+        current_total_months = self.world.current_year * 12 + self.world.current_month
+        if current_total_months - self.meeting_event_last_total_months < MEETING_EVENT_COOLDOWN_MONTHS:
+            return False
+
+        meeting_event = get_meeting_event_for_player(lifecycle)
+        if meeting_event is None:
+            return False
+
+        self.meeting_event_last_total_months = current_total_months
+        self.pending_choice = {
+            "title": "Someone new",
+            "text": meeting_event["text"],
+            "question": "Do you want to introduce yourself?",
+            "options": ["Introduce yourself", "Keep to yourself"],
+            "selected_index": 0,
+            "skippable": False,
+            "choice_id": "meeting_npc",
+        }
+        self.last_message = "You notice someone nearby."
+        return True
+
     def resolve_choice(self, choice_id, selected_value):
         actor = self.get_focused_actor()
         if actor is None:
@@ -1946,6 +1977,32 @@ class ActoraTUI:
                     year=self.world.current_year,
                     month=self.world.current_month,
                 )
+        elif choice_id == "meeting_npc":
+            if selected_value == "Introduce yourself":
+                focused_actor_id = self.get_focused_actor_id()
+                npc_actor_id, npc = self.world.generate_meeting_npc(focused_actor_id)
+                self.world.create_social_link_pair(
+                    focused_actor_id,
+                    npc_actor_id,
+                    closeness=15,
+                    status="active",
+                    closeness_history_months=0,
+                )
+                self.append_event_log_entry(
+                    "event",
+                    f"You introduced yourself to {npc.get_full_name()}.",
+                    year=self.world.current_year,
+                    month=self.world.current_month,
+                )
+                self.last_message = f"You met {npc.get_full_name()}."
+            else:
+                self.append_event_log_entry(
+                    "event",
+                    "You decided to keep to yourself.",
+                    year=self.world.current_year,
+                    month=self.world.current_month,
+                )
+                self.last_message = "You kept to yourself."
 
         self.pending_choice = None
         remaining = self.remaining_skip_months
@@ -2042,6 +2099,11 @@ class ActoraTUI:
             if month_turn_result["months_advanced"] <= 0 or not month_turn_result["focused_actor_alive"]:
                 break
             if self.maybe_offer_identity_choice():
+                remaining = months_to_advance - aggregated_turn_result["months_advanced"]
+                if remaining > 0:
+                    self.remaining_skip_months = remaining
+                break
+            if self.maybe_offer_meeting_event():
                 remaining = months_to_advance - aggregated_turn_result["months_advanced"]
                 if remaining > 0:
                     self.remaining_skip_months = remaining
@@ -2255,6 +2317,7 @@ class ActoraTUI:
         self.sexuality_choice_offered = False
         self.gender_choice_age = random.randint(12, 15)
         self.sexuality_choice_age = random.randint(14, 17)
+        self.meeting_event_last_total_months = 0
         self.selected_continuation_actor_id = None
         self.screen_name = "main"
         self.quit_confirmation_active = False
