@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 - Unified TUI control language and footer labels across wizard and in-game screens.
+- Clarified and partially enforced a stronger selection rule: single-choice lists use live highlight selection, while `[x]` markers are reserved for true multi-select/toggle screens.
 - Added quit confirmation prompt on `Q` to prevent accidental exits.
 - Restored post-TUI quit banner when exiting from character creation before entering the main game.
 

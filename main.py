@@ -1158,8 +1158,7 @@ class CreationWizard:
         for index, country in enumerate(WORLD_GEOGRAPHY):
             if self.location_mode == "country" and index == self.country_index:
                 country_highlight_index = len(country_lines)
-            marker = "[x]" if self.data["country_id"] == country["country_id"] else "[ ]"
-            country_lines.append(f"{marker} {country['country_name']}")
+            country_lines.append(f"{country['country_name']}")
 
         city_lines = [
             f"Cities in {selected_country['country_name']}",
@@ -1169,8 +1168,7 @@ class CreationWizard:
         for index, city in enumerate(selected_country["cities"]):
             if self.location_mode == "city" and index == self.city_index:
                 city_highlight_index = len(city_lines)
-            marker = "[x]" if self.data["city_id"] == city["city_id"] else "[ ]"
-            city_lines.append(f"{marker} {city['city_name']}")
+            city_lines.append(f"{city['city_name']}")
 
         city_lines.extend(
             [
@@ -1226,8 +1224,7 @@ class CreationWizard:
         for index, mode_name in enumerate(self.CREATION_MODES):
             if index == self.mode_index:
                 highlight_index = len(lines)
-            marker = "[x]" if self.selected_mode == mode_name else "[ ]"
-            lines.append(f"{marker} {mode_descriptions[mode_name][0]}")
+            lines.append(f"{mode_descriptions[mode_name][0]}")
             for detail_line in mode_descriptions[mode_name][1:]:
                 lines.append(f"    {detail_line}")
             lines.append("")
@@ -1276,7 +1273,7 @@ class CreationWizard:
         for index, option in enumerate(question["options"]):
             if index == self.question_option_index:
                 highlight_index = len(lines)
-            lines.append(f"[ ] {option['text']}")
+            lines.append(option['text'])
             lines.append("")
         draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
 
@@ -1431,11 +1428,7 @@ class CreationWizard:
             if key == curses.KEY_DOWN:
                 self.set_selected_country(min(len(WORLD_GEOGRAPHY) - 1, self.country_index + 1))
                 return
-            if key == ord(" "):
-                self.location_mode = "city"
-                self.sync_location_indexes()
-                return
-            if key in (curses.KEY_ENTER, 10, 13):
+            if key in (ord(" "), curses.KEY_ENTER, 10, 13):
                 self.location_mode = "city"
                 self.sync_location_indexes()
                 return
@@ -1448,13 +1441,10 @@ class CreationWizard:
         if key == curses.KEY_DOWN:
             self.set_selected_city(min(len(cities) - 1, self.city_index + 1))
             return
-        if key == ord(" "):
-            self.set_selected_city(self.city_index)
-            return
         if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
             self.location_mode = "country"
             return
-        if key in (curses.KEY_ENTER, 10, 13):
+        if key in (ord(" "), curses.KEY_ENTER, 10, 13):
             self.step_index = 2
             self.location_mode = "country"
 
@@ -1526,11 +1516,8 @@ class CreationWizard:
         if key == curses.KEY_DOWN:
             self.mode_index = min(len(self.CREATION_MODES) - 1, self.mode_index + 1)
             return
-        if key == ord(" "):
-            self.selected_mode = self.CREATION_MODES[self.mode_index]
-            return
-        if key in (curses.KEY_ENTER, 10, 13):
-            confirmed_mode = self.selected_mode or self.CREATION_MODES[self.mode_index]
+        if key in (ord(" "), curses.KEY_ENTER, 10, 13):
+            confirmed_mode = self.CREATION_MODES[self.mode_index]
             if confirmed_mode == "questionnaire":
                 self.begin_questionnaire()
             else:
