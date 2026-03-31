@@ -48,24 +48,11 @@ Purpose: repo-local parking lot for current bugs, regressions, and revisit items
   Note: "Other" sexuality is complicated when events need to know attraction patterns. Park until romance events exist.
 
 
-=== RESOLVED ===
+=== RESOLVED (recent) ===
 
-- v0.44.0: all ←→ adjustable fields now render ← value → when active; popup Enter fully blocked (Space-only)
-- v0.43.0: wizard polish (first name error, appearance arrows, custom prompt, questionnaire weight, history breathing, continuation text)
-- v0.42.0: sex field unselectable, trait leak (questionnaire→manual), questionnaire separator, footer labels, continuation crash, None date TypeError, ESC/Enter in questionnaire and pending choice
-- v0.41.0: banners removed, selection behavior enforced, footer labels clarified, quit confirmation added
-
-- v0.39.1: traits wired into events (required_traits field, 20 trait-gated events)
-- v0.39.0: event-choice framework + gender identity emergence at ~12-15 + sexuality emergence at ~14-17
-- v0.38.1: character creation wizard + parents get randomized secondary stats/appearance/traits
-- v0.37.4: skip-time Esc/back UX lag resolved
-- v0.37.2: Life View relationships shows all living family
-- v0.37.1: event history scrollable (live feed + History browser)
-- v0.36.9: continuation substrate broadened (siblings)
-- v0.36.8: old-age mortality implemented
-- v0.36.7: lineage search exit, row overstuffing, identity formatting, event visibility, left-pane scrolling
-- v0.30.0 (planning): planning-doc simplification completed in v49 rewrite
-
-- questionnaire-based stat/trait generation as alternative to manual sliders
-  Status: resolved in v0.40.1
-  Note: 16-question personality test with mixed styles (situational/spectrum/gut-pick). Two modes on Stats step: Manual vs Questionnaire. Questionnaire determines both stats AND traits automatically. Results shown but not editable.
+- v0.44.1: stat number padding removed (was causing double-space next to arrows)
+- v0.44.0: all ←→ adjustable fields render ← value →; popup Enter fully blocked (Space-only)
+- v0.43.0: wizard polish — first name error timing, appearance arrows, custom prompt, questionnaire weight, history breathing, continuation text
+- v0.42.0: sex field unselectable, trait leak (questionnaire→manual), questionnaire separator, footer labels, continuation crash, None date TypeError, ESC/Enter handling
+- v0.41.0: banners removed, selection behavior enforced, quit confirmation added
+- v0.36.0–v0.40.1: see WIR completed milestones
