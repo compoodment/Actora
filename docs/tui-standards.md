@@ -11,18 +11,18 @@ Consistent controls, navigation, and interaction patterns for all Actora TUI sur
 
 ### Navigation
 - `[↑↓]` — Move selection or scroll content
-- `[←→]` — Adjust values (stats only)
+- `[←→]` — Adjust values on any adjustable field (stats, appearance, identity value fields)
 
 ### Actions
-- `[Space]` — Select or toggle an option when the screen supports explicit selection
-- `[Enter]` — Continue, proceed, or confirm
+- `[Space]` — Select or toggle an option when the screen supports explicit selection; also the **only** confirm key for popup choices (Enter must never confirm popups)
+- `[Enter]` — Continue, proceed, or confirm screen transition
 
 ### Selection behavior
 - **Single-choice lists:** moving the highlight changes the current choice immediately. Do not also require a separate commit state.
-- **Single-choice value fields:** when a row owns one value from a fixed set (for example appearance details), `←→` cycles the value directly on the row instead of opening a second nested chooser.
+- **Single-choice value fields:** when a row owns one value from a fixed set, `←→` cycles the value directly on the row instead of opening a second nested chooser. The active field **must** visually render as `← value →` to signal it is adjustable.
 - **Multi-select lists:** highlight shows focus; `[x]` shows toggled selections.
 - **Single-choice lists should not show `[x]` markers** unless there is a true separate committed state the player can change independently of focus.
-- **Enter should never be the primary selection key on list screens.** It is for continuing/proceeding.
+- **Enter must never be a confirm key for popup/choice overlays.** Popup overlays use Space only — Enter is reserved for month advancement and screen transitions and must be fully blocked while a popup is active.
 
 ### Specialist keys (context-specific)
 - `[R]` — Randomize (stats screen only)
