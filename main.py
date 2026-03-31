@@ -828,6 +828,7 @@ class CreationWizard:
         self.question_option_index = 0
         self.questionnaire_answers = []
         self.quit_confirmation_active = False
+        self.identity_first_name_error_shown = False
 
         self.data = {
             "first_name": "",
@@ -1098,13 +1099,10 @@ class CreationWizard:
             else:
                 suffix = "_" if field["kind"] == "text" and index == self.identity_field_index else ""
                 lines.append(f"{field['label']}{optional_suffix}: {value}{suffix}")
-        lines.extend(
-            [
-                "",
-                "First name is required.",
-                f"Gender defaults to: {self.data['gender']}  (chosen later in life)",
-            ]
-        )
+        lines.append("")
+        if self.identity_first_name_error_shown:
+            lines.append("First name is required.")
+        lines.append(f"Gender defaults to: {self.data['gender']}  (chosen later in life)")
         draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
 
     def render_appearance(self, height, width):
@@ -1124,16 +1122,11 @@ class CreationWizard:
             else:
                 value = self.custom_appearance_values[field["key"]]
                 suffix = "_" if index == self.appearance_field_index else ""
-                lines.append(f"{field['label']}: {value}{suffix}")
-
-        lines.extend(
-            [
-                "",
-                "Use ←→ to change listed values.",
-            ]
-        )
-        if not self.can_advance_appearance():
-            lines.extend(["", "Custom values are required when 'Other' is selected."])
+                if index == self.appearance_field_index:
+                    field_name = field["label"].replace("Custom ", "").lower()
+                    lines.append(f"Type custom {field_name}: {value}{suffix}")
+                else:
+                    lines.append(f"{field['label']}: {value}{suffix}")
 
         draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
 
@@ -1263,8 +1256,8 @@ class CreationWizard:
         lines = [
             center_text(f"Question {self.question_index + 1} of {len(QUESTIONNAIRE_QUESTIONS)}", content_width).strip(),
             "",
-            question["text"],
             "",
+            question["text"].upper(),
             "",
         ]
         highlight_index = None
@@ -1379,12 +1372,16 @@ class CreationWizard:
                     self.identity_field_index += 1
                 elif self.can_advance_identity():
                     self.step_index = 1
+                else:
+                    self.identity_first_name_error_shown = True
                 return
             if key in (curses.KEY_BACKSPACE, 127, 8):
                 self.data[current_field["key"]] = self.data[current_field["key"]][:-1]
                 return
             if 32 <= key <= 126:
                 self.data[current_field["key"]] += chr(key)
+                if current_field["key"] == "first_name":
+                    self.identity_first_name_error_shown = False
                 return
         if current_field["kind"] == "select":
             current_index = current_field["options"].index(self.data["sex"])
@@ -1404,8 +1401,11 @@ class CreationWizard:
                 self.data["sex"] = current_field["options"][current_index]
                 self.sync_gender_to_sex()
                 return
-            if key in (curses.KEY_ENTER, 10, 13) and self.can_advance_identity():
-                self.step_index = 1
+            if key in (curses.KEY_ENTER, 10, 13):
+                if self.can_advance_identity():
+                    self.step_index = 1
+                else:
+                    self.identity_first_name_error_shown = True
 
     def handle_location_key(self, key):
         if self.location_mode == "country":
@@ -1654,6 +1654,7 @@ class ActoraTUI:
         self.sexuality_choice_offered = False
         self.gender_choice_age = random.randint(12, 15)
         self.sexuality_choice_age = random.randint(14, 17)
+        self.pending_choice_input_guard = False
 
     def get_focused_actor_id(self):
         return self.world.get_focused_actor_id() or self.player_id
@@ -1881,6 +1882,7 @@ class ActoraTUI:
                 "choice_id": "gender_identity",
                 "default_value": current_gender,
             }
+            self.pending_choice_input_guard = True
             self.gender_choice_offered = True
             self.last_message = "A personal choice needs your attention."
             return True
@@ -1896,6 +1898,7 @@ class ActoraTUI:
                 "choice_id": "sexuality",
                 "default_value": None,
             }
+            self.pending_choice_input_guard = True
             self.sexuality_choice_offered = True
             self.last_message = "A personal choice needs your attention."
             return True
@@ -1964,7 +1967,16 @@ class ActoraTUI:
         """Builds the logical full-screen history line list."""
         if not self.event_log:
             return ["No events yet."]
-        return [format_history_entry(entry, width) for entry in self.event_log]
+        lines = []
+        for entry in self.event_log:
+            if entry["kind"] == "year_header":
+                if lines:
+                    lines.append("")
+                lines.append(format_history_entry(entry, width))
+                lines.append("")
+            else:
+                lines.append(format_history_entry(entry, width))
+        return lines
 
     def get_history_search_status(self):
         if not self.history_search_active:
@@ -2091,14 +2103,19 @@ class ActoraTUI:
 
     def scroll_main_left(self, delta):
         snapshot_sections = build_snapshot_sections(self.get_snapshot_data())
-        scrollable_lines = self.build_main_left_lines(snapshot_sections, include_time=False)
+        left_sections = [
+            section
+            for section in snapshot_sections
+            if section["key"] in MAIN_LEFT_SECTION_KEYS
+        ]
+        scrollable_lines = [self.last_message, ""]
+        scrollable_lines.extend(self.build_main_left_lines(left_sections, include_time=False))
         visible_height = self.main_body_height
         if visible_height <= 0:
             visible_height = 1
         _, next_offset, _, _ = get_scroll_window(scrollable_lines, visible_height, self.main_left_scroll + delta)
         if next_offset != self.main_left_scroll:
             self.main_left_scroll = next_offset
-            pass  # no message on scroll
 
     @property
     def main_body_height(self):
@@ -2189,7 +2206,7 @@ class ActoraTUI:
         if continuity_state["had_continuity_candidates"]:
             self.last_message = "Choose who to continue as."
         else:
-            self.last_message = "No one is available to continue as."
+            self.last_message = "No one is available to continue."
 
     def get_selected_continuation_candidate(self):
         continuity_state = self.get_continuity_state()
@@ -2245,6 +2262,11 @@ class ActoraTUI:
         if key in (ord("q"), ord("Q")):
             self.quit_confirmation_active = True
             return
+
+        if self.pending_choice_input_guard:
+            self.pending_choice_input_guard = False
+            if key in (ord(" "), curses.KEY_ENTER, 10, 13):
+                return
 
         if self.pending_choice is None:
             return
@@ -2887,7 +2909,7 @@ class ActoraTUI:
 
         if not candidates:
             lines.append("No living family members were found.")
-            lines.append("Press B to review the death summary, or Q to quit this run.")
+            lines.append("Press B to review the death summary, or Q to quit the game.")
         else:
             self.continuation_selection = max(
                 0,
