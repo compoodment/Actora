@@ -1,5 +1,13 @@
 # Actora Changelog
 
+## Version 0.44.0 (Minor) - 2026-03-31
+- **Arrow standard + popup fix:**
+    - Stats screen active field now renders `← value →` — consistent with identity and appearance fields.
+    - All adjustable value fields (`←→`) now visually show `← value →` when active. This is the enforced standard across all screens.
+    - Popup choices (gender/sexuality emergence) now only respond to Space — Enter is fully blocked while a popup is active. Fixes held-Enter during month advancement eating popups silently.
+    - Removed now-dead `pending_choice_input_guard` flag (replaced by hard Enter block).
+    - Updated tui-standards.md: `←→` applies to all adjustable fields (not stats-only), popup Enter block rule documented, `← value →` rendering requirement documented.
+
 ## Version 0.43.0 (Minor) - 2026-03-31
 - **Playtest Polish Round 2:**
     - Appearance select fields now show `← value →` on the active row, consistent with identity fields.
