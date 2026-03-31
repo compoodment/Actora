@@ -48,20 +48,29 @@ Files:
 ## Quick usage rules
 
 - **[[master-context|Master Context]]** = durable identity / architecture truth
-- **[[operator-guide|Operator Guide]]** = workflow rules
 - **[[actora-roadmap|Actora Roadmap]]** = sequencing and dependency order
+- **[[operator-guide|Operator Guide]]** = workflow rules
+- **[[source-index|Source Index]]** = source-system navigation and precedence
+- **[[vision-and-systems|Vision & Systems]]** = creative intent per system, updated through interviews
+- **[[ui-architecture|UI Architecture]]** = screen map, navigation hierarchy, rules for adding new systems
+- **[[tui-standards|TUI Standards]]** = interaction design rules (hotkeys, selection behavior)
 - **[[working-ideas-register|Working Ideas Register]]** = active ideas and parked pressures
 - **[[actionable-summary|Actionable Summary]]** = temporary planning snapshot
-- **[[source-index|Source Index]]** = source-system navigation and precedence
+- **[[live-issues|Live Issues]]** = open bugs and revisit items
 - **Repo docs / [[changelog]]** = what was actually implemented
 
 ## Practical loading guide
 
-- Architecture question -> `[[master-context]]`
-- Workflow / review / patch-discipline question -> `[[operator-guide]]`
-- "What should come next?" -> `[[actora-roadmap]]` + planning docs
-- "Where does this idea belong?" -> `[[source-index]]`
-- "What changed in code?" -> repo docs + codebase + git
+- Architecture question → `[[master-context]]`
+- Sequencing / what comes next → `[[actora-roadmap]]` + planning docs
+- Workflow / review / patch discipline → `[[operator-guide]]`
+- "Where does this idea belong?" → `[[source-index]]`
+- Creative intent for a system → `[[vision-and-systems]]`
+- UI structure / where does X live in the interface → `[[ui-architecture]]`
+- Interaction rules / hotkeys → `[[tui-standards]]`
+- Active ideas and planning → `[[working-ideas-register]]`, `[[actionable-summary]]`
+- Open bugs → `[[live-issues]]`
+- "What changed in code?" → `[[changelog]]` + codebase
 
 ## Important rule
 
