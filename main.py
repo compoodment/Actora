@@ -1053,13 +1053,13 @@ class CreationWizard:
 
     def render_footer(self, height, width):
         if self.step_index == 0:
-            footer_text = "[↑↓] Move   [Enter] Continue   [Q] Quit"
+            footer_text = "[↑↓] Move   [←→] Adjust   [Enter] Continue   [Q] Quit"
         elif self.step_index == 1:
             footer_text = "[↑↓] Move   [Space] Select   [Enter] Continue   [B] Back   [Q] Quit"
         elif self.step_index == 2:
             footer_text = "[↑↓] Move   [←→] Adjust   [Enter] Continue   [B] Back   [Q] Quit"
         elif self.step_index == 3:
-            footer_text = "[↑↓] Move   [Space] Select   [Enter] Continue   [B] Back   [Q] Quit"
+            footer_text = "[↑↓] Move   [Enter] Continue   [B] Back   [Q] Quit"
         elif self.step_index == 4 and self.selected_mode == "questionnaire":
             footer_text = "[↑↓] Move   [Space] Select   [B] Back   [Q] Quit"
         elif self.step_index == 4:
@@ -1097,15 +1097,7 @@ class CreationWizard:
         lines.extend(
             [
                 "",
-                "Sex Options",
-            ]
-        )
-        for option in CREATION_SEX_OPTIONS:
-            marker = "[x]" if self.data["sex"] == option else "[ ]"
-            lines.append(f"  {marker} {option}")
-        lines.extend(
-            [
-                "",
+                "First name is required.",
                 f"Gender defaults to: {self.data['gender']}  (chosen later in life)",
             ]
         )
@@ -1392,25 +1384,17 @@ class CreationWizard:
         if current_field["kind"] == "select":
             current_index = current_field["options"].index(self.data["sex"])
             if key == curses.KEY_UP:
-                if current_index == 0:
-                    self.identity_field_index = max(0, self.identity_field_index - 1)
-                else:
-                    self.data["sex"] = current_field["options"][current_index - 1]
-                    self.sync_gender_to_sex()
-                return
-            if key == curses.KEY_DOWN:
-                self.data["sex"] = current_field["options"][min(len(current_field["options"]) - 1, current_index + 1)]
-                self.sync_gender_to_sex()
-                return
-            if key in (curses.KEY_BACKSPACE, 127, 8):
                 self.identity_field_index = max(0, self.identity_field_index - 1)
                 return
-            if key == ord("-"):
+            if key == curses.KEY_DOWN:
+                self.identity_field_index = min(len(fields) - 1, self.identity_field_index + 1)
+                return
+            if key in (curses.KEY_LEFT, ord("-")):
                 current_index = max(0, current_index - 1)
                 self.data["sex"] = current_field["options"][current_index]
                 self.sync_gender_to_sex()
                 return
-            if key in (ord("+"), ord("=")):
+            if key in (curses.KEY_RIGHT, ord("+"), ord("=")):
                 current_index = min(len(current_field["options"]) - 1, current_index + 1)
                 self.data["sex"] = current_field["options"][current_index]
                 self.sync_gender_to_sex()
@@ -1454,8 +1438,14 @@ class CreationWizard:
         self.appearance_field_index = max(0, min(self.appearance_field_index, len(fields) - 1))
         current_field = fields[self.appearance_field_index]
 
-        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
+        if key in (ord("b"), ord("B")):
             self.step_index = 1
+            return
+        if key in (curses.KEY_BACKSPACE, 127, 8):
+            if current_field["kind"] == "text":
+                self.custom_appearance_values[current_field["key"]] = self.custom_appearance_values[current_field["key"]][:-1]
+            else:
+                self.step_index = 1
             return
         if key == curses.KEY_UP:
             self.appearance_field_index = max(0, self.appearance_field_index - 1)
@@ -1484,9 +1474,6 @@ class CreationWizard:
             elif self.can_advance_appearance():
                 self.step_index = 3
             return
-        if key in (curses.KEY_BACKSPACE, 127, 8):
-            self.custom_appearance_values[current_field["key"]] = self.custom_appearance_values[current_field["key"]][:-1]
-            return
         if 32 <= key <= 126:
             self.custom_appearance_values[current_field["key"]] += chr(key)
 
@@ -1500,7 +1487,7 @@ class CreationWizard:
         if key == curses.KEY_DOWN:
             self.mode_index = min(len(self.CREATION_MODES) - 1, self.mode_index + 1)
             return
-        if key in (ord(" "), curses.KEY_ENTER, 10, 13):
+        if key in (curses.KEY_ENTER, 10, 13):
             confirmed_mode = self.CREATION_MODES[self.mode_index]
             if confirmed_mode == "questionnaire":
                 self.begin_questionnaire()
@@ -1582,7 +1569,14 @@ class CreationWizard:
 
     def handle_confirm_key(self, key):
         if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
-            self.step_index = 3 if self.selected_mode == "questionnaire" else 5
+            if self.selected_mode == "questionnaire":
+                if self.questionnaire_answers:
+                    self.questionnaire_answers.pop()
+                self.question_index = len(QUESTIONNAIRE_QUESTIONS) - 1
+                self.question_option_index = 0
+                self.step_index = 4
+            else:
+                self.step_index = 5
             return None
         if key in (curses.KEY_ENTER, 10, 13):
             self.running = False
@@ -1895,7 +1889,7 @@ class ActoraTUI:
                 "selected_index": 0,
                 "skippable": True,
                 "choice_id": "sexuality",
-                "default_value": "Heterosexual",
+                "default_value": None,
             }
             self.sexuality_choice_offered = True
             self.last_message = "A personal choice needs your attention."
@@ -1927,13 +1921,21 @@ class ActoraTUI:
                     month=self.world.current_month,
                 )
         elif choice_id == "sexuality":
-            actor.sexuality = selected_value
-            self.append_event_log_entry(
-                "event",
-                f"You identify as {selected_value}.",
-                year=self.world.current_year,
-                month=self.world.current_month,
-            )
+            if selected_value is not None:
+                actor.sexuality = selected_value
+                self.append_event_log_entry(
+                    "event",
+                    f"You identify as {selected_value}.",
+                    year=self.world.current_year,
+                    month=self.world.current_month,
+                )
+            else:
+                self.append_event_log_entry(
+                    "event",
+                    "You are still figuring things out.",
+                    year=self.world.current_year,
+                    month=self.world.current_month,
+                )
 
         self.pending_choice = None
         remaining = self.remaining_skip_months
@@ -1951,7 +1953,7 @@ class ActoraTUI:
     def open_profile(self):
         self.screen_name = "profile"
         self.profile_scroll = 0
-        self.last_message = "Viewing full actor profile."
+        self.last_message = "Viewing full profile."
 
     def get_history_lines(self, width):
         """Builds the logical full-screen history line list."""
@@ -2232,10 +2234,7 @@ class ActoraTUI:
         self.selected_continuation_actor_id = None
         self.screen_name = "main"
         self.quit_confirmation_active = False
-        self.last_message = (
-            f"Focus moved from {handoff_result['previous_actor_name']} "
-            f"to {handoff_result['new_focused_actor_name']}."
-        )
+        self.last_message = f"Your story continues as {handoff_result['new_focused_actor_name']}."
 
     def handle_pending_choice_key(self, key):
         if key in (ord("q"), ord("Q")):
@@ -2523,9 +2522,8 @@ class ActoraTUI:
         lines = [choice["text"], "", choice["question"], ""]
         option_line_indexes = []
         for index, option in enumerate(choice["options"]):
-            marker = "[x]" if index == choice["selected_index"] else "[ ]"
             option_line_indexes.append(len(lines))
-            lines.append(f"{marker} {option}")
+            lines.append(f"{option}")
         lines.extend(
             [
                 "",
@@ -2884,7 +2882,7 @@ class ActoraTUI:
 
         if not candidates:
             lines.append("No living family members were found.")
-            lines.append("Press Q to quit this run.")
+            lines.append("Press B to review the death summary, or Q to quit this run.")
         else:
             self.continuation_selection = max(
                 0,

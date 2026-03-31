@@ -5,6 +5,7 @@
 - Clarified and enforced a stronger selection rule: single-choice lists use live highlight selection, `[x]` markers are reserved for true multi-select/toggle screens, and single-choice value fields now use direct `←→` cycling instead of nested option choosers.
 - Added quit confirmation prompt on `Q` to prevent accidental exits.
 - Restored post-TUI quit banner when exiting from character creation before entering the main game.
+- Fixed a custom-appearance input regression so `Backspace` erases typed text instead of unexpectedly leaving the appearance step, aligned the identity sex row with the direct-adjust value-field pattern, and cleaned up continuation wording/doc flow descriptions to match current behavior.
 
 ## Version 0.40.1 (Minor) - 2026-03-30
 - **Questionnaire-Based Character Creation Mode:**

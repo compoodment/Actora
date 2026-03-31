@@ -1,7 +1,7 @@
 # Actora Architecture Summary
 
-**Version:** 0.39.1
-**Last Updated:** 2026-03-30
+**Version:** 0.40.1
+**Last Updated:** 2026-03-31
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
 It is intended to support safe patching, review, and manual verification.
@@ -348,7 +348,7 @@ Current shell-level functions:
 - `draw_text_block(...)` — small curses text rendering helper with wrapping support
 - `ActoraTUI` — narrow curses shell object managing the split Life View, dedicated profile screen, accumulating live event feed, full-screen history browser, styled header/footer chrome, lineage list/detail, skip-time selection, death acknowledgment, two-step continuation inspection/selection, simple left-pane/profile/history scrolling, a shell-owned pending-choice popup overlay for major player-facing decisions, and safe footer rendering that avoids writing into the terminal’s last column
 - `safe_input(prompt)` — narrow shared CLI input boundary helper that exits cleanly on `EOFError` and `KeyboardInterrupt`
-- `CreationWizard` — curses-based character creation wizard with five startup steps (identity, appearance, traits, stats, confirmation)
+- `CreationWizard` — curses-based character creation wizard with identity, location, appearance, and creation-mode steps, followed by either a questionnaire branch (questionnaire, confirmation) or a manual branch (stats, traits, confirmation)
 - `setup_initial_world_from_character(character_data)` — primary world creation flow from one fully prepared startup character payload
 - `setup_initial_world(...)` — compatibility wrapper that delegates into `setup_initial_world_from_character(...)`
 - `run_creation_wizard()` — curses wrapper that runs `CreationWizard` and returns character data or `None`
@@ -490,13 +490,15 @@ This function does not perform terminal input, output, or presentation formattin
 
 ### Character Creation
 Current player creation includes:
-- a curses-based `CreationWizard` with six steps: Identity, Location, Appearance, Traits, Stats, Confirm
+- a curses-based `CreationWizard` with Identity, Location, Appearance, and Creation Mode, then either a questionnaire branch (`Questionnaire`, `Confirm`) or a manual branch (`Stats`, `Traits`, `Confirm`)
 - Identity step with required first name, optional last name, and sex selection (`Male`, `Female`, `Intersex`)
 - Location step with country selection first, then city selection within the chosen country; the selected `country_id` / `city_id` are stored in the startup payload
 - gender defaults to match sex and is deferred to puberty emergence during play
 - Appearance step with eye color, hair color, and skin tone; each appearance field supports `Other`, which requires a custom free-text value before continuing
-- Traits step requiring exactly 3 traits from `Curious`, `Calm`, `Fussy`, `Bold`, `Shy`, `Cheerful`, `Stubborn`, `Gentle`, `Restless`, `Alert`
-- Stats step with manual 0-100 adjustment across all 11 stats (`health`, `happiness`, `intelligence`, `strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`) plus `[R]` to randomize all startup stats
+- Creation Mode step with a choice between questionnaire-based generation and manual setup
+- Questionnaire branch with 16 one-at-a-time prompts that derive startup stats and the final 3 traits automatically
+- Manual branch with a Stats step for 0-100 adjustment across all 11 stats (`health`, `happiness`, `intelligence`, `strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`) plus `[R]` to randomize all startup stats
+- Manual Traits step requiring exactly 3 traits from `Curious`, `Calm`, `Fussy`, `Bold`, `Shy`, `Cheerful`, `Stubborn`, `Gentle`, `Restless`, `Alert`
 - Confirm step showing the full character summary, with `Enter` to start the game and `B` to go back
 - current wizard controls are step-specific but centered on `Space` to select/toggle, `Enter` to proceed, `B` / `Backspace` to go back, `↑↓` to navigate, and `←→` to adjust stats
 

@@ -43,7 +43,7 @@
 ## Current implementation reality
 
 The prototype is terminal-first with a curses TUI. It currently has:
-- a curses character creation wizard (Identity → Appearance → Traits → Stats → Confirm)
+- a curses character creation wizard with Identity, Location, Appearance, Creation Mode, then either Questionnaire → Confirm or Stats → Traits → Confirm
 - an actor-first curses TUI with Life View, Profile, Lineage Browser, History Browser, and Skip Time screens
 - 11 actor stats (3 primary + 8 secondary), appearance traits, personality traits, and sexuality emergence
 - 120 human monthly events including trait-gated and family-aware events with cooldown
