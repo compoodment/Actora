@@ -1238,7 +1238,9 @@ class CreationWizard:
                 left_lines.extend(["", "Secondary Stats", ""])
             if index == self.stat_index:
                 highlight_index = len(left_lines)
-            left_lines.append(f"{CREATION_STAT_LABELS[stat_name]}: {self.data['stats'][stat_name]:>3}")
+                left_lines.append(f"{CREATION_STAT_LABELS[stat_name]}: \u2190 {self.data['stats'][stat_name]:>3} \u2192")
+            else:
+                left_lines.append(f"{CREATION_STAT_LABELS[stat_name]}: {self.data['stats'][stat_name]:>3}")
 
         right_lines = [
             "Controls",
@@ -1657,7 +1659,6 @@ class ActoraTUI:
         self.sexuality_choice_offered = False
         self.gender_choice_age = random.randint(12, 15)
         self.sexuality_choice_age = random.randint(14, 17)
-        self.pending_choice_input_guard = False
 
     def get_focused_actor_id(self):
         return self.world.get_focused_actor_id() or self.player_id
@@ -1885,7 +1886,6 @@ class ActoraTUI:
                 "choice_id": "gender_identity",
                 "default_value": current_gender,
             }
-            self.pending_choice_input_guard = True
             self.gender_choice_offered = True
             self.last_message = "A personal choice needs your attention."
             return True
@@ -1901,7 +1901,6 @@ class ActoraTUI:
                 "choice_id": "sexuality",
                 "default_value": None,
             }
-            self.pending_choice_input_guard = True
             self.sexuality_choice_offered = True
             self.last_message = "A personal choice needs your attention."
             return True
@@ -2266,10 +2265,10 @@ class ActoraTUI:
             self.quit_confirmation_active = True
             return
 
-        if self.pending_choice_input_guard:
-            self.pending_choice_input_guard = False
-            if key in (ord(" "), curses.KEY_ENTER, 10, 13):
-                return
+        # Block Enter entirely while a popup is active — Enter is used to advance months
+        # and must never accidentally confirm a popup. Space is the only confirm key.
+        if key in (curses.KEY_ENTER, 10, 13):
+            return
 
         if self.pending_choice is None:
             return
@@ -2280,7 +2279,7 @@ class ActoraTUI:
             self.pending_choice["selected_index"] = max(0, selected_index - 1)
         elif key == curses.KEY_DOWN:
             self.pending_choice["selected_index"] = min(len(options) - 1, selected_index + 1)
-        elif key in (ord(" "), curses.KEY_ENTER, 10, 13):
+        elif key == ord(" "):
             selected_option = options[self.pending_choice["selected_index"]]
             if self.pending_choice["choice_id"] == "sexuality":
                 selected_value = dict(SEXUALITY_OPTION_LABELS)[selected_option]
