@@ -1118,7 +1118,10 @@ class CreationWizard:
                 highlight_index = len(lines)
             if field["kind"] == "select":
                 value = self.get_visible_value_for_appearance(field["key"])
-                lines.append(f"{field['label']}: {value}")
+                if index == self.appearance_field_index:
+                    lines.append(f"{field['label']}: \u2190 {value} \u2192")
+                else:
+                    lines.append(f"{field['label']}: {value}")
             else:
                 value = self.custom_appearance_values[field["key"]]
                 suffix = "_" if index == self.appearance_field_index else ""
