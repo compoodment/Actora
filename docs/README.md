@@ -40,7 +40,9 @@ These are implementation-facing and should not be confused with the source stack
 Files:
 - `[[architecture]]`
 - `[[changelog]]`
-- `[[architecture#Lifecycle System|lifecycle-system]]`
+- `[[tui-standards]]`
+- `[[ui-architecture]]` — screen map, navigation hierarchy, rules for adding new systems
+- `[[vision-and-systems]]` — persistent creative vision per system, updated through interviews
 
 ## Quick usage rules
 
