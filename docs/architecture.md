@@ -3,6 +3,7 @@ title: Architecture
 role: repo-implementation-truth
 stability: moderate
 layer: implementation
+relates_to: [changelog, tui-standards]
 ---
 
 # Actora Architecture Summary
@@ -11,7 +12,7 @@ layer: implementation
 **Last Updated:** 2026-03-31
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
-It is intended to support safe patching, review, and manual verification.
+It is intended to support safe patching, review, and manual verification, alongside [[tui-standards]] and [[ui-architecture]] for interface-specific rules.
 
 ## 1. Stack
 
@@ -28,7 +29,7 @@ It is intended to support safe patching, review, and manual verification.
     ├── human.py
     ├── events.py
     └── docs/
-        ├── [[architecture]]
+        ├── architecture
         └── [[changelog]]
 
 ## 3. Core Objects

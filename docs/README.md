@@ -3,6 +3,7 @@ title: Actora Docs Index
 role: navigation
 stability: high
 layer: navigation
+relates_to: [source-index]
 ---
 
 # Actora Docs

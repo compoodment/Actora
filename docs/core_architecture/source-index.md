@@ -3,6 +3,7 @@ title: Source Index
 role: document-system-navigation
 stability: moderate
 layer: core
+relates_to: [master-context, actora-roadmap, operator-guide]
 ---
 
 Actora Source Index v9
@@ -65,7 +66,7 @@ Use the source documents in this order:
 Use repo truth:
 - codebase
 - repo documentation
-- repo [[changelog]]
+- repo changelog
 - VPS/runtime/manual verification
 
 Do not collapse these questions together.
@@ -239,7 +240,7 @@ built, repo truth wins.
 
 Layer 4 — Implementation history and repo truth
 
-6. Repo documentation and [[changelog]]
+6. Repo documentation and changelog
 
 Role
 The record of implemented and verified changes in the repository.
@@ -316,7 +317,7 @@ Then route it accordingly:
 - sequencing/dependency truth -> [[actora-roadmap|Roadmap]]
 - still an idea / needs filtering -> [[working-ideas-register|Working Ideas Register]]
 - compact near-term planning snapshot -> [[actionable-summary|Actionable Ideas Summary]]
-- already built and verified -> repo docs / [[changelog]]
+- already built and verified -> repo docs / changelog
 
 This prevents every document from trying to be everything at once.
 
@@ -369,7 +370,7 @@ This prevents the stable docs from becoming giant parking lots.
 Session loading strategy
 
 Not every session needs every document loaded. As the project grows, loading all
-source documents plus codebase plus [[changelog]] into a single session will become
+source documents plus codebase plus changelog into a single session will become
 impractical. Use the following guidance to decide what to load for different
 session types.
 
@@ -380,7 +381,7 @@ Spec session (drafting or reviewing a patch spec)
   history
 
 Review and apply session (reviewing a draft, applying a patch, verifying)
-- Always load: [[operator-guide|Operator Guide]], relevant repo docs/[[changelog]], relevant code files
+- Always load: [[operator-guide|Operator Guide]], relevant repo docs/changelog, relevant code files
 - Load if relevant: [[actora-roadmap|Roadmap]] (to confirm scope), [[master-context|Master Context]] (if architecture
   alignment is in question)
 - Usually skip: [[working-ideas-register|Working Ideas Register]], [[actionable-summary|Actionable Ideas Summary]], [[source-index|Source Index]]
@@ -425,7 +426,7 @@ Navigation layer
 
 Implementation history / repo truth
 - repo documentation
-- repo [[changelog]]
+- repo changelog
 - codebase
 - VPS/runtime verification
 
@@ -475,4 +476,4 @@ Compact rule set
 - [[working-ideas-register|Working Ideas Register]] = where active ideas live
 - [[actionable-summary|Actionable Ideas Summary]] = temporary planning snapshot
 - [[source-index|Source Index]] = how the document system is organized
-- repo docs/[[changelog]] = what was actually implemented
+- repo docs/changelog = what was actually implemented

@@ -3,6 +3,7 @@ title: Actora Roadmap
 role: sequencing-and-dependency-order
 stability: high
 layer: core
+relates_to: [master-context, source-index, working-ideas-register]
 ---
 
 Actora Roadmap v10
@@ -84,7 +85,7 @@ Do not use it as the primary source for:
 - implementation history
 - repo-local file truth
 
-Those belong in repo truth, especially the codebase, repo documentation, and the repo [[changelog]].
+Those belong in repo truth, especially the codebase, repo documentation, and the repo changelog.
 
 A roadmap layer may be introduced, tightened, or cleaned up across multiple code versions.
 That does not require the roadmap itself to change unless sequencing or architectural dependency order changed meaningfully.

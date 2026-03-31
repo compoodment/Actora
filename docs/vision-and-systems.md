@@ -3,14 +3,15 @@ title: Vision & Systems
 role: creative-vision-and-system-intent
 stability: moderate
 layer: vision
+relates_to: [master-context, ui-architecture]
 ---
 
 # Actora Vision & Systems
 
 Purpose: Persistent creative vision capture for Actora. Updated through interviews. Never thrown away — iterated.
-This is the "what should this feel like and do" layer, distinct from architecture (Master Context), sequencing (Roadmap), and implementation (architecture.md/changelog).
+This is the "what should this feel like and do" layer, distinct from architecture ([[master-context|Master Context]]), sequencing ([[actora-roadmap|Roadmap]]), and implementation (architecture.md/changelog).
 
-Authority: Non-authoritative vs stable docs. When this conflicts with Master Context or Roadmap, those win. When this conflicts with implementation truth, repo truth wins. But this is the primary source for creative intent per system.
+Authority: Non-authoritative vs stable docs. When this conflicts with [[master-context|Master Context]] or [[actora-roadmap|Roadmap]], those win. When this conflicts with implementation truth, repo truth wins. But this is the primary source for creative intent per system and should be reflected in [[ui-architecture]].
 
 ---
 

@@ -3,6 +3,7 @@ title: TUI Standards
 role: interaction-design-rules
 stability: high
 layer: implementation
+relates_to: [ui-architecture, architecture]
 ---
 
 # TUI Standards

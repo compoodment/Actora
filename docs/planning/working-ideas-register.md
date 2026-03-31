@@ -3,6 +3,7 @@ title: Working Ideas Register
 role: flexible-idea-intake-and-staging
 stability: low
 layer: planning
+relates_to: [actora-roadmap, actionable-summary]
 ---
 
 Actora Working Ideas Register v52
@@ -138,7 +139,7 @@ Core clarified points:
 - gender deferred to puberty, sexuality emerges through events
 - Space=select, Enter=proceed, B=back, all ←→ fields show ← value → when active
 - Enter must never confirm popup overlays — Space only
-- player-facing text must never use internal/architecture language ([[operator-guide|Operator Guide]] section 18)
+- player-facing text must never use internal/architecture language (Operator Guide section 18)
 
 Anti-drift read:
 Actora should not collapse into "deeper BitLife," "detached god sim," or vague universe-scale handwaving. Actor-anchored, zoomable, continuous, simulation-real.

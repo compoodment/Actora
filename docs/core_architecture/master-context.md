@@ -3,6 +3,7 @@ title: Master Context
 role: core-architecture-anchor
 stability: high
 layer: core
+relates_to: [actora-roadmap, source-index]
 ---
 
 Actora Master Context v9

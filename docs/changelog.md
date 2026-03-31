@@ -3,6 +3,7 @@ title: Changelog
 role: version-history
 stability: stable-as-history
 layer: implementation
+relates_to: [architecture]
 ---
 
 # Actora Changelog
@@ -13,7 +14,7 @@ layer: implementation
     - All adjustable value fields (`←→`) now visually show `← value →` when active. This is the enforced standard across all screens.
     - Popup choices (gender/sexuality emergence) now only respond to Space — Enter is fully blocked while a popup is active. Fixes held-Enter during month advancement eating popups silently.
     - Removed now-dead `pending_choice_input_guard` flag (replaced by hard Enter block).
-    - Updated [[tui-standards|TUI Standards]]: `←→` applies to all adjustable fields (not stats-only), popup Enter block rule documented, `← value →` rendering requirement documented.
+    - Updated TUI Standards: `←→` applies to all adjustable fields (not stats-only), popup Enter block rule documented, `← value →` rendering requirement documented.
 
 ## Version 0.43.0 (Minor) - 2026-03-31
 - **Playtest Polish Round 2:**
@@ -590,7 +591,7 @@ layer: implementation
 
 ## Version 0.5.7 (Patch) - 2026-03-14
 - **Docs Sync After Structural Cleanup:**
-    - Updated `[[architecture]]` to reflect the current repository structure after v0.5.6:
+    - Updated `architecture` to reflect the current repository structure after v0.5.6:
         - `world.py` and `banners.py` now listed in file structure.
         - Module responsibilities updated to reflect `World` and `simulate_advance_turn(...)` in `world.py`.
         - `main.py` responsibilities updated to reflect decomposed shell functions.
@@ -613,7 +614,7 @@ layer: implementation
     - Renamed the concrete implemented model class from `Person` to `Human`.
     - Renamed the module `comp_life/person.py` to `comp_life/human.py`.
     - Updated all imports and code references across `main.py` and `events.py` to use the new `Human` class and `human` module.
-    - Updated documentation (`[[architecture]]`) to reflect `Human` / `human.py` for the concrete model.
+    - Updated documentation (`architecture`) to reflect `Human` / `human.py` for the concrete model.
     - Preserved all existing character creation, lifecycle math, event filtering, and overall game behavior exactly.
 
 ## Version 0.5.4 (Minor) - 2026-03-14
@@ -624,7 +625,7 @@ layer: implementation
     - Updated `Person.display_snapshot()` to use `get_lifecycle_state()` for lifecycle-derived values.
     - Modified `events.py` to call `person.get_lifecycle_state()` once and use its result for event filtering, replacing separate direct lifecycle calls.
     - Preserved all existing age math, life-stage thresholds, snapshot values, and event eligibility behavior exactly.
-    - Refreshed `[[architecture]]` to accurately reflect the current repository structure and responsibilities.
+    - Refreshed `architecture` to accurately reflect the current repository structure and responsibilities.
 
 ## Version 0.5.3 (Minor) - 2026-03-12
 - **Structured Turn Result Contract:**

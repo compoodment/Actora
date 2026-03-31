@@ -3,6 +3,7 @@ title: Actionable Summary
 role: near-term-planning-snapshot
 stability: low
 layer: planning
+relates_to: [working-ideas-register, actora-roadmap]
 ---
 
 Actionable Ideas Summary — Rev40
@@ -15,7 +16,7 @@ Usage rule: keep this more distilled than the WIR and focused on the current wor
 === CURRENT WORKING POSITION ===
 
 Verified repo truth is through v0.44.0 with source-stack sync through:
-- [[master-context|Master Context]] v9, [[actora-roadmap|Actora Roadmap]] v10, [[operator-guide|Operator Guide]] v9 (+ section 18: player-facing text rule)
+- Master Context v9, [[actora-roadmap|Actora Roadmap]] v10, Operator Guide v9 (+ section 18: player-facing text rule)
 
 The project has a materially strong early backbone:
 - World-owned actor registry, links, places (hierarchy), records, simulation step
@@ -79,7 +80,7 @@ User direction: non-family relationships before education. Relationships before 
 
 3. Current-layer polish (reactive, as found)
 - More trait events (only 2 per trait currently)
-- Name pool genericness (noted in [[live-issues|Live Issues]])
+- Name pool genericness (noted in Live Issues)
 - These are reactive to playtest findings — address as discovered, not as a planned pass
 
 
