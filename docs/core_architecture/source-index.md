@@ -47,12 +47,12 @@ There are two different questions:
 
 1. What is the approved durable direction?
 Use the source documents in this order:
-- Master Context
-- Operator Guide
-- Roadmap
-- Source Index
-- Working Ideas Register
-- Actionable Ideas Summary
+- [[master-context|Master Context]]
+- [[operator-guide|Operator Guide]]
+- [[actora-roadmap|Roadmap]]
+- [[source-index|Source Index]]
+- [[working-ideas-register|Working Ideas Register]]
+- [[actionable-summary|Actionable Ideas Summary]]
 
 2. What is actually implemented right now?
 Use repo truth:
@@ -70,7 +70,7 @@ When either side changes meaningfully, update the correct layer deliberately.
 
 Layer 1 — Core architecture and workflow anchors
 
-1. Actora Master Context
+1. [[master-context|Actora Master Context]]
 
 Role
 The durable identity and architecture anchor for Actora.
@@ -97,7 +97,7 @@ High stability.
 Only revise when project identity or core architecture truly changes.
 
 
-2. Actora Operator Guide
+2. [[operator-guide|Actora Operator Guide]]
 
 Role
 The workflow and execution discipline anchor.
@@ -133,7 +133,7 @@ Revise when the working method or guardrails genuinely change.
 
 Layer 2 — Structural direction
 
-3. Actora Roadmap
+3. [[actora-roadmap|Actora Roadmap]]
 
 Role
 The sequencing and dependency-order anchor.
@@ -171,7 +171,7 @@ discussion, not in the roadmap text itself.
 
 Layer 3 — Flexible working layer
 
-4. Actora Working Ideas Register
+4. [[working-ideas-register|Actora Working Ideas Register]]
 
 Role
 The flexible intake, filtering, parking, and staging document for ideas.
@@ -199,7 +199,7 @@ Low to moderate stability.
 This is expected to change more often than the stable source documents.
 
 
-5. Actionable Ideas Summary
+5. [[actionable-summary|Actionable Ideas Summary]]
 
 Role
 A supplemental working summary for near-term planning and handoff efficiency.
@@ -261,7 +261,7 @@ Stable as history, but updated whenever verified implementation changes are
 committed or repo docs are deliberately revised.
 
 
-7. Actora Source Index
+7. [[source-index|Actora Source Index]]
 
 Role
 The navigation and precedence guide for the whole document system.
@@ -304,11 +304,11 @@ Ask:
 - is this already implemented?
 
 Then route it accordingly:
-- durable architecture truth -> Master Context
-- workflow/process rule -> Operator Guide
-- sequencing/dependency truth -> Roadmap
-- still an idea / needs filtering -> Working Ideas Register
-- compact near-term planning snapshot -> Actionable Ideas Summary
+- durable architecture truth -> [[master-context|Master Context]]
+- workflow/process rule -> [[operator-guide|Operator Guide]]
+- sequencing/dependency truth -> [[actora-roadmap|Roadmap]]
+- still an idea / needs filtering -> [[working-ideas-register|Working Ideas Register]]
+- compact near-term planning snapshot -> [[actionable-summary|Actionable Ideas Summary]]
 - already built and verified -> repo docs / changelog
 
 This prevents every document from trying to be everything at once.
@@ -349,7 +349,7 @@ part of the system.
 
 Promotion rule
 
-An idea should move from the Working Ideas Register into a stable source
+An idea should move from the [[working-ideas-register|Working Ideas Register]] into a stable source
 document only when it is:
 - durable
 - approved clearly enough to rely on by default
@@ -367,31 +367,31 @@ impractical. Use the following guidance to decide what to load for different
 session types.
 
 Spec session (drafting or reviewing a patch spec)
-- Always load: Master Context, Roadmap
-- Load if relevant: Working Ideas Register, Actionable Ideas Summary
+- Always load: [[master-context|Master Context]], [[actora-roadmap|Roadmap]]
+- Load if relevant: [[working-ideas-register|Working Ideas Register]], [[actionable-summary|Actionable Ideas Summary]]
 - Usually skip: full Operator Guide (unless workflow questions arise), full repo
   history
 
 Review and apply session (reviewing a draft, applying a patch, verifying)
-- Always load: Operator Guide, relevant repo docs/changelog, relevant code files
-- Load if relevant: Roadmap (to confirm scope), Master Context (if architecture
+- Always load: [[operator-guide|Operator Guide]], relevant repo docs/changelog, relevant code files
+- Load if relevant: [[actora-roadmap|Roadmap]] (to confirm scope), [[master-context|Master Context]] (if architecture
   alignment is in question)
 - Usually skip: Working Ideas Register, Actionable Ideas Summary, Source Index
 
 Doc revision session (updating source documents)
-- Always load: Source Index, Master Context, target document being revised
-- Load if relevant: Operator Guide (if workflow content is being revised),
-  Roadmap (if sequencing is being revised), Working Ideas Register (if idea
+- Always load: [[source-index|Source Index]], [[master-context|Master Context]], target document being revised
+- Load if relevant: [[operator-guide|Operator Guide]] (if workflow content is being revised),
+  [[actora-roadmap|Roadmap]] (if sequencing is being revised), [[working-ideas-register|Working Ideas Register]] (if idea
   promotion is involved)
 - Usually skip: full codebase unless implementation truth is needed
 
 Roadmap or planning session (evaluating what comes next, milestone planning)
-- Always load: Master Context, Roadmap, Working Ideas Register
-- Load if relevant: Actionable Ideas Summary, Source Index
+- Always load: [[master-context|Master Context]], [[actora-roadmap|Roadmap]], [[working-ideas-register|Working Ideas Register]]
+- Load if relevant: [[actionable-summary|Actionable Ideas Summary]], [[source-index|Source Index]]
 - Usually skip: full Operator Guide unless process changes are on the table
 
 General working session (mixed tasks, conversation, quick questions)
-- Always load: Master Context, Roadmap
+- Always load: [[master-context|Master Context]], [[actora-roadmap|Roadmap]]
 - Load if relevant: whichever document the conversation touches
 - Usually skip: everything not immediately relevant
 
@@ -403,18 +403,18 @@ bureaucracy about which documents are open.
 Current document set
 
 Core architecture/workflow anchors
-- Actora Master Context
-- Actora Operator Guide
+- [[master-context|Actora Master Context]]
+- [[operator-guide|Actora Operator Guide]]
 
 Structural direction
-- Actora Roadmap
+- [[actora-roadmap|Actora Roadmap]]
 
 Flexible working layer
-- Actora Working Ideas Register
-- Actionable Ideas Summary
+- [[working-ideas-register|Actora Working Ideas Register]]
+- [[actionable-summary|Actionable Ideas Summary]]
 
 Navigation layer
-- Actora Source Index
+- [[source-index|Actora Source Index]]
 
 Implementation history / repo truth
 - repo documentation
@@ -437,7 +437,7 @@ Current recommended maintenance behavior
 
 Current durable baseline reminders
 
-Use Master Context first for reminders about:
+Use [[master-context|Master Context]] first for reminders about:
 - the approved conceptual skeleton
 - non-human-first architecture direction
 - layered simulation depth
@@ -448,12 +448,12 @@ Use Master Context first for reminders about:
 - Type and Scope as foundational cross-cutting layers
 - controlled state mutation direction
 
-Use Roadmap for reminders about:
+Use [[actora-roadmap|Roadmap]] for reminders about:
 - dependency order
 - what layer must come before what
 - what should remain deferred even if it is attractive
 
-Use Operator Guide for reminders about:
+Use [[operator-guide|Operator Guide]] for reminders about:
 - build-before-apply discipline
 - review / verification expectations
 - source-vs-repo truth separation
@@ -462,10 +462,10 @@ Use Operator Guide for reminders about:
 
 Compact rule set
 
-- Master Context = what Actora is
-- Operator Guide = how Actora work is done
-- Roadmap = dependency order
-- Working Ideas Register = where active ideas live
-- Actionable Ideas Summary = temporary planning snapshot
-- Source Index = how the document system is organized
+- [[master-context|Master Context]] = what Actora is
+- [[operator-guide|Operator Guide]] = how Actora work is done
+- [[actora-roadmap|Roadmap]] = dependency order
+- [[working-ideas-register|Working Ideas Register]] = where active ideas live
+- [[actionable-summary|Actionable Ideas Summary]] = temporary planning snapshot
+- [[source-index|Source Index]] = how the document system is organized
 - repo docs/changelog = what was actually implemented

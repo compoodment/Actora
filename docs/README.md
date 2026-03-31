@@ -9,31 +9,31 @@ Stable source documents.
 Use these first when the question is about durable project truth.
 
 Files:
-- `master-context.txt` — what Actora is
-- `actora-roadmap.txt` — dependency order and what should come before what
-- `source-index.txt` — how the document system works
+- `[[master-context]]` — what Actora is
+- `[[actora-roadmap]]` — dependency order and what should come before what
+- `[[source-index]]` — how the document system works
 
 ### `workflow/`
 Workflow and execution discipline.
 
 Files:
-- `operator-guide.txt` — how Actora work should be done
+- `[[operator-guide]]` — how Actora work should be done
 
 ### `planning/`
 Flexible working layer.
 Use this for active pressures, parked ideas, and near-term planning snapshots.
 
 Files:
-- `working-ideas-register.txt`
-- `actionable-summary.txt`
+- `[[working-ideas-register]]`
+- `[[actionable-summary]]`
 
 ### repo-local docs in this folder
 These are implementation-facing and should not be confused with the source stack.
 
 Files:
-- `architecture.md`
-- `changelog.md`
-- `lifecycle-system.md`
+- `[[architecture]]`
+- `[[changelog]]`
+- `[[architecture#Lifecycle System|lifecycle-system]]`
 
 ## Quick usage rules
 
@@ -47,10 +47,10 @@ Files:
 
 ## Practical loading guide
 
-- Architecture question -> `master-context.txt`
-- Workflow / review / patch-discipline question -> `operator-guide.txt`
-- "What should come next?" -> `actora-roadmap.txt` + planning docs
-- "Where does this idea belong?" -> `source-index.txt`
+- Architecture question -> `[[master-context]]`
+- Workflow / review / patch-discipline question -> `[[operator-guide]]`
+- "What should come next?" -> `[[actora-roadmap]]` + planning docs
+- "Where does this idea belong?" -> `[[source-index]]`
 - "What changed in code?" -> repo docs + codebase + git
 
 ## Important rule
