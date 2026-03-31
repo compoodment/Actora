@@ -417,16 +417,22 @@ Core architecture/workflow anchors
 Structural direction
 - [[actora-roadmap|Actora Roadmap]]
 
+Creative vision and UI structure
+- [[vision-and-systems|Vision & Systems]] — creative intent per system, updated through interviews
+- [[ui-architecture|UI Architecture]] — screen map, navigation blueprint, rules for adding systems
+
 Flexible working layer
 - [[working-ideas-register|Actora Working Ideas Register]]
 - [[actionable-summary|Actionable Ideas Summary]]
+- [[live-issues|Live Issues]]
 
 Navigation layer
 - [[source-index|Actora Source Index]]
 
 Implementation history / repo truth
-- repo documentation
-- repo changelog
+- [[architecture|architecture.md]]
+- [[tui-standards|tui-standards.md]]
+- [[changelog|changelog.md]]
 - codebase
 - VPS/runtime verification
 
