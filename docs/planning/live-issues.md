@@ -1,3 +1,10 @@
+---
+title: Live Issues
+role: bug-and-revisit-tracker
+stability: low
+tags: [bugs, issues, tracking]
+---
+
 Live Issues / Revisit Tracker
 Date: 2026-03-31
 Purpose: repo-local parking lot for current bugs, regressions, and revisit items so they do not get lost between patches.
@@ -55,4 +62,4 @@ Purpose: repo-local parking lot for current bugs, regressions, and revisit items
 - v0.43.0: wizard polish — first name error timing, appearance arrows, custom prompt, questionnaire weight, history breathing, continuation text
 - v0.42.0: sex field unselectable, trait leak (questionnaire→manual), questionnaire separator, footer labels, continuation crash, None date TypeError, ESC/Enter handling
 - v0.41.0: banners removed, selection behavior enforced, quit confirmation added
-- v0.36.0–v0.40.1: see WIR completed milestones
+- v0.36.0–v0.40.1: see [[working-ideas-register|Working Ideas Register]] completed milestones

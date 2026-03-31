@@ -1,3 +1,10 @@
+---
+title: TUI Standards
+role: interaction-design-rules
+stability: high
+tags: [tui, standards, ux]
+---
+
 # TUI Standards
 
 Consistent controls, navigation, and interaction patterns for all Actora TUI surfaces.

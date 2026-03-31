@@ -1,3 +1,10 @@
+---
+title: Master Context
+role: core-architecture-anchor
+stability: high
+tags: [core, identity, architecture]
+---
+
 Actora Master Context v9
 
 Purpose

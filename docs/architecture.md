@@ -1,3 +1,10 @@
+---
+title: Architecture
+role: repo-implementation-truth
+stability: moderate
+tags: [implementation, repo-truth]
+---
+
 # Actora Architecture Summary
 
 **Version:** 0.40.1
@@ -21,8 +28,8 @@ It is intended to support safe patching, review, and manual verification.
     ├── human.py
     ├── events.py
     └── docs/
-        ├── architecture.md
-        └── changelog.md
+        ├── [[architecture]]
+        └── [[changelog]]
 
 ## 3. Core Objects
 
@@ -656,7 +663,7 @@ When patching this repository:
 - preserve validated behavior unless the patch explicitly changes it
 - keep simulation logic separate from terminal rendering
 - keep changes narrow and reviewable
-- update `docs/changelog.md` when implemented behavior changes
+- update `[[changelog]]` when implemented behavior changes
 - keep module and function responsibilities clear
 
 ## 12. Manual Verification Focus

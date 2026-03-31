@@ -1,3 +1,10 @@
+---
+title: Working Ideas Register
+role: flexible-idea-intake-and-staging
+stability: low
+tags: [planning, ideas, flexible]
+---
+
 Actora Working Ideas Register v52
 
 Date: 2026-03-31
@@ -51,7 +58,7 @@ Created: 2026-03-31
 Title: Non-family relationships — first social layer
 Status: Next structural move (confirmed)
 Priority: P1
-Roadmap fit: social foundation before social space systems and education
+[[actora-roadmap|Actora Roadmap]] fit: social foundation before social space systems and education
 Summary: Friendships, acquaintances, rivals — the first non-family relationship layer. Dependency for social space systems, education context, and peer-driven events.
 Why it matters: Without non-family relationships, education and social systems have no social substrate to build on.
 Next action: scope and implement
@@ -108,7 +115,7 @@ Core clarified points:
 - gender deferred to puberty, sexuality emerges through events
 - Space=select, Enter=proceed, B=back, all ←→ fields show ← value → when active
 - Enter must never confirm popup overlays — Space only
-- player-facing text must never use internal/architecture language (operator guide section 18)
+- player-facing text must never use internal/architecture language ([[operator-guide|Operator Guide]] section 18)
 
 Anti-drift read:
 Actora should not collapse into "deeper BitLife," "detached god sim," or vague universe-scale handwaving. Actor-anchored, zoomable, continuous, simulation-real.
@@ -128,4 +135,3 @@ Actora should not collapse into "deeper BitLife," "detached god sim," or vague u
 === ONE-LINE SUMMARY ===
 
 Actora has a materially strong TUI-driven prototype through v0.44.1 — next move is non-family relationships as the first social layer before education.
-

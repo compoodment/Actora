@@ -1,3 +1,10 @@
+---
+title: Operator Guide
+role: workflow-and-execution-discipline
+stability: high
+tags: [workflow, process, rules]
+---
+
 Actora Operator Guide v9
 
 Purpose
@@ -6,10 +13,10 @@ This document defines the working method, workflow roles, patch discipline, revi
 
 It is the workflow anchor for the project.
 It does not define the main project identity or milestone sequencing by itself.
-Those belong to the Master Context and Roadmap.
+Those belong to the [[master-context|Master Context]] and [[actora-roadmap|Actora Roadmap]].
 
 It also does not replace repo-local implementation history.
-Repo docs and changelog track what was actually changed in code.
+Repo docs and [[changelog]] track what was actually changed in code.
 
 This document should be used whenever work is being proposed, reviewed, patched, applied, verified, committed, tagged, or documented.
 
@@ -67,7 +74,7 @@ A discussed issue may be:
 	•	immediate work
 	•	deferred work
 	•	roadmap pressure
-	•	Working Ideas Register material
+	•	[[working-ideas-register|Working Ideas Register]] material
 	•	simply a note
 
 1.3 Execution-path selection rule
@@ -215,28 +222,28 @@ This workflow avoids silent drift and error-prone piecemeal edits.
 Actora should be worked on through the source system rather than through drifting chat assumptions.
 
 Use source documents in this priority order:
-	1.	Master Context
-	2.	Operator Guide
-	3.	Roadmap
-	4.	Source Index
-	5.	Working Ideas Register
-	6.	Actionable Ideas Summary, if one is actively maintained
+	1.	[[master-context|Master Context]]
+	2.	[[operator-guide|Operator Guide]]
+	3.	[[actora-roadmap|Actora Roadmap]]
+	4.	[[source-index|Source Index]]
+	5.	[[working-ideas-register|Working Ideas Register]]
+	6.	[[actionable-summary|Actionable Summary]], if one is actively maintained
 
 Use repo-local documents separately for implemented history and repo-local architecture notes.
 Those are not the same thing as the source stack.
 
 Interpretation rule:
-	•	Master Context defines durable project identity and architecture truth
-	•	Operator Guide defines workflow and patch discipline
-	•	Roadmap defines sequencing and dependency order
-	•	Source Index explains source roles and precedence
-	•	Working Ideas Register is flexible staging, not automatic truth
-	•	Actionable Ideas Summary is a temporary planning aid, not durable authority
-	•	Repo changelog records actual implemented history
+	•	[[master-context|Master Context]] defines durable project identity and architecture truth
+	•	[[operator-guide|Operator Guide]] defines workflow and patch discipline
+	•	[[actora-roadmap|Actora Roadmap]] defines sequencing and dependency order
+	•	[[source-index|Source Index]] explains source roles and precedence
+	•	[[working-ideas-register|Working Ideas Register]] is flexible staging, not automatic truth
+	•	[[actionable-summary|Actionable Summary]] is a temporary planning aid, not durable authority
+	•	Repo [[changelog]] records actual implemented history
 	•	Repo architecture notes describe codebase-facing structure and implementation-facing clarification
 
 If a new idea conflicts with stable sources, do not silently follow the idea.
-Route it through the Working Ideas Register or revise the stable docs deliberately if the baseline truly changed.
+Route it through the [[working-ideas-register|Working Ideas Register]] or revise the stable docs deliberately if the baseline truly changed.
 
 ⸻
 
@@ -311,7 +318,7 @@ A patch should do the approved job and no more.
 
 If a good idea appears but does not belong in the current patch:
 	•	keep it out of the patch
-	•	route it to the Working Ideas Register if needed
+	•	route it to the [[working-ideas-register|Working Ideas Register]] if needed
 	•	preserve sequencing discipline
 
 ⸻
@@ -408,21 +415,21 @@ Flexible source docs should absorb active idea pressure.
 Repo docs should carry implementation-facing truth and change history.
 
 Use documents like this:
-	•	Master Context for durable identity and architecture truth
-	•	Operator Guide for workflow rules
-	•	Roadmap for sequencing and dependency order, not patch-by-patch progress tracking
-	•	Source Index for source navigation and precedence
-	•	Working Ideas Register for active idea intake and staging
-	•	Actionable Ideas Summary for temporary planning snapshots when useful
-	•	Repo changelog for implemented history
+	•	[[master-context|Master Context]] for durable identity and architecture truth
+	•	[[operator-guide|Operator Guide]] for workflow rules
+	•	[[actora-roadmap|Actora Roadmap]] for sequencing and dependency order, not patch-by-patch progress tracking
+	•	[[source-index|Source Index]] for source navigation and precedence
+	•	[[working-ideas-register|Working Ideas Register]] for active idea intake and staging
+	•	[[actionable-summary|Actionable Summary]] for temporary planning snapshots when useful
+	•	Repo [[changelog]] for implemented history
 	•	Repo architecture notes for code-facing structural clarification
 
 Do not:
 	•	stuff every brainstorm into stable docs
-	•	use the Working Ideas Register as implementation truth
-	•	use the Actionable Ideas Summary as durable authority
-	•	use the Changelog for speculative planning
-	•	make the Roadmap depend on current patch numbers if dependency order is all that matters
+	•	use the [[working-ideas-register|Working Ideas Register]] as implementation truth
+	•	use the [[actionable-summary|Actionable Summary]] as durable authority
+	•	use the [[changelog|Changelog]] for speculative planning
+	•	make the [[actora-roadmap|Actora Roadmap]] depend on current patch numbers if dependency order is all that matters
 	•	assume source docs and repo docs automatically stay in sync without deliberate updates
 
 If a patch lands and only implementation history changed, update repo docs as needed and leave the stable source stack alone.
@@ -540,7 +547,7 @@ Do not use one exciting idea to bypass dependency order.
 
 15. Working ideas rule
 
-The Working Ideas Register is the intake / filter / staging layer.
+The [[working-ideas-register|Working Ideas Register]] is the intake / filter / staging layer.
 
 Use it for:
 	•	good ideas that do not fit the current milestone
@@ -548,7 +555,7 @@ Use it for:
 	•	rewrite pressures
 	•	future systems that should be remembered without being implemented now
 
-Use the Actionable Ideas Summary, if maintained, as a temporary planning snapshot rather than durable truth.
+Use the [[actionable-summary|Actionable Summary]], if maintained, as a temporary planning snapshot rather than durable truth.
 
 Promotion rule:
 Only move an idea into a stable source when it is durable enough to be relied on by default.

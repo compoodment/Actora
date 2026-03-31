@@ -1,3 +1,10 @@
+---
+title: Source Index
+role: document-system-navigation
+stability: moderate
+tags: [meta, navigation, source-system]
+---
+
 Actora Source Index v9
 
 Purpose
@@ -58,7 +65,7 @@ Use the source documents in this order:
 Use repo truth:
 - codebase
 - repo documentation
-- repo changelog
+- repo [[changelog]]
 - VPS/runtime/manual verification
 
 Do not collapse these questions together.
@@ -158,12 +165,12 @@ Should not contain:
 - temporary arguments that do not affect sequencing
 
 Stability
-High stability, but somewhat more revision-friendly than Master Context and
-Operator Guide.
+High stability, but somewhat more revision-friendly than [[master-context|Master Context]] and
+[[operator-guide|Operator Guide]].
 Revise when sequencing or architectural dependency order changes meaningfully.
 
 Important rule
-The Roadmap is not the place to keep a running “where we are right now” patch
+The [[actora-roadmap|Actora Roadmap]] is not the place to keep a running “where we are right now” patch
 counter.
 Actual implementation progress belongs in repo history and current planning
 discussion, not in the roadmap text itself.
@@ -224,7 +231,7 @@ Low stability.
 This document is allowed to age faster than the main source stack.
 
 Important rule
-If the Actionable Ideas Summary and the stable docs disagree, the stable docs
+If the [[actionable-summary|Actionable Ideas Summary]] and the stable docs disagree, the stable docs
 win.
 If it disagrees with verified repo implementation truth about what is already
 built, repo truth wins.
@@ -232,7 +239,7 @@ built, repo truth wins.
 
 Layer 4 — Implementation history and repo truth
 
-6. Repo documentation and changelog
+6. Repo documentation and [[changelog]]
 
 Role
 The record of implemented and verified changes in the repository.
@@ -309,7 +316,7 @@ Then route it accordingly:
 - sequencing/dependency truth -> [[actora-roadmap|Roadmap]]
 - still an idea / needs filtering -> [[working-ideas-register|Working Ideas Register]]
 - compact near-term planning snapshot -> [[actionable-summary|Actionable Ideas Summary]]
-- already built and verified -> repo docs / changelog
+- already built and verified -> repo docs / [[changelog]]
 
 This prevents every document from trying to be everything at once.
 
@@ -362,21 +369,21 @@ This prevents the stable docs from becoming giant parking lots.
 Session loading strategy
 
 Not every session needs every document loaded. As the project grows, loading all
-source documents plus codebase plus changelog into a single session will become
+source documents plus codebase plus [[changelog]] into a single session will become
 impractical. Use the following guidance to decide what to load for different
 session types.
 
 Spec session (drafting or reviewing a patch spec)
 - Always load: [[master-context|Master Context]], [[actora-roadmap|Roadmap]]
 - Load if relevant: [[working-ideas-register|Working Ideas Register]], [[actionable-summary|Actionable Ideas Summary]]
-- Usually skip: full Operator Guide (unless workflow questions arise), full repo
+- Usually skip: full [[operator-guide|Operator Guide]] (unless workflow questions arise), full repo
   history
 
 Review and apply session (reviewing a draft, applying a patch, verifying)
-- Always load: [[operator-guide|Operator Guide]], relevant repo docs/changelog, relevant code files
+- Always load: [[operator-guide|Operator Guide]], relevant repo docs/[[changelog]], relevant code files
 - Load if relevant: [[actora-roadmap|Roadmap]] (to confirm scope), [[master-context|Master Context]] (if architecture
   alignment is in question)
-- Usually skip: Working Ideas Register, Actionable Ideas Summary, Source Index
+- Usually skip: [[working-ideas-register|Working Ideas Register]], [[actionable-summary|Actionable Ideas Summary]], [[source-index|Source Index]]
 
 Doc revision session (updating source documents)
 - Always load: [[source-index|Source Index]], [[master-context|Master Context]], target document being revised
@@ -385,10 +392,10 @@ Doc revision session (updating source documents)
   promotion is involved)
 - Usually skip: full codebase unless implementation truth is needed
 
-Roadmap or planning session (evaluating what comes next, milestone planning)
+[[actora-roadmap|Actora Roadmap]] or planning session (evaluating what comes next, milestone planning)
 - Always load: [[master-context|Master Context]], [[actora-roadmap|Roadmap]], [[working-ideas-register|Working Ideas Register]]
 - Load if relevant: [[actionable-summary|Actionable Ideas Summary]], [[source-index|Source Index]]
-- Usually skip: full Operator Guide unless process changes are on the table
+- Usually skip: full [[operator-guide|Operator Guide]] unless process changes are on the table
 
 General working session (mixed tasks, conversation, quick questions)
 - Always load: [[master-context|Master Context]], [[actora-roadmap|Roadmap]]
@@ -418,7 +425,7 @@ Navigation layer
 
 Implementation history / repo truth
 - repo documentation
-- repo changelog
+- repo [[changelog]]
 - codebase
 - VPS/runtime verification
 
@@ -468,4 +475,4 @@ Compact rule set
 - [[working-ideas-register|Working Ideas Register]] = where active ideas live
 - [[actionable-summary|Actionable Ideas Summary]] = temporary planning snapshot
 - [[source-index|Source Index]] = how the document system is organized
-- repo docs/changelog = what was actually implemented
+- repo docs/[[changelog]] = what was actually implemented

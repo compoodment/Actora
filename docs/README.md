@@ -1,3 +1,10 @@
+---
+title: Actora Docs Index
+role: navigation
+stability: high
+tags: [index, navigation]
+---
+
 # Actora Docs
 
 This `docs/` directory separates stable source truth, flexible planning, workflow rules, and repo-local implementation truth so the project does not collapse into one giant markdown swamp.
@@ -37,13 +44,13 @@ Files:
 
 ## Quick usage rules
 
-- **Master Context** = durable identity / architecture truth
-- **Operator Guide** = workflow rules
-- **Roadmap** = sequencing and dependency order
-- **Working Ideas Register** = active ideas and parked pressures
-- **Actionable Summary** = temporary planning snapshot
-- **Source Index** = source-system navigation and precedence
-- **Repo docs / changelog** = what was actually implemented
+- **[[master-context|Master Context]]** = durable identity / architecture truth
+- **[[operator-guide|Operator Guide]]** = workflow rules
+- **[[actora-roadmap|Actora Roadmap]]** = sequencing and dependency order
+- **[[working-ideas-register|Working Ideas Register]]** = active ideas and parked pressures
+- **[[actionable-summary|Actionable Summary]]** = temporary planning snapshot
+- **[[source-index|Source Index]]** = source-system navigation and precedence
+- **Repo docs / [[changelog]]** = what was actually implemented
 
 ## Practical loading guide
 
