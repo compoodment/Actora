@@ -1,5 +1,5 @@
-Actionable Ideas Summary — Rev39
-Date: 2026-03-30
+Actionable Ideas Summary — Rev40
+Date: 2026-03-31
 Role: temporary near-term operational planning snapshot for Actora
 Authority: non-authoritative; stable docs win, repo truth wins on implementation
 Usage rule: keep this more distilled than the WIR and focused on the current working position, current planning question, and strongest near-term candidates
@@ -7,7 +7,7 @@ Usage rule: keep this more distilled than the WIR and focused on the current wor
 
 === CURRENT WORKING POSITION ===
 
-Verified repo truth is through v0.40.1 with source-stack sync through:
+Verified repo truth is through v0.44.0 with source-stack sync through:
 - Master Context v9, Roadmap v10, Operator Guide v9 (+ section 18: player-facing text rule)
 
 The project has a materially strong early backbone:
@@ -17,15 +17,18 @@ The project has a materially strong early backbone:
 - Structural death/continuity foundation with playable handoff
 - Ordinary old-age mortality, family continuity substrate (siblings at startup + later births)
 - Actor-first curses TUI with Life View, Profile, Lineage Browser, History Browser, Skip Time
-- Character creation wizard (Identity → Appearance → Traits → Stats → Confirm)
+- Character creation wizard (Identity → Location → Appearance → Mode → Stats/Questionnaire → Traits → Confirm)
 - 120 events (100 general + 20 trait-gated) with family-aware dynamic text and cooldown
 - 11 stats (3 primary + 8 secondary), appearance traits, personality traits
 - Event-choice framework (popup overlay) with gender/sexuality identity emergence
 - Death inspectability (life summary, two-step continuation inspection)
-- Consistent TUI control language (Space=select, Enter=proceed, B=back, ↑↓=navigate)
+- Consistent TUI control language (Space=select, Enter=proceed, B=back, ↑↓=navigate, ←→=adjust)
+- All adjustable value fields render ← value → when active; enforced standard across all screens
+- Popup choices (gender/sexuality) blocked from Enter — Space-only confirm, Enter fully blocked during popup
 - 12 real countries with 39 cities, culture-aware name generation (400+ names)
 - Questionnaire-based character creation as alternative to manual (16 personality questions)
 - Player-facing text lint tool and operator guide rule (section 18)
+- tmux-based headless playtesting capability for TUI verification
 
 Recent milestone sequence:
 - v0.36.8 — ordinary mortality
@@ -40,33 +43,37 @@ Recent milestone sequence:
 - v0.39.1 — traits wired into events
 - v0.40.0 — real location content (12 countries, 39 cities, culture-aware names)
 - v0.40.1 — questionnaire-based character creation mode
+- v0.41.0 — TUI polish: banners removed, selection behavior enforced, footer labels, quit confirmation
+- v0.42.0 — playtest bug fixes: sex field, trait leak, questionnaire separator, footer labels, crash fixes
+- v0.43.0 — playtest polish: wizard UX, history breathing room, left panel scroll, continuation text
+- v0.44.0 — arrow standard enforced on all adjustable fields, popup Enter blocked (Space-only)
 
 
 === CURRENT PLANNING QUESTION ===
 
-"Given repo truth through v0.40.1, what is the strongest next move: education foundation, further polish from playtesting, or remaining open items?"
+"Given repo truth through v0.44.0 and a solid TUI polish pass, what is the next structural move?"
 
-User direction: fix all remaining open items before education. Address everything found during playtesting. Questionnaire is now shipped.
+User direction: non-family relationships before education. Relationships before social space systems — dependency-minded sequencing confirmed and aligned with planning docs.
 
 
 === LEADING PLANNING CANDIDATES ===
 
-1. Education foundation (leading next structural move)
-- The first mid-stage domain layer per roadmap
-- Now has location context to support it (different countries could mean different school systems later)
-- Would give the actor something to DO during childhood/teenage years
-- Would unlock real event content tied to school/learning
-- Depends on: actor model (realized), event foundation (realized), place context (now realized)
+1. Non-family relationships (leading next structural move)
+- Friendships, acquaintances, rivals — the first non-family social layer
+- Dependency: actor model (realized), event foundation (realized), place context (realized)
+- Needed before social space systems and before education makes sense as a social context
+- Would unlock real peer/friend event content and relationship-driven event eligibility
 
-2. Further identity/location depth
-- More countries, regional variation within countries, ethnic diversity in name pools
-- Gradual sexuality signals, culture-driven identity emergence
-- These deepen what exists but don't add new gameplay systems
+2. Education foundation (next after relationships)
+- First mid-stage domain layer per roadmap
+- Has location context to support it (different countries could mean different school systems later)
+- Gives the actor something to DO during childhood/teenage years
+- Depends on: actor model (realized), event foundation (realized), place context (realized), relationships (pending)
 
-3. Current-layer polish
+3. Current-layer polish (reactive, as found)
 - More trait events (only 2 per trait currently)
 - Name pool genericness (noted in live-issues)
-- These are reactive to playtest findings
+- These are reactive to playtest findings — address as discovered, not as a planned pass
 
 
 === DESIGN READ ===
@@ -84,17 +91,19 @@ Key design locks:
 - Stats: 0-100, full sandbox customization
 - Gender deferred to puberty, sexuality emerges through events
 - Space=select/toggle, Enter=proceed, B=back across all TUI
+- All ←→ adjustable fields render ← value → when active
+- Enter must never confirm popup overlays — Space only
 
 
 === REAL TENSIONS ===
 
 1. Scope remains huge — execution risk is "feature landfill" if sequencing discipline slips
-2. Place content is still fake ("Starter Country") while many future systems need real location context
-3. Traits are wired into events but don't yet affect simulation outcomes beyond small stat bumps
-4. Identity depth (sexuality signals, culture-driven emergence) is stored but inert waiting for context systems
-5. Archive/lineage depth is still intentionally narrow
+2. Traits are wired into events but don't yet affect simulation outcomes beyond event eligibility
+3. Identity depth (sexuality signals, culture-driven emergence) is stored but inert waiting for context systems
+4. Archive/lineage depth is still intentionally narrow
+5. Relationships currently only family — non-family social layer is the next dependency unlock
 
 
 === ONE-LINE SUMMARY ===
 
-Actora has a materially strong TUI-driven prototype through v0.40.0 with real actor depth, real geography, and culture-aware identity — and the next honest move is likely the education foundation as the first mid-stage domain layer.
+Actora has a materially strong TUI-driven prototype through v0.44.0 with real actor depth, real geography, culture-aware identity, and a polished creation wizard — next move is non-family relationships as the first social layer before education.
