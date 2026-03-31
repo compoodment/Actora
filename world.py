@@ -1376,6 +1376,252 @@ class World:
             "selected_detail": selected_detail,
         }
 
+    def _get_social_tier_label(self, closeness):
+        """Returns the display tier label for a social link closeness value."""
+        if closeness >= 70:
+            return "Close Friend"
+        if closeness >= 30:
+            return "Friend"
+        return "Acquaintance"
+
+    def _build_relationship_social_entry(self, actor_id, linked_actor_id, link):
+        """Builds one relationship entry for a social-link-connected actor."""
+        linked_actor = self.get_actor(linked_actor_id)
+        if linked_actor is None:
+            return None
+
+        lifecycle_year = self.current_year
+        lifecycle_month = self.current_month
+        if (
+            not linked_actor.is_alive()
+            and linked_actor.death_year is not None
+            and linked_actor.death_month is not None
+        ):
+            lifecycle_year = linked_actor.death_year
+            lifecycle_month = linked_actor.death_month
+
+        lifecycle = linked_actor.get_lifecycle_state(lifecycle_year, lifecycle_month)
+        current_place_name = self.get_place_name(linked_actor.current_place_id) or "Unknown"
+        birth_date = self._format_year_month(linked_actor.birth_year, linked_actor.birth_month)
+        death_date = self._format_year_month(linked_actor.death_year, linked_actor.death_month)
+        meta = link.get("metadata", {})
+        closeness = meta.get("closeness", 0)
+        social_status = meta.get("status", "active")
+
+        return {
+            "actor_id": linked_actor_id,
+            "full_name": linked_actor.get_full_name(),
+            "relationship_label": self._get_social_tier_label(closeness),
+            "family_branch_label": None,
+            "is_alive": linked_actor.is_alive(),
+            "structural_status": linked_actor.structural_status,
+            "age": lifecycle["age_years"],
+            "life_stage": lifecycle["life_stage"],
+            "birth_date": birth_date,
+            "death_date": death_date,
+            "death_reason": linked_actor.death_reason,
+            "current_place_name": current_place_name,
+            "link_type": "social",
+            "social_status": social_status,
+            "closeness": closeness,
+        }
+
+    def get_relationship_entries_for(self, actor_id, filter_mode="all"):
+        """Returns relationship entries (family + social) for the relationship browser."""
+        if actor_id not in self.actors:
+            raise ValueError(f"get_relationship_entries_for: unknown actor_id '{actor_id}'")
+
+        entries = []
+        seen_actor_ids = set()
+
+        if filter_mode in ("all", "family", "living", "dead"):
+            family_entries = self.get_lineage_entries_for(actor_id, filter_mode="all", search_text="")
+            for entry in family_entries:
+                entry = dict(entry)
+                entry.setdefault("link_type", "family")
+                entry.setdefault("social_status", None)
+                entry.setdefault("closeness", None)
+                seen_actor_ids.add(entry["actor_id"])
+                if filter_mode == "living" and not entry["is_alive"]:
+                    continue
+                if filter_mode == "dead" and entry["is_alive"]:
+                    continue
+                entries.append(entry)
+
+        if filter_mode in ("all", "friends", "former", "living", "dead"):
+            social_links = self.get_links(source_id=actor_id, link_type="social")
+            for link in social_links:
+                target_id = link.get("target_id")
+                if target_id is None or target_id in seen_actor_ids:
+                    continue
+                meta = link.get("metadata", {})
+                social_status = meta.get("status", "active")
+                if filter_mode == "friends" and social_status != "active":
+                    continue
+                if filter_mode == "former" and social_status != "former":
+                    continue
+                entry = self._build_relationship_social_entry(actor_id, target_id, link)
+                if entry is None:
+                    continue
+                if filter_mode == "living" and not entry["is_alive"]:
+                    continue
+                if filter_mode == "dead" and entry["is_alive"]:
+                    continue
+                seen_actor_ids.add(target_id)
+                entries.append(entry)
+
+        return sorted(
+            entries,
+            key=lambda e: (
+                e.get("full_name", "").casefold(),
+                e.get("relationship_label", ""),
+                e.get("actor_id", ""),
+            ),
+        )
+
+    def get_relationship_detail_for(self, actor_id, linked_actor_id, recent_record_limit=5):
+        """Returns one relationship detail payload for a family or social link actor."""
+        if actor_id not in self.actors:
+            raise ValueError(f"get_relationship_detail_for: unknown actor_id '{actor_id}'")
+
+        entries = self.get_relationship_entries_for(actor_id)
+        selected_entry = next(
+            (e for e in entries if e["actor_id"] == linked_actor_id),
+            None,
+        )
+        if selected_entry is None:
+            return None
+
+        linked_actor = self.get_actor(linked_actor_id)
+        if linked_actor is None:
+            return None
+
+        actor_records = self.get_actor_records(linked_actor_id)
+        recent_records = actor_records[-recent_record_limit:]
+        record_summaries = [
+            {
+                "year": record.get("year"),
+                "month": record.get("month"),
+                "record_type": record.get("record_type"),
+                "text": record.get("text"),
+            }
+            for record in reversed(recent_records)
+        ]
+
+        return {
+            "summary": {
+                "actor_id": linked_actor_id,
+                "full_name": linked_actor.get_full_name(),
+                "relationship_label": selected_entry["relationship_label"],
+                "family_branch_label": selected_entry.get("family_branch_label"),
+                "species": linked_actor.species,
+                "sex": linked_actor.sex,
+                "gender": linked_actor.gender,
+                "is_alive": linked_actor.is_alive(),
+                "structural_status": linked_actor.structural_status,
+                "age": selected_entry["age"],
+                "life_stage": selected_entry["life_stage"],
+                "birth_date": selected_entry["birth_date"],
+                "death_date": selected_entry["death_date"],
+                "death_reason": selected_entry["death_reason"],
+                "current_place_name": selected_entry["current_place_name"],
+                "health": linked_actor.stats["health"],
+                "happiness": linked_actor.stats["happiness"],
+                "intelligence": linked_actor.stats["intelligence"],
+                "money": linked_actor.money,
+                "link_type": selected_entry.get("link_type", "family"),
+                "social_status": selected_entry.get("social_status"),
+                "closeness": selected_entry.get("closeness"),
+            },
+            "records": record_summaries,
+        }
+
+    def get_relationship_browser_data_for(self, actor_id, *, filter_mode="all", recent_record_limit=5):
+        """Builds one structured relationship-browser payload for the TUI shell."""
+        entries = self.get_relationship_entries_for(actor_id, filter_mode=filter_mode)
+        selected_detail = None
+        if entries:
+            selected_detail = self.get_relationship_detail_for(
+                actor_id,
+                entries[0]["actor_id"],
+                recent_record_limit=recent_record_limit,
+            )
+        return {
+            "actor_id": actor_id,
+            "filter_mode": filter_mode,
+            "entries": entries,
+            "result_count": len(entries),
+            "selected_detail": selected_detail,
+        }
+
+    def apply_social_link_decay(self, focused_actor_id, shared_actor_ids=None):
+        """Applies one month of closeness decay to active social links for the focused actor.
+
+        shared_actor_ids: actor IDs that had a shared event this month (no decay for those).
+        Returns a list of drift event dicts with keys: text, year, month.
+        """
+        if shared_actor_ids is None:
+            shared_actor_ids = set()
+
+        drift_events = []
+        social_links = self.get_links(source_id=focused_actor_id, link_type="social")
+        for link in social_links:
+            meta = link.get("metadata", {})
+            if meta.get("status") != "active":
+                continue
+
+            target_id = link.get("target_id")
+            closeness = meta.get("closeness", 0)
+            history_months = meta.get("closeness_history_months", 0)
+
+            new_history = history_months + 1
+            meta["closeness_history_months"] = new_history
+
+            reverse_links = self.get_links(source_id=target_id, target_id=focused_actor_id, link_type="social")
+            for rev_link in reverse_links:
+                rev_meta = rev_link.get("metadata", {})
+                if rev_meta.get("status") == "active":
+                    rev_meta["closeness_history_months"] = new_history
+
+            if target_id in shared_actor_ids:
+                continue
+
+            if new_history > 60:
+                if new_history % 4 != 0:
+                    continue
+            elif new_history > 24:
+                if new_history % 2 != 0:
+                    continue
+
+            closeness = max(0, closeness - 1)
+            meta["closeness"] = closeness
+            new_role = self._get_social_link_category(closeness)
+            link["role"] = new_role
+
+            for rev_link in reverse_links:
+                rev_meta = rev_link.get("metadata", {})
+                if rev_meta.get("status") == "active":
+                    rev_meta["closeness"] = closeness
+                    rev_link["role"] = new_role
+
+            if closeness <= 0:
+                meta["status"] = "former"
+                link["role"] = "former"
+                for rev_link in reverse_links:
+                    rev_meta = rev_link.get("metadata", {})
+                    rev_meta["status"] = "former"
+                    rev_link["role"] = "former"
+
+                target_actor = self.get_actor(target_id)
+                target_name = target_actor.get_full_name() if target_actor else "Someone"
+                drift_events.append({
+                    "text": f"You and {target_name} have drifted apart.",
+                    "year": self.current_year,
+                    "month": self.current_month,
+                })
+
+        return drift_events
+
     def apply_outcome(self, actor_id, outcome):
         """Applies event outcome stat changes to the target actor, if found."""
         actor_obj = self.get_actor(actor_id)

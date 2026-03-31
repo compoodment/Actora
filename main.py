@@ -19,6 +19,15 @@ LINEAGE_FILTER_LABELS = {
     "living": "Living",
     "dead": "Dead",
 }
+REL_FILTER_OPTIONS = ["all", "family", "friends", "former", "living", "dead"]
+REL_FILTER_LABELS = {
+    "all": "All",
+    "family": "Family",
+    "friends": "Friends",
+    "former": "Former",
+    "living": "Living",
+    "dead": "Dead",
+}
 MAIN_LEFT_SECTION_KEYS = ("identity", "location", "statistics", "relationships")
 HIDDEN_PLAYER_RECORD_TYPES = {"family_bootstrap", "actor_entry"}
 BACK_KEYS = {
@@ -552,6 +561,7 @@ def build_screen_chrome(screen_name, world, focused_actor_name):
         "main": "Life View",
         "profile": "Profile",
         "lineage": "Lineage Browser",
+        "relationship_browser": "Relationships",
         "history": "History",
         "skip_time": "Skip Time",
         "death_ack": "Death",
@@ -562,6 +572,7 @@ def build_screen_chrome(screen_name, world, focused_actor_name):
         "main": focused_actor_name,
         "profile": focused_actor_name,
         "lineage": focused_actor_name,
+        "relationship_browser": focused_actor_name,
         "history": focused_actor_name,
         "skip_time": "Choose a larger time jump or enter custom months",
         "death_ack": focused_actor_name,
@@ -803,6 +814,15 @@ def build_randomized_starting_stats():
     actor = Human("Human", "Temp", "", "Female", "Female", 1, 1)
     actor.randomize_starting_statistics()
     return dict(actor.stats)
+
+
+def _get_social_tier_label(closeness):
+    """Returns the display tier label for a social link closeness value."""
+    if closeness >= 70:
+        return "Close Friend"
+    if closeness >= 30:
+        return "Friend"
+    return "Acquaintance"
 
 
 class CreationWizard:
@@ -1662,6 +1682,10 @@ class ActoraTUI:
         self.gender_choice_age = random.randint(12, 15)
         self.sexuality_choice_age = random.randint(14, 17)
         self.meeting_event_last_total_months = 0
+        self.rel_browser_focus = "filters"
+        self.rel_filter_index = 0
+        self.active_actions = []
+        self.hang_out_actor_ids = []
 
     def get_focused_actor_id(self):
         return self.world.get_focused_actor_id() or self.player_id
@@ -1755,6 +1779,46 @@ class ActoraTUI:
         if self.lineage_search_text:
             return f"Search: {self.lineage_search_text}"
         return "Search: off"
+
+    def get_relationship_browser_state(self):
+        focused_actor_id = self.get_focused_actor_id()
+        filter_mode = REL_FILTER_OPTIONS[self.rel_filter_index]
+        browser_state = self.world.get_relationship_browser_data_for(
+            focused_actor_id,
+            filter_mode=filter_mode,
+            recent_record_limit=LINEAGE_RECORD_LIMIT,
+        )
+        entries = browser_state["entries"]
+        if not entries:
+            self.lineage_selection = 0
+            self.selected_lineage_actor_id = None
+            browser_state["selected_detail"] = None
+            return browser_state
+
+        if self.selected_lineage_actor_id is not None:
+            matching_index = next(
+                (
+                    index
+                    for index, entry in enumerate(entries)
+                    if entry["actor_id"] == self.selected_lineage_actor_id
+                ),
+                None,
+            )
+            if matching_index is not None:
+                self.lineage_selection = matching_index
+            else:
+                self.lineage_selection = 0
+                self.selected_lineage_actor_id = entries[0]["actor_id"]
+        else:
+            self.lineage_selection = max(0, min(self.lineage_selection, len(entries) - 1))
+            self.selected_lineage_actor_id = entries[self.lineage_selection]["actor_id"]
+
+        browser_state["selected_detail"] = self.world.get_relationship_detail_for(
+            focused_actor_id,
+            self.selected_lineage_actor_id,
+            recent_record_limit=LINEAGE_RECORD_LIMIT,
+        )
+        return browser_state
 
     def get_continuity_state(self):
         return self.world.build_continuity_state_for(self.get_focused_actor_id())
@@ -2004,6 +2068,35 @@ class ActoraTUI:
                 )
                 self.last_message = "You kept to yourself."
 
+        elif choice_id == "select_hang_out_target":
+            if selected_value is not None:
+                options_list = (self.pending_choice or {}).get("options", [])
+                try:
+                    selected_idx = options_list.index(selected_value)
+                    target_actor_id = self.hang_out_actor_ids[selected_idx]
+                except (ValueError, IndexError):
+                    self.pending_choice = None
+                    return
+                already_queued = any(
+                    a["action_type"] == "spend_time" and a["target_actor_id"] == target_actor_id
+                    for a in self.active_actions
+                )
+                if not already_queued:
+                    target_actor = self.world.get_actor(target_actor_id)
+                    target_name = target_actor.get_full_name() if target_actor else "Someone"
+                    self.active_actions.append({
+                        "action_type": "spend_time",
+                        "target_actor_id": target_actor_id,
+                        "label": f"Spend time with {target_name}",
+                    })
+                    self.last_message = f"Queued: Spend time with {target_name}."
+                else:
+                    self.last_message = "Already queued to hang out with them."
+            else:
+                self.last_message = "Cancelled."
+            self.pending_choice = None
+            return
+
         self.pending_choice = None
         remaining = self.remaining_skip_months
         self.remaining_skip_months = 0
@@ -2086,15 +2179,93 @@ class ActoraTUI:
             "continuity_state": None,
         }
         new_records = []
+        focused_actor_id = self.get_focused_actor_id()
 
+        spend_time_actions = [a for a in self.active_actions if a["action_type"] == "spend_time"]
+        shared_actor_ids = {a["target_actor_id"] for a in spend_time_actions}
+
+        first_month = True
         for _ in range(months_to_advance):
             prior_record_count = len(self.world.records)
             month_turn_result = self.world.simulate_advance_turn(self.player_id, 1)
-            new_records.extend(self.world.records[prior_record_count:])
+            new_records_this_month = self.world.records[prior_record_count:]
+            new_records.extend(new_records_this_month)
             aggregated_turn_result["months_advanced"] += month_turn_result["months_advanced"]
             aggregated_turn_result["events"].extend(month_turn_result["events"])
             aggregated_turn_result["focused_actor_alive"] = month_turn_result["focused_actor_alive"]
             aggregated_turn_result["continuity_state"] = month_turn_result["continuity_state"]
+
+            if first_month:
+                for action in spend_time_actions:
+                    target_id = action["target_actor_id"]
+                    for lnk in self.world.get_links(source_id=focused_actor_id, target_id=target_id, link_type="social"):
+                        lnk_meta = lnk.get("metadata", {})
+                        if lnk_meta.get("status") == "active":
+                            old_cl = lnk_meta.get("closeness", 0)
+                            new_cl = min(100, old_cl + 8)
+                            lnk_meta["closeness"] = new_cl
+                            new_role = self.world._get_social_link_category(new_cl)
+                            lnk["role"] = new_role
+                            for rev_lnk in self.world.get_links(source_id=target_id, target_id=focused_actor_id, link_type="social"):
+                                rev_meta = rev_lnk.get("metadata", {})
+                                if rev_meta.get("status") == "active":
+                                    rev_meta["closeness"] = new_cl
+                                    rev_lnk["role"] = new_role
+                    target_actor = self.world.get_actor(target_id)
+                    target_name = target_actor.get_full_name() if target_actor else "Someone"
+                    self.append_event_log_entry(
+                        "event",
+                        f"You spent some time with {target_name}.",
+                        year=self.world.current_year,
+                        month=self.world.current_month,
+                    )
+                self.active_actions = [a for a in self.active_actions if a["action_type"] != "spend_time"]
+
+            for record in new_records_this_month:
+                if record.get("record_type") != "death":
+                    continue
+                for dead_actor_id in record.get("actor_ids", []):
+                    if dead_actor_id == focused_actor_id:
+                        continue
+                    for lnk in self.world.get_links(source_id=focused_actor_id, target_id=dead_actor_id, link_type="social"):
+                        lnk_meta = lnk.get("metadata", {})
+                        if lnk_meta.get("status") != "active":
+                            continue
+                        closeness = lnk_meta.get("closeness", 0)
+                        dead_actor = self.world.get_actor(dead_actor_id)
+                        dead_name = dead_actor.get_full_name() if dead_actor else "Someone"
+                        focused_actor_obj = self.world.get_actor(focused_actor_id)
+                        if closeness >= 70:
+                            if focused_actor_obj:
+                                focused_actor_obj.modify_stat("happiness", -18)
+                            self.append_event_log_entry(
+                                "event",
+                                f"You were devastated to hear that {dead_name}, your close friend, has passed away.",
+                                year=self.world.current_year,
+                                month=self.world.current_month,
+                            )
+                        elif closeness >= 30:
+                            if focused_actor_obj:
+                                focused_actor_obj.modify_stat("happiness", -8)
+                            self.append_event_log_entry(
+                                "event",
+                                f"You learned that {dead_name}, your friend, has passed away.",
+                                year=self.world.current_year,
+                                month=self.world.current_month,
+                            )
+
+            if month_turn_result.get("focused_actor_alive", True):
+                month_shared = shared_actor_ids if first_month else set()
+                drift_events = self.world.apply_social_link_decay(focused_actor_id, month_shared)
+                for drift in drift_events:
+                    self.append_event_log_entry(
+                        "event",
+                        drift["text"],
+                        year=drift["year"],
+                        month=drift["month"],
+                    )
+
+            first_month = False
 
             if month_turn_result["months_advanced"] <= 0 or not month_turn_result["focused_actor_alive"]:
                 break
@@ -2155,6 +2326,59 @@ class ActoraTUI:
         self.screen_name = "lineage"
         self.last_message = "Browsing lineage archive."
 
+    def open_relationship_browser(self):
+        self.lineage_selection = 0
+        self.selected_lineage_actor_id = None
+        self.rel_browser_focus = "filters"
+        self.rel_filter_index = 0
+        self.screen_name = "relationship_browser"
+        self.last_message = "Browsing relationships."
+
+    def open_hang_out_select(self):
+        """Opens the hang out overlay to select a friend to spend time with."""
+        focused_actor_id = self.get_focused_actor_id()
+        social_links = self.world.get_links(source_id=focused_actor_id, link_type="social")
+        active_links = [l for l in social_links if l.get("metadata", {}).get("status") == "active"]
+        if not active_links:
+            self.last_message = "You have no one to hang out with."
+            return
+
+        options = []
+        self.hang_out_actor_ids = []
+        for link in active_links:
+            target_id = link.get("target_id")
+            target_actor = self.world.get_actor(target_id)
+            if target_actor is None:
+                continue
+            meta = link.get("metadata", {})
+            closeness = meta.get("closeness", 0)
+            tier = _get_social_tier_label(closeness)
+            already_queued = any(
+                a["action_type"] == "spend_time" and a["target_actor_id"] == target_id
+                for a in self.active_actions
+            )
+            label = f"{target_actor.get_full_name()} · {tier}"
+            if already_queued:
+                label += " (queued)"
+            options.append(label)
+            self.hang_out_actor_ids.append(target_id)
+
+        if not options:
+            self.last_message = "You have no one to hang out with."
+            return
+
+        self.pending_choice = {
+            "title": "Hang Out",
+            "text": "Choose someone to spend time with.",
+            "question": "",
+            "options": options,
+            "selected_index": 0,
+            "skippable": True,
+            "choice_id": "select_hang_out_target",
+            "default_value": None,
+        }
+        self.last_message = "Select someone to hang out with."
+
     def scroll_profile(self, delta):
         profile_lines = self.build_profile_lines(self.get_snapshot_data())
         visible_height = self.profile_body_height
@@ -2189,6 +2413,31 @@ class ActoraTUI:
     def profile_body_height(self):
         return getattr(self, "_profile_body_height", 0)
 
+    def _build_friends_section_lines(self):
+        """Builds the Friends section lines for the main Life View left panel."""
+        focused_actor_id = self.get_focused_actor_id()
+        social_links = self.world.get_links(source_id=focused_actor_id, link_type="social")
+        active_links = [l for l in social_links if l.get("metadata", {}).get("status") == "active"]
+        if not active_links:
+            return ["  No friends yet."]
+        lines = []
+        for link in active_links:
+            target_id = link.get("target_id")
+            target_actor = self.world.get_actor(target_id)
+            if target_actor is None:
+                continue
+            meta = link.get("metadata", {})
+            closeness = meta.get("closeness", 0)
+            tier = _get_social_tier_label(closeness)
+            lines.append(f"  {target_actor.get_full_name()} · {tier}")
+        return lines if lines else ["  No friends yet."]
+
+    def _build_actions_section_lines(self):
+        """Builds the Actions section lines for the main Life View left panel."""
+        if not self.active_actions:
+            return ["  No pending actions."]
+        return [f"  {action['label']}" for action in self.active_actions]
+
     def build_main_left_lines(self, snapshot_sections, *, include_time):
         lines = []
         for section in snapshot_sections:
@@ -2197,6 +2446,12 @@ class ActoraTUI:
             lines.append(section["title"])
             lines.extend(section["lines"])
             lines.append("")
+        lines.append("Friends")
+        lines.extend(self._build_friends_section_lines())
+        lines.append("")
+        lines.append("Actions")
+        lines.extend(self._build_actions_section_lines())
+        lines.append("")
         if lines and lines[-1] == "":
             lines.pop()
         return lines
@@ -2369,9 +2624,11 @@ class ActoraTUI:
         elif key in (ord("p"), ord("P")):
             self.open_profile()
         elif key in (ord("l"), ord("L")):
-            self.open_lineage()
+            self.open_relationship_browser()
         elif key in (ord("h"), ord("H")):
             self.open_history()
+        elif key in (ord("t"), ord("T")):
+            self.open_hang_out_select()
         elif key == curses.KEY_UP:
             self.scroll_main_left(-1)
         elif key == curses.KEY_DOWN:
@@ -2488,6 +2745,47 @@ class ActoraTUI:
         elif key in (curses.KEY_ENTER, 10, 13):
             self.last_message = f"Inspecting {lineage_entries[self.lineage_selection]['full_name']}."
 
+    def handle_relationship_browser_key(self, key):
+        browser_state = self.get_relationship_browser_state()
+        entries = browser_state["entries"]
+
+        if key in (ord("q"), ord("Q")):
+            self.quit_confirmation_active = True
+            return
+
+        if self.rel_browser_focus == "filters":
+            if key in BACK_KEYS or key in (ord("b"), ord("B")):
+                self.screen_name = "main"
+                self.last_message = MAIN_IDLE_MESSAGE
+                return
+            if key == curses.KEY_UP:
+                self.rel_filter_index = max(0, self.rel_filter_index - 1)
+                self.lineage_selection = 0
+                self.selected_lineage_actor_id = None
+            elif key == curses.KEY_DOWN:
+                self.rel_filter_index = min(len(REL_FILTER_OPTIONS) - 1, self.rel_filter_index + 1)
+                self.lineage_selection = 0
+                self.selected_lineage_actor_id = None
+            elif key in (9, curses.KEY_RIGHT):  # Tab or Right
+                self.rel_browser_focus = "actors"
+                self.last_message = "Browsing people."
+        else:  # actors focus
+            if key in (ord("b"), ord("B"), curses.KEY_LEFT) or key in BACK_KEYS:
+                self.rel_browser_focus = "filters"
+                self.last_message = "Browsing relationships."
+                return
+            if not entries:
+                return
+            if key == curses.KEY_UP:
+                self.lineage_selection = max(0, self.lineage_selection - 1)
+                self.selected_lineage_actor_id = entries[self.lineage_selection]["actor_id"]
+            elif key == curses.KEY_DOWN:
+                self.lineage_selection = min(len(entries) - 1, self.lineage_selection + 1)
+                self.selected_lineage_actor_id = entries[self.lineage_selection]["actor_id"]
+            elif key in (curses.KEY_ENTER, 10, 13):
+                if entries:
+                    self.last_message = f"Inspecting {entries[self.lineage_selection]['full_name']}."
+
     def handle_death_ack_key(self, key):
         if key in (ord("q"), ord("Q")):
             self.quit_confirmation_active = True
@@ -2564,6 +2862,8 @@ class ActoraTUI:
             self.handle_profile_key(key)
         elif self.screen_name == "lineage":
             self.handle_lineage_key(key)
+        elif self.screen_name == "relationship_browser":
+            self.handle_relationship_browser_key(key)
         elif self.screen_name == "history":
             self.handle_history_key(key)
         elif self.screen_name == "skip_time":
@@ -2577,9 +2877,10 @@ class ActoraTUI:
 
     def render_footer(self, stdscr, height, width):
         footer_hints = {
-            "main": "[A] Advance Month   [S] Skip Time  |  [P] Profile   [L] Lineage   [H] History   [Q] Quit",
+            "main": "[A] Advance Month   [S] Skip Time  |  [L] Relationships   [P] Profile   [H] History   [T] Hang Out   [Q] Quit",
             "profile": "[↑↓] Scroll   [B] Back   [Q] Quit",
             "lineage": "[↑↓] Move   [A] All   [L] Living   [D] Dead   [/] Search   [B] Back   [Q] Quit",
+            "relationship_browser": "[↑↓] Filter/Move   [Tab/→] Switch   [B/←] Back   [Q] Quit",
             "history": "[↑↓] Scroll   [/] Jump to Year   [B] Back   [Q] Quit",
             "history_search": "Type year [0-9]   [Enter] Continue   [Esc] Cancel   [Q] Quit",
             "lineage_search": "Type search   [Enter] Continue   [Esc] Cancel   [Q] Quit",
@@ -2821,6 +3122,92 @@ class ActoraTUI:
 
         draw_text_block(stdscr, top, right_left, right_width, body_height, right_lines)
 
+    def render_relationship_browser(self, stdscr, height, width):
+        browser_state = self.get_relationship_browser_state()
+        entries = browser_state["entries"]
+        selected_detail = browser_state["selected_detail"]
+
+        top = 4
+        body_height = height - 6
+        content_left, content_width = get_content_bounds(width, max_width=120)
+
+        filter_col_width = 12
+        gap = 2
+        remaining_width = content_width - filter_col_width - gap
+        actor_col_width = remaining_width * 5 // 10
+        detail_left = content_left + filter_col_width + gap + actor_col_width + gap
+        detail_width = max(20, content_width - filter_col_width - gap - actor_col_width - gap)
+        actor_left = content_left + filter_col_width + gap
+
+        filter_lines = []
+        filter_highlight = None
+        for idx, fkey in enumerate(REL_FILTER_OPTIONS):
+            if idx == self.rel_filter_index:
+                filter_highlight = len(filter_lines)
+            marker = ">" if self.rel_browser_focus == "filters" and idx == self.rel_filter_index else " "
+            filter_lines.append(f"{marker} {REL_FILTER_LABELS[fkey]}")
+
+        draw_truncated_block(
+            stdscr, top, content_left, filter_col_width, body_height, filter_lines,
+            highlight_index=filter_highlight,
+        )
+
+        divider1_x = content_left + filter_col_width + 1
+        draw_vertical_divider(stdscr, top, divider1_x, body_height)
+
+        actor_lines = []
+        actor_highlight = None
+        if not entries:
+            actor_lines.append("No entries.")
+        else:
+            for index, entry in enumerate(entries):
+                if index == self.lineage_selection and self.rel_browser_focus == "actors":
+                    actor_highlight = len(actor_lines)
+                actor_lines.append(build_lineage_row(entry))
+
+        draw_truncated_block(
+            stdscr, top, actor_left, actor_col_width, body_height, actor_lines,
+            highlight_index=actor_highlight,
+        )
+
+        divider2_x = detail_left - 1
+        draw_vertical_divider(stdscr, top, divider2_x, body_height)
+
+        if selected_detail is None:
+            right_lines = [
+                center_text("SELECTED PERSON", detail_width),
+                "",
+                "No detail available.",
+            ]
+        else:
+            summary = selected_detail["summary"]
+            records = selected_detail["records"]
+            right_lines = []
+            right_lines.append(center_text("SELECTED PERSON", detail_width))
+            right_lines.append("")
+            right_lines.extend(build_person_card_lines(summary))
+            link_type = summary.get("link_type", "family")
+            if link_type == "social":
+                closeness = summary.get("closeness", 0)
+                social_status = summary.get("social_status", "active")
+                right_lines.extend([
+                    "",
+                    f"Social: {summary['relationship_label']}",
+                    f"Closeness: {closeness}   Status: {social_status}",
+                ])
+            else:
+                right_lines.extend([
+                    "",
+                    "Identity",
+                    f"Species: {summary['species']}",
+                    f"Sex: {summary['sex']}",
+                    f"Condition: Health {summary['health']}   Happiness {summary['happiness']}",
+                ])
+            right_lines.extend(["", "Recent Records"])
+            right_lines.extend(build_record_summary_lines(records))
+
+        draw_text_block(stdscr, top, detail_left, detail_width, body_height, right_lines)
+
     def render_history(self, stdscr, height, width):
         top = 4
         body_height = height - 6
@@ -3055,6 +3442,8 @@ class ActoraTUI:
             self.render_profile(stdscr, height, width)
         elif self.screen_name == "lineage":
             self.render_lineage(stdscr, height, width)
+        elif self.screen_name == "relationship_browser":
+            self.render_relationship_browser(stdscr, height, width)
         elif self.screen_name == "history":
             self.render_history(stdscr, height, width)
         elif self.screen_name == "skip_time":
