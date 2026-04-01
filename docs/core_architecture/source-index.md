@@ -8,22 +8,8 @@ relates_to: [master-context, actora-roadmap, operator-guide]
 
 Actora Source Index v9
 
-Purpose
-
-This document explains the role of each Actora document, how the source system
-should be used, and which layer of documentation should answer which kind of
-question.
-
-This file is the navigation layer for the Actora document system.
-
-It should help answer:
-- which document to check first
-- which document is stable vs flexible
-- which document defines durable architecture truth
-- which document defines workflow rules
-- which document defines roadmap sequencing
-- which document captures active ideas
-- where implementation truth actually lives
+Navigation and precedence guide for the Actora document system.
+Explains the role of each document, which layer to consult for which question, and how source truth and repo truth relate.
 
 
 Core document model

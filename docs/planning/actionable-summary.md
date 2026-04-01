@@ -6,11 +6,7 @@ layer: planning
 relates_to: [working-ideas-register, actora-roadmap]
 ---
 
-Actionable Ideas Summary — Rev41
-Date: 2026-04-01
-Role: temporary near-term operational planning snapshot for Actora
-Authority: non-authoritative; stable docs win, repo truth wins on implementation
-Usage rule: keep this more distilled than the WIR and focused on the current working position, current planning question, and strongest near-term candidates
+Actionable Ideas Summary — Rev41 | 2026-04-01 | Near-term snapshot; non-authoritative, stable docs and repo truth win.
 
 
 === CURRENT WORKING POSITION ===
@@ -81,17 +77,7 @@ Direction: Polish v0.45.0 first (UI restructure, bugs fixed, tui-standards updat
 
 === DESIGN READ ===
 
-See [[vision-and-systems]] for full creative intent per system.
-See [[ui-architecture]] for screen map and navigation rules.
-
-Key locks:
-- Death is a structural transition, not a fail-state
-- Economy and politics are real future pillars
-- Social perception: multi-axis, not a single karma score
-- Scope zoom: actor → city → country → world → star system → galaxy → universe
-- All ←→ adjustable fields render ← value → when active
-- Enter must never confirm popup overlays — Space only
-- `former` is a link status field, not a type — universal across all link types
+See [[vision-and-systems]] for creative intent and [[ui-architecture]] for screen structure.
 
 
 === REAL TENSIONS ===

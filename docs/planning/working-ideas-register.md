@@ -6,13 +6,8 @@ layer: planning
 relates_to: [actora-roadmap, actionable-summary]
 ---
 
-Actora Working Ideas Register v52
-
-Date: 2026-03-31
-Role: broad working idea intake, staging, parking, interview-derived design retention, and rewrite-pressure tracking for Actora
-Authority level: flexible working layer, not durable architecture truth
-Interpretation rule: stable source docs win over this file; verified repo truth wins on what is already implemented
-Usage rule: preserve substantial design material and conversation-derived pressure here instead of flattening everything into short-term task summaries
+Actora Working Ideas Register v52 | 2026-03-31 | Flexible idea intake, staging, and design retention.
+Authority: flexible working layer — stable docs win, repo truth wins on implementation.
 
 
 === CURRENT WORKING READ ===
@@ -125,24 +120,8 @@ v0.41.0–v0.44.1 — TUI polish: banners removed, selection behavior, footer la
 Completed IDEAs: IDEA-045(partial), IDEA-076(partial), IDEA-097–IDEA-121
 
 
-=== CLARIFIED DESIGN READ (PRESERVED WORDING) ===
-
-Actora is a single continuous universe simulation where the player primarily lives as the current actor, but can zoom across scopes, continue through connected lives, and interact with real economic, political, spatial, and later social systems inside the same save.
-
-Core clarified points:
-- one save = one universe simulation; actor life is the emotional anchor
-- full custom sandbox setup is the default; death is a structural transition not a fail-state
-- zoom ladder: actor → city → country → world → star system → galaxy → universe
-- economy and politics are pillars, not garnish
-- social systems: multiple perception axes, not a single karma meter
-- traits: structured (birth) + emergent (develop over time)
-- gender deferred to puberty, sexuality emerges through events
-- Space=select, Enter=proceed, B=back, all ←→ fields show ← value → when active
-- Enter must never confirm popup overlays — Space only
-- player-facing text must never use internal/architecture language (Operator Guide section 18)
-
-Anti-drift read:
-Actora should not collapse into "deeper BitLife," "detached god sim," or vague universe-scale handwaving. Actor-anchored, zoomable, continuous, simulation-real.
+=== CLARIFIED DESIGN READ ===
+See [[vision-and-systems]] for full creative intent and system vision. Key anti-drift summary: Actora should not collapse into deeper BitLife, detached god sim, or vague universe-scale handwaving. Actor-anchored, zoomable, continuous, simulation-real.
 
 
 === DEFERRED IDEAS (PARKED) ===

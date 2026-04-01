@@ -8,18 +8,7 @@ relates_to: [source-index, master-context]
 
 Actora Operator Guide v9
 
-Purpose
-
-This document defines the working method, workflow roles, patch discipline, review rules, verification expectations, and tool-selection rules for Actora.
-
-It is the workflow anchor for the project.
-It does not define the main project identity or milestone sequencing by itself.
-Those belong to the [[master-context|Master Context]] and Actora Roadmap.
-
-It also does not replace repo-local implementation history.
-Repo docs and changelog track what was actually changed in code.
-
-This document should be used whenever work is being proposed, reviewed, patched, applied, verified, committed, tagged, or documented.
+Workflow anchor: defines working method, patch discipline, review rules, verification expectations, and tool-selection rules. Use whenever work is being proposed, reviewed, applied, or documented.
 
 ⸻
 

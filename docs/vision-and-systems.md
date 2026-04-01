@@ -48,7 +48,6 @@ The player primarily lives through their current actor, but that actor exists in
 - Relationships form through player-initiated events — you choose who to engage with
 - Closeness grows through shared time/events, decays when neglected
 - Long-standing relationships decay slower — 10 years of friendship survives a quiet year
-- When a friendship drifts to zero, it's marked as `former` — still in your history, still findable
 - Friend deaths affect you — stat impact scaled to closeness
 - Social actions (hang out, call, etc.) are player-initiated and resolve on advance
 - Later: invite friends to activities, friends can decline based on context
@@ -162,27 +161,11 @@ The player primarily lives through their current actor, but that actor exists in
 ---
 
 ## UI Vision (TUI Phase)
+See [[ui-architecture]] for the full screen map, navigation hierarchy, and rules for adding new systems.
 
-### Current priority: Get the TUI working well for a long time before thinking about visual UI
+Current priority: get the TUI working well before thinking about visual UI.
 
-### Screen structure philosophy
-- Every system should have a clear home — nothing should feel cluttered or orphaned
-- Navigation should be hierarchical and consistent — no hunting for things
-- New systems get added into the existing structure, not bolted on as new hotkeys
-- The player should always know where they are and how to get back
-
-### Committed screen structure (current direction):
-- **Life View** — the anchor. Real-time life. Event feed. Left panel: identity/location/stats/relationships. Profile [P] accessible from here.
-- **Browser [L]** — Relationships tab + History tab. All relationship types, filterable. History with year separators.
-- **Actions [T]** — Pending actions, available actions, categorized. Future: commitments section.
-- **Profile [P]** — Full actor detail. Stats, appearance, traits. Commitments (education, jobs). Future: more domain sections.
-- **Skip Time [S]** — Skip time utility.
-- **Quit [Q]** — Quit confirmation.
-
-### Rules for adding new screens:
-- Does it fit in an existing screen? Add it there.
-- Is it a new top-level domain (like Actions was)? Give it a new hotkey, document it.
-- Never clutter Life View with sections that belong in dedicated screens.
+The terminal is a temporary shell — the simulation core must remain UI-agnostic. Future presentation forms (panel UI, map views, mixed micro-to-macro) should be possible without core rewrites.
 
 ---
 
