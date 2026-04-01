@@ -79,14 +79,15 @@ Purpose: repo-local parking lot for current bugs, regressions, and revisit items
 - v0.36.0–v0.40.1: see Working Ideas Register completed milestones
 
 - v0.45.0 playtest round 2 findings
-  Status: partially in progress (bugs dispatched to Claude Code)
-  Bugs being fixed:
-  - former relationships showing as continuation candidates (social/former leaking)
-  - gender/sexuality popups firing for already-adult continuation actors
-  - "A/Enter advances one month." leaking as last_message in Life View
-  - Age displaying with apostrophe ('79 instead of 79)
-  Design decisions logged (not bugs, for later):
-  - Death screen should show only important/marked records (births, deaths) not random events
-  - Closeness decay too aggressive — maintenance every 3 months is too taxing, tune down
-  - Batch social action needed: "Spend time with friends/family" covering a group at once
-  - "New Life: X" message in feed is internal-looking, needs better phrasing or removal
+  Status: open — Claude Code hit rate limit, bugs not yet applied. Retry next session.
+  Bugs pending (B1-B4):
+  - B1: former relationships showing as continuation candidates (social/former leaking)
+  - B2: gender/sexuality popups firing for already-adult continuation actors (NPC auto-resolve also needed)
+  - B3: "A/Enter advances one month." leaking as last_message in Life View
+  - B4: Age displaying with apostrophe ('79 instead of 79)
+  Design decisions logged (not bugs, implement later):
+  - Death screen should show only important/marked records, not random events
+  - Closeness decay too aggressive — tune down, add proximity-based passive maintenance
+  - Batch social action: "Spend time with friends/family" covering a group at once
+  - "New Life: X" message in feed needs better phrasing or removal
+  - NPC identity auto-resolve: gender/sexuality must silently resolve for non-played actors at age threshold
