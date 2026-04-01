@@ -439,7 +439,7 @@ def build_snapshot_sections(snapshot_data):
         (
             "relationships",
             "Relationships",
-            [f"{entry['label']}: {entry['name']}" for entry in relationships] or ["No living family."],
+            [f"  {entry['name']} · {entry['label']}" for entry in relationships] or ["  No living family."],
         ),
     ]
     return [
@@ -563,6 +563,8 @@ def build_screen_chrome(screen_name, world, focused_actor_name):
         "lineage": "Lineage Browser",
         "relationship_browser": "Relationships",
         "history": "History",
+        "browser": "Browser",
+        "actions": "Actions",
         "skip_time": "Skip Time",
         "death_ack": "Death",
         "continuation": "Continuation",
@@ -574,6 +576,8 @@ def build_screen_chrome(screen_name, world, focused_actor_name):
         "lineage": focused_actor_name,
         "relationship_browser": focused_actor_name,
         "history": focused_actor_name,
+        "browser": focused_actor_name,
+        "actions": focused_actor_name,
         "skip_time": "Choose a larger time jump or enter custom months",
         "death_ack": focused_actor_name,
         "continuation": focused_actor_name,
@@ -1684,6 +1688,9 @@ class ActoraTUI:
         self.meeting_event_last_total_months = 0
         self.rel_browser_focus = "filters"
         self.rel_filter_index = 0
+        self.rel_browser_search_active = False
+        self.rel_browser_search_text = ""
+        self.browser_tab = "relationships"
         self.active_actions = []
         self.hang_out_actor_ids = []
 
@@ -1780,12 +1787,21 @@ class ActoraTUI:
             return f"Search: {self.lineage_search_text}"
         return "Search: off"
 
+    def get_rel_browser_search_status(self):
+        """Returns the search status line for the relationship browser, or None."""
+        if self.rel_browser_search_active:
+            return f"Search: {self.rel_browser_search_text}_"
+        if self.rel_browser_search_text:
+            return f"Search: {self.rel_browser_search_text}"
+        return None
+
     def get_relationship_browser_state(self):
         focused_actor_id = self.get_focused_actor_id()
         filter_mode = REL_FILTER_OPTIONS[self.rel_filter_index]
         browser_state = self.world.get_relationship_browser_data_for(
             focused_actor_id,
             filter_mode=filter_mode,
+            search_text=self.rel_browser_search_text,
             recent_record_limit=LINEAGE_RECORD_LIMIT,
         )
         entries = browser_state["entries"]
@@ -2331,8 +2347,33 @@ class ActoraTUI:
         self.selected_lineage_actor_id = None
         self.rel_browser_focus = "filters"
         self.rel_filter_index = 0
+        self.rel_browser_search_active = False
+        self.rel_browser_search_text = ""
         self.screen_name = "relationship_browser"
         self.last_message = "Browsing relationships."
+
+    def open_browser(self, tab="relationships"):
+        """Opens the unified Browser screen on the specified tab."""
+        self.browser_tab = tab
+        if tab == "relationships":
+            self.lineage_selection = 0
+            self.selected_lineage_actor_id = None
+            self.rel_browser_focus = "filters"
+            self.rel_filter_index = 0
+            self.rel_browser_search_active = False
+            self.rel_browser_search_text = ""
+            self.last_message = "Browsing relationships."
+        else:
+            self.history_scroll = 10**9
+            self.history_search_active = False
+            self.history_search_value = ""
+            self.last_message = "Browsing event history."
+        self.screen_name = "browser"
+
+    def open_actions(self):
+        """Opens the Actions screen."""
+        self.screen_name = "actions"
+        self.last_message = "Actions."
 
     def open_hang_out_select(self):
         """Opens the hang out overlay to select a friend to spend time with."""
@@ -2340,7 +2381,7 @@ class ActoraTUI:
         social_links = self.world.get_links(source_id=focused_actor_id, link_type="social")
         active_links = [l for l in social_links if l.get("metadata", {}).get("status") == "active"]
         if not active_links:
-            self.last_message = "You have no one to hang out with."
+            self.last_message = "No friends to hang out with yet."
             return
 
         options = []
@@ -2364,7 +2405,7 @@ class ActoraTUI:
             self.hang_out_actor_ids.append(target_id)
 
         if not options:
-            self.last_message = "You have no one to hang out with."
+            self.last_message = "No friends to hang out with yet."
             return
 
         self.pending_choice = {
@@ -2439,19 +2480,28 @@ class ActoraTUI:
         return [f"  {action['label']}" for action in self.active_actions]
 
     def build_main_left_lines(self, snapshot_sections, *, include_time):
+        focused_actor_id = self.get_focused_actor_id()
+        social_links = self.world.get_links(source_id=focused_actor_id, link_type="social")
+        active_social_links = [
+            lnk for lnk in social_links if lnk.get("metadata", {}).get("status") == "active"
+        ]
         lines = []
         for section in snapshot_sections:
             if not include_time and section["key"] == "time":
                 continue
             lines.append(section["title"])
             lines.extend(section["lines"])
+            if section["key"] == "relationships" and active_social_links:
+                for lnk in active_social_links:
+                    target_id = lnk.get("target_id")
+                    target_actor = self.world.get_actor(target_id)
+                    if target_actor is None:
+                        continue
+                    meta = lnk.get("metadata", {})
+                    closeness = meta.get("closeness", 0)
+                    tier = _get_social_tier_label(closeness)
+                    lines.append(f"  {target_actor.get_full_name()} · {tier}")
             lines.append("")
-        lines.append("Friends")
-        lines.extend(self._build_friends_section_lines())
-        lines.append("")
-        lines.append("Actions")
-        lines.extend(self._build_actions_section_lines())
-        lines.append("")
         if lines and lines[-1] == "":
             lines.pop()
         return lines
@@ -2624,11 +2674,11 @@ class ActoraTUI:
         elif key in (ord("p"), ord("P")):
             self.open_profile()
         elif key in (ord("l"), ord("L")):
-            self.open_relationship_browser()
+            self.open_browser("relationships")
         elif key in (ord("h"), ord("H")):
-            self.open_history()
+            self.open_browser("history")
         elif key in (ord("t"), ord("T")):
-            self.open_hang_out_select()
+            self.open_actions()
         elif key == curses.KEY_UP:
             self.scroll_main_left(-1)
         elif key == curses.KEY_DOWN:
@@ -2745,7 +2795,37 @@ class ActoraTUI:
         elif key in (curses.KEY_ENTER, 10, 13):
             self.last_message = f"Inspecting {lineage_entries[self.lineage_selection]['full_name']}."
 
-    def handle_relationship_browser_key(self, key):
+    def handle_relationship_browser_key(self, key, *, back_to="main"):
+        """Handles keys for the relationship browser tab/screen.
+
+        back_to: screen name to return to when [B] is pressed from filters focus.
+        """
+        if self.rel_browser_search_active:
+            if key == 27:
+                self.rel_browser_search_active = False
+                self.last_message = "Search canceled."
+                return
+            if key in (curses.KEY_ENTER, 10, 13):
+                self.rel_browser_search_active = False
+                self.lineage_selection = 0
+                self.selected_lineage_actor_id = None
+                if self.rel_browser_search_text:
+                    self.last_message = f"Search: {self.rel_browser_search_text}."
+                else:
+                    self.last_message = "Search cleared."
+                return
+            if key == curses.KEY_BACKSPACE or key in (127, 8):
+                if self.rel_browser_search_text:
+                    self.rel_browser_search_text = self.rel_browser_search_text[:-1]
+                    self.lineage_selection = 0
+                    self.selected_lineage_actor_id = None
+                return
+            if 32 <= key <= 126 and len(self.rel_browser_search_text) < 24:
+                self.rel_browser_search_text += chr(key)
+                self.lineage_selection = 0
+                self.selected_lineage_actor_id = None
+                return
+
         browser_state = self.get_relationship_browser_state()
         entries = browser_state["entries"]
 
@@ -2753,9 +2833,21 @@ class ActoraTUI:
             self.quit_confirmation_active = True
             return
 
+        if key == ord("/"):
+            self.rel_browser_search_active = True
+            self.last_message = "Type to search names. Enter confirms. Esc cancels."
+            return
+        if key == curses.KEY_BACKSPACE or key in (127, 8):
+            if self.rel_browser_search_text:
+                self.rel_browser_search_text = ""
+                self.lineage_selection = 0
+                self.selected_lineage_actor_id = None
+                self.last_message = "Search cleared."
+            return
+
         if self.rel_browser_focus == "filters":
             if key in BACK_KEYS or key in (ord("b"), ord("B")):
-                self.screen_name = "main"
+                self.screen_name = back_to
                 self.last_message = MAIN_IDLE_MESSAGE
                 return
             if key == curses.KEY_UP:
@@ -2785,6 +2877,35 @@ class ActoraTUI:
             elif key in (curses.KEY_ENTER, 10, 13):
                 if entries:
                     self.last_message = f"Inspecting {entries[self.lineage_selection]['full_name']}."
+
+    def handle_browser_key(self, key):
+        """Handles keys for the unified Browser screen (Relationships + History tabs)."""
+        search_active = (
+            (self.browser_tab == "relationships" and self.rel_browser_search_active)
+            or (self.browser_tab == "history" and self.history_search_active)
+        )
+        if not search_active and key == 9:  # Tab key — switch tabs
+            if self.browser_tab == "relationships":
+                self.browser_tab = "history"
+                self.last_message = "Browsing event history."
+            else:
+                self.browser_tab = "relationships"
+                self.last_message = "Browsing relationships."
+            return
+        if self.browser_tab == "relationships":
+            self.handle_relationship_browser_key(key, back_to="main")
+        elif self.browser_tab == "history":
+            self.handle_history_key(key)
+
+    def handle_actions_key(self, key):
+        """Handles keys for the Actions screen."""
+        if key in (ord("q"), ord("Q")):
+            self.quit_confirmation_active = True
+        elif key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8) or key in BACK_KEYS:
+            self.screen_name = "main"
+            self.last_message = MAIN_IDLE_MESSAGE
+        elif key in (ord("t"), ord("T")):
+            self.open_hang_out_select()
 
     def handle_death_ack_key(self, key):
         if key in (ord("q"), ord("Q")):
@@ -2866,6 +2987,10 @@ class ActoraTUI:
             self.handle_relationship_browser_key(key)
         elif self.screen_name == "history":
             self.handle_history_key(key)
+        elif self.screen_name == "browser":
+            self.handle_browser_key(key)
+        elif self.screen_name == "actions":
+            self.handle_actions_key(key)
         elif self.screen_name == "skip_time":
             self.handle_skip_time_key(key)
         elif self.screen_name == "death_ack":
@@ -2877,11 +3002,14 @@ class ActoraTUI:
 
     def render_footer(self, stdscr, height, width):
         footer_hints = {
-            "main": "[A] Advance Month   [S] Skip Time  |  [L] Relationships   [P] Profile   [H] History   [T] Hang Out   [Q] Quit",
+            "main": "[A] Advance Month   [S] Skip Time  |  [L] Browser   [T] Actions   [P] Profile   [Q] Quit",
             "profile": "[↑↓] Scroll   [B] Back   [Q] Quit",
             "lineage": "[↑↓] Move   [A] All   [L] Living   [D] Dead   [/] Search   [B] Back   [Q] Quit",
-            "relationship_browser": "[↑↓] Filter/Move   [Tab/→] Switch   [B/←] Back   [Q] Quit",
+            "relationship_browser": "[↑↓] Filter/Move   [/] Search   [Tab/→] Switch   [B/←] Back   [Q] Quit",
             "history": "[↑↓] Scroll   [/] Jump to Year   [B] Back   [Q] Quit",
+            "browser": "[Tab] Switch Tab   [↑↓] Move   [/] Search   [B] Back   [Q] Quit",
+            "browser_rel_search": "Type search   [Enter] Confirm   [Esc] Cancel   [Q] Quit",
+            "actions": "[↑↓] Move   [Enter] Select   [T] Hang Out   [B] Back   [Q] Quit",
             "history_search": "Type year [0-9]   [Enter] Continue   [Esc] Cancel   [Q] Quit",
             "lineage_search": "Type search   [Enter] Continue   [Esc] Cancel   [Q] Quit",
             "skip_time": "[↑↓] Move   [0-9] Custom   [Bksp] Erase   [Enter] Continue   [B] Back   [Q] Quit",
@@ -2891,6 +3019,10 @@ class ActoraTUI:
         if self.screen_name == "lineage" and self.lineage_search_active:
             footer_text = footer_hints["lineage_search"]
         elif self.screen_name == "history" and self.history_search_active:
+            footer_text = footer_hints["history_search"]
+        elif self.screen_name == "browser" and self.browser_tab == "relationships" and self.rel_browser_search_active:
+            footer_text = footer_hints["browser_rel_search"]
+        elif self.screen_name == "browser" and self.browser_tab == "history" and self.history_search_active:
             footer_text = footer_hints["history_search"]
         elif self.screen_name == "continuation":
             continuity_state = self.get_continuity_state()
@@ -3157,12 +3289,17 @@ class ActoraTUI:
 
         actor_lines = []
         actor_highlight = None
+        search_status = self.get_rel_browser_search_status()
+        if search_status:
+            actor_lines.append(search_status)
+            actor_lines.append("")
         if not entries:
             actor_lines.append("No entries.")
         else:
+            search_offset = len(actor_lines)
             for index, entry in enumerate(entries):
                 if index == self.lineage_selection and self.rel_browser_focus == "actors":
-                    actor_highlight = len(actor_lines)
+                    actor_highlight = search_offset + index
                 actor_lines.append(build_lineage_row(entry))
 
         draw_truncated_block(
@@ -3240,6 +3377,61 @@ class ActoraTUI:
                 content_width,
                 curses.A_DIM,
             )
+
+    def render_browser(self, stdscr, height, width):
+        """Renders the unified Browser screen with Relationships and History tabs."""
+        content_left, content_width = get_content_bounds(width, max_width=120, min_margin=1)
+
+        # Tab bar on row 3
+        rel_label = "[ Relationships ]" if self.browser_tab == "relationships" else "  Relationships  "
+        hist_label = "[ History ]" if self.browser_tab == "history" else "  History  "
+        tab_bar = f"{rel_label}   {hist_label}"
+        try:
+            stdscr.addnstr(3, content_left, center_text(tab_bar, content_width), content_width)
+        except curses.error:
+            pass
+
+        if self.browser_tab == "relationships":
+            self.render_relationship_browser(stdscr, height, width)
+        else:
+            self.render_history(stdscr, height, width)
+
+    def render_actions(self, stdscr, height, width):
+        """Renders the Actions screen with pending actions and available actions."""
+        top = 4
+        body_height = height - 6
+        content_left, content_width = get_content_bounds(width, max_width=112)
+        left_width, right_left, right_width = split_centered_columns(content_left, content_width, left_ratio=0.5)
+        divider_x = right_left - 2
+
+        left_lines = ["Pending Actions", ""]
+        if not self.active_actions:
+            left_lines.append("  No pending actions.")
+        else:
+            for action in self.active_actions:
+                left_lines.append(f"  {action['label']}")
+
+        focused_actor_id = self.get_focused_actor_id()
+        social_links = self.world.get_links(source_id=focused_actor_id, link_type="social")
+        active_social = [lnk for lnk in social_links if lnk.get("metadata", {}).get("status") == "active"]
+        right_lines = ["Available Actions", ""]
+        if active_social:
+            right_lines.append("  Hang Out  [T]")
+            for lnk in active_social:
+                target_id = lnk.get("target_id")
+                target_actor = self.world.get_actor(target_id)
+                if target_actor is None:
+                    continue
+                meta = lnk.get("metadata", {})
+                closeness = meta.get("closeness", 0)
+                tier = _get_social_tier_label(closeness)
+                right_lines.append(f"    {target_actor.get_full_name()} · {tier}")
+        else:
+            right_lines.append("  No friends to hang out with yet.")
+
+        draw_text_block(stdscr, top, content_left, left_width, body_height, left_lines)
+        draw_vertical_divider(stdscr, top, divider_x, body_height)
+        draw_text_block(stdscr, top, right_left, right_width, body_height, right_lines)
 
     def build_actor_inspect_detail(self, actor_id, *, relationship_label=None, recent_record_limit=INSPECT_RECORD_LIMIT):
         """Builds one shell-owned inspectability payload for an actor."""
@@ -3446,6 +3638,10 @@ class ActoraTUI:
             self.render_relationship_browser(stdscr, height, width)
         elif self.screen_name == "history":
             self.render_history(stdscr, height, width)
+        elif self.screen_name == "browser":
+            self.render_browser(stdscr, height, width)
+        elif self.screen_name == "actions":
+            self.render_actions(stdscr, height, width)
         elif self.screen_name == "skip_time":
             self.render_skip_time(stdscr, height, width)
         elif self.screen_name == "death_ack":

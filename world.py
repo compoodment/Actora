@@ -25,6 +25,7 @@ class World:
         self.places = {}
         self.records = []
         self.focused_actor_id = None
+        self._used_npc_last_names = set()
 
     def add_place(self, place_id, name, kind, parent_place_id=None, metadata=None):
         """Adds a place record to the world-owned place registry."""
@@ -950,7 +951,17 @@ class World:
         last_name_pool = culture_pool.get("last_names", FALLBACK_LAST_NAME_POOL)
 
         first_name = random.choice(first_name_pool)
-        last_name = random.choice(last_name_pool)
+        player_last_name = player.last_name if player else None
+        available_last_names = [
+            name for name in last_name_pool
+            if name != player_last_name and name not in self._used_npc_last_names
+        ]
+        if not available_last_names:
+            available_last_names = [name for name in last_name_pool if name != player_last_name]
+        if not available_last_names:
+            available_last_names = last_name_pool
+        last_name = random.choice(available_last_names)
+        self._used_npc_last_names.add(last_name)
 
         npc_actor_id = self.generate_actor_id("npc")
         npc = self.create_human_actor(
@@ -1536,9 +1547,12 @@ class World:
             "records": record_summaries,
         }
 
-    def get_relationship_browser_data_for(self, actor_id, *, filter_mode="all", recent_record_limit=5):
+    def get_relationship_browser_data_for(self, actor_id, *, filter_mode="all", search_text="", recent_record_limit=5):
         """Builds one structured relationship-browser payload for the TUI shell."""
         entries = self.get_relationship_entries_for(actor_id, filter_mode=filter_mode)
+        if search_text:
+            normalized = search_text.strip().casefold()
+            entries = [e for e in entries if normalized in e["full_name"].casefold()]
         selected_detail = None
         if entries:
             selected_detail = self.get_relationship_detail_for(
