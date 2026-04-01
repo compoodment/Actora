@@ -58,11 +58,14 @@ Character creation should feel like you are genuinely shaping who this person is
 - Relationships form through player-initiated events — you choose who to engage with
 - Closeness grows through shared time/events, decays when neglected
 - Long-standing relationships decay slower — 10 years of friendship survives a quiet year
+- **Proximity provides passive closeness maintenance** — living in the same city as a friend slows or offsets decay naturally. Moving away accelerates it. This reflects real life.
+- Decay tuning: current implementation is too aggressive (forces hang out every ~3 months). Should feel sustainable without constant micro-management.
 - Friend deaths affect you — stat impact scaled to closeness
 - Social actions (hang out, call, etc.) are player-initiated and resolve on advance
 - Later: invite friends to activities, friends can decline based on context
 - Later: rivals, negative relationship types, romance
 - Later: NPC-initiated relationship events (someone reaches out to you)
+- **NPC identity rule:** Gender and sexuality for non-played actors must auto-resolve silently at the appropriate age — no popup. Popups are only for the currently focused/played actor. Any future popup system must follow this rule: player = popup, NPC = silent auto-resolve.
 
 ### Social Perception & Reputation
 - Multi-axis, not a single karma score

@@ -77,3 +77,16 @@ Purpose: repo-local parking lot for current bugs, regressions, and revisit items
 - v0.42.0: sex field unselectable, trait leak (questionnaire→manual), questionnaire separator, footer labels, continuation crash, None date TypeError, ESC/Enter handling
 - v0.41.0: banners removed, selection behavior enforced, quit confirmation added
 - v0.36.0–v0.40.1: see Working Ideas Register completed milestones
+
+- v0.45.0 playtest round 2 findings
+  Status: partially in progress (bugs dispatched to Claude Code)
+  Bugs being fixed:
+  - former relationships showing as continuation candidates (social/former leaking)
+  - gender/sexuality popups firing for already-adult continuation actors
+  - "A/Enter advances one month." leaking as last_message in Life View
+  - Age displaying with apostrophe ('79 instead of 79)
+  Design decisions logged (not bugs, for later):
+  - Death screen should show only important/marked records (births, deaths) not random events
+  - Closeness decay too aggressive — maintenance every 3 months is too taxing, tune down
+  - Batch social action needed: "Spend time with friends/family" covering a group at once
+  - "New Life: X" message in feed is internal-looking, needs better phrasing or removal
