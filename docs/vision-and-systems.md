@@ -204,6 +204,13 @@ Current priority: get the TUI working well before thinking about visual UI.
 
 The terminal is a temporary shell — the simulation core must remain UI-agnostic. Future presentation forms (panel UI, map views, mixed micro-to-macro) should be possible without core rewrites.
 
+Current TUI shell direction:
+- favor a compact stacked shell header for major in-game screens rather than a single overloaded command bar
+- keep shell identity visible (Actora, actor, screen, simulation progression)
+- keep compact actor/world state visible near the top (location/date context, health, money)
+- use centered, menu-like primary commands and show lower control hints only when relevant to the current surface
+- prefer visible mockups/drafts before implementing meaningful shell/layout changes so visual flaws are caught before patching the real UI
+
 ---
 
 ## Open Design Questions (to resolve through future interviews)

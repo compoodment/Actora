@@ -21,7 +21,11 @@ relates_to: [architecture]
     - "Spend time with friend" action queues and resolves on next advance.
     - Relationship Browser replaces Lineage Browser — now a tabbed Browser screen.
     - `[L]` opens Browser on Relationships tab; `[H]` opens Browser on History tab.
-    - Browser Relationships tab: persistent filter sidebar (All/Family/Friends/Former/Living/Dead), search restored.
+    - Browser Relationships tab: persistent filter sidebar (All/Family/Friends/Past/Living/Dead), search restored.
+    - Browser shell now renders a bottom divider under the Relationships/History tab row so the tabs read as browser chrome rather than body content.
+    - Continuation candidates now exclude former social links, so drifted relationships no longer leak into handoff options.
+    - Adult continuation handoffs silently auto-resolve identity state without firing gender/sexuality popups, while ordinary played-life popup behavior remains intact.
+    - Life View idle status text no longer reuses the footer control hint, fixing the `A/Enter advances one month.` leak.
     - NPC last-name collision fix — generated friends no longer share player surname.
     - Main footer updated: `[A] Advance Month   [S] Skip Time  |  [L] Browser   [T] Actions   [P] Profile   [Q] Quit`.
     - tui-standards.md updated with new navigation map.

@@ -50,17 +50,16 @@ Recent milestone sequence:
 
 "v0.45.0 shipped but needs a polish pass. After that, what's next?"
 
-Direction: Polish v0.45.0 first (UI restructure, bugs fixed, tui-standards updated). Then: action system foundation as the next structural move, then education.
+Direction: Finish the remaining v0.45.0 polish/restructure work first (UI cleanup, wording/UX cleanup, tui-standards sync, any remaining browser/action rough edges). B1/B2/B3 are now fixed and B4 was closed as non-bug. Then: action system foundation as the next structural move, then education.
 
 
 === LEADING PLANNING CANDIDATES ===
 
 1. v0.45.0 polish pass (immediate)
-- Remove Friends and Actions sections from Life View left panel — fold social links into Relationships section
-- Give Actions its own screen ([T])
-- Fix [L] → Relationship Browser routing, search, name collision bug, "no one to hang out" message
-- Update tui-standards.md with new hotkeys and navigation
-- See live-issues.md for full bug list
+- Remaining cleanup after the applied fixes: wording/UX refinement, browser shell consistency, and any unresolved action-browser rough edges
+- Confirm doc truth matches current repo behavior (Browser tabs, Past label, continuation/identity behavior)
+- Update tui-standards.md with new hotkeys and navigation if not already fully synced
+- See live-issues.md for the remaining open/revisit items
 
 2. Action system foundation (next structural move)
 - Two action types: instant and monthly

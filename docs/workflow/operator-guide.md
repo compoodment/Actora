@@ -107,6 +107,7 @@ When opening an OpenClaw task for code or repo-doc work:
 	•	specify exact files, constraints, preserved behavior, and patch boundaries
 	•	state the intended current date explicitly if repo docs are being edited
 	•	prefer build/show, diff, or explicit patch output before apply when appropriate
+	•	for UI / shell / TUI layout changes, prefer visible mockups or draft layouts before implementation so visual flaws are caught before patching the real surface
 	•	do not mix unrelated cleanup into one task
 
 Do not ask OpenClaw to infer source-level architecture context from chat drift.

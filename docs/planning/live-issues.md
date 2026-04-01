@@ -20,18 +20,15 @@ Purpose: repo-local parking lot for current bugs, regressions, and revisit items
 
 === CURRENTLY OPEN ===
 
-- v0.45.0 playtest findings — polish pass required
+- v0.45.0 polish pass — remaining open items only
   Status: open
-  Bugs:
-  - "Friend: actor" leaking as raw text in Relationships section
-  - [T] Hang Out says "no one to hang out with" despite family existing — only checks social links, should include all valid targets or fix message
-  - Two NPC friends generated with same last name as each other (name pool collision in generate_meeting_npc)
-  - Search missing from Relationship Browser (was in Lineage Browser)
-  - [L] footer binding still shows Relationships label but underlying hotkey routing needs verification
-  Architecture changes needed:
-  - Remove Friends section and Actions section from Life View left panel — social links should be folded into the existing Relationships section (name + type in one place)
-  - Actions need their own screen ([T] key), not crammed into left panel
-  - Navigation restructure: [L] = Browser page containing Relationships + History tabs; [H] and [L] unified
+  Still open:
+  - Broader shell/navigation redesign questions from playtest need a proper design pass (top-vs-footer command hierarchy, number hotkeys, options menu, skip-time popup model)
+  Design follow-through still needed:
+  - Death screen should show only important/marked records, not random events
+  - Closeness decay too aggressive — tune down, add proximity-based passive maintenance
+  - Batch social action: "Spend time with friends/family" covering a group at once
+  - "New Life: X" message in feed needs better phrasing or removal
 
 - sibling/family birth tuning still needs later balancing
   Status: open revisit
@@ -79,12 +76,14 @@ Purpose: repo-local parking lot for current bugs, regressions, and revisit items
 - v0.36.0–v0.40.1: see Working Ideas Register completed milestones
 
 - v0.45.0 playtest round 2 findings
-  Status: open — Claude Code hit rate limit, bugs not yet applied. Retry next session.
-  Bugs pending (B1-B4):
+  Status: partially resolved — B1/B2/B3 fixed in repo; B4 closed as non-bug.
+  Resolved:
   - B1: former relationships showing as continuation candidates (social/former leaking)
-  - B2: gender/sexuality popups firing for already-adult continuation actors (NPC auto-resolve also needed)
+  - B2: gender/sexuality popups firing for already-adult continuation actors
   - B3: "A/Enter advances one month." leaking as last_message in Life View
-  - B4: Age displaying with apostrophe ('79 instead of 79)
+  - Browser tab shell polish: bottom divider added under Relationships/History tabs; "Former" renamed to "Past"
+  Closed:
+  - B4: Age displaying with apostrophe ('79 instead of 79) — this was correct formatting, not a bug
   Design decisions logged (not bugs, implement later):
   - Death screen should show only important/marked records, not random events
   - Closeness decay too aggressive — tune down, add proximity-based passive maintenance

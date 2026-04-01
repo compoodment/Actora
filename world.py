@@ -1673,11 +1673,23 @@ class World:
         if not links:
             return None
 
+        valid_links = []
+        for link in links:
+            link_type = link.get("type")
+            if link_type == "social":
+                social_status = link.get("metadata", {}).get("status", "active")
+                if social_status != "active":
+                    continue
+            valid_links.append(link)
+
+        if not valid_links:
+            return None
+
         actor_perspective_links = [
-            link for link in links
+            link for link in valid_links
             if link.get("source_id") == actor_id and link.get("target_id") == candidate_actor_id
         ]
-        defining_link_pool = actor_perspective_links or links
+        defining_link_pool = actor_perspective_links or valid_links
         defining_link = sorted(defining_link_pool, key=self._get_continuity_link_sort_key)[0]
         link_type = defining_link.get("type")
         link_role = defining_link.get("role")

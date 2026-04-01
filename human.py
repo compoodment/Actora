@@ -24,6 +24,10 @@ def _get_relationship_label_from_role(role, linked_actor):
     return str(role).replace("_", " ").title()
 
 
+SEXUALITY_OPTIONS = ["Heterosexual", "Homosexual", "Bisexual", "Asexual", "Pansexual", "Queer"]
+GENDER_IDENTITY_AUTO_OPTIONS = ["Male", "Female", "Non-binary", "Agender", "Genderfluid"]
+
+
 class Human:
     def __init__(self, species, first_name, last_name, sex, gender, birth_year, birth_month=1):
         self.species = species
@@ -85,14 +89,24 @@ class Human:
         eye_colors = ["Brown", "Blue", "Green", "Hazel", "Gray", "Amber"]
         hair_colors = ["Black", "Brown", "Blonde", "Red", "Auburn"]
         skin_tones = ["Light", "Fair", "Medium", "Olive", "Tan", "Brown", "Dark"]
-        sexuality_options = ["Heterosexual", "Homosexual", "Bisexual", "Asexual", "Pansexual", "Queer"]
         self.appearance["eye_color"] = random.choice(eye_colors)
         self.appearance["hair_color"] = random.choice(hair_colors)
         self.appearance["skin_tone"] = random.choice(skin_tones)
-        self.sexuality = random.choice(sexuality_options)
+        self.sexuality = random.choice(SEXUALITY_OPTIONS)
 
         trait_pool = ["Curious", "Calm", "Fussy", "Bold", "Shy", "Cheerful", "Stubborn", "Gentle", "Restless", "Alert"]
         self.traits = random.sample(trait_pool, min(3, len(trait_pool)))
+
+    def auto_resolve_identity(self):
+        """Silently resolves unresolved gender/sexuality for non-played or resumed actors."""
+        if not self.gender or self.gender == self.sex:
+            if self.sex in {"Male", "Female"} and random.random() < 0.85:
+                self.gender = self.sex
+            else:
+                self.gender = random.choice(GENDER_IDENTITY_AUTO_OPTIONS)
+
+        if self.sexuality is None:
+            self.sexuality = random.choice(SEXUALITY_OPTIONS)
 
     def get_lifecycle_state(self, current_year, current_month):
         """

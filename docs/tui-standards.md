@@ -15,7 +15,10 @@ Consistent controls, navigation, and interaction patterns for all Actora TUI sur
 
 ### Universal keys (available on every screen)
 - `[Q]` — Quit (with confirmation prompt)
-- `[B]` or `Backspace` — Go back to previous screen (where applicable)
+- `[B]` — Go back to previous screen (where applicable)
+
+Rule:
+- Do **not** add hidden convenience aliases for navigation outside clearly scoped text-input/search contexts. `Backspace` may edit text while typing, but ordinary surface navigation should use explicit documented keys like `[B]`.
 
 ### Navigation
 - `[↑↓]` — Move selection or scroll content
@@ -35,9 +38,11 @@ Consistent controls, navigation, and interaction patterns for all Actora TUI sur
 ### Specialist keys (context-specific)
 - `[R]` — Randomize (stats screen only)
 - `[/]` — Search or year-jump (Browser: Relationships/History tabs)
-- `[0-9]` — Custom numeric input (skip time)
-- `[Tab]` or `[→]` — Switch tabs (Browser screen)
-- `[A]` — Advance one month (Life View only)
+- `[0-9]` — Custom numeric input (skip time / history year jump)
+- `[Tab]` — Switch Browser tabs when no tab-specific search input is active
+- `[→]` — In Browser Relationships tab, move focus from filters to actor list
+- `[←]` — In Browser Relationships tab, move focus from actor list back to filters
+- `[A]` — Advance one month (Life View only; Enter also advances on Life View)
 - `[S]` — Open Skip Time screen (Life View only)
 - `[P]` — Open Profile (Life View only)
 - `[L]` — Open Browser on Relationships tab (Life View only)
@@ -49,7 +54,7 @@ Consistent controls, navigation, and interaction patterns for all Actora TUI sur
 
 | Key | Destination |
 |-----|------------|
-| A | Advance 1 month |
+| A / Enter | Advance 1 month |
 | S | Skip Time screen |
 | L | Browser → Relationships tab |
 | H | Browser → History tab |
@@ -57,17 +62,37 @@ Consistent controls, navigation, and interaction patterns for all Actora TUI sur
 | P | Profile screen |
 | Q | Quit confirmation |
 
-**Note:** `[H]` is now a shortcut into the Browser at the History tab, not a separate standalone screen.
+**Notes:**
+- `[H]` is a shortcut into the Browser at the History tab, not a separate standalone screen.
+- The Browser is one shell with two tabs (`Relationships`, `History`), not two unrelated screens.
 
+
+## Shell header + footer direction
+
+Current shell direction for major in-game screens:
+- Keep a compact top shell identity stack rather than collapsing everything into one command bar.
+- Preferred current layout direction:
+  1. centered Actora title
+  2. actor + simulation turn line
+  3. centered screen-name line
+  4. compact state/info line (location/date on the left; health/money on the right)
+- Primary commands should be centered and menu-like.
+- Local controls should also be centered, but only shown when relevant to the current surface/mode.
+- Use a single full-width divider unless the body is truly split into distinct panes.
+- Do not repeat a screen title inside the body if the shell header already names the screen.
 
 ## Footer format
 
-Footers should follow this pattern:
+When a footer hint row is needed, follow this pattern:
 ```
 [navigation] [actions] [specialist] [back] [quit]
 ```
 
 Example: `[↑↓] Move   [Space] Select   [Enter] Continue   [B] Back   [Q] Quit`
+
+Browser-specific rule:
+- The Browser tab row is shell chrome, not body content.
+- Visually separate the tab row from the active pane content with a bottom divider/rule.
 
 
 ## Naming rules
@@ -80,6 +105,10 @@ Example: `[↑↓] Move   [Space] Select   [Enter] Continue   [B] Back   [Q] Qui
 | Enter | Continue (or "Start Game" on final confirmation only) |
 | B | Back |
 | Q | Quit |
+
+Relationship wording rule:
+- Use player-facing social-state labels that read naturally in the UI.
+- Current label choice for archived/former social ties is `Past`.
 
 
 ## Quit confirmation
@@ -94,6 +123,16 @@ Are you sure you want to quit?
 This prevents accidental quits. The game only exits when Enter is pressed on the confirmation.
 
 
+## Browser behavior rules
+
+- Browser Relationships tab has two focus zones: `filters` and `actors`.
+- `↑↓` moves within the active focus zone.
+- `[→]` or `[Tab]` moves from filters to actors.
+- `[←]` or `[B]` moves from actors back to filters.
+- `[B]` from filters exits the Browser back to Life View.
+- `[/]` opens search on the active Browser tab.
+- Search mode temporarily owns text input; tab switching should not fire while search is active.
+
 ## Adding new screens
 
 When adding a new TUI screen:
@@ -105,4 +144,5 @@ When adding a new TUI screen:
 6. Use `[Enter] Continue` for proceeding to the next step
 7. Use `Move` for selection lists, `Scroll` for content browsing
 8. Follow the footer format order: navigation → actions → specialist → back → quit
-9. Reference this document in the implementation prompt
+9. For shell-style multi-tab surfaces, visually separate shell chrome from body content
+10. Reference this document in the implementation prompt

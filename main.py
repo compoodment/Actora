@@ -24,7 +24,7 @@ REL_FILTER_LABELS = {
     "all": "All",
     "family": "Family",
     "friends": "Friends",
-    "former": "Former",
+    "former": "Past",
     "living": "Living",
     "dead": "Dead",
 }
@@ -33,7 +33,7 @@ HIDDEN_PLAYER_RECORD_TYPES = {"family_bootstrap", "actor_entry"}
 BACK_KEYS = {
     27,
 }
-MAIN_IDLE_MESSAGE = "A/Enter advances one month."
+MAIN_IDLE_MESSAGE = "Living your life."
 ADVANCE_THROTTLE_SECONDS = 0.2
 MEETING_EVENT_COOLDOWN_MONTHS = 18
 CREATION_SEX_OPTIONS = ["Male", "Female", "Intersex"]
@@ -765,7 +765,7 @@ def build_person_card_lines(summary):
         summary.get("full_name", "Unknown"),
         f"Status: {status_label}   Relationship: {summary.get('relationship_label', 'Connected')}",
         f"{age_label}: {summary.get('age', '?')}   Life Stage: {summary.get('life_stage', 'Unknown')}",
-        f"Place: {summary.get('current_place_name') or 'Unknown'}",
+        f"Location: {summary.get('current_place_name') or 'Unknown'}",
     ]
 
     family_branch_label = summary.get("family_branch_label")
@@ -789,8 +789,7 @@ def build_person_card_lines(summary):
 
 def build_lineage_row(entry):
     """Builds one compact lineage browser row."""
-    status_label = "Alive" if entry["is_alive"] else "Dead"
-    return f"{entry['full_name']} · {entry['relationship_label']} · {status_label} · Age {entry['age']}"
+    return f"{entry['full_name']} · {entry['relationship_label']} · Age {entry['age']}"
 
 
 def filter_player_facing_records(records):
@@ -1683,6 +1682,7 @@ class ActoraTUI:
         self.quit_confirmation_active = False
         self.gender_choice_offered = False
         self.sexuality_choice_offered = False
+        self.identity_popup_suppressed_for_resumed_adult = False
         self.gender_choice_age = random.randint(12, 15)
         self.sexuality_choice_age = random.randint(14, 17)
         self.meeting_event_last_total_months = 0
@@ -1952,6 +1952,9 @@ class ActoraTUI:
         lifecycle = actor.get_lifecycle_state(self.world.current_year, self.world.current_month)
         age_years = lifecycle["age_years"]
         current_gender = actor.gender or "Other"
+
+        if self.identity_popup_suppressed_for_resumed_adult:
+            return False
 
         if age_years >= self.gender_choice_age and not self.gender_choice_offered:
             selected_index = (
@@ -2381,7 +2384,7 @@ class ActoraTUI:
         social_links = self.world.get_links(source_id=focused_actor_id, link_type="social")
         active_links = [l for l in social_links if l.get("metadata", {}).get("status") == "active"]
         if not active_links:
-            self.last_message = "No friends to hang out with yet."
+            self.last_message = "No active social connections are available for Hang Out yet."
             return
 
         options = []
@@ -2405,7 +2408,7 @@ class ActoraTUI:
             self.hang_out_actor_ids.append(target_id)
 
         if not options:
-            self.last_message = "No friends to hang out with yet."
+            self.last_message = "No active social connections are available for Hang Out yet."
             return
 
         self.pending_choice = {
@@ -2453,31 +2456,6 @@ class ActoraTUI:
     @property
     def profile_body_height(self):
         return getattr(self, "_profile_body_height", 0)
-
-    def _build_friends_section_lines(self):
-        """Builds the Friends section lines for the main Life View left panel."""
-        focused_actor_id = self.get_focused_actor_id()
-        social_links = self.world.get_links(source_id=focused_actor_id, link_type="social")
-        active_links = [l for l in social_links if l.get("metadata", {}).get("status") == "active"]
-        if not active_links:
-            return ["  No friends yet."]
-        lines = []
-        for link in active_links:
-            target_id = link.get("target_id")
-            target_actor = self.world.get_actor(target_id)
-            if target_actor is None:
-                continue
-            meta = link.get("metadata", {})
-            closeness = meta.get("closeness", 0)
-            tier = _get_social_tier_label(closeness)
-            lines.append(f"  {target_actor.get_full_name()} · {tier}")
-        return lines if lines else ["  No friends yet."]
-
-    def _build_actions_section_lines(self):
-        """Builds the Actions section lines for the main Life View left panel."""
-        if not self.active_actions:
-            return ["  No pending actions."]
-        return [f"  {action['label']}" for action in self.active_actions]
 
     def build_main_left_lines(self, snapshot_sections, *, include_time):
         focused_actor_id = self.get_focused_actor_id()
@@ -2618,8 +2596,21 @@ class ActoraTUI:
         )
         self.pending_choice = None
         self.remaining_skip_months = 0
-        self.gender_choice_offered = False
-        self.sexuality_choice_offered = False
+        continued_actor = self.get_focused_actor()
+        continued_lifecycle = (
+            continued_actor.get_lifecycle_state(self.world.current_year, self.world.current_month)
+            if continued_actor is not None
+            else None
+        )
+        self.identity_popup_suppressed_for_resumed_adult = False
+        if continued_actor is not None and continued_lifecycle is not None and continued_lifecycle["age_years"] >= 18:
+            continued_actor.auto_resolve_identity()
+            self.gender_choice_offered = True
+            self.sexuality_choice_offered = True
+            self.identity_popup_suppressed_for_resumed_adult = True
+        else:
+            self.gender_choice_offered = False
+            self.sexuality_choice_offered = False
         self.gender_choice_age = random.randint(12, 15)
         self.sexuality_choice_age = random.randint(14, 17)
         self.meeting_event_last_total_months = 0
@@ -3259,8 +3250,8 @@ class ActoraTUI:
         entries = browser_state["entries"]
         selected_detail = browser_state["selected_detail"]
 
-        top = 4
-        body_height = height - 6
+        top = 5
+        body_height = height - 7
         content_left, content_width = get_content_bounds(width, max_width=120)
 
         filter_col_width = 12
@@ -3330,7 +3321,7 @@ class ActoraTUI:
                 right_lines.extend([
                     "",
                     f"Social: {summary['relationship_label']}",
-                    f"Closeness: {closeness}   Status: {social_status}",
+                    f"Closeness: {closeness}   Status: {'past' if social_status == 'former' else social_status}",
                 ])
             else:
                 right_lines.extend([
@@ -3346,8 +3337,8 @@ class ActoraTUI:
         draw_text_block(stdscr, top, detail_left, detail_width, body_height, right_lines)
 
     def render_history(self, stdscr, height, width):
-        top = 4
-        body_height = height - 6
+        top = 5
+        body_height = height - 7
         self._history_body_height = body_height
         content_left, content_width = get_content_bounds(width, max_width=104)
         self._history_content_width = content_width
@@ -3382,12 +3373,14 @@ class ActoraTUI:
         """Renders the unified Browser screen with Relationships and History tabs."""
         content_left, content_width = get_content_bounds(width, max_width=120, min_margin=1)
 
-        # Tab bar on row 3
+        # Tab bar on row 3 with a separating bottom rule so tabs read as shell chrome.
         rel_label = "[ Relationships ]" if self.browser_tab == "relationships" else "  Relationships  "
         hist_label = "[ History ]" if self.browser_tab == "history" else "  History  "
         tab_bar = f"{rel_label}     │     {hist_label}"
         try:
             stdscr.addnstr(3, content_left, center_text(tab_bar, content_width), content_width)
+            hline_char = getattr(curses, "ACS_HLINE", ord("-"))
+            stdscr.hline(4, content_left, hline_char, content_width)
         except curses.error:
             pass
 
@@ -3427,7 +3420,7 @@ class ActoraTUI:
                 tier = _get_social_tier_label(closeness)
                 right_lines.append(f"    {target_actor.get_full_name()} · {tier}")
         else:
-            right_lines.append("  No friends to hang out with yet.")
+            right_lines.append("  No active social connections available for Hang Out yet.")
 
         draw_text_block(stdscr, top, content_left, left_width, body_height, left_lines)
         draw_vertical_divider(stdscr, top, divider_x, body_height)
@@ -3544,8 +3537,6 @@ class ActoraTUI:
         candidates = continuity_state["continuity_candidates"]
         content_left, content_width = get_content_bounds(width, max_width=96)
         lines = [
-            center_text("CONTINUATION", content_width),
-            "",
             center_text(self.last_message, content_width),
             "",
         ]
@@ -3602,7 +3593,7 @@ class ActoraTUI:
             detail["full_name"],
             (
                 f"{detail['relationship_label']}   Age {detail['age']}   "
-                f"Place: {detail['current_place_name']}"
+                f"Location: {detail['current_place_name']}"
             ),
             (
                 f"Health {detail['health']}   Happiness {detail['happiness']}   "
