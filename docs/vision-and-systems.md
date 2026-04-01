@@ -42,8 +42,18 @@ The player primarily lives through their current actor, but that actor exists in
 
 ## Systems — Vision Per System
 
-### Social Relationships
-- Closeness is numeric (0–100), tiered as acquaintance / friend / close friend
+### Character Creation & Identity
+
+Character creation should feel like you are genuinely shaping who this person is — not filling out a form.
+
+- **Ethnicity** — player picks their ethnicity (single or mixed). This informs parent ethnicity: parents could be mixed themselves, or they could be the source of the mix. Ethnicity affects name generation, cultural context, and appearance seeding.
+- **Trait and stat inheritance** — the traits and stats the player picks (or the questionnaire derives) should feel like a believable blend of both parents' characteristics. Not purely random — a reflection of where you came from.
+- **Sibling similarity** — siblings share family resemblance in traits and appearance but with natural variation. Sometimes very similar, sometimes noticeably different. Both are realistic.
+- **Parents feel real** — parents should have their own consistent appearance, traits, and personality that the player can recognise and see reflected in their character.
+- Later: parent backstory depth, grandparent lineage, family history context.
+- Depends on: IDEA-091 (identity generation realism), culture-aware name generation (v0.40.0 foundation).
+
+### Social Relationships- Closeness is numeric (0–100), tiered as acquaintance / friend / close friend
 - All introduced NPCs are real full actors in the world
 - Relationships form through player-initiated events — you choose who to engage with
 - Closeness grows through shared time/events, decays when neglected
