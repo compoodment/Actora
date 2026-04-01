@@ -82,6 +82,19 @@ Summary from interview:
 Why it matters: Without an action system, the game is purely passive — player just watches events tick by. Actions are what make it a life simulation.
 Deferred from this spec: prerequisites (needs venue system), multi-month actions, action skip-time caps, opportunity section placement, cancel-action mechanic
 
+ID: IDEA-124
+Created: 2026-04-01
+Title: Ethnicity, trait inheritance, and sibling similarity
+Status: Parked — document now, implement when dependencies are ready
+Priority: P2
+Roadmap fit: extends IDEA-091 (identity generation realism, roadmap layer 4.10) + actor model depth
+Summary:
+- Ethnicity as a choosable field in character creation (single or mixed). Player's ethnicity should inform parent ethnicity — parents could be mixed themselves or the source of the mix.
+- Traits and stats are partly inherited from parents — player creation results should reflect a believable blend of both parents' characteristics (not purely random).
+- Siblings should show family resemblance in traits/appearance but with natural variation — sometimes similar, sometimes noticeably different.
+Depends on: structured identity generation context (IDEA-091), culture-aware name generation (realized in v0.40.0)
+Deferred until: identity generation system is mature enough to support contextual seeding
+
 
 === ACTIVE DESIGN GUARDRAILS ===
 
