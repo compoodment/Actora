@@ -88,6 +88,30 @@ Character creation should feel like you are genuinely shaping who this person is
 - Social actions can optionally bring friends who may decline based on context
 - Later: spiral side-quest chains — forced sequences of decisions with branching outcomes
 
+### Stats — Contract & Intent
+
+Stats are 0–100 values. They should affect real simulation outcomes — not just be numbers on a profile screen. This table tracks what each stat currently does vs what it's intended to do. Update this when a new system wires into a stat.
+
+**Rule:** every stat should have at least one real effect before being considered complete. When building a new system, check this table and wire into relevant stats deliberately.
+
+| Stat | Currently affects | Intended to affect |
+|------|------------------|--------------------|
+| Health | Nothing yet (displayed only) | Mortality risk, energy for actions, illness chance |
+| Happiness | Friend death impact (-8/-18) | Event eligibility, action effectiveness, mental health events |
+| Intelligence | Nothing yet | Education performance, questionnaire outcomes, job eligibility |
+| Strength | Nothing yet | Physical actions, certain job eligibility |
+| Charisma | Nothing yet | Social actions effectiveness, relationship formation speed |
+| Creativity | Nothing yet | Certain career paths, event outcomes |
+| Wisdom | Nothing yet | Decision quality events, elder life outcomes |
+| Discipline | Nothing yet | Education performance, work consistency |
+| Willpower | Nothing yet | Overcoming negative events, addiction resistance |
+| Looks | Nothing yet | Social first impressions, certain relationship events |
+| Fertility | Nothing yet | Chance of having children |
+
+**Current reality:** Most stats are decoration. That's acceptable while the systems that consume them don't exist. But as each domain system is built, the relevant stats must be wired in — not left inert.
+
+**Stat application rule:** stat changes should flow through the controlled mutation boundary (world.apply_outcome) not be scattered across files. This is already the architectural direction (master-context section 18).
+
 ### Education
 - First mid-stage domain layer after relationships
 - School as a real place with real NPC teachers and peers
