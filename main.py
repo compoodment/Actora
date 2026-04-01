@@ -3385,7 +3385,7 @@ class ActoraTUI:
         # Tab bar on row 3
         rel_label = "[ Relationships ]" if self.browser_tab == "relationships" else "  Relationships  "
         hist_label = "[ History ]" if self.browser_tab == "history" else "  History  "
-        tab_bar = f"{rel_label}   {hist_label}"
+        tab_bar = f"{rel_label}     │     {hist_label}"
         try:
             stdscr.addnstr(3, content_left, center_text(tab_bar, content_width), content_width)
         except curses.error:
