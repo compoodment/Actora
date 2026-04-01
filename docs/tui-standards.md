@@ -34,14 +34,30 @@ Consistent controls, navigation, and interaction patterns for all Actora TUI sur
 
 ### Specialist keys (context-specific)
 - `[R]` — Randomize (stats screen only)
-- `[/]` — Search or jump to year (lineage, history)
+- `[/]` — Search or year-jump (Browser: Relationships/History tabs)
 - `[0-9]` — Custom numeric input (skip time)
-- `[A] [L] [D]` — Filter shortcuts (lineage: All, Living, Dead)
+- `[Tab]` or `[→]` — Switch tabs (Browser screen)
 - `[A]` — Advance one month (Life View only)
-- `[S]` — Open skip time (Life View only)
-- `[P]` — Open profile (Life View only)
-- `[L]` — Open lineage (Life View only)
-- `[H]` — Open history (Life View only)
+- `[S]` — Open Skip Time screen (Life View only)
+- `[P]` — Open Profile (Life View only)
+- `[L]` — Open Browser on Relationships tab (Life View only)
+- `[H]` — Open Browser on History tab (Life View only)
+- `[T]` — Open Actions screen (Life View only)
+
+
+## Main screen navigation map
+
+| Key | Destination |
+|-----|------------|
+| A | Advance 1 month |
+| S | Skip Time screen |
+| L | Browser → Relationships tab |
+| H | Browser → History tab |
+| T | Actions screen |
+| P | Profile screen |
+| Q | Quit confirmation |
+
+**Note:** `[H]` is now a shortcut into the Browser at the History tab, not a separate standalone screen.
 
 
 ## Footer format

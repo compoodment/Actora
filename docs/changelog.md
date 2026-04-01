@@ -8,6 +8,24 @@ relates_to: [architecture]
 
 # Actora Changelog
 
+## Version 0.45.0 (Minor) - 2026-04-01
+- **Non-family Relationships + Action Foundation:**
+    - Added acquaintance/friend/close_friend link types with numeric closeness score (0–100).
+    - Player-initiated meeting events — popup choice to introduce yourself or keep to yourself.
+    - NPCs generated at meeting with culture-aware names, plausible age/stats/traits.
+    - Closeness decay per month with history-based resistance (long friendships decay slower).
+    - Drift events fire when closeness hits 0; link archived with `status: former`.
+    - Friend deaths affect player happiness scaled to closeness.
+    - Social links folded into existing Relationships section in Life View left panel (name · tier).
+    - `[T]` opens a dedicated Actions screen — pending actions + available social actions.
+    - "Spend time with friend" action queues and resolves on next advance.
+    - Relationship Browser replaces Lineage Browser — now a tabbed Browser screen.
+    - `[L]` opens Browser on Relationships tab; `[H]` opens Browser on History tab.
+    - Browser Relationships tab: persistent filter sidebar (All/Family/Friends/Former/Living/Dead), search restored.
+    - NPC last-name collision fix — generated friends no longer share player surname.
+    - Main footer updated: `[A] Advance Month   [S] Skip Time  |  [L] Browser   [T] Actions   [P] Profile   [Q] Quit`.
+    - tui-standards.md updated with new navigation map.
+
 ## Version 0.44.0 (Minor) - 2026-03-31
 - **Arrow standard + popup fix:**
     - Stats screen active field now renders `← value →` — consistent with identity and appearance fields.
