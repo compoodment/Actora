@@ -96,7 +96,8 @@ That gets you oriented. Only read other docs when the task requires them.
 
 ### Version milestone workflow
 1. All of implementation workflow above
-2. Tag: `git tag vX.Y.Z && git push origin vX.Y.Z`
+2. Decide version bump level (see versioning rules in `rules.md`)
+3. Tag: `git tag vX.Y.Z && git push origin vX.Y.Z`
 3. Check `codebase.md` is current through this version
 4. Update `backlog.md` — move completed items out
 5. Promote durable insights to `MEMORY.md` if needed

@@ -83,9 +83,18 @@ If any answer is no, stop and resolve before accepting.
 
 ## Versioning rules
 
-1. Major = large phase shift
-2. Minor = meaningful foundation piece or meaningful doc revision
-3. Patch = cleanup, polish, correction, smaller improvement
+Format: `vMAJOR.MINOR.PATCH` (e.g. `v0.45.0`, `v0.45.1`)
+
+1. **Major (v1.0.0, v2.0.0)** — fundamental phase shift. We're still v0 because the game isn't feature-complete yet. v1.0.0 = first "this is a real playable game" milestone.
+2. **Minor (v0.45.0 → v0.46.0)** — new system, meaningful feature, or structural foundation piece. Examples: non-family relationships (v0.45.0), questionnaire creation (v0.40.1), real location content (v0.40.0).
+3. **Patch (v0.45.0 → v0.45.1)** — bug fix, polish, cleanup, doc-only changes, small corrections. Examples: stat padding fix (v0.44.1), playtest polish rounds.
+
+Rules:
+- Stay on v0.x.x until the game reaches a coherent first-playable milestone
+- Don't bump minor for pure doc/cleanup work — that's a patch
+- Don't bump major just because a lot of patches accumulated
+- Tag format: `v0.45.0` not `v0.45` or `0.45.0` — always three numbers, always `v` prefix
+- Use plain version tags only — no descriptive sentence tags like `v0.45.0-relationships-and-actions`
 
 ## Truth classification
 
