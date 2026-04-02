@@ -20,14 +20,14 @@ Purpose: repo-local parking lot for current bugs, regressions, and revisit items
 
 === CURRENTLY OPEN ===
 
-- v0.45.0 polish pass — remaining open items only
-  Status: open
-  Still open:
-  - Broader shell/navigation redesign questions from playtest need a proper design pass (top-vs-footer command hierarchy, number hotkeys, options menu, skip-time popup model)
+- Shell / navigation redesign follow-through
+  Status: open design pressure
+  Scope:
+  - implement the chosen balanced shell direction without reintroducing hidden keybind chaos
+  - settle Menu / Options / Skip Time popup structure
+  - finalize top-vs-footer responsibility split per surface
   Design follow-through still needed:
   - Death screen should show only important/marked records, not random events
-  - Closeness decay too aggressive — tune down, add proximity-based passive maintenance
-  - Batch social action: "Spend time with friends/family" covering a group at once
   - "New Life: X" message in feed needs better phrasing or removal
 
 - sibling/family birth tuning still needs later balancing

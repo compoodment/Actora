@@ -6,13 +6,13 @@ layer: planning
 relates_to: [actora-roadmap, actionable-summary]
 ---
 
-Actora Working Ideas Register v52 | 2026-03-31 | Flexible idea intake, staging, and design retention.
+Actora Working Ideas Register v53 | 2026-04-02 | Flexible idea intake, staging, and design retention.
 Authority: flexible working layer — stable docs win, repo truth wins on implementation.
 
 
 === CURRENT WORKING READ ===
 
-Verified repo truth is through v0.44.1. The backbone is materially strong and the TUI is polished.
+Verified repo truth is through v0.45.0 plus follow-through polish. The backbone is materially strong, and the current pressure has shifted from generic polish toward shell/navigation follow-through + action-system scoping.
 
 Foundation layers realized:
 - World-owned actor registry, link storage, place registry (with parent-place hierarchy), record storage, simulation-step boundary
@@ -31,9 +31,9 @@ Actor model depth:
 - Sexuality (emerges through event-choice at ~14-17)
 - Gender (defaults to sex at birth, choosable at ~12-15 through event-choice popup)
 
-TUI surfaces (polished through v0.44.1):
+TUI surfaces (current broad shape):
 - Life View (split: left identity/stats/relationships scrollable, right accumulating event feed)
-- Profile screen ([P]), Lineage Browser ([L]), History Browser ([H]), Skip Time ([S])
+- Profile screen ([P]), Browser shell (`Relationships` + `History`), Skip Time ([S]), Actions screen ([T])
 - Death interrupt with life summary, two-step continuation inspection
 - Character creation wizard (Identity → Location → Appearance → Mode → Stats/Questionnaire → Traits → Confirm)
 - Event-choice popup overlay (Space-only confirm; Enter fully blocked during popup)
@@ -44,7 +44,7 @@ Event system:
 - Family-aware dynamic name insertion, 3-event cooldown, trait-gated events (required_traits field)
 - Event-choice framework for gender/sexuality emergence
 
-The current pressure: what real content and domain systems should be added next now that the actor, TUI, and event foundations are materially credible.
+The current pressure: finish shell/navigation follow-through cleanly enough that it stops distorting judgment, then move into the next real structural system layer (actions).
 
 
 === ACTIVE NEAR-TERM PRESSURES ===
@@ -65,22 +65,30 @@ Status: Interview complete, not yet specced for implementation
 Priority: P1 (next after relationship polish)
 [[actora-roadmap|Actora Roadmap]] fit: player agency layer, dependency for all domain systems
 Summary from interview:
-- Two action types: instant (happens now, no queue) and monthly (queued, resolves on advance)
-- Actions are categorized: social, personal development, career, etc.
-- Dynamic availability based on life situation, location, age, relationships, prerequisites
-- Prerequisites silently hidden — unavailable actions don't show at all (age-gated, location-gated)
-- Long commitments (education, job) are NOT in the action queue — they live in Profile as a "commitments" section
-- Surprise opportunities: popup if urgent (1-month window), persistent "opportunities section" if open-ended. Location of that section TBD.
-- No forced constraints — player chooses freely even if overcommitting (for now)
-- Action atoms: "call a friend", "go to the club" (social + stat changes + random events), "go to the gym", etc.
-- Venues/locations surface available actions (club in your city = action available)
-- Actions get their own screen/page (not crammed into Life View left panel)
-- Queued/pending actions visible in their own panel, not mixed into Life View sections
-- Social actions like "hang out" can optionally bring a friend — friend can decline based on context
-- Eventually: spiral side-quest chains where you are forced through a sequence of decisions with branching outcomes
-- Some future actions will span multiple months (space mission etc.) — shown as active commitments
+- Actions is the main actor-action hub, but not the only place actions can exist. Domain-specific surfaces (for example education or company management later) can still expose their own in-context actions.
+- Actions should show the actor's actionable life surface broadly: available actions, active actions, and commitments.
+- Actions are for actor-specific actions, not profile editing or misc shell/system actions.
+- Two action types remain in play conceptually: instant and monthly, but the more useful unresolved seam may be action/time shape rather than rigid label buckets alone.
+- Long commitments (education, job contracts, travel, later similar long-running states) are not ordinary one-month actions; they should live as ongoing commitments that affect what else the actor can do.
+- Not every action should necessarily carry time cost; some can remain effectively immediate/negligible for now. The future cap/constraint model should emerge from what an action actually consumes and touches, not from premature abstract slot rules.
+- Dynamic availability should eventually come from many axes: age/life stage, location, relationships, traits, commitments, opportunities, etc.
+- Early implementation should lean primarily on age/life-stage gating and avoid overfitting actions to immature foundation layers.
+- Visibility direction is broader than previously framed: actions should often be shown unless they are fundamentally inapplicable (life stage, location, era, similar hard locks). Discovery/unlock/opportunity-driven visibility can grow later.
+- No forced constraints — player chooses freely even if overcommitting (for now).
+- First meaningful implementation categories should stay narrow: social and self-improvement.
+- Actor skills are a newly surfaced seam worth retaining: distinct from stats/traits/commitments, later actions and systems may need learned capabilities / proficiencies that can grow over time.
+- Avoid first-wave dependence on venue-heavy/location-object systems; the place layer is not mature enough for that yet.
+- Actions get their own screen/page (not crammed into Life View left panel), but should not become a monopoly surface for every domain-specific action forever.
+- Social maintenance should support both passive and active playstyles:
+  - ordinary relationship upkeep should not be fully manual
+  - some baseline maintenance should happen through threshold/system logic rather than spammy explicit events
+  - active social actions should provide stronger or more directed upkeep, and batch social actions remain desirable for low-micromanagement play
+- The same passive-vs-active philosophy should extend beyond relationships: jobs and other ordinary life systems should not force tedious micromanagement just to remain functional.
+- Social actions like "hang out" can optionally bring a friend — friend can decline based on context.
+- Eventually: spiral side-quest chains where you are forced through a sequence of decisions with branching outcomes.
+- Some future actions will span multiple months (space mission etc.) — shown as active commitments.
 Why it matters: Without an action system, the game is purely passive — player just watches events tick by. Actions are what make it a life simulation.
-Deferred from this spec: prerequisites (needs venue system), multi-month actions, action skip-time caps, opportunity section placement, cancel-action mechanic
+Deferred from this spec: venue-heavy action logic, deep work simulation, romance, crime, stamina/energy economy, complex scheduling, and the still-unresolved exact monthly queue shape / cancel rules / opportunity section placement.
 
 ID: IDEA-124
 Created: 2026-04-01
@@ -150,4 +158,4 @@ See [[vision-and-systems]] for full creative intent and system vision. Key anti-
 
 === ONE-LINE SUMMARY ===
 
-Actora has a materially strong TUI-driven prototype through v0.44.1 — next move is non-family relationships as the first social layer before education.
+Actora has a materially strong TUI-driven prototype through v0.45.0 plus follow-through polish — immediate design pressure is shell/navigation follow-through, and the next real structural move is action system foundation before education.

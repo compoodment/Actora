@@ -6,12 +6,12 @@ layer: planning
 relates_to: [working-ideas-register, actora-roadmap]
 ---
 
-Actionable Ideas Summary — Rev41 | 2026-04-01 | Near-term snapshot; non-authoritative, stable docs and repo truth win.
+Actionable Ideas Summary — Rev42 | 2026-04-01 | Near-term snapshot; non-authoritative, stable docs and repo truth win.
 
 
 === CURRENT WORKING POSITION ===
 
-Verified repo truth is through v0.45.0 (partial — polish pass pending) with source-stack sync through:
+Verified repo truth is through v0.45.0 plus post-release polish/follow-through, with source-stack sync through:
 - Master Context v9, [[actora-roadmap|Actora Roadmap]] v10, Operator Guide v9 (+ section 18: player-facing text rule)
 - New docs added: [[vision-and-systems]] (creative intent per system), [[ui-architecture]] (screen map and navigation blueprint)
 
@@ -43,31 +43,31 @@ Recent milestone sequence:
 - v0.43.0 — playtest polish: wizard UX, history breathing room, left panel scroll, continuation text
 - v0.44.0 — arrow standard enforced, popup Enter blocked (Space-only)
 - v0.44.1 — stat number padding fix, docs restructured for Obsidian (wikilinks, YAML frontmatter)
-- v0.45.0 — non-family relationships + action foundation (polish pass pending)
+- v0.45.0 — non-family relationships + action foundation
+- post-v0.45.0 follow-through — continuation/browser/Hang Out fixes and shell-direction decision
 
 
 === CURRENT PLANNING QUESTION ===
 
-"v0.45.0 shipped but needs a polish pass. After that, what's next?"
+"The immediate polish wave mostly landed. What is the next real structural move, and what shell redesign pressure should stay in view while we get there?"
 
-Direction: Finish the remaining v0.45.0 polish/restructure work first (UI cleanup, wording/UX cleanup, tui-standards sync, any remaining browser/action rough edges). B1/B2/B3 are now fixed and B4 was closed as non-bug. Then: action system foundation as the next structural move, then education.
+Direction: Treat the generic v0.45.0 polish pass as mostly complete. The remaining near-term design pressure is the shell/navigation redesign (chosen direction documented; implementation still pending). The next real structural move is action system foundation, then education.
 
 
 === LEADING PLANNING CANDIDATES ===
 
-1. v0.45.0 polish pass (immediate)
-- Remaining cleanup after the applied fixes: wording/UX refinement, browser shell consistency, and any unresolved action-browser rough edges
-- Confirm doc truth matches current repo behavior (Browser tabs, Past label, continuation/identity behavior)
-- Update tui-standards.md with new hotkeys and navigation if not already fully synced
-- See live-issues.md for the remaining open/revisit items
+1. Shell / navigation redesign follow-through (immediate design pressure)
+- Chosen direction: balanced stacked shell header, centered numbered primary commands, controls only when relevant, no hidden keybinds
+- Still needs implementation scoping for Menu / Options / Skip Time popup structure and final top-vs-footer responsibility split
+- Shell redesign decisions are now documented; implementation should follow the chosen direction rather than re-inventing the shell per patch
 
 2. Action system foundation (next structural move)
-- Two action types: instant and monthly
-- Time budget per month (emergent constraint, not arbitrary cap)
-- Categorized actions (social, personal, career, etc.)
-- Dynamic availability based on age/location/relationships/era
-- Visibility: age/era gates silently hidden; resource gates shown as unavailable
-- Requires: relationship foundation (realized), place context (realized)
+- Core role now clearer: Actions is the actor-action hub, but not the only possible action entry point forever
+- First meaningful implementation scope should stay narrow: social + self-improvement
+- Long-running states like education/job/travel should be treated as commitments, not ordinary one-month action rows
+- Visibility should be broad by default, with fundamentally inapplicable actions hidden and richer discovery/unlock logic deferred
+- Passive-vs-active balance matters: ordinary life should still function without tedious micromanagement; explicit actions provide focus, leverage, stronger effects, and playstyle expression
+- Still needs one focused follow-up pass on the unresolved seam: action time-shape / exact monthly queue shape vs instant actions vs commitments, plus whether the Actions surface benefits from a detail pane
 
 3. Education foundation (after action system)
 - First mid-stage domain layer per roadmap
@@ -81,13 +81,13 @@ See [[vision-and-systems]] for creative intent and [[ui-architecture]] for scree
 
 === REAL TENSIONS ===
 
-1. v0.45.0 shipped but UI is not yet restructured — polish pass required before it's clean
-2. Action system design is specced but not implemented — it's the missing agency layer
+1. Shell redesign direction is now chosen, but implementation shape is still open enough to drift if not scoped carefully
+2. Action system design is specced but not implemented — it's still the missing agency layer
 3. Traits affect event eligibility but not simulation outcomes
-4. UI architecture doc exists but tui-standards.md hasn't been updated to match new navigation
+4. Relationship maintenance / social decay still needs a better passive-vs-active balance
 5. Scope is huge — discipline required to avoid feature landfill
 
 
 === ONE-LINE SUMMARY ===
 
-Actora has a strong TUI-driven prototype through v0.45.0 with real actor depth, geography, identity, relationships, and an action seed — next immediate move is the v0.45.0 polish pass, then action system foundation.
+Actora has a strong TUI-driven prototype through v0.45.0 plus follow-through polish; next immediate pressures are shell/navigation redesign follow-through and action system foundation.

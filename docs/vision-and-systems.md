@@ -59,6 +59,8 @@ Character creation should feel like you are genuinely shaping who this person is
 - Closeness grows through shared time/events, decays when neglected
 - Long-standing relationships decay slower — 10 years of friendship survives a quiet year
 - **Proximity provides passive closeness maintenance** — living in the same city as a friend slows or offsets decay naturally. Moving away accelerates it. This reflects real life.
+- More broadly, relationships should not feel purely manual. The simulation should assume some ordinary self-driven contact/maintenance above sensible thresholds rather than forcing the player to micromanage every friendship or family tie just to keep it alive.
+- Prefer passive upkeep via thresholds/system logic over bloating the simulation with constant tiny explicit events. Active social actions should matter for stronger gains, targeted attention, batch upkeep, and social-focused playstyles — not as the only way to prevent ordinary relationship collapse.
 - Decay tuning: current implementation is too aggressive (forces hang out every ~3 months). Should feel sustainable without constant micro-management.
 - Friend deaths affect you — stat impact scaled to closeness
 - Social actions (hang out, call, etc.) are player-initiated and resolve on advance
@@ -76,16 +78,20 @@ Character creation should feel like you are genuinely shaping who this person is
 - Deferred until actor/link/context foundations are mature
 
 ### Actions
-- Two types: instant (happens now, no queue) and monthly (queued, resolves on advance)
+- Two core action types remain in play: instant and monthly. Long-running states like education, job contracts, travel, and similar commitments should not be treated like ordinary one-month queue items.
 - Categorized: social, personal development, career, criminal, political, etc.
-- **Action visibility:** Age/era/context gates → silently hidden. Resource/prerequisite gates (no money, missing item, etc.) → shown as unavailable with reason. Rule: if you can never do it right now regardless of effort, hide it. If you could do it but currently can't, show it greyed.
-- **Action time budget:** Actions have a time cost. Free actions (texting a friend, quick errand) consume negligible time. Medium actions consume part of the month. Heavy commitments (job contract, military service, long voyage, expedition) consume most or all of the month's available time. The constraint on how many actions you can do in a month is emergent from time cost allocation, not an arbitrary cap.
+- Actor skills are a likely later seam: distinct from stats/traits/commitments, actions and domain systems may eventually need learned capabilities / proficiencies that grow over time.
+- The Actions surface is the main actor-action hub, but it should not monopolize every action entry point forever; domain-specific surfaces may still expose their own context-native actions later.
+- **Action visibility:** broadly visible action space by default, with fundamentally inapplicable actions hidden (life stage, era, location, similar hard locks). More discovery/unlock/opportunity-driven visibility can grow later.
+- **Action time shape:** the more useful design seam may be what an action consumes and touches, not just whether it wears the label `instant` or `monthly`. Some actions may be effectively immediate/negligible, some may shape a month, and some become ongoing commitments.
+- **Action time budget:** keep this flexible and honest, but do not force tedious micromanagement. Ordinary life should still function passively at a baseline; explicit actions are for focus, leverage, stronger effects, and playstyle expression.
 - **Multi-month actions are era-agnostic** — a sailing voyage in 1600, a research expedition in 2010, a space mission in 2300. Same mechanic, different context. Time-based commitment applies to any era where the scenario warrants it.
-- No forced constraints — player can queue freely, but time budget is real. Overcommitting means something gives.
+- No forced constraints — player can queue freely, but real consequences/structure may grow later.
 - Dynamic — what's available depends on age, location, relationships, commitments, era
-- Long commitments (education, job) live in Profile as "commitments", not in the action queue
+- Long commitments (education, job) live in Profile as "commitments", not in the ordinary action queue
 - Urgent surprise opportunities are popups (1-month window). Open-ended opportunities have their own persistent section (TBD location)
 - Social actions can optionally bring friends who may decline based on context
+- Relationship and ordinary-life maintenance should support both passive and active playstyles: baseline upkeep through threshold/system logic, stronger or more directed change through explicit action
 - Later: spiral side-quest chains — forced sequences of decisions with branching outcomes
 
 ### Stats — Contract & Intent

@@ -100,6 +100,18 @@ Selection should consider:
 	•	whether the task is code-heavy or doc-heavy
 	•	whether Codex is the better token split even for medium work
 
+1.3.1 Interview workflow rules
+
+Interviews are a real Actora workflow path, not random chat fluff.
+Use them when design clarity is missing, when tradeoffs need to be surfaced explicitly, or when shell/UI/system direction should be locked before implementation.
+
+Interview rules:
+	•	send questions in one deliberate batch, not a dribble of one-off prompts
+	•	for UI / shell / TUI work, prefer show-before-apply: mockups, draft layouts, or patch previews first
+	•	if text/mockup review stops being sufficient, switch to a throwaway UI experiment workflow (temporary branch/worktree) and test the real surface there
+	•	capture the resulting decisions in the correct source doc layer (for example `vision-and-systems`, WIR, or tui-standards depending on the kind of decision)
+	•	do not leave important interview conclusions trapped only in chat history
+
 1.4 OpenClaw workflow rules
 
 When opening an OpenClaw task for code or repo-doc work:
@@ -108,6 +120,7 @@ When opening an OpenClaw task for code or repo-doc work:
 	•	state the intended current date explicitly if repo docs are being edited
 	•	prefer build/show, diff, or explicit patch output before apply when appropriate
 	•	for UI / shell / TUI layout changes, prefer visible mockups or draft layouts before implementation so visual flaws are caught before patching the real surface
+	•	if text/mockup review stops being sufficient, switch to a throwaway UI experiment workflow (temporary branch/worktree) and test the real surface there before merging or porting back to the main line
 	•	do not mix unrelated cleanup into one task
 
 Do not ask OpenClaw to infer source-level architecture context from chat drift.

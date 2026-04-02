@@ -145,4 +145,5 @@ When adding a new TUI screen:
 7. Use `Move` for selection lists, `Scroll` for content browsing
 8. Follow the footer format order: navigation → actions → specialist → back → quit
 9. For shell-style multi-tab surfaces, visually separate shell chrome from body content
-10. Reference this document in the implementation prompt
+10. If layout clarity is still ambiguous after mockups, prefer a temporary worktree/branch experiment and playtest the real UI before finalizing the shape
+11. Reference this document in the implementation prompt
