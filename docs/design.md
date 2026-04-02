@@ -112,7 +112,7 @@ Stats are 0–100 values. They should affect real simulation outcomes — not ju
 
 **Current reality:** Most stats are decoration. That's acceptable while the systems that consume them don't exist. But as each domain system is built, the relevant stats must be wired in — not left inert.
 
-**Stat application rule:** stat changes should flow through the controlled mutation boundary (world.apply_outcome) not be scattered across files. This is already the architectural direction (master-context section 18).
+**Stat application rule:** stat changes should flow through the controlled mutation boundary (world.apply_outcome) not be scattered across files. This is already the architectural direction (see identity.md).
 
 ### Education
 - First mid-stage domain layer after relationships
