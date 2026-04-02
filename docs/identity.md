@@ -61,7 +61,7 @@ The approved main conceptual anchors:
 ## 3. Architecture principles
 
 ### Not human-first
-Human-focused early content is fine. Human-only current implementation is fine. But architecture must not hard-bake Human as the universal being model. Actor is the broader layer. Future actor forms may include non-human beings, synthetic beings, robots, alien beings, etc.
+Human-focused early content is fine. Human-only current implementation is fine. But architecture must not hard-bake Human as the universal being model. Actor is the broader layer. Playability is a mode or permission, not a type of being. Future actor forms may include non-human beings, synthetic beings, robots, alien beings, etc.
 
 ### Layered simulation depth
 Not everything gets simulated at the same fidelity. High detail for focused/relevant actors, medium for surrounding actors and systems, lower/aggregate for macro world state. This is necessary for feasibility. Aim for believable and internally coherent, not brute-force total-detail realism.
