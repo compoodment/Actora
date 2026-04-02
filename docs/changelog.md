@@ -6,6 +6,17 @@ updated: 2026-04-02
 
 # Actora Changelog
 
+## Docs Restructure - 2026-04-02
+- **Major documentation system rework:**
+    - Flat `docs/` directory — killed all subfolders (`core_architecture/`, `planning/`, `workflow/`).
+    - Renamed docs to clear names: master-context→identity, actora-roadmap→roadmap, vision-and-systems→design, ui-architecture→screens, tui-standards→controls, architecture→codebase, hotkey-control-workbook→hotkey-workbook.
+    - New docs: `guide.md` (single navigation/workflow doc), `rules.md` (all project constraints), `backlog.md` (Now/Next/Later), `bugs.md` (actual bugs only), `decisions.md` (ADR-style immutable decision log, 11 entries).
+    - Killed: source-index (472 lines), operator-guide (628 lines), working-ideas-register, actionable-summary, live-issues, README.md.
+    - Trimmed: identity.md (516→143), roadmap.md (536→123), design.md (224→200).
+    - Added: glossary in identity.md, routing table in guide.md, review checklist in rules.md, versioning rules, cascade check rule, heartbeat system.
+    - Net result: 13 docs, ~2200 lines of bloat removed, no contradictions, no duplicate content.
+    - All wikilinks updated to new doc names. Tags added to all docs for Obsidian.
+
 ## Version 0.45.0 (Minor) - 2026-04-01
 - **Non-family Relationships + Action Foundation:**
     - Added acquaintance/friend/close_friend link types with numeric closeness score (0–100).
