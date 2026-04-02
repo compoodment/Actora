@@ -13,7 +13,7 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Now
 
-- **Hotkey/control contract** — fill in workbook from Obsidian, review against code/docs, draft canonical contract v2, then update `controls.md`
+- **Hotkey/control contract** — fill in workbook from Obsidian, review against code/docs, draft canonical contract v2, then update `controls.md`. **After contract lands:** add a rule/workflow entry that controls.md must be updated whenever an interview changes hotkey decisions. Controls.md should contain both the current canonical map AND a future hotkey roadmap section.
 - **Shell experiment paused** — worktree exists at `/home/compadmin/openclaw_automated/actora_ui_shell_experiment` (branch: `ui-shell-experiment`). Do NOT resume until control contract is locked. Codex pass was rejected and worktree was restored.
 
 ## Next
