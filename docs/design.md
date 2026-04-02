@@ -14,164 +14,225 @@ For project identity, see `identity.md`. For sequencing, see `roadmap.md`. For i
 
 ## Systems — Vision Per System
 
+Each system uses this format:
+- **Status:** not started / in progress / implemented / evolving
+- **Current truth:** what actually exists in code right now
+- **Intent:** what it should feel like and do
+- **Open questions:** unresolved design decisions
+
+---
+
 ### Character Creation & Identity
-
-Character creation should feel like you are genuinely shaping who this person is — not filling out a form.
-
-- **Ethnicity** — player picks their ethnicity (single or mixed). This informs parent ethnicity: parents could be mixed themselves, or they could be the source of the mix. Ethnicity affects name generation, cultural context, and appearance seeding.
-- **Trait and stat inheritance** — the traits and stats the player picks (or the questionnaire derives) should feel like a believable blend of both parents' characteristics. Not purely random — a reflection of where you came from.
-- **Sibling similarity** — siblings share family resemblance in traits and appearance but with natural variation. Sometimes very similar, sometimes noticeably different. Both are realistic.
-- **Parents feel real** — parents should have their own consistent appearance, traits, and personality that the player can recognise and see reflected in their character.
+**Status:** Implemented (evolving)
+**Current truth:** Identity, Location, Appearance, Mode, Stats/Questionnaire, Traits, Confirm steps. Manual stat sliders or 16-question questionnaire. Culture-aware names. No ethnicity field yet.
+**Intent:** Should feel like genuinely shaping who this person is — not filling out a form. The result should feel like a believable blend of both parents' characteristics, not random.
+- Ethnicity — player picks (single or mixed). Informs parent ethnicity, name generation, cultural context, appearance seeding.
+- Trait and stat inheritance — the questionnaire/manual choices should reflect where you came from.
+- Siblings share family resemblance with natural variation.
+- Parents feel real — consistent appearance, traits, personality visible in your character.
 - Later: parent backstory depth, grandparent lineage, family history context.
-- Depends on: IDEA-091 (identity generation realism), culture-aware name generation (v0.40.0 foundation).
+**Open questions:** None currently blocking.
 
-### Social Relationships- Closeness is numeric (0–100), tiered as acquaintance / friend / close friend
-- All introduced NPCs are real full actors in the world
-- Relationships form through player-initiated events — you choose who to engage with
-- Closeness grows through shared time/events, decays when neglected
-- Long-standing relationships decay slower — 10 years of friendship survives a quiet year
-- **Proximity provides passive closeness maintenance** — living in the same city as a friend slows or offsets decay naturally. Moving away accelerates it. This reflects real life.
-- More broadly, relationships should not feel purely manual. The simulation should assume some ordinary self-driven contact/maintenance above sensible thresholds rather than forcing the player to micromanage every friendship or family tie just to keep it alive.
-- Prefer passive upkeep via thresholds/system logic over bloating the simulation with constant tiny explicit events. Active social actions should matter for stronger gains, targeted attention, batch upkeep, and social-focused playstyles — not as the only way to prevent ordinary relationship collapse.
-- Decay tuning: current implementation is too aggressive (forces hang out every ~3 months). Should feel sustainable without constant micro-management.
-- Friend deaths affect you — stat impact scaled to closeness
-- Social actions (hang out, call, etc.) are player-initiated and resolve on advance
-- Later: invite friends to activities, friends can decline based on context
-- Later: rivals, negative relationship types, romance
-- Later: NPC-initiated relationship events (someone reaches out to you)
-- **NPC identity rule:** Gender and sexuality for non-played actors must auto-resolve silently at the appropriate age — no popup. Popups are only for the currently focused/played actor. Any future popup system must follow this rule: player = popup, NPC = silent auto-resolve.
+---
+
+### Social Relationships
+**Status:** Implemented (evolving)
+**Current truth:** Acquaintance/friend/close_friend with numeric closeness (0–100). Player-initiated meeting via popup. Closeness decay per month with history-based resistance. Drift events + former link status (`Past`). Friend death stat impact. Relationship Browser with filter sidebar. "Spend time with friend" action queues and resolves on advance. Social links shown in Life View left panel.
+**Intent:**
+- Relationships should not feel purely manual — some baseline upkeep should happen through system logic without constant micromanagement.
+- Decay tuning: current implementation is too aggressive. Should feel sustainable.
+- Proximity provides passive closeness maintenance — living in the same city slows decay.
+- Active social actions matter for stronger gains, targeted attention, batch upkeep, and social-focused playstyles.
+- All introduced NPCs are real full actors in the world.
+- Friend deaths affect you — scaled to closeness.
+- Later: invite friends to activities, friends can decline based on context, rivals, negative relationship types, romance, NPC-initiated relationship events.
+- **NPC identity rule:** gender and sexuality for non-played actors must auto-resolve silently — no popup. Player = popup, NPC = silent.
+**Open questions:** Passive upkeep threshold/proximity mechanic not yet designed in detail.
+
+---
 
 ### Social Perception & Reputation
-- Multi-axis, not a single karma score
-- Different axes: trustworthiness, danger level, status, charisma, notoriety, etc.
-- How people perceive you affects what opportunities appear, who approaches you, what's available
-- Crime makes certain people avoid you and others seek you out
-- Presidential power changes how the entire world perceives you
-- Deferred until actor/link/context foundations are mature
+**Status:** Not started
+**Current truth:** Nothing implemented.
+**Intent:**
+- Multi-axis, not a single karma score.
+- Axes: trustworthiness, danger level, status, charisma, notoriety, etc.
+- How people perceive you affects opportunities, who approaches you, what's available.
+- Crime makes some people avoid you and others seek you out.
+- Presidential power changes how the world perceives you.
+**Open questions:** Full design deferred until actor/link/context foundations are mature.
+
+---
 
 ### Actions
-- Two core action types remain in play: instant and monthly. Long-running states like education, job contracts, travel, and similar commitments should not be treated like ordinary one-month queue items.
+**Status:** In progress (foundation only)
+**Current truth:** Actions screen exists with "Spend time with friend" social action. Categories/Actions/Details three-column layout in worktree experiment. Action queues and resolves on Q (next advance). No categories, no self-improvement actions yet.
+**Intent:**
+- Two time-shape types: immediate/negligible and month-consuming. Long-running states (education, job, travel) are commitments, not queue items.
 - Categorized: social, personal development, career, criminal, political, etc.
-- Actor skills are a likely later seam: distinct from stats/traits/commitments, actions and domain systems may eventually need learned capabilities / proficiencies that grow over time.
-- The Actions surface is the main actor-action hub, but it should not monopolize every action entry point forever; domain-specific surfaces may still expose their own context-native actions later.
-- **Action visibility:** broadly visible action space by default, with fundamentally inapplicable actions hidden (life stage, era, location, similar hard locks). More discovery/unlock/opportunity-driven visibility can grow later.
-- **Action time shape:** the more useful design seam may be what an action consumes and touches, not just whether it wears the label `instant` or `monthly`. Some actions may be effectively immediate/negligible, some may shape a month, and some become ongoing commitments.
-- **Action time budget:** keep this flexible and honest, but do not force tedious micromanagement. Ordinary life should still function passively at a baseline; explicit actions are for focus, leverage, stronger effects, and playstyle expression.
-- **Multi-month actions are era-agnostic** — a sailing voyage in 1600, a research expedition in 2010, a space mission in 2300. Same mechanic, different context. Time-based commitment applies to any era where the scenario warrants it.
-- No forced constraints — player can queue freely, but real consequences/structure may grow later.
-- Dynamic — what's available depends on age, location, relationships, commitments, era
-- Long commitments (education, job) live in Profile as "commitments", not in the ordinary action queue
-- Urgent surprise opportunities are popups (1-month window). Open-ended opportunities have their own persistent section (TBD location)
-- Social actions can optionally bring friends who may decline based on context
-- Relationship and ordinary-life maintenance should support both passive and active playstyles: baseline upkeep through threshold/system logic, stronger or more directed change through explicit action
-- Later: spiral side-quest chains — forced sequences of decisions with branching outcomes
+- Actor skills are a likely later seam — learned capabilities distinct from stats/traits.
+- The Actions surface is the main actor-action hub but not the only forever entry point.
+- Action visibility: broadly visible by default, hidden only if fundamentally inapplicable (life stage, era, location).
+- Time budget: flexible. Ordinary life functions at baseline without micromanagement; explicit actions provide focus, leverage, stronger effects.
+- Multi-month actions are era-agnostic — sailing voyage 1600, research expedition 2010, space mission 2300.
+- Urgent opportunities are popups (1-month window). Open-ended opportunities have a persistent section (TBD).
+- Later: spiral side-quest chains.
+**Open questions:** Where do persistent open-ended opportunities live? Detail pane interaction if it becomes interactive?
+
+---
 
 ### Stats — Contract & Intent
-
-Stats are 0–100 values. They should affect real simulation outcomes — not just be numbers on a profile screen. This table tracks what each stat currently does vs what it's intended to do. Update this when a new system wires into a stat.
-
-**Rule:** every stat should have at least one real effect before being considered complete. When building a new system, check this table and wire into relevant stats deliberately.
+**Status:** Partially implemented
+**Current truth:** 11 stats displayed (3 primary + 8 secondary). Happiness wired to friend death. Everything else is decoration for now.
+**Intent:** Stats should affect real simulation outcomes. Every stat should have at least one real effect before being considered complete. When building a new system, check this table and wire into relevant stats deliberately.
 
 | Stat | Currently affects | Intended to affect |
 |------|------------------|--------------------|
-| Health | Nothing yet (displayed only) | Mortality risk, energy for actions, illness chance |
-| Happiness | Friend death impact (-8/-18) | Event eligibility, action effectiveness, mental health events |
-| Intelligence | Nothing yet | Education performance, questionnaire outcomes, job eligibility |
-| Strength | Nothing yet | Physical actions, certain job eligibility |
-| Charisma | Nothing yet | Social actions effectiveness, relationship formation speed |
-| Creativity | Nothing yet | Certain career paths, event outcomes |
-| Wisdom | Nothing yet | Decision quality events, elder life outcomes |
-| Discipline | Nothing yet | Education performance, work consistency |
-| Willpower | Nothing yet | Overcoming negative events, addiction resistance |
-| Looks | Nothing yet | Social first impressions, certain relationship events |
-| Fertility | Nothing yet | Chance of having children |
+| Health | Nothing (displayed only) | Mortality risk, energy for actions, illness chance |
+| Happiness | Friend death (-8/-18) | Event eligibility, action effectiveness, mental health events |
+| Intelligence | Nothing | Education performance, questionnaire outcomes, job eligibility |
+| Strength | Nothing | Physical actions, certain job eligibility |
+| Charisma | Nothing | Social actions effectiveness, relationship formation speed |
+| Creativity | Nothing | Certain career paths, event outcomes |
+| Wisdom | Nothing | Decision quality events, elder life outcomes |
+| Discipline | Nothing | Education performance, work consistency |
+| Willpower | Nothing | Overcoming negative events, addiction resistance |
+| Looks | Nothing | Social first impressions, certain relationship events |
+| Fertility | Nothing | Chance of having children |
 
-**Current reality:** Most stats are decoration. That's acceptable while the systems that consume them don't exist. But as each domain system is built, the relevant stats must be wired in — not left inert.
+**Stat application rule:** stat changes must flow through `world.apply_outcome`, not scattered direct mutation.
+**Open questions:** None blocking — stats wire in as each domain system is built.
 
-**Stat application rule:** stat changes should flow through the controlled mutation boundary (world.apply_outcome) not be scattered across files. This is already the architectural direction (see identity.md).
+---
 
 ### Education
-- First mid-stage domain layer after relationships
-- School as a real place with real NPC teachers and peers
-- Different countries = different school systems
-- Gives the actor something to DO during childhood/teen years
-- Unlocks real peer/friend event content
-- Long commitment — lives in Profile, not action queue
-- Later: grades, performance, subject specialization, dropout mechanic
+**Status:** Not started
+**Current truth:** Nothing implemented.
+**Intent:**
+- First mid-stage domain layer after relationships.
+- School as a real place with real NPC teachers and peers.
+- Different countries = different school systems.
+- Gives the actor something to DO during childhood/teen years.
+- Unlocks real peer/friend event content.
+- Long commitment — lives in Profile, not action queue.
+- Later: grades, performance, subject specialization, dropout mechanic.
+**Open questions:** Depends on action system foundation.
+
+---
 
 ### Work & Career
-- Jobs as real role-based commitments
-- Income, work-state, career progression
-- Domain actions via Profile: view current job, take job actions from there
-- Boss/coworker NPCs are real actors (more thoroughly simulated despite potentially low closeness — context threshold)
-- Later: starting companies, hiring, company trade with other companies in the right field
-- When you own a company you can trade with others in the relevant field
-- When you're a professor you can apply to schools
-- Requires: education foundation, actor-state stability
+**Status:** Not started
+**Current truth:** Nothing implemented.
+**Intent:**
+- Jobs as real role-based commitments. Income, career progression.
+- Boss/coworker NPCs are real actors.
+- Domain actions via Profile.
+- Later: starting companies, hiring, company trade in relevant fields. When you own a company you can trade with others. When you're a professor you can apply to schools.
+**Open questions:** Requires education foundation and actor-state stability.
+
+---
 
 ### Economy
-- Real future pillar — not fake spreadsheet theater
-- Firms, organizations, markets, investment structures
-- Company ownership enables trade relationships with other companies
-- Economy affects what jobs exist, what opportunities appear, what things cost
-- Macro conditions are real — countries can be in recession, boom, war economy
-- Requires: work/role foundation, links, records, place, state-mutation foundations
+**Status:** Not started
+**Current truth:** Nothing implemented.
+**Intent:**
+- Real future pillar — not fake spreadsheet theater.
+- Firms, organizations, markets, investment structures.
+- Economy affects what jobs exist, what opportunities appear, what things cost.
+- Macro conditions are real — recession, boom, war economy.
+**Open questions:** Requires work/role, links, records, place, state-mutation foundations.
+
+---
 
 ### Politics & Power
-- Real future pillar
-- Becoming president / leader is a real possibility
-- Presidential actions: wage war, make peace, change economies, issue policy
-- Elections, coups, political parties as real structures
-- Power has real consequences — world events, NPC reactions, history records
-- Requires: country/political layer, economy, social perception
+**Status:** Not started
+**Current truth:** Nothing implemented.
+**Intent:**
+- Becoming president/leader is a real possibility.
+- Presidential actions: wage war, make peace, change economies, issue policy.
+- Elections, coups, political parties as real structures.
+- Power has real consequences — world events, NPC reactions, history records.
+**Open questions:** Requires country/political layer, economy, social perception.
+
+---
 
 ### Crime & Consequence
-- Criminal actions are a real category in the action system
-- Crime changes your social perception — some people avoid you, others seek you
-- Law enforcement, legal status as real systems
-- Criminal networks as real organizations with real actor NPCs
-- Consequences persist — your criminal history is real history
+**Status:** Not started
+**Current truth:** Nothing implemented.
+**Intent:**
+- Criminal actions are a real category in the action system.
+- Crime changes your social perception — some people avoid you, others seek you.
+- Law enforcement, legal status as real systems.
+- Criminal networks as real organizations with real actor NPCs.
+- Consequences persist — your criminal history is real history.
+**Open questions:** Depends on social perception and action system.
+
+---
 
 ### News & Information
-- Local newspapers and global newspapers (and future equivalents in futuristic eras)
-- Content: country went to war, coup happened, tsunami killed 4000 people, presidential actions, company moves
-- Makes the world feel alive and larger than your actor's immediate life
-- Future equivalents in futuristic eras have different names/forms
-- Requires: political layer, economic layer, event system maturity
+**Status:** Not started
+**Current truth:** Nothing implemented.
+**Intent:**
+- Local and global newspapers (and era-appropriate equivalents).
+- Content: wars, coups, disasters, presidential actions, company moves.
+- Makes the world feel alive and larger than your actor's immediate life.
+**Open questions:** Requires political layer, economic layer, event system maturity.
+
+---
 
 ### Health & Conditions
-- Health as a real system, not just a stat
-- Illness, injury, recovery as structured events
-- Affects what actions are available, what opportunities exist
-- Requires: lifecycle/event/link/state foundations
+**Status:** Not started (Health stat exists but is decoration)
+**Current truth:** Health stat displayed but affects nothing yet.
+**Intent:**
+- Health as a real system — illness, injury, recovery as structured events.
+- Affects what actions are available, what opportunities exist.
+**Open questions:** Requires lifecycle/event/link/state foundations.
+
+---
 
 ### Property & Household
-- Owned places separate from where you live, which is separate from where you are
-- Household depth: who lives with you, dependencies, costs
-- Inventory and item ownership as real structures
-- Requires: structured place, spatial identity separation
+**Status:** Not started
+**Current truth:** Nothing implemented.
+**Intent:**
+- Owned places separate from where you live, which is separate from where you are.
+- Household depth: who lives with you, dependencies, costs.
+- Inventory and item ownership as real structures.
+**Open questions:** Requires structured place, spatial identity separation.
+
+---
 
 ### Travel & Movement
-- Moving between cities, countries, world bodies
-- Not assumed to be terrestrial or local long-term
-- Future eras: space travel, interplanetary movement
-- Travel affects relationship decay, opportunity availability, cultural context
-- Requires: structured places, spatial identity separation
+**Status:** Not started
+**Current truth:** Location exists in actor model (city/country) but is static — no movement system.
+**Intent:**
+- Moving between cities, countries, world bodies.
+- Not assumed terrestrial long-term.
+- Travel affects relationship decay, opportunity availability, cultural context.
+**Open questions:** Requires structured places, spatial identity separation.
+
+---
 
 ### Space & Galactic Layers
-- Future eras have space travel as a real available system
-- Vessels, stations as non-fixed place types
-- Star systems, solar systems as real place hierarchy layers
-- Galaxy-level play as the eventual ceiling
-- Your sister's fantasy planet: a real world body in a pre-BC era within the same universe save
-- Requires: all lower spatial layers proven first
+**Status:** Not started
+**Current truth:** Nothing implemented.
+**Intent:**
+- Future eras have space travel as a real available system.
+- Vessels, stations as non-fixed place types.
+- Star systems, solar systems as real place hierarchy layers.
+- Galaxy-level play as the eventual ceiling.
+**Open questions:** Requires all lower spatial layers proven first.
+
+---
 
 ### Eras & Timeline
-- Different eras have different rules, technologies, possibilities
-- Modern era is the first. Near-future follows. Futuristic eras beyond that.
-- Era affects: what actions exist, what species exist, what places exist, what news looks like
-- Characters are era-restricted — a medieval peasant can't use a smartphone
-- Compverse = the concept of universe saves; one save = one continuous universe with one advancing timeline
+**Status:** Not started
+**Current truth:** Modern era only. No era awareness in events or systems.
+**Intent:**
+- Different eras have different rules, technologies, possibilities.
+- Modern era first. Near-future follows. Futuristic eras beyond that.
+- Era affects: what actions exist, what species exist, what places exist, what news looks like.
+- Characters are era-restricted — a medieval peasant can't use a smartphone.
+- Compverse = one save = one continuous universe with one advancing timeline.
 
 ---
 
