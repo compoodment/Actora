@@ -86,3 +86,39 @@ Major structural decisions. Immutable — never edit an entry. If a decision cha
 **Context:** Docs had vague names (WIR, live issues), mixed purposes, subfolders adding no value, and overlapping content across 14 files.
 **Decision:** Flat `docs/` directory, 13 docs with names that say what they are. No subfolders. Every doc has one clear purpose. Routing table in guide.md.
 **Alternatives rejected:** Keep existing layered system, add more docs to cover gaps.
+
+### DEC-012: Q = advance month, E = skip time
+**Date:** 2026-04-02
+**Context:** Hotkey contract interview. Wanted advance/skip to be one-key actions reachable from anywhere, and freed Q from its old quit role.
+**Decision:** Q = advance month. E = skip time. Both globally available except in: text input, search, popups, wizard, continuation, death screen.
+**Alternatives rejected:** A/Enter for advance (kept as legacy but not canonical), S for skip.
+
+### DEC-013: Backspace = universal Back
+**Date:** 2026-04-02
+**Context:** P was freed from Profile (Profile moved into Menu). Needed an intuitive global back key.
+**Decision:** Backspace = Back globally outside text input. In text input/search, Backspace deletes characters. In search, Esc exits search mode.
+**Alternatives rejected:** B = Back (old standard), P = Back.
+
+### DEC-014: WASD as movement aliases
+**Date:** 2026-04-02
+**Context:** User is a gamer, fingers naturally on WASD. Wanted movement without leaving home position.
+**Decision:** W/A/S/D are full aliases for ↑/←/↓/→. Same behavior, same context rules. In text input, WASD type characters.
+**Alternatives rejected:** WASD only (no arrows), arrows only.
+
+### DEC-015: Esc = Options popup (toggle)
+**Date:** 2026-04-02
+**Context:** Needed a dedicated key for the Options popup that's always accessible without being a number key.
+**Decision:** Esc opens/closes Options popup. Outside text input: Esc = Options. In text input/search: Esc = exit text mode. Esc does NOT close other popups — only Options.
+**Alternatives rejected:** [4] for Options (number key), dedicated key like O.
+
+### DEC-016: Profile moves into Menu
+**Date:** 2026-04-02
+**Context:** Shell redesign — reduce top-level letter key clutter. Profile doesn't need its own dedicated hotkey if Menu is always one key away.
+**Decision:** Profile accessible via [1] Menu → Profile. P key freed for Backspace/Back.
+**Alternatives rejected:** Keep P = Profile as standalone hotkey.
+
+### DEC-017: Q/E available from any non-input screen
+**Date:** 2026-04-02
+**Context:** User doesn't want to navigate back to Life View just to advance time or skip. You should be able to advance/skip from Browser, Actions, Profile, future Education/Company views, etc.
+**Decision:** Q and E work from any screen that isn't actively consuming input. The game should not require returning to Life View to perform time actions.
+**Alternatives rejected:** Q/E only on Life View.

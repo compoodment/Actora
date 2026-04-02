@@ -55,7 +55,7 @@ That gets you oriented. Only read other docs when the task requires them.
 | Major structural decision made | `decisions.md` |
 | Interview produced design intent | `design.md` |
 | Interview produced screen/layout truth | `screens.md` |
-| Interview produced hotkey/control truth | `controls.md` |
+| Interview produced hotkey/control truth | `controls.md` — update immediately. controls.md is the only canonical home for hotkey decisions.
 | New project rule / constraint | `rules.md` |
 | Workflow changed | `guide.md` |
 | Code structure changed meaningfully | `codebase.md` |

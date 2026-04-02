@@ -6,143 +6,231 @@ updated: 2026-04-02
 
 # Actora Controls
 
-Hotkeys, interaction rules, and the canonical control contract for all TUI surfaces.
-The hotkey workbook (`hotkey-workbook.md`) feeds into this doc once reviewed.
+Canonical control contract for all TUI surfaces. If it's not here, it's not official.
 
+---
 
-## Controls
+## Global contract
 
-### Universal keys (available on every screen)
-- `[Q]` — Quit (with confirmation prompt)
-- `[B]` — Go back to previous screen (where applicable)
+| Key | Action | Notes |
+|-----|--------|-------|
+| Q | Advance month | Blocked: text input, search, popups, wizard, continuation, death screen |
+| E | Skip time | Same blocks as Q |
+| Backspace | Back / cancel | Navigation; overridden to delete-char in text input |
+| Esc | Options popup | Outside text input/search; closes Options if already open |
+| Enter | Proceed / confirm | Screen transitions, popup confirm, confirmation screens |
+| [1] | Menu | Always visible; opens Browser / Actions / Profile |
+| [2][3][4] | Reserved | Future domain systems |
+| / | Open search | Any screen that supports it |
+| W / ↑ | Move up / scroll up | Outside text input |
+| S / ↓ | Move down / scroll down | Outside text input |
+| A / ← | Move left / adjust value left | Outside text input |
+| D / → | Move right / adjust value right | Outside text input |
+| Tab | Switch Browser tabs | Browser only |
+| Space | Toggle / select | Multi-select screens only |
 
-Rule:
-- Do **not** add hidden convenience aliases for navigation outside clearly scoped text-input/search contexts. `Backspace` may edit text while typing, but ordinary surface navigation should use explicit documented keys like `[B]`.
+**WASD are full movement aliases for arrow keys.** Same behavior, same context rules. In text input, WASD type characters (no movement).
 
-### Navigation
-- `[↑↓]` — Move selection or scroll content
-- `[←→]` — Adjust values on any adjustable field (stats, appearance, identity value fields)
+**Adjustable value fields:** A/D (and ←→) adjust value when the row is active/focused, navigate when it's not. Active adjustable fields must visually render as `← value →`.
+
+---
+
+## Context override rules
+
+| Context | What changes |
+|---------|-------------|
+| Text input field | Backspace = delete char, WASD = type characters, Esc = exit text mode |
+| Search active | Backspace = delete char, WASD = type characters, Esc = exit search |
+| Any popup open | Q/E blocked, [1] blocked |
+| Character creation wizard | Q/E blocked, Esc blocked, [1] blocked |
+| Continuation/death screen | Q/E blocked |
+
+---
+
+## Per-screen contracts
+
+### Life View (anchor screen)
+
+| Key | Action |
+|-----|--------|
+| Q | Advance month |
+| E | Open Skip Time |
+| [1] | Menu |
+| Esc | Options |
+| W/S or ↑↓ | Reserved for future panel interaction |
+
+Left/right panel scrolling: mouse wheel when hovering over panel (future implementation).
+
+---
+
+### Browser
+
+Two tabs: Relationships (with filter sidebar + actor list) and History (read-only log).
+
+| Key | Action | Context |
+|-----|--------|---------|
+| Tab | Switch Relationships / History tab | |
+| W/S or ↑↓ | Move within active focus zone | |
+| D or → | Move focus: filters → actor list | Relationships tab |
+| A or ← | Move focus: actor list → filters | Relationships tab |
+| Backspace | Actor list → filters | In actor list |
+| Backspace | Close Browser | In filters |
+| Enter | Inspect selected actor | Actor list |
+| / | Open search | Either tab |
+
+History tab: W/S scroll log, `/` opens year jump, Enter confirms year, Backspace cancels year input / closes Browser.
+
+---
 
 ### Actions
-- `[Space]` — Select or toggle an option when the screen supports explicit selection; also the **only** confirm key for popup choices (Enter must never confirm popups)
-- `[Enter]` — Continue, proceed, or confirm screen transition
 
-### Selection behavior
-- **Single-choice lists:** moving the highlight changes the current choice immediately. Do not also require a separate commit state.
-- **Single-choice value fields:** when a row owns one value from a fixed set, `←→` cycles the value directly on the row instead of opening a second nested chooser. The active field **must** visually render as `← value →` to signal it is adjustable.
-- **Multi-select lists:** highlight shows focus; `[x]` shows toggled selections.
-- **Single-choice lists should not show `[x]` markers** unless there is a true separate committed state the player can change independently of focus.
-- **Enter must never be a confirm key for popup/choice overlays.** Popup overlays use Space only — Enter is reserved for month advancement and screen transitions and must be fully blocked while a popup is active.
+Three columns: Categories / Actions / Details. Details is currently display-only.
 
-### Specialist keys (context-specific)
-- `[R]` — Randomize (stats screen only)
-- `[/]` — Search or year-jump (Browser: Relationships/History tabs)
-- `[0-9]` — Custom numeric input (skip time / history year jump)
-- `[Tab]` — Switch Browser tabs when no tab-specific search input is active
-- `[→]` — In Browser Relationships tab, move focus from filters to actor list
-- `[←]` — In Browser Relationships tab, move focus from actor list back to filters
-- `[A]` — Advance one month (Life View only; Enter also advances on Life View)
-- `[S]` — Open Skip Time screen (Life View only)
-- `[P]` — Open Profile (Life View only)
-- `[L]` — Open Browser on Relationships tab (Life View only)
-- `[H]` — Open Browser on History tab (Life View only)
-- `[T]` — Open Actions screen (Life View only)
+| Key | Action | Context |
+|-----|--------|---------|
+| W/S or ↑↓ | Move within active column | |
+| D or → | Move focus: categories → actions | |
+| A or ← | Move focus: actions → categories | |
+| Enter | Queue selected action | On an action |
+| Backspace | Close Actions | |
 
+Details column follows action selection automatically. Queued actions resolve on Q (next advance).
 
-## Main screen navigation map
+---
 
-| Key | Destination |
-|-----|------------|
-| A / Enter | Advance 1 month |
-| S | Skip Time screen |
-| L | Browser → Relationships tab |
-| H | Browser → History tab |
-| T | Actions screen |
-| P | Profile screen |
-| Q | Quit confirmation |
+### Profile
 
-**Notes:**
-- `[H]` is a shortcut into the Browser at the History tab, not a separate standalone screen.
-- The Browser is one shell with two tabs (`Relationships`, `History`), not two unrelated screens.
+Read-only for now. Future: commitments, health, property sections.
 
+| Key | Action |
+|-----|--------|
+| W/S or ↑↓ | Scroll (when content grows) |
+| Backspace | Close Profile |
 
-## Shell header + footer direction
+---
 
-Current shell direction for major in-game screens:
-- Keep a compact top shell identity stack rather than collapsing everything into one command bar.
-- Preferred current layout direction:
-  1. centered Actora title
-  2. actor + simulation turn line
-  3. centered screen-name line
-  4. compact state/info line (location/date on the left; health/money on the right)
-- Primary commands should be centered and menu-like.
-- Local controls should also be centered, but only shown when relevant to the current surface/mode.
-- Use a single full-width divider unless the body is truly split into distinct panes.
-- Do not repeat a screen title inside the body if the shell header already names the screen.
+### Skip Time
 
-## Footer format
+| Key | Action |
+|-----|--------|
+| W/S or ↑↓ | Move between presets |
+| Enter | Confirm selected preset / confirm custom input |
+| 0-9 | Type custom month count |
+| Backspace | Delete typed digit; close screen if input empty |
+| Q/E | Blocked |
 
-When a footer hint row is needed, follow this pattern:
-```
-[navigation] [actions] [specialist] [back] [quit]
-```
+---
 
-Example: `[↑↓] Move   [Space] Select   [Enter] Continue   [B] Back   [Q] Quit`
+### Character Creation Wizard
 
-Browser-specific rule:
-- The Browser tab row is shell chrome, not body content.
-- Visually separate the tab row from the active pane content with a bottom divider/rule.
+| Key | Action | Context |
+|-----|--------|---------|
+| W/S or ↑↓ | Move between fields | |
+| A/D or ←→ | Cycle value / adjust | Adjustable fields |
+| Enter | Proceed to next step | |
+| Backspace | Go back one step | Navigation |
+| Backspace | Delete character | Text input field |
+| Space | Select / toggle | Choice fields |
+| R | Randomize all stats | Stats step only |
+| Q / E / Esc / [1] | Blocked | Entire wizard |
 
+---
 
-## Naming rules
+### Continuation / Death
 
-| Key | Always call it |
-|-----|---------------|
+Death summary → candidate list → candidate detail → confirm. Q/E fully blocked throughout.
+
+| Key | Action | Context |
+|-----|--------|---------|
+| Enter | Acknowledge death / proceed | Death summary |
+| W/S or ↑↓ | Move between candidates | Candidate list |
+| Enter | Inspect selected candidate | Candidate list |
+| Backspace | Back to candidate list | Candidate detail |
+| Enter | Confirm continuation | Candidate detail |
+| Backspace | No effect | Death summary (nowhere to go) |
+
+---
+
+### Menu popup ([1])
+
+| Key | Action |
+|-----|--------|
+| W/S or ↑↓ | Move between items |
+| 1 / 2 / 3 | Fast-select (Browser / Actions / Profile) |
+| Enter | Open selected |
+| Backspace | Close popup |
+
+---
+
+### Options popup (Esc)
+
+| Key | Action |
+|-----|--------|
+| W/S or ↑↓ | Move between items |
+| Enter | Select item |
+| Esc | Close popup |
+
+Current items: Quit Game → confirmation, Help/Controls (future), Settings (future).
+
+---
+
+### Quit confirmation
+
+| Key | Action |
+|-----|--------|
+| Enter | Confirm quit |
+| Backspace | Cancel |
+
+---
+
+## Popup close rules
+
+| Popup | Close key |
+|-------|-----------|
+| Options popup | Esc (toggle) |
+| Menu popup | Backspace |
+| Quit confirmation | Backspace |
+| Choice overlays | Backspace (if skippable) |
+
+Esc only closes Options. It does not close other popups.
+
+---
+
+## Footer naming conventions
+
+| Key | Display label |
+|-----|--------------|
 | ↑↓ with selection list | Move |
 | ↑↓ with scrollable content | Scroll |
 | Space | Select |
-| Enter | Continue (or "Start Game" on final confirmation only) |
-| B | Back |
-| Q | Quit |
+| Enter | Continue (or "Start" on final confirmation only) |
+| Backspace | Back |
+| Q | Quit (only in footer if Options is unavailable) |
 
-Relationship wording rule:
-- Use player-facing social-state labels that read naturally in the UI.
-- Current label choice for archived/former social ties is `Past`.
+Relationship wording: archived/former social ties use the player-facing label `Past`.
 
+---
 
-## Quit confirmation
+## Rules for adding new screens
 
-Pressing Q on any screen shows a centered confirmation prompt:
-```
-Are you sure you want to quit?
+1. Include `[1] Menu` and `Esc Options` in shell header
+2. Include `[Backspace] Back` in footer if screen has a parent
+3. Single-choice lists: highlighted row = live selection (no separate commit)
+4. Adjustable fields: render `← value →` when active
+5. Use `[Space] Select` only for true multi-select/toggle screens
+6. Use `[Enter] Continue` for proceeding; never for popup confirm
+7. Q/E must be blocked during any active input context
+8. Follow footer order: navigation → actions → specialist → back
+9. Visually separate shell chrome from body content (divider)
+10. If layout is ambiguous after mockups, use a throwaway worktree to test real UI
+11. Reference this doc in implementation prompts
+12. After adding a screen, cascade-check: does screens.md need updating?
 
-  [Enter] Quit   [B] Cancel
-```
+---
 
-This prevents accidental quits. The game only exits when Enter is pressed on the confirmation.
+## Known issues (fix in next UI pass)
 
-
-## Browser behavior rules
-
-- Browser Relationships tab has two focus zones: `filters` and `actors`.
-- `↑↓` moves within the active focus zone.
-- `[→]` or `[Tab]` moves from filters to actors.
-- `[←]` or `[B]` moves from actors back to filters.
-- `[B]` from filters exits the Browser back to Life View.
-- `[/]` opens search on the active Browser tab.
-- Search mode temporarily owns text input; tab switching should not fire while search is active.
-
-## Adding new screens
-
-When adding a new TUI screen:
-1. Include `[Q] Quit` in the footer
-2. Include `[B] Back` if the screen has a parent to return to
-3. For single-choice lists, make the highlighted row the live selection
-4. Use `[x]` markers only for true multi-select/toggle screens
-5. Use `[Space] Select` for picking/toggling where explicit selection is needed; do not make Enter the primary list-selection key
-6. Use `[Enter] Continue` for proceeding to the next step
-7. Use `Move` for selection lists, `Scroll` for content browsing
-8. Follow the footer format order: navigation → actions → specialist → back → quit
-9. For shell-style multi-tab surfaces, visually separate shell chrome from body content
-10. If layout clarity is still ambiguous after mockups, prefer a temporary worktree/branch experiment and playtest the real UI before finalizing the shape
-11. Reference this document in the implementation prompt
+- Space/Enter overlap exists in current code on some screens — violation of the contract above
+- BACK_KEYS aliases (Backspace/127/8) in `handle_actions_key` — should be Backspace only
+- Q/E not yet wired as advance/skip (currently A/S) — full wiring needed in next UI pass
+- WASD movement not yet implemented — current code uses arrows only
