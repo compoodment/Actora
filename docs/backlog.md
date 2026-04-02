@@ -26,21 +26,22 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Later
 
-- **Education foundation** — first mid-stage domain layer per roadmap, depends on action system
-- **Actor skills** — learned capabilities / proficiencies distinct from stats/traits. Actions and later systems depend on this.
-- **Actor personalities** — structural NPC behavior layer distinct from traits. Influences action preference, NPC response, relationship behavior, event choice weighting.
-- **Ethnicity + trait inheritance + sibling similarity** (IDEA-124) — parked until identity generation is mature
-- **Multi-axis social perception / reputation** (IDEA-103) — depends on stronger social foundations
-- **Professional doc structure upgrade** — ADR patterns, review checklists, stronger source-of-truth hierarchy (partially realized in this rework)
-- **Contabo Firewall** — optional second security layer on top of existing UFW host firewall
-- **Closeness decay tuning** — current decay may be too aggressive; add proximity-based passive maintenance
-- **Batch social action** — "Spend time with friends/family" covering a group at once
-- **Death screen record filtering** — show only important/marked records, not random events
-- **"New Life: X" feed phrasing** — needs better wording or removal
-- **Gradual sexuality signal events** — 3-5 small events building toward suggestion instead of single choice
-- **Culture/location-driven identity context** for gender/sexuality emergence
-- **Gender/sexuality changeable through Profile** triggering life event
-- **"Other" sexuality** integration with future romance events
-- **Sibling/family birth probability tuning** — current heuristic is intentionally simple first-pass
-- **Name pool deepening** — regional variation, ethnic/religious diversity, era awareness, family naming conventions
-- **Operator tooling / scenario testing seam** (IDEA-104)
+- **Education foundation** — first mid-stage domain layer per roadmap, depends on action system *(2026-03-31)*
+- **Actor skills** — learned capabilities / proficiencies distinct from stats/traits. Actions and later systems depend on this. *(2026-04-01)*
+- **Actor personalities** — structural NPC behavior layer distinct from traits. Influences action preference, NPC response, relationship behavior, event choice weighting. *(2026-04-01)*
+- **Ethnicity + trait inheritance + sibling similarity** — parked until identity generation is mature *(2026-03-31)*
+- **Multi-axis social perception / reputation** — depends on stronger social foundations *(2026-03-27)*
+- **Professional doc structure upgrade** — remaining ADR patterns, review checklists beyond what's already done *(2026-04-02)*
+- **Contabo Firewall** — optional second security layer on top of existing UFW host firewall *(2026-04-01)*
+- **NPC identity auto-resolve** — gender/sexuality must silently resolve for non-played actors at age threshold *(2026-04-01)*
+- **Closeness decay tuning** — current decay may be too aggressive; add proximity-based passive maintenance *(2026-04-01)*
+- **Batch social action** — "Spend time with friends/family" covering a group at once *(2026-04-01)*
+- **Death screen record filtering** — show only important/marked records, not random events *(2026-04-01)*
+- **"New Life: X" feed phrasing** — needs better wording or removal *(2026-04-01)*
+- **Gradual sexuality signal events** — 3-5 small events building toward suggestion instead of single choice *(2026-03-31)*
+- **Culture/location-driven identity context** for gender/sexuality emergence *(2026-03-31)*
+- **Gender/sexuality changeable through Profile** triggering life event *(2026-03-31)*
+- **"Other" sexuality** integration with future romance events *(2026-03-31)*
+- **Sibling/family birth probability tuning** — current heuristic is intentionally simple first-pass *(2026-03-31)*
+- **Name pool deepening** — regional variation, ethnic/religious diversity, era awareness, family naming conventions *(2026-03-31)*
+- **Operator tooling / scenario testing seam** *(2026-03-27)*

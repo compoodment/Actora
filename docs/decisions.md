@@ -8,6 +8,17 @@ updated: 2026-04-02
 
 Major structural decisions. Immutable — never edit an entry. If a decision changes, add a new one that supersedes the old.
 
+## Template
+
+```
+### DEC-XXX: [Title]
+**Date:** YYYY-MM-DD
+**Context:** [Why this decision was needed]
+**Decision:** [What was decided]
+**Alternatives rejected:** [What else was considered]
+**Supersedes:** DEC-YYY (only if replacing an earlier decision)
+```
+
 ---
 
 ### DEC-001: Actor-anchored continuous universe

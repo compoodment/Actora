@@ -8,14 +8,20 @@ updated: 2026-04-02
 
 What Actora is. The durable project identity and architecture anchor.
 
+**Anti-drift reminder:** Actora should not collapse into deeper BitLife, detached god sim, or vague universe-scale handwaving. Actor-anchored, zoomable, continuous, simulation-real.
+
+**Active guardrails** (always in effect):
+- Preserve actor-anchored / zoomable-universe player contract (see DEC-001)
+- Controlled state mutation — mutations flow through world-owned methods
+- Origin / lineage / care semantic separation in family links
+
 Purpose
 
 This document is the durable identity and architecture anchor for Actora.
 
 It defines what Actora fundamentally is, what the project is trying to become, and which approved architectural truths should guide future planning, review, and implementation.
 
-This is a stable source document.
-It should stay focused on durable truth rather than temporary brainstorming or patch-level chatter.
+Only revise when project identity or core architecture truly changes.
 
 
 1. Project identity
@@ -483,3 +489,28 @@ Connection to existing architecture philosophy
 - it supports layered simulation depth by making system interaction more legible and less chaotic
 
 It should stay focused on durable identity and architecture truth.
+
+---
+
+## Glossary
+
+These terms have specific meanings in Actora. Use them consistently across all docs.
+
+| Term | Meaning |
+|------|---------|
+| **Actor** | Any simulation subject (human or otherwise). The player controls one at a time. |
+| **Focused actor** | The actor the player currently controls. |
+| **Continuation** | After the focused actor dies, choosing a connected living actor to continue as. |
+| **Link** | A world-owned relationship record between two entities (family, social, association). |
+| **Social link** | A non-family relationship with a closeness score (0-100). Types: acquaintance, friend, close_friend. |
+| **Place** | A location in the world hierarchy (earth → country → city). |
+| **Spatial identity** | An actor's current location, residence, jurisdiction, and temporary occupancy — kept separate. |
+| **Commitment** | A long-running state like education, job, or travel — not an ordinary one-month action. |
+| **Action** | Something the player's actor can do. Classified by time-shape, not abstract buckets. |
+| **Structural status** | Whether an actor is "active" or "dead" — the narrow lifecycle state. |
+| **Record** | A world-owned structured event/history entry (event, birth, death, family_bootstrap, actor_entry). |
+| **Life stage** | Derived from age: Infant → Child → Teenager → Young Adult → Adult → Elder. |
+| **Trait** | One of 10 personality descriptors (pick 3 at creation). Affects event eligibility. |
+| **Stat** | One of 11 numeric attributes (health, happiness, intelligence + 8 secondary). |
+| **Shell** | The persistent TUI frame: header, footer, screen body. |
+| **Browser** | The tabbed screen containing Relationships and History tabs. |

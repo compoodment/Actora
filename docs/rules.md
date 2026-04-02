@@ -44,11 +44,32 @@ All project constraints in one place. If it says "don't" or "must", it lives her
 
 ## Patch rules
 
-1. Spec before apply for anything non-trivial
+1. Spec before apply for anything non-trivial — include: target, files touched, behavior changed, behavior preserved, regression risks, verification plan
 2. Verify on VPS — `python3 -c "import main"` minimum, tmux playtest for TUI changes
 3. Don't silently broaden scope — a patch does the approved job and no more
 4. Review before acceptance — worker output must be checked, not blindly trusted
 5. If a good idea appears mid-patch that doesn't belong in the current scope, route it to `backlog.md`
+6. Not every mentioned issue is an immediate fix request — it may be backlog, later, or just a note
+7. Don't mix unrelated cleanup into one task
+8. Don't assume claimed completion means real completion — VPS truth is the final check
+
+## Worker output review checklist
+
+Before accepting any worker-produced code change, confirm:
+1. Does a patch spec exist?
+2. Files touched listed?
+3. Behavior changed listed?
+4. Behavior preserved listed?
+5. Output/diff actually reviewed?
+6. Regression risks identified?
+7. Build/show-first respected if intended?
+8. Result approved before final apply?
+9. VPS verification plan clear?
+10. Any architecture-fit or efficiency issues flagged?
+11. Did the worker miss something important?
+12. Is there a tighter/better version still within scope?
+
+If any answer is no, stop and resolve before accepting.
 
 ## Naming rules
 
@@ -56,6 +77,24 @@ All project constraints in one place. If it says "don't" or "must", it lives her
 2. `Location` is the right player-facing abstraction, not city-specific wording
 3. Use "you" or the character's name in player text, never "actor" or "focused actor"
 4. Use "family" not "connected actors" or "linked actors"
+5. Internal code/comments/architecture docs may use full internal vocabulary — only rendered display text follows player-facing rules
+6. When dispatching workers, include the player-facing text rule explicitly so they don't reintroduce jargon
+7. Meaningful milestones should prefer plain version tags like `v0.28.0` — not descriptive sentence tags
+
+## Versioning rules
+
+1. Major = large phase shift
+2. Minor = meaningful foundation piece or meaningful doc revision
+3. Patch = cleanup, polish, correction, smaller improvement
+
+## Truth classification
+
+Always distinguish:
+1. **Verified truth** — actually built, in the repo, verified on VPS
+2. **Architecture direction** — what stable docs define as current project truth
+3. **Proposed** — ideas, plans, specs not yet implemented
+
+Don't blur these. Don't present proposals as implemented. Don't assume docs auto-sync.
 
 ## Anti-drift rules
 

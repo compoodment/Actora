@@ -37,6 +37,8 @@ That gets you oriented. Only read other docs when the task requires them.
 | `decisions.md` | Major structural decisions log (immutable) | "Why did we decide X?" |
 | `rules.md` | All project constraints | Before any work that touches code, docs, or design |
 
+**Bug severity:** 🔴 Blocking (can't playtest) · 🟡 Annoying (noticeable but playable) · ⚪ Minor (cosmetic/edge)
+
 ---
 
 ## Where does this go?
@@ -98,6 +100,7 @@ That gets you oriented. Only read other docs when the task requires them.
 3. Check `codebase.md` is current through this version
 4. Update `backlog.md` — move completed items out
 5. Promote durable insights to `MEMORY.md` if needed
+6. Every ~3 version tags: run cross-doc health check (see `rules.md`)
 
 ### Worker context loading
 When dispatching Codex or Claude Code, include:
