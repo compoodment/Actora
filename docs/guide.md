@@ -14,7 +14,9 @@ The one doc. Navigation, workflows, reading order, routing.
 
 1. `memory/YYYY-MM-DD.md` (today + yesterday)
 2. `MEMORY.md` (workspace, durable rules)
-3. This file — then check `backlog.md` → Now section
+3. This file — doc map, workflows, routing
+4. `rules.md` — constraints to not break things
+5. `backlog.md` → Now section — what we're actively doing
 
 That gets you oriented. Only read other docs when the task requires them.
 
