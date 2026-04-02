@@ -16,6 +16,7 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 - **Shell experiment** — resume now that control contract is locked. Implement new contract (Q/E/WASD/Backspace/Esc) in worktree first, then merge. See controls.md for full spec.
 - **Space/Enter overlap fix** — known violation in current code, fix in next UI pass
 - **BACK_KEYS aliases cleanup** — `handle_actions_key` still uses legacy aliases, fix in UI pass
+- **Remove legacy letter keys (L/H/T/P/A/S)** — these are deprecated. L/H open Browser, T opens Actions, P opens Profile, A/S were advance/skip. All replaced by Q/E/[1] Menu. Remove once Menu popup exists and is confirmed working.
 
 ## Next
 
