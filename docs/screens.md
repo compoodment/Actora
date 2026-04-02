@@ -17,13 +17,15 @@ Note: Current implementation is TUI-first. This doc describes the intended TUI s
 
 ```
 Life View (anchor / home)
-├── [P] Profile
-├── [L] Browser
-│   ├── Relationships tab
-│   └── History tab
-├── [T] Actions
-├── [S] Skip Time
-└── [Q] Quit (confirmation)
+├── [1] Menu
+│   ├── Browser
+│   │   ├── Relationships tab
+│   │   └── History tab
+│   ├── Actions
+│   └── Profile
+├── [E] Skip Time
+├── [Q] Advance month
+└── [Esc] Options (quit, help, misc)
 ```
 
 All screens are reachable from Life View. Nested screens return to their parent with [B].
@@ -59,7 +61,7 @@ All screens are reachable from Life View. Nested screens return to their parent 
 
 ---
 
-### Profile [P]
+### Profile (via Menu → Profile)
 **Purpose:** Full actor detail. Who you are, what you've committed to.
 **What lives here:**
 - Full stats (primary + secondary)
@@ -76,7 +78,7 @@ All screens are reachable from Life View. Nested screens return to their parent 
 
 ---
 
-### Browser [L]
+### Browser (via Menu → Browser)
 **Purpose:** Browsing and exploration of persistent simulation data.
 **Tabs:**
 - **Relationships** — all actors you have a link to, filterable by type/status/living
@@ -104,7 +106,7 @@ All screens are reachable from Life View. Nested screens return to their parent 
 
 ---
 
-### Actions [T]
+### Actions (via Menu → Actions)
 **Purpose:** Player agency. What you can do. What you've queued.
 **What lives here:**
 - Pending actions (queued, awaiting next advance)
@@ -128,7 +130,7 @@ All screens are reachable from Life View. Nested screens return to their parent 
 
 ---
 
-### Skip Time [S]
+### Skip Time ([E] from Life View or any non-input screen)
 **Purpose:** Advance simulation time in bulk.
 **What lives here:**
 - Preset jumps (1, 3, 6, 12, 24, 60 months)
@@ -137,23 +139,26 @@ All screens are reachable from Life View. Nested screens return to their parent 
 
 ---
 
-## Hotkey Map (current)
+## Hotkey Map (current — v2 contract)
 
-| Key | Screen / Action |
-|-----|----------------|
-| A   | Advance 1 month |
-| S   | Skip Time screen |
-| P   | Profile |
-| L   | Browser (Relationships + History) |
-| T   | Actions screen |
-| H   | Browser → History tab (shortcut into History) |
-| Q   | Quit confirmation |
-| B   | Back (from any non-Life View screen) |
+| Key | Action |
+|-----|--------|
+| Q | Advance month |
+| E | Open Skip Time |
+| [1] | Menu (Browser / Actions / Profile) |
+| Esc | Options popup |
+| Backspace | Back |
 
-**Reserved / context-only keys (within screens):**
-- ↑↓: navigate lists / scroll
-- ←→: adjust value fields (show ← value → when active)
-- Space: select / confirm popup choices
+**Legacy keys (still in code, will be removed in next UI pass):**
+- A = advance, S = skip, L = Browser, H = History, T = Actions, P = Profile
+
+**Reserved context-only keys:**
+- ↑↓ / W/S: navigate / scroll
+- ←→ / A/D: adjust value fields (show ← value → when active)
+- Space: toggle/select on multi-select screens
+- Enter: proceed / confirm
+- Tab: switch Browser tabs
+- /: open search
 - Enter: proceed / continue / confirm screen transition
 - /: search or year-jump (Relationships, History)
 - R: randomize (Stats creation screen only)
@@ -162,8 +167,8 @@ All screens are reachable from Life View. Nested screens return to their parent 
 - Esc: back (mirrors B in wizard/questionnaire contexts)
 
 **Note:**
-- [H] is a shortcut directly into Browser at the History tab, not a separate screen.
-- [L] opens Browser at the Relationships tab by default.
+- [Q] advances month, [E] opens Skip Time — both available from any non-input screen.
+- Browser is accessed via [1] Menu. L/H/T/P are legacy keys that will be removed.
 
 ---
 
@@ -178,7 +183,7 @@ All screens are reachable from Life View. Nested screens return to their parent 
 
 2. **Is it a new top-level domain?**
    - Needs its own screen → assign a free hotkey, document it here, add to footer
-   - Currently free: [E] (education future), [W] (work future), [N] (news future)
+   - Currently free: [N] (news future), [R] (reserved), plus L/H/T/P when legacy cleanup happens
 
 3. **Never:**
    - Add standalone sections to Life View left panel without structural review
