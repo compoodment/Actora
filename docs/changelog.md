@@ -1,10 +1,7 @@
 ---
 title: Changelog
-role: version-history
-stability: stable-as-history
-layer: implementation
-relates_to: [architecture]
-tags: [history, versions, implementation]
+tags: [implementation, reference, stable]
+updated: 2026-04-02
 ---
 
 # Actora Changelog

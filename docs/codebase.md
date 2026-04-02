@@ -1,19 +1,19 @@
 ---
-title: Architecture
-role: repo-implementation-truth
-stability: moderate
-layer: implementation
-relates_to: [changelog, tui-standards]
-tags: [architecture, implementation, repo-truth]
+title: Codebase
+tags: [implementation, reference, stable]
+updated: 2026-04-02
+through: v0.45.0+
 ---
 
-# Actora Architecture Summary
+# Actora Codebase
+
+Current repo implementation truth. What the code looks like right now.
 
 **Version:** 0.45.0+
 **Last Updated:** 2026-04-02
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
-It is intended to support safe patching, review, and manual verification, alongside [[tui-standards]] and [[ui-architecture]] for interface-specific rules.
+It is intended to support safe patching, review, and manual verification, alongside [[controls]] and [[screens]] for interface-specific rules.
 
 ## 1. Stack
 

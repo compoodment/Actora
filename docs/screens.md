@@ -1,18 +1,13 @@
 ---
-title: UI Architecture
-role: interface-structure-and-navigation-blueprint
-stability: moderate
-layer: implementation
-relates_to: [tui-standards, vision-and-systems]
-tags: [ui, screens, navigation, layout]
+title: Screens
+tags: [implementation, tui, reference]
+updated: 2026-04-02
 ---
 
-# Actora UI Architecture
+# Actora Screens
 
-Purpose: The structural blueprint for Actora's interface. Defines what screens exist, what they're for, what information lives where, and how new systems get added without cluttering.
-This is separate from [[tui-standards]] (interaction rules) and [[vision-and-systems]] (creative intent).
-
-Authority: This doc defines the spatial/structural truth of the interface. [[tui-standards]] defines interaction behavior within screens. It should remain aligned with [[master-context]].
+Screen map, navigation hierarchy, and rules for adding new systems to the UI.
+Separate from controls (interaction rules) and design (creative intent).
 
 Note: Current implementation is TUI-first. This doc describes the intended TUI structure and should remain compatible with future non-TUI presentation.
 

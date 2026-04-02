@@ -1,13 +1,12 @@
 ---
-title: Master Context
-role: core-architecture-anchor
-stability: high
-layer: core
-relates_to: [actora-roadmap, source-index]
-tags: [identity, vision, core, architecture]
+title: Identity
+tags: [core, identity, stable]
+updated: 2026-04-02
 ---
 
-Actora Master Context v9
+# Actora Identity
+
+What Actora is. The durable project identity and architecture anchor.
 
 Purpose
 

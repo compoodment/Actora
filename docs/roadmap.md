@@ -1,13 +1,12 @@
 ---
-title: Actora Roadmap
-role: sequencing-and-dependency-order
-stability: high
-layer: core
-relates_to: [master-context, source-index, working-ideas-register]
-tags: [roadmap, sequencing, core, architecture]
+title: Roadmap
+tags: [core, reference, stable]
+updated: 2026-04-02
 ---
 
-Actora Roadmap v10
+# Actora Roadmap
+
+Dependency order. What must come before what.
 
 1. Roadmap framing
 

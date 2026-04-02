@@ -1,18 +1,13 @@
 ---
-title: Hotkey & Control Workbook
-role: fill-in-control-contract-workbook
-stability: low
-layer: planning
-relates_to: [tui-standards, ui-architecture, actionable-summary]
-tags: [hotkeys, controls, tui, workbook, wip]
+title: Hotkey Workbook
+tags: [controls, tui, wip]
+updated: 2026-04-02
 ---
 
 # Hotkey & Control Workbook
 
-Purpose: fill-in workbook for locking Actora's control contract more explicitly before more shell/UI redesign work.
-
-Status: provisional working document. This is **not** the canonical hotkey contract yet.
-Use it to capture current desired truth + future direction, then promote the reviewed result into `tui-standards.md` / `ui-architecture.md`.
+Fill-in workbook for locking Actora's control contract. This is NOT the canonical contract yet.
+Once reviewed, the result gets promoted into `controls.md`.
 
 Notes:
 - Prefilled values below combine current repo truth + shell interview decisions (2026-04-01) + recent hotkey audit signals.

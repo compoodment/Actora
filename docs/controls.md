@@ -1,15 +1,13 @@
 ---
-title: TUI Standards
-role: interaction-design-rules
-stability: high
-layer: implementation
-relates_to: [ui-architecture, architecture]
-tags: [tui, controls, hotkeys, shell, ui]
+title: Controls
+tags: [implementation, controls, tui, stable]
+updated: 2026-04-02
 ---
 
-# TUI Standards
+# Actora Controls
 
-Consistent controls, navigation, and interaction patterns for all Actora TUI surfaces.
+Hotkeys, interaction rules, and the canonical control contract for all TUI surfaces.
+The hotkey workbook (`hotkey-workbook.md`) feeds into this doc once reviewed.
 
 
 ## Controls

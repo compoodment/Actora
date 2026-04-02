@@ -1,18 +1,13 @@
 ---
-title: Vision & Systems
-role: creative-vision-and-system-intent
-stability: moderate
-layer: vision
-relates_to: [master-context, ui-architecture]
-tags: [vision, systems, design, creative-intent]
+title: Design
+tags: [core, reference, stable]
+updated: 2026-04-02
 ---
 
-# Actora Vision & Systems
+# Actora Design
 
-Purpose: Persistent creative vision capture for Actora. Updated through interviews. Never thrown away — iterated.
-This is the "what should this feel like and do" layer, distinct from architecture ([[master-context|Master Context]]), sequencing ([[actora-roadmap|Roadmap]]), and implementation (architecture.md/changelog).
-
-Authority: Non-authoritative vs stable docs. When this conflicts with [[master-context|Master Context]] or [[actora-roadmap|Roadmap]], those win. When this conflicts with implementation truth, repo truth wins. But this is the primary source for creative intent per system and should be reflected in [[ui-architecture]].
+Creative intent per system. Updated through interviews. Never thrown away — iterated.
+This is the "what should this feel like and do" layer, distinct from identity (what Actora is), roadmap (sequencing), and codebase (implementation truth).
 
 ---
 
@@ -205,7 +200,7 @@ Stats are 0–100 values. They should affect real simulation outcomes — not ju
 ---
 
 ## UI Vision (TUI Phase)
-See [[ui-architecture]] for the full screen map, navigation hierarchy, and rules for adding new systems.
+See [[screens]] for the full screen map, navigation hierarchy, and rules for adding new systems.
 
 Current priority: get the TUI working well before thinking about visual UI.
 
