@@ -52,6 +52,7 @@ All project constraints in one place. If it says "don't" or "must", it lives her
 6. Not every mentioned issue is an immediate fix request — it may be backlog, later, or just a note
 7. Don't mix unrelated cleanup into one task
 8. Don't assume claimed completion means real completion — VPS truth is the final check
+9. **When verifying a control/hotkey change: check that old keys are GONE, not just that new keys work. Both directions must be verified. Partial re-wiring is how broken state accumulates.**
 
 ## Worker output review checklist
 
