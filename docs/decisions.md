@@ -111,11 +111,11 @@ Major structural decisions. Immutable — never edit an entry. If a decision cha
 **Decision:** Esc opens/closes Options popup. Outside text input: Esc = Options. In text input/search: Esc = exit text mode. Esc does NOT close other popups — only Options.
 **Alternatives rejected:** [4] for Options (number key), dedicated key like O.
 
-### DEC-016: Profile moves into Menu
+### DEC-016: Profile moves into Menu, P freed
 **Date:** 2026-04-02
 **Context:** Shell redesign — reduce top-level letter key clutter. Profile doesn't need its own dedicated hotkey if Menu is always one key away.
-**Decision:** Profile accessible via [1] Menu → Profile. P key freed for Backspace/Back.
-**Alternatives rejected:** Keep P = Profile as standalone hotkey.
+**Decision:** Profile accessible via [1] Menu → Profile. P key freed (not reassigned — Backspace became the universal Back key instead).
+**Alternatives rejected:** Keep P = Profile as standalone hotkey, P = Back.
 
 ### DEC-017: Q/E available from any non-input screen
 **Date:** 2026-04-02
