@@ -44,4 +44,5 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 - **"Other" sexuality** integration with future romance events *(2026-03-31)*
 - **Sibling/family birth probability tuning** — current heuristic is intentionally simple first-pass *(2026-03-31)*
 - **Name pool deepening** — regional variation, ethnic/religious diversity, era awareness, family naming conventions *(2026-03-31)*
-- **Operator tooling / scenario testing seam** *(2026-03-27)*
+- **Mouse wheel scroll for panels** — confirmed mouse events work in current curses. Life View left/right panels should scroll on mouse wheel hover. Implement when panels have overflow content. *(2026-04-02)*
+- **Inventory / objects** — not yet designed. Protected future concern per roadmap (Property/Household/Inventory layer). Needs a design interview when dependencies are ready. *(2026-04-02)*
