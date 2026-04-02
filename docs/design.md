@@ -7,32 +7,8 @@ updated: 2026-04-02
 # Actora Design
 
 Creative intent per system. Updated through interviews. Never thrown away — iterated.
-This is the "what should this feel like and do" layer, distinct from identity (what Actora is), roadmap (sequencing), and codebase (implementation truth).
 
----
-
-## The Core Experience
-
-Actora is a continuous universe simulator where you start as a person but the world never stops being real.
-
-You are born. You live. You die. The universe continues.
-Your great-great-grandchild might board a spacecraft in 2340 inside the same save.
-Everything that happened before is still real, still recorded, still part of the same simulation.
-
-It is not BitLife. It is not a detached god sim. It is not a spreadsheet with humans taped on.
-It is actor-anchored, zoomable, continuous, and simulation-real.
-
-The player primarily lives through their current actor, but that actor exists inside a larger world that doesn't pause for them.
-
----
-
-## What Makes It Different
-
-- **Continuity across lives** — one save, one universe, one advancing timeline. Your lineage matters. What your ancestors did is real history.
-- **Scale** — from being born in Amsterdam in 2025 to commanding a warship in 2340 in the same save, same universe.
-- **Consequences** — actions have real ripple effects. Go into crime and you attract a different kind of person. Become president and you can change the world or destroy it.
-- **Systems that are real** — economy, politics, social perception, organizations — not flavor text, not fake numbers. Real interacting systems.
-- **Era-awareness** — different eras have different rules, different technologies, different possibilities. Future eras have space travel. Past eras don't have smartphones. These are real constraints, not cosmetic.
+For project identity, see `identity.md`. For sequencing, see `roadmap.md`. For implementation truth, see `codebase.md`.
 
 ---
 

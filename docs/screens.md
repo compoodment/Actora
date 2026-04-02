@@ -146,7 +146,7 @@ All screens are reachable from Life View. Nested screens return to their parent 
 | P   | Profile |
 | L   | Browser (Relationships + History) |
 | T   | Actions screen |
-| H   | (freed — was History, now in Browser) |
+| H   | Browser → History tab (shortcut into History) |
 | Q   | Quit confirmation |
 | B   | Back (from any non-Life View screen) |
 
@@ -161,9 +161,9 @@ All screens are reachable from Life View. Nested screens return to their parent 
 - Tab / →: switch focus between panels (Browser)
 - Esc: back (mirrors B in wizard/questionnaire contexts)
 
-**Conflict notes:**
-- [R] was proposed for Relationships but conflicts with Randomize on stats screen. Resolved as [L] = Browser.
-- [H] freed after History moved into Browser. Available for future use.
+**Note:**
+- [H] is a shortcut directly into Browser at the History tab, not a separate screen.
+- [L] opens Browser at the Relationships tab by default.
 
 ---
 
@@ -178,7 +178,7 @@ All screens are reachable from Life View. Nested screens return to their parent 
 
 2. **Is it a new top-level domain?**
    - Needs its own screen → assign a free hotkey, document it here, add to footer
-   - Currently free: [H], [E] (education future), [W] (work future), [N] (news future)
+   - Currently free: [E] (education future), [W] (work future), [N] (news future)
 
 3. **Never:**
    - Add standalone sections to Life View left panel without structural review
@@ -227,4 +227,3 @@ The left panel will grow as systems are added. Rules:
 - When does the left panel need to split into tabs or collapse? (monitor as systems grow)
 - Where exactly do "open opportunities" (persistent, non-urgent) live? (candidates: Actions screen, or a future dedicated section)
 - How does scope-shifting (actor → city → country view) surface in the TUI? (deferred until scope systems exist)
-- What replaces [H] now that History is in Browser? (currently free)

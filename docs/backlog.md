@@ -14,7 +14,6 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 ## Now
 
 - **Hotkey/control contract** — fill in workbook from Obsidian, review against code/docs, draft canonical contract v2, then update `controls.md`
-- **Doc system rework** — restructure all docs to new flat system (this is happening right now)
 - **Shell experiment paused** — worktree exists at `/home/compadmin/openclaw_automated/actora_ui_shell_experiment` (branch: `ui-shell-experiment`). Do NOT resume until control contract is locked. Codex pass was rejected and worktree was restored.
 
 ## Next
