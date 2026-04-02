@@ -29,6 +29,13 @@ Canonical control contract for all TUI surfaces. If it's not here, it's not offi
 | Tab | Switch Browser tabs | Browser only |
 | Space | Toggle / select | Multi-select screens only |
 
+**Text-input contexts (search, year jump, custom month input):**
+- Backspace = delete character
+- Esc = cancel / exit the input context (takes priority over Options in this context)
+- Options popup (Esc) is blocked while text input is active
+
+This means in Skip Time custom input, Esc exits the input (not Options). Same rule for Browser search, History year jump, and any future text-input fields.
+
 **WASD are full movement aliases for arrow keys.** Same behavior, same context rules. In text input, WASD type characters (no movement).
 
 **Adjustable value fields:** A/D (and ←→) adjust value when the row is active/focused, navigate when it's not. Active adjustable fields must visually render as `← value →`.
@@ -40,7 +47,7 @@ Canonical control contract for all TUI surfaces. If it's not here, it's not offi
 | Context | What changes |
 |---------|-------------|
 | Text input field | Backspace = delete char, WASD = type characters, Esc = exit text mode |
-| Search active | Backspace = delete char, WASD = type characters, Esc = exit search |
+| Search / year jump / custom input | Backspace = delete char, WASD = type characters, Esc = cancel/exit input (Options blocked) |
 | Any popup open | Q/E blocked, [1] blocked |
 | Character creation wizard | Q/E blocked, Esc blocked, [1] blocked |
 | Continuation/death screen | Q/E blocked |
