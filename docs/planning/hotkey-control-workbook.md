@@ -15,7 +15,8 @@ Status: provisional working document. This is **not** the canonical hotkey contr
 Use it to capture current desired truth + future direction, then promote the reviewed result into `tui-standards.md` / `ui-architecture.md`.
 
 Notes:
-- Prefilled values below are my best read of current repo truth + recent interview signals.
+- Prefilled values below combine current repo truth + shell interview decisions (2026-04-01) + recent hotkey audit signals.
+- The shell interview established: primary commands = Advance, Skip Time, Menu, Options. Menu = Browser/Actions/Profile. Options = popup with Quit + misc/system actions. That direction is reflected here.
 - Change anything you dislike.
 - Replace `PROVISIONAL` / `UNSURE` / `TBD` freely.
 
@@ -34,17 +35,18 @@ Notes:
 - Are Backspace/Esc allowed as navigation outside text input/search?: **Probably no**, except where current code still has legacy behavior that should be cleaned up
 
 ## 2. MAIN / LIFE VIEW
-- Advance one month: `A` and `Enter`
-- Skip time: `S`
-- Open browser (default tab): `L`
-- Open browser directly to history: `H`
-- Open actions: `T`
-- Open profile: `P`
-- Open menu: `PROVISIONAL: maybe [3] later, not canonical yet`
-- Open options: `PROVISIONAL: maybe [4] later, not canonical yet`
+- Advance one month: `A` and `Enter` (current code); shell interview direction suggests `[1]` later
+- Skip time: `S` (current code); shell interview direction suggests `[2]` later
+- Open browser (default tab): `L` (current code); shell interview direction moves this inside Menu
+- Open browser directly to history: `H` (current code); shell interview direction moves this inside Menu
+- Open actions: `T` (current code); shell interview direction moves this inside Menu
+- Open profile: `P` (current code); shell interview direction moves this inside Menu
+- Open menu: `PROVISIONAL [3]` — shell interview decided Menu is a primary command containing Browser / Actions / Profile
+- Open options: `PROVISIONAL [4]` — shell interview decided Options is a small popup for misc/system actions (quit game, help, settings later)
 - Left panel scroll up: `↑`
 - Left panel scroll down: `↓`
-- Anything else on main: numbered top-level shell commands are desired direction, but not canonical truth yet
+- Anything else on main: shell interview direction = numbered primary commands (`[1]` Advance, `[2]` Skip Time, `[3]` Menu, `[4]` Options). Old letter keys (`L`, `H`, `T`, `P`) become legacy once Menu is real.
+- Shell header direction (from interview): centered Actora title, actor + turn line, screen-name line, compact state line (location/date left, health/money right)
 
 ## 3. BROWSER — GLOBAL
 - Switch browser tabs: `Tab`
@@ -120,7 +122,7 @@ Notes:
 - If yes, what should [1] do?: `Advance`
 - If yes, what should [2] do?: `Skip Time`
 - If yes, what should [3] do?: `Menu`
-- If yes, what should [4] do?: `Options`
+- If yes, what should [4] do?: `Options` (popup: quit game, misc/system actions, help, settings later — NOT a standalone quit key)
 - On which screens should the numbered row appear right now?: `UNSURE — probably only major in-game screens, not every surface`
 - On which screens should it NOT appear right now?: `wizard/setup screens, search/input submodes, popups, maybe continuation until shell is more stable`
 
@@ -140,10 +142,11 @@ Notes:
 - Why: reduce mnemonic clutter, reduce conflicts, make shell more menu-like and easier to remember
 
 ## 2. MENU / OPTIONS
-- Should Menu become a major shell entry point long-term?: `Yes, likely`
-- What should Menu eventually contain?: `Browser, Actions, Profile, maybe other actor/navigation surfaces`
-- What should Options eventually contain?: `Quit, controls/help, maybe later settings/system/meta items`
-- Should Menu and Options use numbers, arrows, or both?: `Probably numbers to open, arrows within popup`
+- Should Menu become a major shell entry point long-term?: `Yes` (shell interview decided this)
+- What should Menu eventually contain?: `Browser, Actions, Profile` (decided in shell interview; may grow with domain screens like Education/Work later)
+- What should Options eventually contain?: `Quit game, help/controls, maybe settings/system/meta later` (shell interview: "game-like options bucket")
+- Should Menu and Options use numbers, arrows, or both?: `Probably numbered items inside the popup, arrows to move selection`
+- Menu/Options interaction model: `Hybrid — mix of screens + popups. Menu opens a popup or small overlay, not a full screen replacement` (from interview)
 
 ## 3. BROWSER FUTURE
 - Should Relationships / History keep sharing one Browser shell long-term?: `Yes`
@@ -165,8 +168,8 @@ Notes:
 - Notes: domain screens should not break the global control language just because they are specialized
 
 ## 6. POPUP / OVERLAY FUTURE
-- Should small modals become more common than full screens?: `For lightweight things, probably yes`
-- Which things should likely become popups later?: `Skip Time, Options, maybe small selectors / opportunities`
+- Should small modals become more common than full screens?: `For lightweight things, probably yes` (shell interview leaned hybrid: mix of screens + popups)
+- Which things should likely become popups later?: `Skip Time, Options, Menu, maybe small selectors / opportunities / urgent events`
 - Which things should probably stay full screens?: `Life View, Browser, Profile, Actions, bigger domain surfaces`
 
 ## 7. NUMBERED COMMAND EVOLUTION
