@@ -108,7 +108,8 @@ Don't blur these. Don't present proposals as implemented. Don't assume docs auto
 ## Anti-drift rules
 
 1. After every meaningful change: sync docs + memory immediately — don't batch it to later
-2. Before starting any task: targeted memory_search + read only the relevant files
-3. After compaction: re-read memory/daily + MEMORY.md + guide.md only; don't bulk-read source files unless needed
-4. Before any config edit: create a backup first
-5. For meaningful repo/file edits: create a local pre-edit backup in `.backups/`
+2. **Cascade check:** when updating any doc, check if other docs reference or depend on the same information and update them too. One doc change can make others stale.
+3. Before starting any task: targeted memory_search + read only the relevant files
+4. After compaction: re-read memory/daily + MEMORY.md + guide.md only; don't bulk-read source files unless needed
+5. Before any config edit: create a backup first
+6. For meaningful repo/file edits: create a local pre-edit backup in `.backups/`

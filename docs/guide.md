@@ -91,7 +91,7 @@ That gets you oriented. Only read other docs when the task requires them.
 4. Spec before apply for anything non-trivial
 5. Verify: `python3 -c "import main"` + tmux playtest if TUI
 6. `git add -A && git commit && git push`
-7. Update affected docs (codebase, changelog, backlog)
+7. Update affected docs (codebase, changelog, backlog) — check if the change makes other docs stale too
 8. Update daily memory log
 
 ### Version milestone workflow
