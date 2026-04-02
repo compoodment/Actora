@@ -13,10 +13,11 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Now
 
-- **Shell experiment** — resume now that control contract is locked. Implement new contract (Q/E/WASD/Backspace/Esc) in worktree first, then merge. See controls.md for full spec.
-- **Space/Enter overlap fix** — known violation in current code, fix in next UI pass
-- **BACK_KEYS aliases cleanup** — `handle_actions_key` still uses legacy aliases, fix in UI pass
-- **Remove legacy letter keys (L/H/T/P/A/S)** — these are deprecated. L/H open Browser, T opens Actions, P opens Profile, A/S were advance/skip. All replaced by Q/E/[1] Menu. Remove once Menu popup exists and is confirmed working.
+- **Space/Enter overlap fix** — known violation in current code (Space and Enter sometimes both trigger on same screen), fix in next UI pass
+- **Remove legacy letter keys (L/H/T/P/A/S)** — deprecated. L/H open Browser, T opens Actions, P opens Profile, A/S were advance/skip. All replaced by Q/E/[1] Menu. Remove once Menu popup exists and is confirmed working.
+- **Wizard quit-path gap** — Q and Esc are both blocked in wizard per contract. Currently no quit path from within the wizard. Needs design resolution.
+- **Menu popup** — [1] currently opens Browser as a stub. Real Menu popup (Browser / Actions / Profile items) needs implementation.
+- **Options popup** — Esc currently opens quit confirmation as a stub. Real Options popup (Quit Game / Help / Settings) needs implementation.
 
 ## Next
 

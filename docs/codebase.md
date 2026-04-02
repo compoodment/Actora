@@ -1,15 +1,15 @@
 ---
 title: Codebase
 tags: [implementation, reference, stable]
-updated: 2026-04-02
-through: v0.45.0+
-verified: 2026-04-02
+updated: 2026-04-03
+through: v0.46.0
+verified: 2026-04-03
 ---
 
 # Actora Codebase
 
 Current repo implementation truth. What the code looks like right now.
-**Last verified against actual code:** 2026-04-02
+**Last verified against actual code:** 2026-04-03
 
 **Version:** 0.45.0+
 **Last Updated:** 2026-04-02

@@ -6,7 +6,27 @@ updated: 2026-04-02
 
 # Actora Changelog
 
-## Docs Restructure - 2026-04-02
+## Version 0.46.0 (Minor) - 2026-04-03
+- **Control Contract v2:**
+    - Q = advance month (all non-input screens; blocked in: text input, search, popups, wizard, continuation, death screen)
+    - E = skip time (same blocks as Q)
+    - Backspace = universal Back (replaces B everywhere in navigation)
+    - Esc = Options popup stub (opens quit confirmation until Options popup exists; Esc toggles it closed)
+    - [1] = Menu stub (opens Browser until Menu popup exists)
+    - WASD = full movement aliases for arrow keys (W/A/S/D = ↑/←/↓/→; WASD type characters in text input)
+    - Enter-as-advance removed — Enter is now proceed/confirm only
+    - Q-as-quit removed from all game screens (wizard has no quit path per contract)
+    - B-as-back removed from all game screens (Backspace only)
+    - Q blocked in popup/death/continuation/wizard handlers
+    - All `[B] Back` footer labels → `[Bsp] Back`
+    - All `[Q] Quit` footer labels removed from game screens
+    - Esc toggles Options popup correctly (was not closing on second press)
+    - Q blocked while popup/choice overlay is active
+- **Polish:**
+    - `Name:` indentation fix on wizard confirm screen (`.strip()` was stripping leading spaces)
+    - Redundant body controls hint removed from continuation detail screen
+
+
 - **Major documentation system rework:**
     - Flat `docs/` directory — killed all subfolders (`core_architecture/`, `planning/`, `workflow/`).
     - Renamed docs to clear names: master-context→identity, actora-roadmap→roadmap, vision-and-systems→design, ui-architecture→screens, tui-standards→controls, architecture→codebase, hotkey-control-workbook→hotkey-workbook.
