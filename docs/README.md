@@ -4,6 +4,7 @@ role: navigation
 stability: high
 layer: navigation
 relates_to: [source-index]
+tags: [navigation, docs, index]
 ---
 
 # Actora Docs

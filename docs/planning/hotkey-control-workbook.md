@@ -4,6 +4,7 @@ role: fill-in-control-contract-workbook
 stability: low
 layer: planning
 relates_to: [tui-standards, ui-architecture, actionable-summary]
+tags: [hotkeys, controls, tui, workbook, wip]
 ---
 
 # Hotkey & Control Workbook

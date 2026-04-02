@@ -4,6 +4,7 @@ role: core-architecture-anchor
 stability: high
 layer: core
 relates_to: [actora-roadmap, source-index]
+tags: [identity, vision, core, architecture]
 ---
 
 Actora Master Context v9

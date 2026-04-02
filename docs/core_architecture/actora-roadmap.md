@@ -4,6 +4,7 @@ role: sequencing-and-dependency-order
 stability: high
 layer: core
 relates_to: [master-context, source-index, working-ideas-register]
+tags: [roadmap, sequencing, core, architecture]
 ---
 
 Actora Roadmap v10

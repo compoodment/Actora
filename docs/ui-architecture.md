@@ -4,6 +4,7 @@ role: interface-structure-and-navigation-blueprint
 stability: moderate
 layer: implementation
 relates_to: [tui-standards, vision-and-systems]
+tags: [ui, screens, navigation, layout]
 ---
 
 # Actora UI Architecture

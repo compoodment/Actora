@@ -4,6 +4,7 @@ role: repo-implementation-truth
 stability: moderate
 layer: implementation
 relates_to: [changelog, tui-standards]
+tags: [architecture, implementation, repo-truth]
 ---
 
 # Actora Architecture Summary

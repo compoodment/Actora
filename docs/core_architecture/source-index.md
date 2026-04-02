@@ -4,6 +4,7 @@ role: document-system-navigation
 stability: moderate
 layer: core
 relates_to: [master-context, actora-roadmap, operator-guide]
+tags: [navigation, docs, core]
 ---
 
 Actora Source Index v9

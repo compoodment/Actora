@@ -4,6 +4,7 @@ role: bug-and-revisit-tracker
 stability: low
 layer: planning
 relates_to: [working-ideas-register]
+tags: [bugs, issues, revisit, planning]
 ---
 
 Live Issues / Revisit Tracker

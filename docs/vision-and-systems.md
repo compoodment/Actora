@@ -4,6 +4,7 @@ role: creative-vision-and-system-intent
 stability: moderate
 layer: vision
 relates_to: [master-context, ui-architecture]
+tags: [vision, systems, design, creative-intent]
 ---
 
 # Actora Vision & Systems

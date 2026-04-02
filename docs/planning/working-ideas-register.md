@@ -4,6 +4,7 @@ role: flexible-idea-intake-and-staging
 stability: low
 layer: planning
 relates_to: [actora-roadmap, actionable-summary]
+tags: [planning, ideas, design, staging]
 ---
 
 Actora Working Ideas Register v53 | 2026-04-02 | Flexible idea intake, staging, and design retention.

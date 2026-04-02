@@ -4,6 +4,7 @@ role: workflow-and-execution-discipline
 stability: high
 layer: workflow
 relates_to: [source-index, master-context]
+tags: [workflow, process, coding, interviews]
 ---
 
 Actora Operator Guide v9

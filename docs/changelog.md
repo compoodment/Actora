@@ -4,6 +4,7 @@ role: version-history
 stability: stable-as-history
 layer: implementation
 relates_to: [architecture]
+tags: [history, versions, implementation]
 ---
 
 # Actora Changelog

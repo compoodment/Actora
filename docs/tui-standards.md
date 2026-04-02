@@ -4,6 +4,7 @@ role: interaction-design-rules
 stability: high
 layer: implementation
 relates_to: [ui-architecture, architecture]
+tags: [tui, controls, hotkeys, shell, ui]
 ---
 
 # TUI Standards

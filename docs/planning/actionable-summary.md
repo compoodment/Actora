@@ -4,6 +4,7 @@ role: near-term-planning-snapshot
 stability: low
 layer: planning
 relates_to: [working-ideas-register, actora-roadmap]
+tags: [planning, snapshot, next-steps]
 ---
 
 Actionable Ideas Summary — Rev42 | 2026-04-01 | Near-term snapshot; non-authoritative, stable docs and repo truth win.
