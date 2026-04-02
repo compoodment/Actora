@@ -1,51 +1,42 @@
 # Actora
 
-A continuous universe life simulation. Actor-anchored, zoomable, foundation-first.
+A life simulation where the world doesn't stop when you die.
 
-## What is Actora?
+You're born in Amsterdam in 1987. You grow up, make friends, maybe go to school, get a job. You die in 2051. Then you continue as your daughter, who was born in 2012 and is now 39. She builds a company. Her son emigrates to Tokyo. His granddaughter boards a spacecraft in 2280.
 
-You are born. You live. You die. The universe continues. Your great-great-grandchild might board a spacecraft in 2340 — in the same save.
+Same save. Same universe. The history is real.
 
-Actora is not BitLife. It's not a detached god sim. It's one continuous simulation where you live through an actor inside a larger world that doesn't stop being real just because you're focused on one life.
+It's not BitLife. It's not a god sim. It's somewhere in between — you live through one person at a time, but the world around you is actually running.
 
-## Current state
+Currently a terminal prototype. Python, curses TUI. Work in progress.
 
-Terminal prototype with a curses TUI. Currently has:
-- Character creation (identity, location, appearance, traits, stats — manual or questionnaire)
-- Life View with identity/stats/relationships and accumulating event feed
-- Non-family relationships (acquaintance/friend/close friend) with closeness, decay, and drift
-- Tabbed Browser (Relationships + History)
-- Actions screen with social actions
-- 120 lifecycle events including trait-gated and family-aware
-- Death, continuation through connected actors, and lineage
-- 12 countries, 39 cities, culture-aware name generation (400+ names)
+---
 
-## Repo structure
+## What exists right now
 
-```
-main.py          — TUI, creation wizard, shell, rendering (3857 lines)
-world.py         — simulation state, links, places, records, social, mortality (2090 lines)
-human.py         — actor model, lifecycle, spatial, snapshot (289 lines)
-events.py        — monthly events, meeting events (388 lines)
-identity.py      — name pools, culture-aware identity generation (299 lines)
-docs/            — project documentation (flat, 13 docs)
+- Character creation with questionnaire or manual stat setup
+- Life sim with events, relationships, family, death, and continuation
+- Friends — meet people, grow close, drift apart, lose them
+- Relationship browser and history log
+- 12 countries, 39 cities, culture-aware names
+- 120 events including family-aware and personality-specific ones
+
+## Running it
+
+```bash
+python3 main.py
 ```
 
-## Documentation
+Requires Python 3 and a terminal that supports curses.
 
-All docs live flat in `docs/`. Start with `docs/guide.md` — it tells you where everything else is.
+## Docs
 
-| Doc | What it is |
-|-----|-----------|
-| `guide.md` | Navigation, workflows, routing — the one doc |
-| `identity.md` | What Actora is |
-| `roadmap.md` | Dependency order |
-| `design.md` | Creative intent per system |
-| `screens.md` | Screen map, navigation |
-| `controls.md` | Hotkeys, interaction rules |
-| `codebase.md` | Current implementation truth |
-| `changelog.md` | Version history |
-| `backlog.md` | What we're working on |
-| `bugs.md` | Known bugs |
-| `decisions.md` | Major structural decisions |
-| `rules.md` | Project constraints |
+Start with [`docs/guide.md`](docs/guide.md) — it maps everything.
+
+| | |
+|---|---|
+| [`identity.md`](docs/identity.md) | What Actora is trying to be |
+| [`roadmap.md`](docs/roadmap.md) | What gets built and in what order |
+| [`design.md`](docs/design.md) | How each system should feel |
+| [`codebase.md`](docs/codebase.md) | What's actually implemented |
+| [`changelog.md`](docs/changelog.md) | Version history |
