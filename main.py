@@ -31,7 +31,7 @@ REL_FILTER_LABELS = {
 MAIN_LEFT_SECTION_KEYS = ("identity", "location", "statistics", "relationships")
 HIDDEN_PLAYER_RECORD_TYPES = {"family_bootstrap", "actor_entry"}
 BACK_KEYS = {
-    27,
+    curses.KEY_BACKSPACE, 127, 8,
 }
 MAIN_IDLE_MESSAGE = "Living your life."
 ADVANCE_THROTTLE_SECONDS = 0.2
@@ -1080,21 +1080,21 @@ class CreationWizard:
 
     def render_footer(self, height, width):
         if self.step_index == 0:
-            footer_text = "[↑↓] Move   [←→] Adjust   [Enter] Continue   [Q] Quit"
+            footer_text = "[↑↓] Move   [←→] Adjust   [Enter] Continue"
         elif self.step_index == 1:
-            footer_text = "[↑↓] Move   [Space] Select   [Enter] Continue   [B] Back   [Q] Quit"
+            footer_text = "[↑↓] Move   [Space] Select   [Enter] Continue   [Bsp] Back"
         elif self.step_index == 2:
-            footer_text = "[↑↓] Move   [←→] Adjust   [Enter] Continue   [B] Back   [Q] Quit"
+            footer_text = "[↑↓] Move   [←→] Adjust   [Enter] Continue   [Bsp] Back"
         elif self.step_index == 3:
-            footer_text = "[↑↓] Move   [Enter] Continue   [B] Back   [Q] Quit"
+            footer_text = "[↑↓] Move   [Enter] Continue   [Bsp] Back"
         elif self.step_index == 4 and self.selected_mode == "questionnaire":
-            footer_text = "[↑↓] Move   [Space] Select   [B] Back   [Q] Quit"
+            footer_text = "[↑↓] Move   [Space] Select   [Bsp] Back"
         elif self.step_index == 4:
-            footer_text = "[↑↓] Move   [←→] Adjust   [R] Randomize   [Enter] Continue   [B] Back   [Q] Quit"
+            footer_text = "[↑↓] Move   [←→] Adjust   [R] Randomize   [Enter] Continue   [Bsp] Back"
         elif self.step_index == 5 and self.selected_mode == "manual":
-            footer_text = "[↑↓] Move   [Space] Select   [Enter] Continue   [B] Back   [Q] Quit"
+            footer_text = "[↑↓] Move   [Space] Select   [Enter] Continue   [Bsp] Back"
         else:
-            footer_text = "[Enter] Start Game   [B] Back   [Q] Quit"
+            footer_text = "[Enter] Start Game   [Bsp] Back"
         content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
         hline_char = getattr(curses, "ACS_HLINE", ord("-"))
         self.stdscr.hline(height - 2, content_left, hline_char, content_width)
@@ -1306,7 +1306,7 @@ class CreationWizard:
         lines = [
             "Are you sure you want to quit?",
             "",
-            "[Enter] Quit   [B] Cancel",
+            "[Enter] Quit   [Bsp] Cancel",
         ]
         draw_box(self.stdscr, top, left, box_height, box_width, title="Quit")
         draw_panel_text(self.stdscr, top, left, box_height, box_width, lines)
@@ -1318,7 +1318,7 @@ class CreationWizard:
             "Review your character.",
             "",
             "Identity",
-            f"  Name: {result['first_name']} {result['last_name']}".strip(),
+            f"  Name: {(result['first_name'] + ' ' + result['last_name']).strip()}",
             f"  Sex: {result['sex']}",
             f"  Gender: {result['gender']}",
             "",
@@ -1374,7 +1374,7 @@ class CreationWizard:
 
     def handle_quit_key(self, key):
         if self.quit_confirmation_active:
-            if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8, 27):
+            if key in BACK_KEYS:
                 self.quit_confirmation_active = False
                 return True
             if key in (curses.KEY_ENTER, 10, 13):
@@ -1382,9 +1382,7 @@ class CreationWizard:
                 self.cancelled = True
                 return True
             return True
-        if key in (ord("q"), ord("Q")):
-            self.quit_confirmation_active = True
-            return True
+        # Q blocked in wizard — no quit path in wizard per control contract
         return False
 
     def handle_identity_key(self, key):
@@ -1415,18 +1413,18 @@ class CreationWizard:
                 return
         if current_field["kind"] == "select":
             current_index = current_field["options"].index(self.data["sex"])
-            if key == curses.KEY_UP:
+            if key in (curses.KEY_UP, ord("w"), ord("W")):
                 self.identity_field_index = max(0, self.identity_field_index - 1)
                 return
-            if key == curses.KEY_DOWN:
+            if key in (curses.KEY_DOWN, ord("s"), ord("S")):
                 self.identity_field_index = min(len(fields) - 1, self.identity_field_index + 1)
                 return
-            if key in (curses.KEY_LEFT, ord("-")):
+            if key in (curses.KEY_LEFT, ord("a"), ord("A"), ord("-")):
                 current_index = max(0, current_index - 1)
                 self.data["sex"] = current_field["options"][current_index]
                 self.sync_gender_to_sex()
                 return
-            if key in (curses.KEY_RIGHT, ord("+"), ord("=")):
+            if key in (curses.KEY_RIGHT, ord("d"), ord("D"), ord("+"), ord("=")):
                 current_index = min(len(current_field["options"]) - 1, current_index + 1)
                 self.data["sex"] = current_field["options"][current_index]
                 self.sync_gender_to_sex()
@@ -1439,13 +1437,13 @@ class CreationWizard:
 
     def handle_location_key(self, key):
         if self.location_mode == "country":
-            if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
+            if key in BACK_KEYS:
                 self.step_index = 0
                 return
-            if key == curses.KEY_UP:
+            if key in (curses.KEY_UP, ord("w"), ord("W")):
                 self.set_selected_country(max(0, self.country_index - 1))
                 return
-            if key == curses.KEY_DOWN:
+            if key in (curses.KEY_DOWN, ord("s"), ord("S")):
                 self.set_selected_country(min(len(WORLD_GEOGRAPHY) - 1, self.country_index + 1))
                 return
             if key in (ord(" "), curses.KEY_ENTER, 10, 13):
@@ -1455,13 +1453,13 @@ class CreationWizard:
             return
 
         cities = self.get_location_cities()
-        if key == curses.KEY_UP:
+        if key in (curses.KEY_UP, ord("w"), ord("W")):
             self.set_selected_city(max(0, self.city_index - 1))
             return
-        if key == curses.KEY_DOWN:
+        if key in (curses.KEY_DOWN, ord("s"), ord("S")):
             self.set_selected_city(min(len(cities) - 1, self.city_index + 1))
             return
-        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
+        if key in BACK_KEYS:
             self.location_mode = "country"
             return
         if key in (ord(" "), curses.KEY_ENTER, 10, 13):
@@ -1473,29 +1471,26 @@ class CreationWizard:
         self.appearance_field_index = max(0, min(self.appearance_field_index, len(fields) - 1))
         current_field = fields[self.appearance_field_index]
 
-        if key in (ord("b"), ord("B")):
-            self.step_index = 1
-            return
         if key in (curses.KEY_BACKSPACE, 127, 8):
             if current_field["kind"] == "text":
                 self.custom_appearance_values[current_field["key"]] = self.custom_appearance_values[current_field["key"]][:-1]
             else:
                 self.step_index = 1
             return
-        if key == curses.KEY_UP:
+        if key in (curses.KEY_UP, ord("w"), ord("W")):
             self.appearance_field_index = max(0, self.appearance_field_index - 1)
             return
-        if key == curses.KEY_DOWN:
+        if key in (curses.KEY_DOWN, ord("s"), ord("S")):
             self.appearance_field_index = min(len(fields) - 1, self.appearance_field_index + 1)
             return
         if current_field["kind"] == "select":
             options = current_field["options"]
             current_value = self.data["appearance"][current_field["key"]]
             current_index = options.index(current_value)
-            if key in (curses.KEY_LEFT, ord("-")):
+            if key in (curses.KEY_LEFT, ord("a"), ord("A"), ord("-")):
                 self.data["appearance"][current_field["key"]] = options[max(0, current_index - 1)]
                 return
-            if key in (curses.KEY_RIGHT, ord("+"), ord("="), ord(" ")):
+            if key in (curses.KEY_RIGHT, ord("d"), ord("D"), ord("+"), ord("="), ord(" ")):
                 self.data["appearance"][current_field["key"]] = options[min(len(options) - 1, current_index + 1)]
                 return
             if key in (curses.KEY_ENTER, 10, 13):
@@ -1513,13 +1508,13 @@ class CreationWizard:
             self.custom_appearance_values[current_field["key"]] += chr(key)
 
     def handle_mode_key(self, key):
-        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
+        if key in BACK_KEYS:
             self.step_index = 2
             return
-        if key == curses.KEY_UP:
+        if key in (curses.KEY_UP, ord("w"), ord("W")):
             self.mode_index = max(0, self.mode_index - 1)
             return
-        if key == curses.KEY_DOWN:
+        if key in (curses.KEY_DOWN, ord("s"), ord("S")):
             self.mode_index = min(len(self.CREATION_MODES) - 1, self.mode_index + 1)
             return
         if key in (curses.KEY_ENTER, 10, 13):
@@ -1531,13 +1526,13 @@ class CreationWizard:
             return
 
     def handle_traits_key(self, key):
-        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
+        if key in BACK_KEYS:
             self.step_index = 4
             return
-        if key == curses.KEY_UP:
+        if key in (curses.KEY_UP, ord("w"), ord("W")):
             self.trait_index = max(0, self.trait_index - 1)
             return
-        if key == curses.KEY_DOWN:
+        if key in (curses.KEY_DOWN, ord("s"), ord("S")):
             self.trait_index = min(len(CREATION_TRAIT_POOL) - 1, self.trait_index + 1)
             return
         if key == ord(" "):
@@ -1552,13 +1547,13 @@ class CreationWizard:
             return
 
     def handle_stats_key(self, key):
-        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
+        if key in BACK_KEYS:
             self.step_index = 3
             return
-        if key == curses.KEY_UP:
+        if key in (curses.KEY_UP, ord("w"), ord("W")):
             self.stat_index = max(0, self.stat_index - 1)
             return
-        if key == curses.KEY_DOWN:
+        if key in (curses.KEY_DOWN, ord("s"), ord("S")):
             self.stat_index = min(len(CREATION_STAT_ORDER) - 1, self.stat_index + 1)
             return
         if key in (ord("r"), ord("R")):
@@ -1567,17 +1562,17 @@ class CreationWizard:
         if key in (curses.KEY_ENTER, 10, 13):
             self.step_index = 5
             return
-        if key in (curses.KEY_LEFT, ord("-")):
+        if key in (curses.KEY_LEFT, ord("a"), ord("A"), ord("-")):
             stat_name = CREATION_STAT_ORDER[self.stat_index]
             self.data["stats"][stat_name] = max(0, self.data["stats"][stat_name] - 1)
             return
-        if key in (curses.KEY_RIGHT, ord("+"), ord("=")):
+        if key in (curses.KEY_RIGHT, ord("d"), ord("D"), ord("+"), ord("=")):
             stat_name = CREATION_STAT_ORDER[self.stat_index]
             self.data["stats"][stat_name] = min(100, self.data["stats"][stat_name] + 1)
 
     def handle_questionnaire_key(self, key):
         question = QUESTIONNAIRE_QUESTIONS[self.question_index]
-        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8, 27):
+        if key in BACK_KEYS:
             if self.question_index > 0:
                 self.question_index -= 1
                 self.questionnaire_answers.pop()
@@ -1586,10 +1581,10 @@ class CreationWizard:
                 self.step_index = 3
                 self.selected_mode = None
             return
-        if key == curses.KEY_UP:
+        if key in (curses.KEY_UP, ord("w"), ord("W")):
             self.question_option_index = max(0, self.question_option_index - 1)
             return
-        if key == curses.KEY_DOWN:
+        if key in (curses.KEY_DOWN, ord("s"), ord("S")):
             self.question_option_index = min(len(question["options"]) - 1, self.question_option_index + 1)
             return
         if key in (ord(" "), curses.KEY_ENTER, 10, 13):
@@ -1603,7 +1598,7 @@ class CreationWizard:
             self.question_option_index = 0
 
     def handle_confirm_key(self, key):
-        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8):
+        if key in BACK_KEYS:
             if self.selected_mode == "questionnaire":
                 if self.questionnaire_answers:
                     self.questionnaire_answers.pop()
@@ -2620,12 +2615,11 @@ class ActoraTUI:
         self.last_message = f"Your story continues as {handoff_result['new_focused_actor_name']}."
 
     def handle_pending_choice_key(self, key):
-        if key in (ord("q"), ord("Q")):
-            self.quit_confirmation_active = True
+        # Q and E are blocked while a popup is active — cannot advance or skip during a choice
+        if key in (ord("q"), ord("Q"), ord("e"), ord("E")):
             return
 
-        # Block Enter entirely while a popup is active — Enter is used to advance months
-        # and must never accidentally confirm a popup. Space is the only confirm key.
+        # Block Enter entirely while a popup is active — Space is the only confirm key.
         if key in (curses.KEY_ENTER, 10, 13):
             return
 
@@ -2634,9 +2628,9 @@ class ActoraTUI:
 
         options = self.pending_choice["options"]
         selected_index = self.pending_choice["selected_index"]
-        if key == curses.KEY_UP:
+        if key in (curses.KEY_UP, ord("w"), ord("W")):
             self.pending_choice["selected_index"] = max(0, selected_index - 1)
-        elif key == curses.KEY_DOWN:
+        elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
             self.pending_choice["selected_index"] = min(len(options) - 1, selected_index + 1)
         elif key == ord(" "):
             selected_option = options[self.pending_choice["selected_index"]]
@@ -2645,35 +2639,43 @@ class ActoraTUI:
             else:
                 selected_value = selected_option
             self.resolve_choice(self.pending_choice["choice_id"], selected_value)
-        elif self.pending_choice.get("skippable") and key in (ord("b"), ord("B")):
+        elif self.pending_choice.get("skippable") and key in BACK_KEYS:
             self.resolve_choice(
                 self.pending_choice["choice_id"],
                 self.pending_choice.get("default_value"),
             )
 
     def handle_main_key(self, key):
+        # Q = advance month
         if key in (ord("q"), ord("Q")):
-            self.quit_confirmation_active = True
-        elif key in (curses.KEY_ENTER, 10, 13, ord("a"), ord("A")):
             now = time.monotonic()
             if now - self.last_advance_time < ADVANCE_THROTTLE_SECONDS:
                 return
             self.last_advance_time = now
             self.advance_one_month()
-        elif key in (ord("s"), ord("S")):
+        # E = skip time
+        elif key in (ord("e"), ord("E")):
             self.open_skip_time()
-        elif key in (ord("p"), ord("P")):
-            self.open_profile()
+        # [1] = Menu stub (Browser/Actions/Profile)
+        elif key == ord("1"):
+            self.open_browser("relationships")  # stub: open browser until Menu popup exists
+        # Esc = Options stub
+        elif key == 27:
+            self.quit_confirmation_active = True  # stub: open quit confirmation until Options popup exists
+        # WASD = movement aliases
+        elif key in (ord("w"), ord("W"), curses.KEY_UP):
+            self.scroll_main_left(-1)
+        elif key in (ord("s"), ord("S"), curses.KEY_DOWN):
+            self.scroll_main_left(1)
+        # Legacy keys — keep temporarily, will be removed after full pass
         elif key in (ord("l"), ord("L")):
             self.open_browser("relationships")
         elif key in (ord("h"), ord("H")):
             self.open_browser("history")
         elif key in (ord("t"), ord("T")):
             self.open_actions()
-        elif key == curses.KEY_UP:
-            self.scroll_main_left(-1)
-        elif key == curses.KEY_DOWN:
-            self.scroll_main_left(1)
+        elif key in (ord("p"), ord("P")):
+            self.open_profile()
 
     def handle_history_key(self, key):
         if self.history_search_active:
@@ -2697,8 +2699,14 @@ class ActoraTUI:
             return
 
         if key in (ord("q"), ord("Q")):
-            self.quit_confirmation_active = True
-        elif key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8) or key in BACK_KEYS:
+            now = time.monotonic()
+            if now - self.last_advance_time < ADVANCE_THROTTLE_SECONDS:
+                return
+            self.last_advance_time = now
+            self.advance_one_month()
+        elif key in (ord("e"), ord("E")):
+            self.open_skip_time()
+        elif key in BACK_KEYS:
             self.screen_name = "main"
             self.history_search_active = False
             self.history_search_value = ""
@@ -2707,20 +2715,26 @@ class ActoraTUI:
             self.history_search_active = True
             self.history_search_value = ""
             self.last_message = "Type a year number. Enter jumps. Esc cancels."
-        elif key == curses.KEY_UP:
+        elif key in (curses.KEY_UP, ord("w"), ord("W")):
             self.history_scroll = max(0, self.history_scroll - 1)
-        elif key == curses.KEY_DOWN:
+        elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
             self.history_scroll += 1
 
     def handle_profile_key(self, key):
         if key in (ord("q"), ord("Q")):
-            self.quit_confirmation_active = True
-        elif key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8) or key in BACK_KEYS:
+            now = time.monotonic()
+            if now - self.last_advance_time < ADVANCE_THROTTLE_SECONDS:
+                return
+            self.last_advance_time = now
+            self.advance_one_month()
+        elif key in (ord("e"), ord("E")):
+            self.open_skip_time()
+        elif key in BACK_KEYS:
             self.screen_name = "main"
             self.last_message = MAIN_IDLE_MESSAGE
-        elif key == curses.KEY_UP:
+        elif key in (curses.KEY_UP, ord("w"), ord("W")):
             self.scroll_profile(-1)
-        elif key == curses.KEY_DOWN:
+        elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
             self.scroll_profile(1)
 
     def handle_lineage_key(self, key):
@@ -2752,9 +2766,16 @@ class ActoraTUI:
 
         lineage_entries = self.get_lineage_entries()
         if key in (ord("q"), ord("Q")):
-            self.quit_confirmation_active = True
+            now = time.monotonic()
+            if now - self.last_advance_time < ADVANCE_THROTTLE_SECONDS:
+                return
+            self.last_advance_time = now
+            self.advance_one_month()
             return
-        if key in (ord("b"), ord("B")) or key in BACK_KEYS:
+        if key in (ord("e"), ord("E")):
+            self.open_skip_time()
+            return
+        if key in BACK_KEYS:
             self.screen_name = "main"
             self.lineage_search_active = False
             self.last_message = MAIN_IDLE_MESSAGE
@@ -2772,15 +2793,12 @@ class ActoraTUI:
             self.lineage_search_active = True
             self.last_message = "Type to search lineage names. Enter confirms. Esc cancels search."
             return
-        if key == curses.KEY_BACKSPACE or key in (127, 8):
-            self.clear_lineage_search()
-            return
         if not lineage_entries:
             return
-        if key == curses.KEY_UP:
+        if key in (curses.KEY_UP, ord("w"), ord("W")):
             self.lineage_selection = max(0, self.lineage_selection - 1)
             self.selected_lineage_actor_id = lineage_entries[self.lineage_selection]["actor_id"]
-        elif key == curses.KEY_DOWN:
+        elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
             self.lineage_selection = min(len(lineage_entries) - 1, self.lineage_selection + 1)
             self.selected_lineage_actor_id = lineage_entries[self.lineage_selection]["actor_id"]
         elif key in (curses.KEY_ENTER, 10, 13):
@@ -2821,7 +2839,14 @@ class ActoraTUI:
         entries = browser_state["entries"]
 
         if key in (ord("q"), ord("Q")):
-            self.quit_confirmation_active = True
+            now = time.monotonic()
+            if now - self.last_advance_time < ADVANCE_THROTTLE_SECONDS:
+                return
+            self.last_advance_time = now
+            self.advance_one_month()
+            return
+        if key in (ord("e"), ord("E")):
+            self.open_skip_time()
             return
 
         if key == ord("/"):
@@ -2834,35 +2859,35 @@ class ActoraTUI:
                 self.lineage_selection = 0
                 self.selected_lineage_actor_id = None
                 self.last_message = "Search cleared."
-            return
+                return
 
         if self.rel_browser_focus == "filters":
-            if key in BACK_KEYS or key in (ord("b"), ord("B")):
+            if key in BACK_KEYS:
                 self.screen_name = back_to
                 self.last_message = MAIN_IDLE_MESSAGE
                 return
-            if key == curses.KEY_UP:
+            if key in (curses.KEY_UP, ord("w"), ord("W")):
                 self.rel_filter_index = max(0, self.rel_filter_index - 1)
                 self.lineage_selection = 0
                 self.selected_lineage_actor_id = None
-            elif key == curses.KEY_DOWN:
+            elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
                 self.rel_filter_index = min(len(REL_FILTER_OPTIONS) - 1, self.rel_filter_index + 1)
                 self.lineage_selection = 0
                 self.selected_lineage_actor_id = None
-            elif key in (9, curses.KEY_RIGHT):  # Tab or Right
+            elif key in (9, curses.KEY_RIGHT, ord("d"), ord("D")):  # Tab or Right
                 self.rel_browser_focus = "actors"
                 self.last_message = "Browsing people."
         else:  # actors focus
-            if key in (ord("b"), ord("B"), curses.KEY_LEFT) or key in BACK_KEYS:
+            if key in (curses.KEY_LEFT, ord("a"), ord("A")) or key in BACK_KEYS:
                 self.rel_browser_focus = "filters"
                 self.last_message = "Browsing relationships."
                 return
             if not entries:
                 return
-            if key == curses.KEY_UP:
+            if key in (curses.KEY_UP, ord("w"), ord("W")):
                 self.lineage_selection = max(0, self.lineage_selection - 1)
                 self.selected_lineage_actor_id = entries[self.lineage_selection]["actor_id"]
-            elif key == curses.KEY_DOWN:
+            elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
                 self.lineage_selection = min(len(entries) - 1, self.lineage_selection + 1)
                 self.selected_lineage_actor_id = entries[self.lineage_selection]["actor_id"]
             elif key in (curses.KEY_ENTER, 10, 13):
@@ -2891,8 +2916,14 @@ class ActoraTUI:
     def handle_actions_key(self, key):
         """Handles keys for the Actions screen."""
         if key in (ord("q"), ord("Q")):
-            self.quit_confirmation_active = True
-        elif key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8) or key in BACK_KEYS:
+            now = time.monotonic()
+            if now - self.last_advance_time < ADVANCE_THROTTLE_SECONDS:
+                return
+            self.last_advance_time = now
+            self.advance_one_month()
+        elif key in (ord("e"), ord("E")):
+            self.open_skip_time()
+        elif key in BACK_KEYS:
             self.screen_name = "main"
             self.last_message = MAIN_IDLE_MESSAGE
         elif key in (ord("t"), ord("T")):
@@ -2900,21 +2931,21 @@ class ActoraTUI:
 
     def handle_death_ack_key(self, key):
         if key in (ord("q"), ord("Q")):
-            self.quit_confirmation_active = True
+            return  # Q blocked on death screen — use Esc for Options
         elif key in (curses.KEY_ENTER, 10, 13):
             self.acknowledge_death()
 
     def handle_skip_time_key(self, key):
+        # Q blocked during skip time — user is actively doing a time action
         if key in (ord("q"), ord("Q")):
-            self.quit_confirmation_active = True
-            return
-        if key in (ord("b"), ord("B"), 27):
+            return  # do nothing
+        if key in BACK_KEYS:
             self.screen_name = "main"
             self.last_message = MAIN_IDLE_MESSAGE
             return
-        if key == curses.KEY_UP:
+        if key in (curses.KEY_UP, ord("w"), ord("W")):
             self.skip_selection = max(0, self.skip_selection - 1)
-        elif key == curses.KEY_DOWN:
+        elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
             self.skip_selection = min(len(SKIP_MONTH_PRESETS) - 1, self.skip_selection + 1)
         elif key in (curses.KEY_ENTER, 10, 13):
             self.confirm_skip_selection()
@@ -2928,17 +2959,16 @@ class ActoraTUI:
         continuity_state = self.get_continuity_state()
         candidates = continuity_state["continuity_candidates"]
         if key in (ord("q"), ord("Q")):
-            self.quit_confirmation_active = True
-            return
-        if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8) or key in BACK_KEYS:
+            return  # Q blocked on continuation screen — use Esc for Options
+        if key in BACK_KEYS:
             self.screen_name = "death_ack"
             self.last_message = "Returned to death summary."
             return
         if not candidates:
             return
-        if key == curses.KEY_UP:
+        if key in (curses.KEY_UP, ord("w"), ord("W")):
             self.continuation_selection = max(0, self.continuation_selection - 1)
-        elif key == curses.KEY_DOWN:
+        elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
             self.continuation_selection = min(
                 len(candidates) - 1,
                 self.continuation_selection + 1,
@@ -2948,8 +2978,8 @@ class ActoraTUI:
 
     def handle_continuation_detail_key(self, key):
         if key in (ord("q"), ord("Q")):
-            self.quit_confirmation_active = True
-        elif key in (ord("b"), ord("B")) or key in BACK_KEYS:
+            return  # Q blocked on continuation screen — use Esc for Options
+        elif key in BACK_KEYS:
             self.screen_name = "continuation"
             self.last_message = "Returned to available lives."
         elif key in (curses.KEY_ENTER, 10, 13):
@@ -2958,7 +2988,7 @@ class ActoraTUI:
     def handle_key(self, key):
         self.sync_focus_state()
         if self.quit_confirmation_active:
-            if key in (ord("b"), ord("B"), curses.KEY_BACKSPACE, 127, 8, 27):
+            if key in BACK_KEYS or key == 27:  # Backspace or Esc closes quit popup
                 self.quit_confirmation_active = False
                 return
             if key in (curses.KEY_ENTER, 10, 13):
@@ -2993,19 +3023,19 @@ class ActoraTUI:
 
     def render_footer(self, stdscr, height, width):
         footer_hints = {
-            "main": "[A] Advance Month   [S] Skip Time  |  [L] Browser   [T] Actions   [P] Profile   [Q] Quit",
-            "profile": "[↑↓] Scroll   [B] Back   [Q] Quit",
-            "lineage": "[↑↓] Move   [A] All   [L] Living   [D] Dead   [/] Search   [B] Back   [Q] Quit",
-            "relationship_browser": "[↑↓] Filter/Move   [/] Search   [Tab/→] Switch   [B/←] Back   [Q] Quit",
-            "history": "[↑↓] Scroll   [/] Jump to Year   [B] Back   [Q] Quit",
-            "browser": "[Tab] Switch Tab   [↑↓] Move   [/] Search   [B] Back   [Q] Quit",
-            "browser_rel_search": "Type search   [Enter] Confirm   [Esc] Cancel   [Q] Quit",
-            "actions": "[↑↓] Move   [Enter] Select   [T] Hang Out   [B] Back   [Q] Quit",
-            "history_search": "Type year [0-9]   [Enter] Continue   [Esc] Cancel   [Q] Quit",
-            "lineage_search": "Type search   [Enter] Continue   [Esc] Cancel   [Q] Quit",
-            "skip_time": "[↑↓] Move   [0-9] Custom   [Bksp] Erase   [Enter] Continue   [B] Back   [Q] Quit",
-            "death_ack": "[Enter] Continue   [Q] Quit",
-            "continuation_detail": "[Enter] Continue   [B] Back   [Q] Quit",
+            "main": "[Q] Advance Month   [E] Skip Time  |  [1] Menu   [Esc] Options",
+            "profile": "[↑↓] Scroll   [Bsp] Back   [Q] Advance",
+            "lineage": "[↑↓] Move   [A] All   [L] Living   [D] Dead   [/] Search   [Bsp] Back   [Q] Advance",
+            "relationship_browser": "[↑↓] Filter/Move   [/] Search   [Tab/→] Switch   [Bsp/←] Back   [Q] Advance",
+            "history": "[↑↓] Scroll   [/] Jump to Year   [Bsp] Back   [Q] Advance",
+            "browser": "[Tab] Switch Tab   [↑↓] Move   [/] Search   [Bsp] Back   [Q] Advance",
+            "browser_rel_search": "Type search   [Enter] Confirm   [Esc] Cancel   [Q] Advance",
+            "actions": "[↑↓] Move   [Enter] Select   [T] Hang Out   [Bsp] Back   [Q] Advance",
+            "history_search": "Type year [0-9]   [Enter] Continue   [Esc] Cancel   [Q] Advance",
+            "lineage_search": "Type search   [Enter] Continue   [Esc] Cancel   [Q] Advance",
+            "skip_time": "[↑↓] Move   [0-9] Custom   [Bksp] Erase   [Enter] Continue   [Bsp] Back",
+            "death_ack": "[Enter] Continue",
+            "continuation_detail": "[Enter] Continue   [Bsp] Back",
         }
         if self.screen_name == "lineage" and self.lineage_search_active:
             footer_text = footer_hints["lineage_search"]
@@ -3018,9 +3048,9 @@ class ActoraTUI:
         elif self.screen_name == "continuation":
             continuity_state = self.get_continuity_state()
             if continuity_state["continuity_candidates"]:
-                footer_text = "[↑↓] Move   [Enter] Continue   [B] Back   [Q] Quit"
+                footer_text = "[↑↓] Move   [Enter] Continue   [Bsp] Back"
             else:
-                footer_text = "[B] Back   [Q] Quit"
+                footer_text = "[Bsp] Back"
         else:
             footer_text = footer_hints.get(self.screen_name, "")
         content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
@@ -3044,7 +3074,7 @@ class ActoraTUI:
             [
                 "",
                 (
-                    "[↑↓] Move   [Space] Select   [B] Skip"
+                    "[↑↓] Move   [Space] Select   [Bsp] Skip"
                     if choice.get("skippable")
                     else "[↑↓] Move   [Space] Select"
                 ),
@@ -3084,7 +3114,7 @@ class ActoraTUI:
         lines = [
             "Are you sure you want to quit?",
             "",
-            "[Enter] Quit   [B] Cancel",
+            "[Enter] Quit   [Bsp] Cancel",
         ]
         draw_box(stdscr, top, left, box_height, box_width, title="Quit")
         draw_panel_text(stdscr, top, left, box_height, box_width, lines)
@@ -3603,12 +3633,6 @@ class ActoraTUI:
             "Recent Records",
         ]
         lines.extend(build_record_summary_lines(detail["records"]))
-        lines.extend(
-            [
-                "",
-                "[Enter] Continue as this person   [B] Back to list",
-            ]
-        )
         draw_text_block(stdscr, 5, content_left, content_width, height - 7, lines)
 
     def render(self, stdscr):
