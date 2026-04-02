@@ -232,5 +232,7 @@ Relationship wording: archived/former social ties use the player-facing label `P
 
 - Space/Enter overlap exists in current code on some screens — violation of the contract above
 - BACK_KEYS aliases (Backspace/127/8) in `handle_actions_key` — should be Backspace only
-- Q/E not yet wired as advance/skip (currently A/S) — full wiring needed in next UI pass
-- WASD movement not yet implemented — current code uses arrows only
+- Q/E not yet wired as advance/skip (currently A/S) — full wiring needed in next UI pass **[DONE in worktree v0.46.0]**
+- WASD movement not yet implemented — current code uses arrows only **[DONE in worktree v0.46.0]**
+- Skip Time: Backspace exits screen instead of deleting typed digit first — acceptable for now since Skip Time is destined to become a popup
+- `[Bksp] Erase` label in Skip Time footer is inconsistent with `[Bsp] Back` elsewhere — fix when Skip Time becomes a popup
