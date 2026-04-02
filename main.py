@@ -1675,7 +1675,8 @@ class ActoraTUI:
         self.pending_choice = None
         self.remaining_skip_months = 0
         self.quit_confirmation_active = False
-        self.gender_choice_offered = False
+        self.menu_popup_active = False
+        self.menu_selection = 0  # 0=Browser, 1=Actions, 2=Profile
         self.sexuality_choice_offered = False
         self.identity_popup_suppressed_for_resumed_adult = False
         self.gender_choice_age = random.randint(12, 15)
@@ -2350,6 +2351,16 @@ class ActoraTUI:
         self.screen_name = "relationship_browser"
         self.last_message = "Browsing relationships."
 
+    def _open_menu_selection(self):
+        """Opens the screen selected in the menu popup."""
+        self.menu_popup_active = False
+        if self.menu_selection == 0:
+            self.open_browser("relationships")
+        elif self.menu_selection == 1:
+            self.open_actions()
+        elif self.menu_selection == 2:
+            self.open_profile()
+
     def open_browser(self, tab="relationships"):
         """Opens the unified Browser screen on the specified tab."""
         self.browser_tab = tab
@@ -2656,9 +2667,10 @@ class ActoraTUI:
         # E = skip time
         elif key in (ord("e"), ord("E")):
             self.open_skip_time()
-        # [1] = Menu stub (Browser/Actions/Profile)
+        # [1] = Menu popup
         elif key == ord("1"):
-            self.open_browser("relationships")  # stub: open browser until Menu popup exists
+            self.menu_popup_active = not self.menu_popup_active
+            self.menu_selection = 0
         # Esc = Options stub
         elif key == 27:
             self.quit_confirmation_active = True  # stub: open quit confirmation until Options popup exists
@@ -2995,6 +3007,26 @@ class ActoraTUI:
                 self.running = False
                 return
             return
+        if self.menu_popup_active:
+            MENU_ITEMS = ["Browser", "Actions", "Profile"]
+            if key in BACK_KEYS:
+                self.menu_popup_active = False
+            elif key in (curses.KEY_UP, ord("w"), ord("W")):
+                self.menu_selection = max(0, self.menu_selection - 1)
+            elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
+                self.menu_selection = min(len(MENU_ITEMS) - 1, self.menu_selection + 1)
+            elif key == ord("1"):
+                self.menu_selection = 0
+                self._open_menu_selection()
+            elif key == ord("2"):
+                self.menu_selection = 1
+                self._open_menu_selection()
+            elif key == ord("3"):
+                self.menu_selection = 2
+                self._open_menu_selection()
+            elif key in (curses.KEY_ENTER, 10, 13):
+                self._open_menu_selection()
+            return
         if self.pending_choice is not None:
             self.handle_pending_choice_key(key)
             return
@@ -3105,6 +3137,20 @@ class ActoraTUI:
             popup_lines,
             highlight_index=highlighted_line,
         )
+
+    def render_menu_popup(self, stdscr, height, width):
+        MENU_ITEMS = ["Browser", "Actions", "Profile"]
+        box_width = 24
+        box_height = len(MENU_ITEMS) + 4
+        top = max(2, (height - box_height) // 2)
+        left = max(0, (width - box_width) // 2)
+        draw_box(stdscr, top, left, box_height, box_width, title="Menu")
+        for i, item in enumerate(MENU_ITEMS):
+            label = f"  {i+1}. {item}"
+            attr = curses.A_REVERSE if i == self.menu_selection else curses.A_NORMAL
+            row = top + 2 + i
+            if row < height and left + 1 < width:
+                stdscr.addnstr(row, left + 1, label.ljust(box_width - 2), box_width - 2, attr)
 
     def render_quit_confirmation(self, stdscr, height, width):
         box_width = min(max(36, width // 2), 44)
@@ -3668,6 +3714,8 @@ class ActoraTUI:
 
         self.render_footer(stdscr, height, width)
         self.render_pending_choice(stdscr, height, width)
+        if self.menu_popup_active:
+            self.render_menu_popup(stdscr, height, width)
         stdscr.refresh()
 
     def run(self, stdscr):
