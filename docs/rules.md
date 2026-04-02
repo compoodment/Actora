@@ -110,6 +110,6 @@ Don't blur these. Don't present proposals as implemented. Don't assume docs auto
 1. After every meaningful change: sync docs + memory immediately — don't batch it to later
 2. **Cascade check:** when updating any doc, check if other docs reference or depend on the same information and update them too. One doc change can make others stale.
 3. Before starting any task: targeted memory_search + read only the relevant files
-4. After compaction: re-read memory/daily + MEMORY.md + guide.md only; don't bulk-read source files unless needed
+4. After compaction: re-read memory/daily + MEMORY.md + guide.md + rules.md + backlog.md (Now); don't bulk-read other docs unless the task needs them
 5. Before any config edit: create a backup first
 6. For meaningful repo/file edits: create a local pre-edit backup in `.backups/`
