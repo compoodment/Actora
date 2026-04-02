@@ -55,7 +55,7 @@ That gets you oriented. Only read other docs when the task requires them.
 | Major structural decision made | `decisions.md` |
 | Interview produced design intent | `design.md` |
 | Interview produced screen/layout truth | `screens.md` |
-| Interview produced hotkey/control truth | `controls.md` — update immediately. controls.md is the only canonical home for hotkey decisions.
+| Interview produced hotkey/control truth | `controls.md` — update immediately, it is the only canonical home for hotkey decisions |
 | New project rule / constraint | `rules.md` |
 | Workflow changed | `guide.md` |
 | Code structure changed meaningfully | `codebase.md` |
@@ -100,10 +100,10 @@ That gets you oriented. Only read other docs when the task requires them.
 1. All of implementation workflow above
 2. Decide version bump level (see versioning rules in `rules.md`)
 3. Tag: `git tag vX.Y.Z && git push origin vX.Y.Z`
-3. Check `codebase.md` is current through this version
-4. Update `backlog.md` — move completed items out
-5. Promote durable insights to `MEMORY.md` if needed
-6. Every ~3 version tags: run cross-doc health check (see `rules.md`)
+4. Check `codebase.md` is current through this version
+5. Update `backlog.md` — move completed items out
+6. Promote durable insights to `MEMORY.md` if needed
+7. Every ~3 version tags: run cross-doc health check (see `rules.md`)
 
 ### Worker context loading
 When dispatching Codex or Claude Code, include:
