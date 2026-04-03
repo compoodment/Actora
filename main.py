@@ -1490,7 +1490,7 @@ class CreationWizard:
             if key in (curses.KEY_LEFT, ord("a"), ord("A"), ord("-")):
                 self.data["appearance"][current_field["key"]] = options[max(0, current_index - 1)]
                 return
-            if key in (curses.KEY_RIGHT, ord("d"), ord("D"), ord("+"), ord("="), ord(" ")):
+            if key in (curses.KEY_RIGHT, ord("d"), ord("D"), ord("+"), ord("=")):
                 self.data["appearance"][current_field["key"]] = options[min(len(options) - 1, current_index + 1)]
                 return
             if key in (curses.KEY_ENTER, 10, 13):
