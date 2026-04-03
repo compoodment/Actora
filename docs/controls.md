@@ -237,7 +237,6 @@ Relationship wording: archived/former social ties use the player-facing label `P
 
 ## Known issues (fix in next UI pass)
 
-- Space/Enter overlap was fixed in wizard location, questionnaire, and pending choice popup. Remaining screens should still be audited for any leftovers.
 - BACK_KEYS aliases (Backspace/127/8) in `handle_actions_key` — should be Backspace only
 - Q/E not yet wired as advance/skip (currently A/S) — full wiring needed in next UI pass **[DONE in worktree v0.46.0]**
 - WASD movement not yet implemented — current code uses arrows only **[DONE in worktree v0.46.0]**
