@@ -6,6 +6,30 @@ updated: 2026-04-03
 
 # Actora Changelog
 
+## Version 0.47.1 (Patch) - 2026-04-04
+- **Wizard polish:**
+    - Last name is now required for humans (was previously optional)
+    - Error message: "First and last name are required."
+    - Identity step: Esc triggers quit confirmation (Backspace is text-input only)
+    - Identity step footer: `[Esc] Quit` replacing `[Bsp] Quit`
+    - Traits step: removed "exactly" from trait count wording
+    - Location footer: separate hints for country and city sub-states
+    - Questionnaire footer: `[Enter] Continue` replacing `[Space] Select`
+- **Popup polish:**
+    - Options popup box widened; hint now fits properly
+    - Menu popup box widened; hint now has correct `[ ]` brackets
+    - Both popup hints: `[↑↓]`, `[Enter]`, `[Bsp]`, `[Esc]` brackets consistent
+    - Pending choice popup hint: `[Enter] Select` replacing `[Space] Select`
+    - Quit confirmation hint: `[Bsp] Back` replacing `[Bsp] Cancel`
+    - Backspace on quit confirmation (when opened from Options) returns to Options
+- **Life View footer:**
+    - Added second `|` divider: `[1] Menu  |  [Esc] Options`
+- **Actions footer:**
+    - Removed `D/A` from focus hint — arrows only shown
+- **controls.md synced:**
+    - Wizard Esc exception documented (identity step only)
+    - Quit confirmation Backspace semantics documented
+
 ## Version 0.47.0 (Minor) - 2026-04-03
 - **Actions screen redesigned — three-column layout:**
     - Categories column (left): lists action categories; focus starts here on open; W/S navigates, D/→ moves to Actions
