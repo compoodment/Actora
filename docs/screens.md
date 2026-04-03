@@ -1,7 +1,7 @@
 ---
 title: Screens
 tags: [implementation, tui, reference]
-updated: 2026-04-02
+updated: 2026-04-03
 ---
 
 # Actora Screens
@@ -149,9 +149,6 @@ All screens are reachable from Life View. Nested screens return to their parent 
 | Esc | Options popup |
 | Backspace | Back |
 
-**Legacy keys (still in code, will be removed in next UI pass):**
-- A = advance, S = skip, L = Browser, H = History, T = Actions, P = Profile
-
 **Reserved context-only keys:**
 - ↑↓ / W/S: navigate / scroll
 - ←→ / A/D: adjust value fields (show ← value → when active)
@@ -168,7 +165,7 @@ All screens are reachable from Life View. Nested screens return to their parent 
 
 **Note:**
 - [Q] advances month, [E] opens Skip Time — both available from any non-input screen.
-- Browser is accessed via [1] Menu. L/H/T/P are legacy keys that will be removed.
+- Browser, Actions, and Profile are accessed via [1] Menu. Legacy keys L/H/T/P have been removed.
 
 ---
 
@@ -183,7 +180,7 @@ All screens are reachable from Life View. Nested screens return to their parent 
 
 2. **Is it a new top-level domain?**
    - Needs its own screen → assign a free hotkey, document it here, add to footer
-   - Currently free: [N] (news future), [R] (reserved), plus L/H/T/P when legacy cleanup happens
+   - Currently free: [N] (news future), [R] (reserved), L/H/T/P (freed after legacy cleanup)
 
 3. **Never:**
    - Add standalone sections to Life View left panel without structural review
