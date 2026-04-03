@@ -2786,9 +2786,6 @@ class ActoraTUI:
         if key in (ord("a"), ord("A")):
             self.set_lineage_filter_mode("all")
             return
-        if key in (ord("l"), ord("L")):
-            self.set_lineage_filter_mode("living")
-            return
         if key in (ord("d"), ord("D")):
             self.set_lineage_filter_mode("dead")
             return
@@ -2929,8 +2926,7 @@ class ActoraTUI:
         elif key in BACK_KEYS:
             self.screen_name = "main"
             self.last_message = MAIN_IDLE_MESSAGE
-        elif key in (ord("t"), ord("T")):
-            self.open_hang_out_select()
+
 
     def handle_death_ack_key(self, key):
         if key in (ord("q"), ord("Q")):
@@ -3480,7 +3476,7 @@ class ActoraTUI:
         active_social = [lnk for lnk in social_links if lnk.get("metadata", {}).get("status") == "active"]
         right_lines = ["Available Actions", ""]
         if active_social:
-            right_lines.append("  Hang Out  [T]")
+            right_lines.append("  Hang Out")
             for lnk in active_social:
                 target_id = lnk.get("target_id")
                 target_actor = self.world.get_actor(target_id)
