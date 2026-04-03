@@ -1686,6 +1686,7 @@ class ActoraTUI:
         self.pending_choice = None
         self.remaining_skip_months = 0
         self.quit_confirmation_active = False
+        self.quit_from_options = False
         self.menu_popup_active = False
         self.menu_selection = 0  # 0=Browser, 1=Actions, 2=Profile
         self.options_popup_active = False
@@ -2381,6 +2382,7 @@ class ActoraTUI:
         if self.options_selection == 0:
             self.options_popup_active = False
             self.quit_confirmation_active = True
+            self.quit_from_options = True
 
     def open_browser(self, tab="relationships"):
         """Opens the unified Browser screen on the specified tab."""
@@ -3067,8 +3069,11 @@ class ActoraTUI:
     def handle_key(self, key):
         self.sync_focus_state()
         if self.quit_confirmation_active:
-            if key in BACK_KEYS or key == 27:  # Backspace or Esc closes quit popup
+            if key in BACK_KEYS or key == 27:
                 self.quit_confirmation_active = False
+                if self.quit_from_options:
+                    self.quit_from_options = False
+                    self.options_popup_active = True
                 return
             if key in (curses.KEY_ENTER, 10, 13):
                 self.running = False
