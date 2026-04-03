@@ -3078,7 +3078,7 @@ class ActoraTUI:
             "history": "[↑↓] Scroll   [/] Jump to Year   [Bsp] Back   [Q] Advance",
             "browser": "[Tab] Switch Tab   [↑↓] Move   [/] Search   [Bsp] Back   [Q] Advance",
             "browser_rel_search": "Type search   [Enter] Confirm   [Esc] Cancel   [Q] Advance",
-            "actions": "[↑↓] Move   [Enter] Select   [T] Hang Out   [Bsp] Back   [Q] Advance",
+            "actions": "[↑↓] Move   [Bsp] Back   [Q] Advance",
             "history_search": "Type year [0-9]   [Enter] Continue   [Esc] Cancel   [Q] Advance",
             "lineage_search": "Type search   [Enter] Continue   [Esc] Cancel   [Q] Advance",
             "skip_time": "[↑↓] Move   [0-9] Custom   [Bksp] Erase   [Enter] Continue   [Bsp] Back",

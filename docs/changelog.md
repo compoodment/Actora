@@ -21,6 +21,11 @@ updated: 2026-04-03
     - Removed Space-as-confirm from wizard location selection
     - Removed Space-as-confirm from questionnaire choice selection
     - Pending choice popup now confirms with Enter instead of Space
+    - Removed Space as adjustable field alias in wizard appearance step
+- **Hidden hotkey cleanup:**
+    - Removed undocumented G alias for year-jump in History (/ only, per contract)
+- **Polish:**
+    - Added [Bsp] Quit hint to wizard identity step footer
 
 ## Version 0.46.1 (Patch) - 2026-04-03
 - **Menu popup complete:**
