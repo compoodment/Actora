@@ -2679,15 +2679,6 @@ class ActoraTUI:
             self.scroll_main_left(-1)
         elif key in (ord("s"), ord("S"), curses.KEY_DOWN):
             self.scroll_main_left(1)
-        # Legacy keys — keep temporarily, will be removed after full pass
-        elif key in (ord("l"), ord("L")):
-            self.open_browser("relationships")
-        elif key in (ord("h"), ord("H")):
-            self.open_browser("history")
-        elif key in (ord("t"), ord("T")):
-            self.open_actions()
-        elif key in (ord("p"), ord("P")):
-            self.open_profile()
 
     def handle_history_key(self, key):
         if self.history_search_active:
