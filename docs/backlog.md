@@ -13,9 +13,8 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Now
 
-- **Space/Enter overlap fix** — known violation in current code (Space and Enter sometimes both trigger on same screen), fix in dedicated UI pass
+- **Space/Enter overlap follow-up** — major overlap violations fixed (wizard location, questionnaire, pending choice popup), but remaining screens should still be audited for any leftovers.
 - **Wizard quit-path gap** — Q and Esc are both blocked in wizard per contract. Currently no quit path from within the wizard. Needs design resolution.
-- **Options popup** — Esc currently opens quit confirmation as a stub. Real Options popup (Quit Game / Help / Settings) needs implementation.
 - **Actions screen selection state** — Actions screen shows available actions but has no cursor/selection. Hang Out is display-only until Actions gets proper selection + Enter-to-activate. Part of full Actions redesign.
 
 ## Next

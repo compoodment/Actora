@@ -6,6 +6,18 @@ updated: 2026-04-03
 
 # Actora Changelog
 
+## Version 0.46.2 (Patch) - 2026-04-03
+- **Options popup implemented:**
+    - Esc now opens a real centered Options popup instead of jumping straight to quit confirmation
+    - Popup contains Quit Game, Help / Controls, and Settings
+    - W/S or ↑↓ navigate, Enter selects, Esc closes
+    - Help / Controls and Settings are currently display-only and dimmed
+    - Quit Game routes into the existing quit confirmation
+- **Space/Enter contract cleanup:**
+    - Removed Space-as-confirm from wizard location selection
+    - Removed Space-as-confirm from questionnaire choice selection
+    - Pending choice popup now confirms with Enter instead of Space
+
 ## Version 0.46.1 (Patch) - 2026-04-03
 - **Menu popup complete:**
     - [1] opens a centered Menu popup with Browser / Actions / Profile items
