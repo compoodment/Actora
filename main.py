@@ -1126,7 +1126,7 @@ class CreationWizard:
                 lines.append(f"{field['label']}{optional_suffix}: {value}{suffix}")
         lines.append("")
         if self.identity_first_name_error_shown:
-            lines.append("Both first and last name are required.")
+            lines.append("First and last name are required.")
         lines.append(f"Gender defaults to: {self.data['gender']}  (chosen later in life)")
         draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
 
