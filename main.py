@@ -3184,9 +3184,9 @@ class ActoraTUI:
             [
                 "",
                 (
-                    "[↑↓] Move   [Space] Select   [Bsp] Skip"
+                    "[↑↓] Move   [Enter] Select   [Bsp] Skip"
                     if choice.get("skippable")
-                    else "[↑↓] Move   [Space] Select"
+                    else "[↑↓] Move   [Enter] Select"
                 ),
             ]
         )
