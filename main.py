@@ -3140,8 +3140,8 @@ class ActoraTUI:
 
     def render_menu_popup(self, stdscr, height, width):
         MENU_ITEMS = ["Browser", "Actions", "Profile"]
-        box_width = 24
-        box_height = len(MENU_ITEMS) + 4
+        box_width = 28
+        box_height = len(MENU_ITEMS) + 6
         top = max(2, (height - box_height) // 2)
         left = max(0, (width - box_width) // 2)
         draw_box(stdscr, top, left, box_height, box_width, title="Menu")
@@ -3151,6 +3151,10 @@ class ActoraTUI:
             row = top + 2 + i
             if row < height and left + 1 < width:
                 stdscr.addnstr(row, left + 1, label.ljust(box_width - 2), box_width - 2, attr)
+        hint_row = top + 2 + len(MENU_ITEMS) + 1
+        hint = " ↑↓ Move  Enter Select  Bsp Back"
+        if hint_row < height and left + 1 < width:
+            stdscr.addnstr(hint_row, left + 1, hint.ljust(box_width - 2), box_width - 2)
 
     def render_quit_confirmation(self, stdscr, height, width):
         box_width = min(max(36, width // 2), 44)
