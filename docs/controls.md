@@ -235,10 +235,8 @@ Relationship wording: archived/former social ties use the player-facing label `P
 
 ---
 
-## Known issues (fix in next UI pass)
+## Known issues
 
-- BACK_KEYS aliases (Backspace/127/8) in `handle_actions_key` — should be Backspace only
-- Q/E not yet wired as advance/skip (currently A/S) — full wiring needed in next UI pass **[DONE in worktree v0.46.0]**
-- WASD movement not yet implemented — current code uses arrows only **[DONE in worktree v0.46.0]**
+- `BACK_KEYS` constant in `handle_actions_key` uses `{KEY_BACKSPACE, 127, 8}` — matches DEC-013 exactly, no violation. Flag can be removed.
 - Skip Time: Backspace exits screen instead of deleting typed digit first — acceptable for now since Skip Time is destined to become a popup
 - `[Bksp] Erase` label in Skip Time footer is inconsistent with `[Bsp] Back` elsewhere — fix when Skip Time becomes a popup
