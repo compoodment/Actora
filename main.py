@@ -1309,7 +1309,7 @@ class CreationWizard:
         lines = [
             "Are you sure you want to quit?",
             "",
-            "[Enter] Quit   [Bsp] Cancel",
+            "[Enter] Quit   [Bsp] Back",
         ]
         draw_box(self.stdscr, top, left, box_height, box_width, title="Quit")
         draw_panel_text(self.stdscr, top, left, box_height, box_width, lines)
@@ -3268,7 +3268,7 @@ class ActoraTUI:
         lines = [
             "Are you sure you want to quit?",
             "",
-            "[Enter] Quit   [Bsp] Cancel",
+            "[Enter] Quit   [Bsp] Back",
         ]
         draw_box(stdscr, top, left, box_height, box_width, title="Quit")
         draw_panel_text(stdscr, top, left, box_height, box_width, lines)
