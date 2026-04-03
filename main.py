@@ -946,7 +946,7 @@ class CreationWizard:
     def get_identity_fields(self):
         return [
             {"kind": "text", "key": "first_name", "label": "First Name", "optional": False},
-            {"kind": "text", "key": "last_name", "label": "Last Name", "optional": True},
+            {"kind": "text", "key": "last_name", "label": "Last Name", "optional": False},
             {"kind": "select", "key": "sex", "label": "Sex", "options": CREATION_SEX_OPTIONS},
         ]
 
@@ -1038,7 +1038,7 @@ class CreationWizard:
         self.data["gender"] = sex if sex in {"Male", "Female"} else "Non-binary"
 
     def can_advance_identity(self):
-        return bool(self.data["first_name"].strip())
+        return bool(self.data["first_name"].strip()) and bool(self.data["last_name"].strip())
 
     def can_advance_appearance(self):
         for key, value in self.data["appearance"].items():
@@ -1126,7 +1126,10 @@ class CreationWizard:
                 lines.append(f"{field['label']}{optional_suffix}: {value}{suffix}")
         lines.append("")
         if self.identity_first_name_error_shown:
-            lines.append("First name is required.")
+            if not self.data["first_name"].strip():
+                lines.append("First name is required.")
+            elif not self.data["last_name"].strip():
+                lines.append("Last name is required.")
         lines.append(f"Gender defaults to: {self.data['gender']}  (chosen later in life)")
         draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
 
