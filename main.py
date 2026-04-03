@@ -1080,7 +1080,7 @@ class CreationWizard:
 
     def render_footer(self, height, width):
         if self.step_index == 0:
-            footer_text = "[↑↓] Move   [←→] Adjust   [Enter] Continue"
+            footer_text = "[↑↓] Move   [←→] Adjust   [Enter] Continue   [Bsp] Quit"
         elif self.step_index == 1:
             footer_text = "[↑↓] Move   [Space] Select   [Enter] Continue   [Bsp] Back"
         elif self.step_index == 2:
