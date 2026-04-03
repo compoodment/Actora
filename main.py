@@ -1702,6 +1702,9 @@ class ActoraTUI:
         self.browser_tab = "relationships"
         self.active_actions = []
         self.hang_out_actor_ids = []
+        self.actions_focus = "categories"
+        self.actions_category_index = 0
+        self.actions_action_index = 0
 
     def get_focused_actor_id(self):
         return self.world.get_focused_actor_id() or self.player_id
@@ -2400,6 +2403,9 @@ class ActoraTUI:
     def open_actions(self):
         """Opens the Actions screen."""
         self.screen_name = "actions"
+        self.actions_focus = "categories"
+        self.actions_category_index = 0
+        self.actions_action_index = 0
         self.last_message = "Actions."
 
     def open_hang_out_select(self):
@@ -2931,6 +2937,18 @@ class ActoraTUI:
         elif self.browser_tab == "history":
             self.handle_history_key(key)
 
+    def get_actions_categories(self):
+        """Returns the categories and their available actions for the current actor."""
+        focused_actor_id = self.get_focused_actor_id()
+        social_links = self.world.get_links(source_id=focused_actor_id, link_type="social")
+        active_social = [lnk for lnk in social_links if lnk.get("metadata", {}).get("status") == "active"]
+        social_actions = []
+        if active_social:
+            social_actions.append({"id": "hang_out", "label": "Hang Out", "links": active_social})
+        return [
+            {"id": "social", "label": "Social", "actions": social_actions},
+        ]
+
     def handle_actions_key(self, key):
         """Handles keys for the Actions screen."""
         if key in (ord("q"), ord("Q")):
@@ -2942,8 +2960,52 @@ class ActoraTUI:
         elif key in (ord("e"), ord("E")):
             self.open_skip_time()
         elif key in BACK_KEYS:
-            self.screen_name = "main"
-            self.last_message = MAIN_IDLE_MESSAGE
+            if self.actions_focus == "actions":
+                self.actions_focus = "categories"
+                self.actions_action_index = 0
+            else:
+                self.screen_name = "main"
+                self.last_message = MAIN_IDLE_MESSAGE
+        elif key in (curses.KEY_UP, ord("w"), ord("W")):
+            if self.actions_focus == "categories":
+                categories = self.get_actions_categories()
+                self.actions_category_index = max(0, self.actions_category_index - 1)
+                self.actions_action_index = 0
+            else:
+                categories = self.get_actions_categories()
+                cat = categories[self.actions_category_index] if categories else None
+                actions = cat["actions"] if cat else []
+                self.actions_action_index = max(0, self.actions_action_index - 1)
+        elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
+            if self.actions_focus == "categories":
+                categories = self.get_actions_categories()
+                self.actions_category_index = min(len(categories) - 1, self.actions_category_index + 1)
+                self.actions_action_index = 0
+            else:
+                categories = self.get_actions_categories()
+                cat = categories[self.actions_category_index] if categories else None
+                actions = cat["actions"] if cat else []
+                self.actions_action_index = min(max(0, len(actions) - 1), self.actions_action_index + 1)
+        elif key in (curses.KEY_RIGHT, ord("d"), ord("D")):
+            if self.actions_focus == "categories":
+                categories = self.get_actions_categories()
+                cat = categories[self.actions_category_index] if categories else None
+                if cat and cat["actions"]:
+                    self.actions_focus = "actions"
+                    self.actions_action_index = 0
+        elif key in (curses.KEY_LEFT, ord("a"), ord("A")):
+            if self.actions_focus == "actions":
+                self.actions_focus = "categories"
+                self.actions_action_index = 0
+        elif key in (curses.KEY_ENTER, 10, 13):
+            if self.actions_focus == "actions":
+                categories = self.get_actions_categories()
+                cat = categories[self.actions_category_index] if categories else None
+                actions = cat["actions"] if cat else []
+                if actions and self.actions_action_index < len(actions):
+                    action = actions[self.actions_action_index]
+                    if action["id"] == "hang_out":
+                        self.open_hang_out_select()
 
 
     def handle_death_ack_key(self, key):
@@ -3078,7 +3140,7 @@ class ActoraTUI:
             "history": "[↑↓] Scroll   [/] Jump to Year   [Bsp] Back   [Q] Advance",
             "browser": "[Tab] Switch Tab   [↑↓] Move   [/] Search   [Bsp] Back   [Q] Advance",
             "browser_rel_search": "Type search   [Enter] Confirm   [Esc] Cancel   [Q] Advance",
-            "actions": "[↑↓] Move   [Bsp] Back   [Q] Advance",
+            "actions": "[↑↓] Move   [←→/D/A] Focus   [Enter] Select   [Bsp] Back   [Q] Advance",
             "history_search": "Type year [0-9]   [Enter] Continue   [Esc] Cancel   [Q] Advance",
             "lineage_search": "Type search   [Enter] Continue   [Esc] Cancel   [Q] Advance",
             "skip_time": "[↑↓] Move   [0-9] Custom   [Bksp] Erase   [Enter] Continue   [Bsp] Back",
@@ -3507,41 +3569,74 @@ class ActoraTUI:
             self.render_history(stdscr, height, width)
 
     def render_actions(self, stdscr, height, width):
-        """Renders the Actions screen with pending actions and available actions."""
+        """Renders the Actions screen: Categories | Actions | Details."""
         top = 4
         body_height = height - 6
-        content_left, content_width = get_content_bounds(width, max_width=112)
-        left_width, right_left, right_width = split_centered_columns(content_left, content_width, left_ratio=0.5)
-        divider_x = right_left - 2
+        content_left, content_width = get_content_bounds(width, max_width=120)
+        col_w = content_width // 3
+        cat_left = content_left
+        act_left = content_left + col_w + 1
+        det_left = content_left + col_w * 2 + 2
+        det_width = content_width - col_w * 2 - 2
 
-        left_lines = ["Pending Actions", ""]
-        if not self.active_actions:
-            left_lines.append("  No pending actions.")
+        categories = self.get_actions_categories()
+        cat_idx = self.actions_category_index
+        act_idx = self.actions_action_index
+        current_cat = categories[cat_idx] if categories else None
+        actions = current_cat["actions"] if current_cat else []
+        current_action = actions[act_idx] if actions and act_idx < len(actions) else None
+
+        # Categories column
+        for i, cat in enumerate(categories):
+            label = f" {cat['label']}"
+            attr = curses.A_REVERSE if (i == cat_idx and self.actions_focus == "categories") else curses.A_NORMAL
+            if i == cat_idx and self.actions_focus != "categories":
+                attr = curses.A_BOLD
+            row = top + 1 + i
+            if row < height:
+                stdscr.addnstr(row, cat_left, label.ljust(col_w - 1), col_w - 1, attr)
+        if not categories:
+            stdscr.addnstr(top + 1, cat_left, " (none)", col_w - 1, curses.A_DIM)
+
+        # Divider 1
+        draw_vertical_divider(stdscr, top, act_left - 1, body_height)
+
+        # Actions column
+        if not actions:
+            stdscr.addnstr(top + 1, act_left, " (none yet)", col_w - 1, curses.A_DIM)
         else:
-            for action in self.active_actions:
-                left_lines.append(f"  {action['label']}")
+            for i, action in enumerate(actions):
+                label = f" {action['label']}"
+                attr = curses.A_REVERSE if (i == act_idx and self.actions_focus == "actions") else curses.A_NORMAL
+                row = top + 1 + i
+                if row < height:
+                    stdscr.addnstr(row, act_left, label.ljust(col_w - 1), col_w - 1, attr)
 
-        focused_actor_id = self.get_focused_actor_id()
-        social_links = self.world.get_links(source_id=focused_actor_id, link_type="social")
-        active_social = [lnk for lnk in social_links if lnk.get("metadata", {}).get("status") == "active"]
-        right_lines = ["Available Actions", ""]
-        if active_social:
-            right_lines.append("  Hang Out")
-            for lnk in active_social:
-                target_id = lnk.get("target_id")
-                target_actor = self.world.get_actor(target_id)
-                if target_actor is None:
-                    continue
-                meta = lnk.get("metadata", {})
-                closeness = meta.get("closeness", 0)
-                tier = _get_social_tier_label(closeness)
-                right_lines.append(f"    {target_actor.get_full_name()} · {tier}")
+        # Divider 2
+        draw_vertical_divider(stdscr, top, det_left - 1, body_height)
+
+        # Details column
+        if current_action:
+            det_lines = [f" {current_action['label']}", ""]
+            if current_action["id"] == "hang_out":
+                links = current_action.get("links", [])
+                if links:
+                    det_lines.append(" Who you can hang out with:")
+                    det_lines.append("")
+                    for lnk in links:
+                        target_id = lnk.get("target_id")
+                        target_actor = self.world.get_actor(target_id)
+                        if target_actor is None:
+                            continue
+                        meta = lnk.get("metadata", {})
+                        closeness = meta.get("closeness", 0)
+                        tier = _get_social_tier_label(closeness)
+                        det_lines.append(f"  {target_actor.get_full_name()} · {tier}")
+                else:
+                    det_lines.append(" No active social connections yet.")
+            draw_text_block(stdscr, top, det_left, det_width, body_height, det_lines)
         else:
-            right_lines.append("  No active social connections available for Hang Out yet.")
-
-        draw_text_block(stdscr, top, content_left, left_width, body_height, left_lines)
-        draw_vertical_divider(stdscr, top, divider_x, body_height)
-        draw_text_block(stdscr, top, right_left, right_width, body_height, right_lines)
+            stdscr.addnstr(top + 1, det_left, " Select an action", det_width, curses.A_DIM)
 
     def build_actor_inspect_detail(self, actor_id, *, relationship_label=None, recent_record_limit=INSPECT_RECORD_LIMIT):
         """Builds one shell-owned inspectability payload for an actor."""
