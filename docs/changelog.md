@@ -6,6 +6,18 @@ updated: 2026-04-03
 
 # Actora Changelog
 
+## Version 0.47.0 (Minor) - 2026-04-03
+- **Actions screen redesigned — three-column layout:**
+    - Categories column (left): lists action categories; focus starts here on open; W/S navigates, D/→ moves to Actions
+    - Actions column (middle): shows actions for selected category; W/S navigates, A/← returns to Categories, Enter activates
+    - Details column (right): shows action description and context; updates live as Actions selection changes
+    - For Hang Out: Details shows "who you can hang out with" — name and relationship tier
+    - Enter on Hang Out opens friend selection popup (existing pending-choice system)
+    - D/→ blocked if category has no actions — no navigating into empty columns
+    - Screen resets focus to Categories on every open
+    - Footer updated: `[↑↓] Move   [←→/D/A] Focus   [Enter] Select   [Bsp] Back   [Q] Advance`
+    - Categories data structure: hardcoded list per actor state, easy to extend with new categories
+
 ## Version 0.46.2 (Patch) - 2026-04-03
 - **Wizard quit path (option B):**
     - Backspace on empty first-name field triggers quit confirmation

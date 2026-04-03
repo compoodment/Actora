@@ -2,7 +2,7 @@
 title: Backlog
 tags: [planning, tracking, wip]
 updated: 2026-04-03
-through: v0.46.2
+through: v0.47.0
 ---
 
 # Actora Backlog
@@ -13,14 +13,13 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Now
 
-- **Actions screen selection state** — Actions screen shows available actions but has no cursor/selection. Hang Out is display-only until Actions gets proper selection + Enter-to-activate. Part of full Actions redesign.
 
 ## Next
 
 - **Resume shell experiment** — implement chosen balanced shell direction against the locked control contract
 - **main.py extraction** — identify first sane decomposition seam after shell settles (shell/browser/actions rendering is the likely first candidate)
 - **Stable doc sync** — verify all docs match current implementation after shell work lands
-- **Action system implementation** — narrow first-wave: social + self-improvement categories
+- **Action system implementation** — narrow first-wave: social + self-improvement categories (foundation screen now exists)
 
 ## Later
 
