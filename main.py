@@ -1210,7 +1210,7 @@ class CreationWizard:
     def render_traits(self, height, width):
         content_left, content_width = get_content_bounds(width, max_width=84)
         lines = [
-            "Select exactly 3 traits.",
+            "Select 3 traits.",
             f"Selected: {len(self.data['traits'])}/3",
             "",
         ]
@@ -1221,7 +1221,7 @@ class CreationWizard:
             marker = "[x]" if trait in self.data["traits"] else "[ ]"
             lines.append(f"{marker} {trait}")
         if not self.can_advance_traits():
-            lines.extend(["", "You must choose exactly 3 traits to continue."])
+            lines.extend(["", "Choose 3 traits to continue."])
         draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
 
     def render_mode_selection(self, height, width):
@@ -3138,7 +3138,7 @@ class ActoraTUI:
 
     def render_footer(self, stdscr, height, width):
         footer_hints = {
-            "main": "[Q] Advance Month   [E] Skip Time  |  [1] Menu   [Esc] Options",
+            "main": "[Q] Advance Month   [E] Skip Time  |  [1] Menu  |  [Esc] Options",
             "profile": "[↑↓] Scroll   [Bsp] Back   [Q] Advance",
             "lineage": "[↑↓] Move   [A] All   [L] Living   [D] Dead   [/] Search   [Bsp] Back   [Q] Advance",
             "relationship_browser": "[↑↓] Filter/Move   [/] Search   [Tab/→] Switch   [Bsp/←] Back   [Q] Advance",
@@ -3223,7 +3223,7 @@ class ActoraTUI:
 
     def render_menu_popup(self, stdscr, height, width):
         MENU_ITEMS = ["Browser", "Actions", "Profile"]
-        box_width = 28
+        box_width = 32
         box_height = len(MENU_ITEMS) + 6
         top = max(2, (height - box_height) // 2)
         left = max(0, (width - box_width) // 2)
@@ -3235,7 +3235,7 @@ class ActoraTUI:
             if row < height and left + 1 < width:
                 stdscr.addnstr(row, left + 1, label.ljust(box_width - 2), box_width - 2, attr)
         hint_row = top + 2 + len(MENU_ITEMS) + 1
-        hint = " ↑↓  Enter Select  Bsp Back"
+        hint = " [↑↓]  [Enter] Select  [Bsp] Back"
         if hint_row < height and left + 1 < width:
             stdscr.addnstr(hint_row, left + 1, hint.ljust(box_width - 2), box_width - 2)
 
@@ -3256,7 +3256,7 @@ class ActoraTUI:
             if row < height and left + 1 < width:
                 stdscr.addnstr(row, left + 1, label.ljust(box_width - 2), box_width - 2, attr)
         hint_row = top + 2 + len(OPTION_ITEMS) + 1
-        hint = " ↑↓  Enter Select  Esc Close"
+        hint = " [↑↓]  [Enter] Select  [Esc] Close"
         if hint_row < height and left + 1 < width:
             stdscr.addnstr(hint_row, left + 1, hint.ljust(box_width - 2), box_width - 2)
 
