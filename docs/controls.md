@@ -49,7 +49,7 @@ This means in Skip Time custom input, Esc exits the input (not Options). Same ru
 | Text input field | Backspace = delete char, WASD = type characters, Esc = exit text mode |
 | Search / year jump / custom input | Backspace = delete char, WASD = type characters, Esc = cancel/exit input (Options blocked) |
 | Any popup open | Q/E blocked, [1] blocked |
-| Character creation wizard | Q/E blocked, Esc blocked, [1] blocked |
+| Character creation wizard | Q/E blocked, [1] blocked; Esc = quit on identity step, blocked on all other wizard steps |
 | Continuation/death screen | Q/E blocked |
 
 ---
@@ -139,7 +139,8 @@ Read-only for now. Future: commitments, health, property sections.
 | Backspace | Delete character | Text input field |
 | Space | Select / toggle | Choice fields |
 | R | Randomize all stats | Stats step only |
-| Q / E / Esc / [1] | Blocked | Entire wizard |
+| Q / E / [1] | Blocked | Entire wizard |
+| Esc | Quit (→ confirmation) | Identity step only |
 
 ---
 
@@ -186,7 +187,7 @@ Current items: Quit Game → confirmation, Help/Controls (future), Settings (fut
 | Key | Action |
 |-----|--------|
 | Enter | Confirm quit |
-| Backspace | Cancel |
+| Backspace | Back (returns to Options if opened from Options; otherwise closes) |
 
 ---
 
@@ -237,6 +238,5 @@ Relationship wording: archived/former social ties use the player-facing label `P
 
 ## Known issues
 
-- `BACK_KEYS` constant in `handle_actions_key` uses `{KEY_BACKSPACE, 127, 8}` — matches DEC-013 exactly, no violation. Flag can be removed.
 - Skip Time: Backspace exits screen instead of deleting typed digit first — acceptable for now since Skip Time is destined to become a popup
 - `[Bksp] Erase` label in Skip Time footer is inconsistent with `[Bsp] Back` elsewhere — fix when Skip Time becomes a popup
