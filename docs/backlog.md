@@ -13,7 +13,6 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Now
 
-- **Wizard quit-path gap** — Q and Esc are both blocked in wizard per contract. Currently no quit path from within the wizard. Needs design resolution.
 - **Actions screen selection state** — Actions screen shows available actions but has no cursor/selection. Hang Out is display-only until Actions gets proper selection + Enter-to-activate. Part of full Actions redesign.
 
 ## Next

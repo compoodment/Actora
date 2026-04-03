@@ -7,6 +7,10 @@ updated: 2026-04-03
 # Actora Changelog
 
 ## Version 0.46.2 (Patch) - 2026-04-03
+- **Wizard quit path (option B):**
+    - Backspace on empty first-name field triggers quit confirmation
+    - Backspace on sex select field returns to name field (or quit if already at top)
+    - Quit confirmation: Enter confirms quit, Backspace cancels back to wizard
 - **Options popup implemented:**
     - Esc now opens a real centered Options popup instead of jumping straight to quit confirmation
     - Popup contains Quit Game, Help / Controls, and Settings
