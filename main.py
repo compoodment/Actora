@@ -1404,7 +1404,11 @@ class CreationWizard:
                     self.identity_first_name_error_shown = True
                 return
             if key in (curses.KEY_BACKSPACE, 127, 8):
-                self.data[current_field["key"]] = self.data[current_field["key"]][:-1]
+                if self.data[current_field["key"]]:
+                    self.data[current_field["key"]] = self.data[current_field["key"]][:-1]
+                elif self.identity_field_index == 0:
+                    # Backspace on empty first field — nowhere to go, offer quit
+                    self.quit_confirmation_active = True
                 return
             if 32 <= key <= 126:
                 self.data[current_field["key"]] += chr(key)
@@ -1413,6 +1417,13 @@ class CreationWizard:
                 return
         if current_field["kind"] == "select":
             current_index = current_field["options"].index(self.data["sex"])
+            if key in (curses.KEY_BACKSPACE, 127, 8):
+                # Backspace on select field — go back up to name, or quit if at top
+                if self.identity_field_index > 0:
+                    self.identity_field_index -= 1
+                else:
+                    self.quit_confirmation_active = True
+                return
             if key in (curses.KEY_UP, ord("w"), ord("W")):
                 self.identity_field_index = max(0, self.identity_field_index - 1)
                 return
