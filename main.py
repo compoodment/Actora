@@ -1082,13 +1082,16 @@ class CreationWizard:
         if self.step_index == 0:
             footer_text = "[↑↓] Move   [←→] Adjust   [Enter] Continue   [Bsp] Quit"
         elif self.step_index == 1:
-            footer_text = "[↑↓] Move   [Space] Select   [Enter] Continue   [Bsp] Back"
+            if self.location_mode == "country":
+                footer_text = "[↑↓] Move   [Enter] Select Country   [Bsp] Back"
+            else:
+                footer_text = "[↑↓] Move   [Enter] Continue   [Bsp] Back Country"
         elif self.step_index == 2:
             footer_text = "[↑↓] Move   [←→] Adjust   [Enter] Continue   [Bsp] Back"
         elif self.step_index == 3:
             footer_text = "[↑↓] Move   [Enter] Continue   [Bsp] Back"
         elif self.step_index == 4 and self.selected_mode == "questionnaire":
-            footer_text = "[↑↓] Move   [Space] Select   [Bsp] Back"
+            footer_text = "[↑↓] Move   [Enter] Continue   [Bsp] Back"
         elif self.step_index == 4:
             footer_text = "[↑↓] Move   [←→] Adjust   [R] Randomize   [Enter] Continue   [Bsp] Back"
         elif self.step_index == 5 and self.selected_mode == "manual":
