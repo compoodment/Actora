@@ -1446,7 +1446,7 @@ class CreationWizard:
             if key in (curses.KEY_DOWN, ord("s"), ord("S")):
                 self.set_selected_country(min(len(WORLD_GEOGRAPHY) - 1, self.country_index + 1))
                 return
-            if key in (ord(" "), curses.KEY_ENTER, 10, 13):
+            if key in (curses.KEY_ENTER, 10, 13):
                 self.location_mode = "city"
                 self.sync_location_indexes()
                 return
@@ -1462,7 +1462,7 @@ class CreationWizard:
         if key in BACK_KEYS:
             self.location_mode = "country"
             return
-        if key in (ord(" "), curses.KEY_ENTER, 10, 13):
+        if key in (curses.KEY_ENTER, 10, 13):
             self.step_index = 2
             self.location_mode = "country"
 
@@ -1587,7 +1587,7 @@ class CreationWizard:
         if key in (curses.KEY_DOWN, ord("s"), ord("S")):
             self.question_option_index = min(len(question["options"]) - 1, self.question_option_index + 1)
             return
-        if key in (ord(" "), curses.KEY_ENTER, 10, 13):
+        if key in (curses.KEY_ENTER, 10, 13):
             selected_option = question["options"][self.question_option_index]
             self.questionnaire_answers.append(selected_option)
             if self.question_index >= len(QUESTIONNAIRE_QUESTIONS) - 1:
@@ -1677,6 +1677,8 @@ class ActoraTUI:
         self.quit_confirmation_active = False
         self.menu_popup_active = False
         self.menu_selection = 0  # 0=Browser, 1=Actions, 2=Profile
+        self.options_popup_active = False
+        self.options_selection = 0
         self.sexuality_choice_offered = False
         self.identity_popup_suppressed_for_resumed_adult = False
         self.gender_choice_age = random.randint(12, 15)
@@ -2361,6 +2363,11 @@ class ActoraTUI:
         elif self.menu_selection == 2:
             self.open_profile()
 
+    def _open_options_selection(self):
+        if self.options_selection == 0:
+            self.options_popup_active = False
+            self.quit_confirmation_active = True
+
     def open_browser(self, tab="relationships"):
         """Opens the unified Browser screen on the specified tab."""
         self.browser_tab = tab
@@ -2630,10 +2637,6 @@ class ActoraTUI:
         if key in (ord("q"), ord("Q"), ord("e"), ord("E")):
             return
 
-        # Block Enter entirely while a popup is active — Space is the only confirm key.
-        if key in (curses.KEY_ENTER, 10, 13):
-            return
-
         if self.pending_choice is None:
             return
 
@@ -2643,7 +2646,7 @@ class ActoraTUI:
             self.pending_choice["selected_index"] = max(0, selected_index - 1)
         elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
             self.pending_choice["selected_index"] = min(len(options) - 1, selected_index + 1)
-        elif key == ord(" "):
+        elif key in (curses.KEY_ENTER, 10, 13):
             selected_option = options[self.pending_choice["selected_index"]]
             if self.pending_choice["choice_id"] == "sexuality":
                 selected_value = dict(SEXUALITY_OPTION_LABELS)[selected_option]
@@ -2671,9 +2674,13 @@ class ActoraTUI:
         elif key == ord("1"):
             self.menu_popup_active = not self.menu_popup_active
             self.menu_selection = 0
-        # Esc = Options stub
+        # Esc = Options popup
         elif key == 27:
-            self.quit_confirmation_active = True  # stub: open quit confirmation until Options popup exists
+            self.options_popup_active = not self.options_popup_active
+            if self.options_popup_active:
+                self.options_selection = 0
+            else:
+                self.last_message = MAIN_IDLE_MESSAGE
         # WASD = movement aliases
         elif key in (ord("w"), ord("W"), curses.KEY_UP):
             self.scroll_main_left(-1)
@@ -2994,6 +3001,17 @@ class ActoraTUI:
                 self.running = False
                 return
             return
+        if self.options_popup_active:
+            OPTIONS_ITEMS = ["Quit Game", "Help / Controls", "Settings"]
+            if key == 27:
+                self.options_popup_active = False
+            elif key in (curses.KEY_UP, ord("w"), ord("W")):
+                self.options_selection = max(0, self.options_selection - 1)
+            elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
+                self.options_selection = min(len(OPTIONS_ITEMS) - 1, self.options_selection + 1)
+            elif key in (curses.KEY_ENTER, 10, 13):
+                self._open_options_selection()
+            return
         if self.menu_popup_active:
             MENU_ITEMS = ["Browser", "Actions", "Profile"]
             if key in BACK_KEYS:
@@ -3140,6 +3158,27 @@ class ActoraTUI:
                 stdscr.addnstr(row, left + 1, label.ljust(box_width - 2), box_width - 2, attr)
         hint_row = top + 2 + len(MENU_ITEMS) + 1
         hint = " ↑↓ Move  Enter Select  Bsp Back"
+        if hint_row < height and left + 1 < width:
+            stdscr.addnstr(hint_row, left + 1, hint.ljust(box_width - 2), box_width - 2)
+
+    def render_options_popup(self, stdscr, height, width):
+        OPTION_ITEMS = ["Quit Game", "Help / Controls", "Settings"]
+        box_width = 32
+        box_height = len(OPTION_ITEMS) + 6
+        top = max(2, (height - box_height) // 2)
+        left = max(0, (width - box_width) // 2)
+        draw_box(stdscr, top, left, box_height, box_width, title="Options")
+        for i, item in enumerate(OPTION_ITEMS):
+            prefix = "  "
+            attr = curses.A_REVERSE if i == self.options_selection else curses.A_NORMAL
+            if i > 0:
+                attr |= curses.A_DIM
+            label = f"{prefix}{item}"
+            row = top + 2 + i
+            if row < height and left + 1 < width:
+                stdscr.addnstr(row, left + 1, label.ljust(box_width - 2), box_width - 2, attr)
+        hint_row = top + 2 + len(OPTION_ITEMS) + 1
+        hint = " ↑↓ Move  Enter Select  Esc Close"
         if hint_row < height and left + 1 < width:
             stdscr.addnstr(hint_row, left + 1, hint.ljust(box_width - 2), box_width - 2)
 
@@ -3707,6 +3746,8 @@ class ActoraTUI:
         self.render_pending_choice(stdscr, height, width)
         if self.menu_popup_active:
             self.render_menu_popup(stdscr, height, width)
+        if self.options_popup_active:
+            self.render_options_popup(stdscr, height, width)
         stdscr.refresh()
 
     def run(self, stdscr):
