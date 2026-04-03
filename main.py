@@ -2714,7 +2714,7 @@ class ActoraTUI:
             self.history_search_active = False
             self.history_search_value = ""
             self.last_message = MAIN_IDLE_MESSAGE
-        elif key in (ord("/"), ord("g"), ord("G")):
+        elif key == ord("/"):
             self.history_search_active = True
             self.history_search_value = ""
             self.last_message = "Type a year number. Enter jumps. Esc cancels."
