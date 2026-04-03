@@ -3230,13 +3230,13 @@ class ActoraTUI:
             if row < height and left + 1 < width:
                 stdscr.addnstr(row, left + 1, label.ljust(box_width - 2), box_width - 2, attr)
         hint_row = top + 2 + len(MENU_ITEMS) + 1
-        hint = " ↑↓ Move  Enter Select  Bsp Back"
+        hint = " ↑↓  Enter Select  Bsp Back"
         if hint_row < height and left + 1 < width:
             stdscr.addnstr(hint_row, left + 1, hint.ljust(box_width - 2), box_width - 2)
 
     def render_options_popup(self, stdscr, height, width):
         OPTION_ITEMS = ["Quit Game", "Help / Controls", "Settings"]
-        box_width = 32
+        box_width = 36
         box_height = len(OPTION_ITEMS) + 6
         top = max(2, (height - box_height) // 2)
         left = max(0, (width - box_width) // 2)
@@ -3251,7 +3251,7 @@ class ActoraTUI:
             if row < height and left + 1 < width:
                 stdscr.addnstr(row, left + 1, label.ljust(box_width - 2), box_width - 2, attr)
         hint_row = top + 2 + len(OPTION_ITEMS) + 1
-        hint = " ↑↓ Move  Enter Select  Esc Close"
+        hint = " ↑↓  Enter Select  Esc Close"
         if hint_row < height and left + 1 < width:
             stdscr.addnstr(hint_row, left + 1, hint.ljust(box_width - 2), box_width - 2)
 
