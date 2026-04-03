@@ -2,7 +2,7 @@
 title: Backlog
 tags: [planning, tracking, wip]
 updated: 2026-04-03
-through: v0.45.0+
+through: v0.46.1
 ---
 
 # Actora Backlog
@@ -13,11 +13,10 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Now
 
-- **Space/Enter overlap fix** — known violation in current code (Space and Enter sometimes both trigger on same screen), fix in next UI pass
-- **Remove legacy letter keys (L/H/T/P/A/S)** — deprecated. L/H open Browser, T opens Actions, P opens Profile, A/S were advance/skip. All replaced by Q/E/[1] Menu. Remove once Menu popup exists and is confirmed working.
+- **Space/Enter overlap fix** — known violation in current code (Space and Enter sometimes both trigger on same screen), fix in dedicated UI pass
 - **Wizard quit-path gap** — Q and Esc are both blocked in wizard per contract. Currently no quit path from within the wizard. Needs design resolution.
-- **Menu popup** — [1] currently opens Browser as a stub. Real Menu popup (Browser / Actions / Profile items) needs implementation.
 - **Options popup** — Esc currently opens quit confirmation as a stub. Real Options popup (Quit Game / Help / Settings) needs implementation.
+- **Actions screen selection state** — Actions screen shows available actions but has no cursor/selection. Hang Out is display-only until Actions gets proper selection + Enter-to-activate. Part of full Actions redesign.
 
 ## Next
 

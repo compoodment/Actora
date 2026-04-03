@@ -6,7 +6,19 @@ updated: 2026-04-02
 
 # Actora Changelog
 
-## Version 0.46.0 (Minor) - 2026-04-03
+## Version 0.46.1 (Patch) - 2026-04-03
+- **Menu popup complete:**
+    - [1] opens a centered Menu popup with Browser / Actions / Profile items
+    - W/S or ↑↓ navigate items; 1/2/3 fast-select; Enter opens; Backspace closes
+    - Hint line added showing controls inside popup
+- **Legacy letter keys removed:**
+    - L/H/T/P removed from Life View (now accessed via [1] Menu)
+    - L (living filter) and T (hang out) shortcuts removed from their respective screens
+    - Hang Out is display-only in Actions until Actions gets full selection state
+- **Polish:**
+    - `[T]` label removed from Hang Out in Actions screen
+
+
 - **Control Contract v2:**
     - Q = advance month (all non-input screens; blocked in: text input, search, popups, wizard, continuation, death screen)
     - E = skip time (same blocks as Q)
