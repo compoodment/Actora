@@ -54,7 +54,7 @@ HUMAN_MONTHLY_EVENTS = [
 
     # Child-specific events (Age 3-9 = Months 36-119)
     _event("child_imaginary_friend", "You made a new imaginary friend!", life_stages=["Child"], outcome={"stat_changes": {"happiness": 2}}, tags=["positive", "child"]),
-    _event("child_draw_picture", "You drew a colorful picture.", life_stages=["Child"], outcome={"stat_changes": {"intelligence": 1, "creativity": 1}}, tags=["neutral", "child"]),
+    _event("child_draw_picture", "You drew a colorful picture.", life_stages=["Child"], outcome={"stat_changes": {"intelligence": 1, "imagination": 1}}, tags=["neutral", "child"]),
     _event("child_play_outside", "You played outside and got a little dirty.", life_stages=["Child"], min_age_months=48, outcome={"stat_changes": {"happiness": 1, "strength": 1}}, tags=["positive", "child"]),
     _event("child_tie_shoes", "You learned to tie your shoes!", life_stages=["Child"], min_age_months=60, outcome={"stat_changes": {"intelligence": 2}}, tags=["positive", "child"]),
     _event("child_simple_chore", "You helped a parent with a simple chore.", life_stages=["Child"], min_age_months=40, outcome={"stat_changes": {"happiness": 1}}, tags=["positive", "child"]),
@@ -102,7 +102,7 @@ HUMAN_MONTHLY_EVENTS = [
     _event("cheerful_brightened_day", "Your mood was contagious today. Several people smiled because of you.", life_stages=["Child", "Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"happiness": 1, "charisma": 1}}, tags=["positive"], required_traits=["Cheerful"]),
     _event("stubborn_refused_change", "You refused to change your mind about something. You were right.", life_stages=["Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"willpower": 1}}, tags=["neutral"], required_traits=["Stubborn"]),
     _event("stubborn_argument_won", "You argued your point until the other person gave up. Whether you were right is debatable.", life_stages=["Teenager", "Adult"], outcome={"stat_changes": {"willpower": 1, "charisma": -1}}, tags=["neutral"], required_traits=["Stubborn"]),
-    _event("restless_late_night", "You could not sit still and ended up reorganizing something at 2 AM.", life_stages=["Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"discipline": -1, "creativity": 1}}, tags=["neutral"], required_traits=["Restless"]),
+    _event("restless_late_night", "You could not sit still and ended up reorganizing something at 2 AM.", life_stages=["Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"discipline": -1, "imagination": 1}}, tags=["neutral"], required_traits=["Restless"]),
     _event("alert_caught_danger", "Your quick awareness helped you avoid a small accident.", life_stages=["Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"health": 1}}, tags=["positive"], required_traits=["Alert"]),
 
     # Young-adult-specific events (Age 18-24)
@@ -112,7 +112,7 @@ HUMAN_MONTHLY_EVENTS = [
     _event("young_adult_unexpected_fee", "An unexpected small fee forces you to watch your spending more closely.", life_stages=["Young Adult"], outcome={"stat_changes": {"money": -1}}, tags=["negative", "young_adult"]),
     _event("young_adult_missed_bus", "A badly timed delay throws off your whole day.", life_stages=["Young Adult", "Adult"], outcome={"stat_changes": {"happiness": -1}}, tags=["negative"]),
     _event("young_adult_clear_morning", "A clear morning makes the future feel a little more manageable.", life_stages=["Young Adult"], outcome={"stat_changes": {"happiness": 1}}, tags=["positive", "young_adult"]),
-    _event("young_adult_new_recipe", "You tried a new recipe and it turned out better than expected.", life_stages=["Young Adult", "Adult"], outcome={"stat_changes": {"health": 1, "creativity": 1}}, tags=["positive"]),
+    _event("young_adult_new_recipe", "You tried a new recipe and it turned out better than expected.", life_stages=["Young Adult", "Adult"], outcome={"stat_changes": {"health": 1, "imagination": 1}}, tags=["positive"]),
     _event("young_adult_bad_purchase", "You spent money on something that immediately felt unnecessary.", life_stages=["Young Adult"], outcome={"stat_changes": {"money": -1}}, tags=["negative", "young_adult"]),
     _event("young_adult_day_trip", "A small adventure breaks up the routine of the month.", life_stages=["Young Adult"], outcome={"stat_changes": {"happiness": 2}}, tags=["positive", "young_adult"]),
     _event("young_adult_called_family", "You called your {family_role} just to chat.", life_stages=["Young Adult", "Adult"], outcome={"stat_changes": {"happiness": 1}}, tags=["family"], family_context=True, family_roles=["mother", "father", "sibling"]),

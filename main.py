@@ -48,7 +48,7 @@ QUESTIONNAIRE_QUESTIONS = [
         "options": [
             {"text": "Try to find who it belongs to", "stat_changes": {"charisma": 6, "wisdom": 4}, "trait_suggest": "Gentle"},
             {"text": "Keep it - finders keepers", "stat_changes": {"willpower": 5, "looks": 3}},
-            {"text": "Look at it, put it back", "stat_changes": {"intelligence": 5, "creativity": 4}, "trait_suggest": "Curious"},
+            {"text": "Look at it, put it back", "stat_changes": {"intelligence": 5, "imagination": 4}, "trait_suggest": "Curious"},
             {"text": "Walk past it", "stat_changes": {"discipline": 4, "willpower": 3}},
         ],
     },
@@ -56,7 +56,7 @@ QUESTIONNAIRE_QUESTIONS = [
         "style": "spectrum",
         "text": "When plans suddenly change...",
         "options": [
-            {"text": "I get excited about what might happen instead", "stat_changes": {"creativity": 6, "happiness": 4}, "trait_suggest": "Cheerful"},
+            {"text": "I get excited about what might happen instead", "stat_changes": {"imagination": 6, "happiness": 4}, "trait_suggest": "Cheerful"},
             {"text": "I feel annoyed but go with it", "stat_changes": {"willpower": 5, "discipline": 4}, "trait_suggest": "Stubborn"},
             {"text": "I need a minute before I can deal with it", "stat_changes": {"wisdom": 5, "intelligence": 3}, "trait_suggest": "Calm"},
             {"text": "I just wish things stayed how they were", "stat_changes": {"discipline": 6, "health": 3}},
@@ -69,7 +69,7 @@ QUESTIONNAIRE_QUESTIONS = [
             {"text": "I jump in first and think later", "stat_changes": {"strength": 5, "willpower": 5}, "trait_suggest": "Bold"},
             {"text": "I watch first, then decide", "stat_changes": {"intelligence": 5, "wisdom": 4}, "trait_suggest": "Alert"},
             {"text": "I ask someone else what they think", "stat_changes": {"charisma": 6, "happiness": 3}},
-            {"text": "I overthink it until the moment passes", "stat_changes": {"intelligence": 6, "creativity": 3}, "trait_suggest": "Restless"},
+            {"text": "I overthink it until the moment passes", "stat_changes": {"intelligence": 6, "imagination": 3}, "trait_suggest": "Restless"},
         ],
     },
     {
@@ -79,7 +79,7 @@ QUESTIONNAIRE_QUESTIONS = [
             {"text": "I talk back like we have been friends for years", "stat_changes": {"charisma": 8, "happiness": 3}, "trait_suggest": "Cheerful"},
             {"text": "I smile and keep it short", "stat_changes": {"charisma": 4, "discipline": 4}},
             {"text": "I freeze up a little", "stat_changes": {"intelligence": 4, "wisdom": 3}, "trait_suggest": "Shy"},
-            {"text": "I pretend I did not hear them", "stat_changes": {"willpower": 5, "creativity": 3}},
+            {"text": "I pretend I did not hear them", "stat_changes": {"willpower": 5, "imagination": 3}},
         ],
     },
     {
@@ -96,9 +96,9 @@ QUESTIONNAIRE_QUESTIONS = [
         "style": "gut_pick",
         "text": "Pick the one that fits:",
         "options": [
-            {"text": "I have taken something apart just to see how it works", "stat_changes": {"intelligence": 7, "creativity": 4}, "trait_suggest": "Curious"},
+            {"text": "I have taken something apart just to see how it works", "stat_changes": {"intelligence": 7, "imagination": 4}, "trait_suggest": "Curious"},
             {"text": "I have never understood why people break things on purpose", "stat_changes": {"discipline": 5, "health": 4}, "trait_suggest": "Calm"},
-            {"text": "I would rather build something new than fix something old", "stat_changes": {"creativity": 7, "intelligence": 3}, "trait_suggest": "Restless"},
+            {"text": "I would rather build something new than fix something old", "stat_changes": {"imagination": 7, "intelligence": 3}, "trait_suggest": "Restless"},
             {"text": "I do not really care how things work as long as they do", "stat_changes": {"willpower": 5, "happiness": 3}},
         ],
     },
@@ -107,7 +107,7 @@ QUESTIONNAIRE_QUESTIONS = [
         "text": "You are given a set of rules you think are stupid.",
         "options": [
             {"text": "I follow them anyway", "stat_changes": {"discipline": 7, "willpower": 3}},
-            {"text": "I ignore the ones I disagree with", "stat_changes": {"willpower": 6, "creativity": 3}, "trait_suggest": "Stubborn"},
+            {"text": "I ignore the ones I disagree with", "stat_changes": {"willpower": 6, "imagination": 3}, "trait_suggest": "Stubborn"},
             {"text": "I try to change them", "stat_changes": {"charisma": 5, "intelligence": 4}, "trait_suggest": "Bold"},
             {"text": "I follow them while complaining the entire time", "stat_changes": {"happiness": -3, "willpower": 4}, "trait_suggest": "Fussy"},
         ],
@@ -119,7 +119,7 @@ QUESTIONNAIRE_QUESTIONS = [
             {"text": "Right now, no waiting", "stat_changes": {"willpower": 5, "strength": 4}, "trait_suggest": "Restless"},
             {"text": "Soon, but I can be patient", "stat_changes": {"discipline": 5, "happiness": 4}},
             {"text": "I will plan for it and get it eventually", "stat_changes": {"wisdom": 6, "discipline": 5}, "trait_suggest": "Calm"},
-            {"text": "I think about it so long I sometimes forget I wanted it", "stat_changes": {"creativity": 5, "intelligence": 4}},
+            {"text": "I think about it so long I sometimes forget I wanted it", "stat_changes": {"imagination": 5, "intelligence": 4}},
         ],
     },
     {
@@ -128,7 +128,7 @@ QUESTIONNAIRE_QUESTIONS = [
         "options": [
             {"text": "I say what I think, even if people do not want to hear it", "stat_changes": {"willpower": 7, "charisma": -2}, "trait_suggest": "Stubborn"},
             {"text": "I keep most of my real opinions to myself", "stat_changes": {"wisdom": 5, "discipline": 4}, "trait_suggest": "Shy"},
-            {"text": "I adjust what I say depending on who I am talking to", "stat_changes": {"charisma": 6, "creativity": 3}},
+            {"text": "I adjust what I say depending on who I am talking to", "stat_changes": {"charisma": 6, "imagination": 3}},
             {"text": "I do not really have strong opinions about most things", "stat_changes": {"happiness": 4, "health": 3}},
         ],
     },
@@ -139,7 +139,7 @@ QUESTIONNAIRE_QUESTIONS = [
             {"text": "Already doing it", "stat_changes": {"strength": 5, "willpower": 5, "health": -3}, "trait_suggest": "Bold"},
             {"text": "I think about it, then probably do it", "stat_changes": {"intelligence": 4, "willpower": 4}},
             {"text": "I laugh it off and say no", "stat_changes": {"wisdom": 5, "discipline": 4}, "trait_suggest": "Calm"},
-            {"text": "I dare them to do it first", "stat_changes": {"charisma": 5, "creativity": 4}, "trait_suggest": "Cheerful"},
+            {"text": "I dare them to do it first", "stat_changes": {"charisma": 5, "imagination": 4}, "trait_suggest": "Cheerful"},
         ],
     },
     {
@@ -148,7 +148,7 @@ QUESTIONNAIRE_QUESTIONS = [
         "options": [
             {"text": "Want to try again immediately", "stat_changes": {"willpower": 7, "strength": 4}, "trait_suggest": "Stubborn"},
             {"text": "Frustrated, but I get over it", "stat_changes": {"discipline": 5, "wisdom": 3}},
-            {"text": "Question whether it was worth trying", "stat_changes": {"intelligence": 5, "creativity": 3}},
+            {"text": "Question whether it was worth trying", "stat_changes": {"intelligence": 5, "imagination": 3}},
             {"text": "Not care that much honestly", "stat_changes": {"happiness": 5, "looks": 3}},
         ],
     },
@@ -167,7 +167,7 @@ QUESTIONNAIRE_QUESTIONS = [
         "text": "You have one free afternoon with nothing planned.",
         "options": [
             {"text": "I am already outside doing something", "stat_changes": {"health": 5, "strength": 4}, "trait_suggest": "Restless"},
-            {"text": "I make something - draw, write, build, whatever", "stat_changes": {"creativity": 7, "intelligence": 3}, "trait_suggest": "Curious"},
+            {"text": "I make something - draw, write, build, whatever", "stat_changes": {"imagination": 7, "intelligence": 3}, "trait_suggest": "Curious"},
             {"text": "I find someone to hang out with", "stat_changes": {"charisma": 6, "happiness": 4}, "trait_suggest": "Cheerful"},
             {"text": "I sit somewhere quiet and do absolutely nothing", "stat_changes": {"wisdom": 5, "happiness": 4}, "trait_suggest": "Calm"},
         ],
@@ -179,7 +179,7 @@ QUESTIONNAIRE_QUESTIONS = [
             {"text": "More than I would ever admit", "stat_changes": {"looks": 8, "discipline": 3}, "trait_suggest": "Fussy"},
             {"text": "Enough to make an effort most days", "stat_changes": {"looks": 5, "charisma": 3}},
             {"text": "Only when it matters", "stat_changes": {"wisdom": 4, "willpower": 3}},
-            {"text": "Genuinely not that much", "stat_changes": {"happiness": 4, "creativity": 3}},
+            {"text": "Genuinely not that much", "stat_changes": {"happiness": 4, "imagination": 3}},
         ],
     },
     {
@@ -188,7 +188,7 @@ QUESTIONNAIRE_QUESTIONS = [
         "options": [
             {"text": "Right, and I trust it completely", "stat_changes": {"willpower": 7, "wisdom": 4}, "trait_suggest": "Bold"},
             {"text": "Right, but I double check anyway", "stat_changes": {"intelligence": 6, "wisdom": 4}, "trait_suggest": "Alert"},
-            {"text": "Hit or miss honestly", "stat_changes": {"creativity": 4, "happiness": 3}},
+            {"text": "Hit or miss honestly", "stat_changes": {"imagination": 4, "happiness": 3}},
             {"text": "Something I mostly ignore", "stat_changes": {"discipline": 6, "intelligence": 3}},
         ],
     },
@@ -209,8 +209,10 @@ CREATION_STAT_ORDER = [
     "intelligence",
     "strength",
     "charisma",
-    "creativity",
+    "imagination",
+    "memory",
     "wisdom",
+    "stress",
     "discipline",
     "willpower",
     "looks",
@@ -222,13 +224,44 @@ CREATION_STAT_LABELS = {
     "intelligence": "Intelligence",
     "strength": "Strength",
     "charisma": "Charisma",
-    "creativity": "Creativity",
+    "imagination": "Imagination",
+    "memory": "Memory",
     "wisdom": "Wisdom",
+    "stress": "Stress",
     "discipline": "Discipline",
     "willpower": "Willpower",
     "looks": "Looks",
     "fertility": "Fertility",
 }
+
+
+def normalize_creation_stats(stats):
+    """Aligns creation and loaded stat blocks with the current stat model."""
+    source_stats = dict(stats)
+    normalized_stats = {}
+    for stat_name in CREATION_STAT_ORDER:
+        if stat_name == "imagination":
+            if stat_name in source_stats:
+                normalized_stats[stat_name] = source_stats[stat_name]
+            else:
+                normalized_stats[stat_name] = next(
+                    (
+                        stat_value
+                        for legacy_name, stat_value in source_stats.items()
+                        if legacy_name not in CREATION_STAT_LABELS
+                    ),
+                    50,
+                )
+            continue
+
+        default_value = 10 if stat_name == "stress" else 50
+        normalized_stats[stat_name] = source_stats.get(stat_name, default_value)
+
+    if "memory" not in source_stats:
+        normalized_stats["memory"] = random.randint(40, 70)
+    if "stress" not in source_stats:
+        normalized_stats["stress"] = random.randint(5, 20)
+    return normalized_stats
 GENDER_IDENTITY_OPTIONS = ["Male", "Female", "Non-binary", "Agender", "Genderfluid", "Other"]
 SEXUALITY_OPTION_LABELS = [
     ("Opposite gender (Heterosexual)", "Heterosexual"),
@@ -816,7 +849,7 @@ def build_randomized_starting_stats():
     """Builds one startup stat block using the same Human randomization ranges."""
     actor = Human("Human", "Temp", "", "Female", "Female", 1, 1)
     actor.randomize_starting_statistics()
-    return dict(actor.stats)
+    return normalize_creation_stats(actor.stats)
 
 
 def _get_social_tier_label(closeness):
@@ -1717,12 +1750,27 @@ class ActoraTUI:
     def get_snapshot_data(self):
         focused_actor_id = self.get_focused_actor_id()
         focused_actor = self.world.get_actor(focused_actor_id)
-        return focused_actor.get_snapshot_data(
+        snapshot_data = focused_actor.get_snapshot_data(
             self.world.current_year,
             self.world.current_month,
             self.world,
             focused_actor_id,
         )
+        normalized_actor_stats = normalize_creation_stats(focused_actor.stats)
+        secondary_statistics = {
+            "strength": normalized_actor_stats["strength"],
+            "charisma": normalized_actor_stats["charisma"],
+            "imagination": normalized_actor_stats["imagination"],
+            "memory": normalized_actor_stats["memory"],
+            "wisdom": normalized_actor_stats["wisdom"],
+            "stress": normalized_actor_stats["stress"],
+            "discipline": normalized_actor_stats["discipline"],
+            "willpower": normalized_actor_stats["willpower"],
+            "looks": normalized_actor_stats["looks"],
+            "fertility": normalized_actor_stats["fertility"],
+        }
+        snapshot_data["secondary_statistics"] = secondary_statistics
+        return snapshot_data
 
     def sync_focus_state(self):
         """Applies shell-level dead-focus flow selection before rendering."""
@@ -2559,8 +2607,9 @@ class ActoraTUI:
             "",
             "Secondary Stats",
             format_stat_pair("Strength", secondary_statistics["strength"], "Charisma", secondary_statistics["charisma"]),
-            format_stat_pair("Creativity", secondary_statistics["creativity"], "Wisdom", secondary_statistics["wisdom"]),
-            format_stat_pair("Discipline", secondary_statistics["discipline"], "Willpower", secondary_statistics["willpower"]),
+            format_stat_pair("Imagination", secondary_statistics["imagination"], "Memory", secondary_statistics["memory"]),
+            format_stat_pair("Wisdom", secondary_statistics["wisdom"], "Discipline", secondary_statistics["discipline"]),
+            format_stat_pair("Willpower", secondary_statistics["willpower"], "Stress", secondary_statistics["stress"]),
             format_stat_pair("Looks", secondary_statistics["looks"], "Fertility", secondary_statistics["fertility"]),
             "",
             "Location",
@@ -4106,7 +4155,7 @@ def setup_initial_world_from_character(character_data):
         birth_record_tags=["family", "bootstrap"],
         birth_record_metadata={"is_startup_player": True},
     )
-    player.stats = dict(character_data["stats"])
+    player.stats = normalize_creation_stats(character_data["stats"])
     player.appearance = dict(character_data["appearance"])
     player.traits = list(character_data["traits"])
     player.money = 0

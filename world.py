@@ -4,6 +4,47 @@ from uuid import uuid4
 
 from events import get_human_monthly_event_from_lifecycle
 from human import Human
+
+
+_CANONICAL_HUMAN_STAT_KEYS = {
+    "health",
+    "happiness",
+    "intelligence",
+    "strength",
+    "charisma",
+    "imagination",
+    "memory",
+    "wisdom",
+    "stress",
+    "discipline",
+    "willpower",
+    "looks",
+    "fertility",
+}
+
+
+def _extract_imagination_value(stats):
+    """Finds the imagination-equivalent value from a human stat block."""
+    if "imagination" in stats:
+        return stats["imagination"]
+    for stat_name, stat_value in stats.items():
+        if stat_name not in _CANONICAL_HUMAN_STAT_KEYS:
+            return stat_value
+    return 50
+
+
+def _normalize_human_stats(stats):
+    """Aligns human stat keys with the shell-owned stat model."""
+    source_stats = dict(stats)
+    normalized_stats = {
+        stat_name: stat_value
+        for stat_name, stat_value in source_stats.items()
+        if stat_name in _CANONICAL_HUMAN_STAT_KEYS
+    }
+    normalized_stats["imagination"] = _extract_imagination_value(source_stats)
+    normalized_stats.setdefault("memory", random.randint(40, 70))
+    normalized_stats.setdefault("stress", random.randint(5, 20))
+    return normalized_stats
 from identity import (
     CULTURE_NAME_POOLS,
     FALLBACK_LAST_NAME_POOL,
@@ -276,6 +317,7 @@ class World:
         )
         if randomize_stats:
             actor.randomize_starting_statistics()
+        actor.stats = _normalize_human_stats(actor.stats)
         self.add_actor(actor_id, actor)
         self.update_actor_spatial_identity(
             actor_id,
@@ -984,13 +1026,16 @@ class World:
             "intelligence": random.randint(35, 75),
             "strength": random.randint(30, 70),
             "charisma": random.randint(30, 70),
-            "creativity": random.randint(30, 70),
+            "imagination": random.randint(30, 70),
+            "memory": random.randint(40, 70),
+            "stress": random.randint(5, 20),
             "wisdom": random.randint(20, 60),
             "discipline": random.randint(20, 60),
             "willpower": random.randint(30, 70),
             "looks": random.randint(30, 80),
             "fertility": random.randint(40, 90),
         })
+        npc.stats = _normalize_human_stats(npc.stats)
         npc.traits = random.sample(self._NPC_TRAIT_POOL, 3)
 
         return npc_actor_id, npc
