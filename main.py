@@ -3334,16 +3334,16 @@ class ActoraTUI:
             loc_str = health = money_str = ""
 
         left_lines = [
+            chrome["date_text"],
             chrome["subtitle"],
             chrome["title"],
-            "",
             "",
         ]
         right_lines = [
             loc_str,
-            chrome["date_text"],
             f"Health: {health}",
             money_str,
+            "",
         ]
 
         panel_w = max(1, (width - logo_w - 4) // 2)
