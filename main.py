@@ -3308,39 +3308,65 @@ class ActoraTUI:
         focused_actor = self.get_focused_actor()
         focused_actor_name = focused_actor.get_full_name() if focused_actor is not None else "Unknown"
         chrome = build_screen_chrome(self.screen_name, self.world, focused_actor_name)
-        content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
         full_hline = "═" * max(0, width - 1)
+        divider = "║"
 
-        # Row 0: ══ Actora ══ (full width)
-        stdscr.addnstr(0, 0, build_centered_rule("Actora", width - 1), width - 1, curses.A_BOLD)
-        # Row 1: Screen │ Actor │ Date (content width)
-        subtitle_text = center_text(
-            f"{chrome['title']}  │  {chrome['subtitle']}  │  {chrome['date_text']}",
-            content_width,
-        )
-        stdscr.addnstr(1, content_left, subtitle_text, content_width)
-        # Row 2: separator (full width)
-        stdscr.addnstr(2, 0, full_hline, width - 1, curses.A_BOLD)
-        # Row 3: state line — location left, health+money right
-        snapshot = self.get_snapshot_data() if hasattr(self, '_cached_snapshot') else None
+        LOGO = [
+            r"           __               ",
+            r" ___ _____/ /____  _______ _",
+            r"/ _ `/ __/ __/ _ \/ __/ _ `/",
+            r"\_,_/\__/\__/\___/_/  \_,_/ ",
+        ]
+        logo_w = max(len(l) for l in LOGO) + 4  # padding each side
+
+        # Left panel content
         try:
             snapshot = self.get_snapshot_data()
             loc = snapshot.get("location", {})
             stats = snapshot.get("statistics", {})
             city = loc.get("current_place_name", "")
             country = loc.get("jurisdiction_place_name", "")
-            location_str = f"  {city}, {country}" if city and country else f"  {city or country or 'Unknown'}"
+            loc_str = f"{city}, {country}" if city and country else city or country or ""
             health = stats.get("health", 0)
             money = stats.get("money", 0)
             money_str = f"${money:,.0f}" if isinstance(money, (int, float)) else str(money)
-            right_str = f"Health: {health}   {money_str}  "
-            left_part = location_str.ljust(content_width - len(right_str))
-            state_line = (left_part + right_str)[:content_width]
         except Exception:
-            state_line = ""
-        stdscr.addnstr(3, content_left, state_line, content_width)
-        # Row 4: separator (full width)
-        stdscr.addnstr(4, 0, full_hline, width - 1, curses.A_BOLD)
+            loc_str = health = money_str = ""
+
+        left_lines = [
+            chrome["date_text"],
+            chrome["subtitle"],
+            chrome["title"],
+            "",
+        ]
+        right_lines = [
+            loc_str,
+            f"Health: {health}",
+            money_str,
+            "",
+        ]
+
+        panel_w = max(1, (width - logo_w - 4) // 2)
+
+        # Row 0: top separator
+        stdscr.addnstr(0, 0, full_hline, width - 1, curses.A_BOLD)
+
+        # Rows 1-4: logo + left/right panels
+        for i in range(4):
+            logo_line = LOGO[i] if i < len(LOGO) else ""
+            logo_padded = f"  {logo_line:<{logo_w - 2}}"
+            left_text = f"{left_lines[i]:>{panel_w - 1}} " if i < len(left_lines) else " " * panel_w
+            right_text = f" {right_lines[i]:<{panel_w - 1}}" if i < len(right_lines) else " " * panel_w
+            row_text = f"{left_text}{divider}{logo_padded}{divider}{right_text}"
+            try:
+                stdscr.addnstr(i + 1, 0, row_text[:width - 1], width - 1)
+            except curses.error:
+                pass
+
+        # Row 5: bottom separator (becomes body boundary)
+        stdscr.addnstr(5, 0, full_hline, width - 1, curses.A_BOLD)
+        # State line handled inside render_header logo layout
+        pass  # state line folded into logo header
 
     def render_main(self, stdscr, height, width):
         snapshot_data = self.get_snapshot_data()
@@ -3419,8 +3445,8 @@ class ActoraTUI:
         lineage_entries = browser_state["entries"]
         selected_detail = browser_state["selected_detail"]
 
-        top = 7
-        body_height = height - 9
+        top = 9
+        body_height = height - 11
         content_left, content_width = get_content_bounds(width, max_width=112)
         left_width, right_left, right_width = split_centered_columns(content_left, content_width)
         filter_label = LINEAGE_FILTER_LABELS[browser_state["filter_mode"]]
@@ -3488,8 +3514,8 @@ class ActoraTUI:
         entries = browser_state["entries"]
         selected_detail = browser_state["selected_detail"]
 
-        top = 7
-        body_height = height - 9
+        top = 9
+        body_height = height - 11
         content_left, content_width = get_content_bounds(width, max_width=120)
 
         filter_col_width = 12
@@ -3575,8 +3601,8 @@ class ActoraTUI:
         draw_text_block(stdscr, top, detail_left, detail_width, body_height, right_lines)
 
     def render_history(self, stdscr, height, width):
-        top = 7
-        body_height = height - 9
+        top = 8
+        body_height = height - 10
         self._history_body_height = body_height
         content_left, content_width = get_content_bounds(width, max_width=104)
         self._history_content_width = content_width
@@ -3616,9 +3642,9 @@ class ActoraTUI:
         hist_label = "[ History ]" if self.browser_tab == "history" else "  History  "
         tab_bar = f"{rel_label}     │     {hist_label}"
         try:
-            stdscr.addnstr(5, content_left, center_text(tab_bar, content_width), content_width)
+            stdscr.addnstr(6, content_left, center_text(tab_bar, content_width), content_width)
             hline_char = getattr(curses, "ACS_HLINE", ord("-"))
-            stdscr.hline(6, content_left, hline_char, content_width)
+            stdscr.hline(7, content_left, hline_char, content_width)
         except curses.error:
             pass
 
