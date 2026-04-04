@@ -117,6 +117,27 @@ Major structural decisions. Immutable — never edit an entry. If a decision cha
 **Decision:** Profile accessible via [1] Menu → Profile. P key freed (not reassigned — Backspace became the universal Back key instead).
 **Alternatives rejected:** Keep P = Profile as standalone hotkey, P = Back.
 
+### DEC-018: Actions use a monthly time budget, not slot limits
+**Date:** 2026-04-04
+**Context:** Action quantity cap design. Slot-based limits (e.g. "2 actions per month") are arbitrary and don't model real life. Time is the real resource.
+**Decision:** Each character has a monthly free-time pool in hours: total hours − sleep hours − obligatory maintenance (eating, hygiene). Each action and sub-action has a specific time cost in hours. Players can only queue what fits in their remaining free time.
+Sleep hours vary by trait and later by condition/lifestyle. Example starting baseline: ~240hr/month sleep (8hr/night). Restless trait = less sleep = more free time. Later: sleep disorders, shift work, etc. affect this.
+Sub-actions carry individual time costs — a specific book has its own read time (eventually sourced from real data), a specific exercise session has its own duration.
+**Alternatives rejected:** Abstract slot system, discipline-gated slots.
+
+### DEC-019: Action sub-selections — each action has a sub-type with individual properties
+**Date:** 2026-04-04
+**Context:** Exercise, Read, Rest are categories, not actions. Each sub-type (running, math book, nap) has distinct outcomes and time costs.
+**Decision:** Actions with sub-types open a sub-selection UI on Enter. Each sub-type has: label, time cost, stat outcome. Exercise sub-types affect physical stats. Read sub-types affect knowledge stats (subject area = which stat). Rest sub-types affect recovery stats (nap vs music vs stare at wall).
+Future: real books get real read times from external data. Real workouts get real durations.
+**Alternatives rejected:** Single generic action with variable outcome, flat action list without sub-types.
+
+### DEC-020: Trait pool redesign — traits must be meaningful and non-weird
+**Date:** 2026-04-04
+**Context:** Original trait pool ("Fussy", etc.) was AI-generated without care. Traits should feel like real personality descriptors a player would actually pick.
+**Decision:** Replace the current trait pool with a clean redesigned set. Traits must: (1) be recognizable human personality words, (2) have actual gameplay effects (not just event eligibility flavor), (3) feel meaningful to pick. Fussy, Restless, Alert removed or renamed. New pool to be designed as a separate task before action system ships.
+**Alternatives rejected:** Keep current pool, add more AI-generated traits.
+
 ### DEC-017: Q/E available from any non-input screen
 **Date:** 2026-04-02
 **Context:** User doesn't want to navigate back to Life View just to advance time or skip. You should be able to advance/skip from Browser, Actions, Profile, future Education/Company views, etc.

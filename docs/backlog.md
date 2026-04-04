@@ -13,6 +13,11 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Now
 
+- **Trait pool redesign** — current pool (Fussy, Restless, Alert, etc.) was AI-generated. Redesign with meaningful real personality words that have actual gameplay effects. Do before action system ships.
+- **Action system first wave** — time-budget model (monthly free hours), sub-type selections per action (exercise type, book subject, rest type), individual time costs per sub-action. Social: Hang Out resolves with +5 closeness. Personal: Exercise, Read, Rest with sub-types. Do before Education.
+- **Action time budget** — derive monthly free hours from sleep baseline (240hr/month) minus maintenance. Restless trait modifier. Wire to action queue so you can't queue more than fits.
+
+
 
 ## Next
 

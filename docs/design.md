@@ -79,6 +79,13 @@ Each system uses this format:
 - Later: spiral side-quest chains.
 **Open questions:** Where do persistent open-ended opportunities live? Detail pane interaction if it becomes interactive?
 
+**Time budget design (DEC-018/019):**
+- Monthly free time = total hours − sleep hours (~240/month baseline) − obligatory maintenance
+- Traits affect sleep hours (Restless = less sleep = more time)
+- Each action and sub-action has individual time cost
+- Queue rejects additions that exceed remaining free time
+- Future: real books get real read times from external data
+
 ---
 
 ### Stats — Contract & Intent
