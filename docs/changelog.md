@@ -6,6 +6,15 @@ updated: 2026-04-04
 
 # Actora Changelog
 
+## Version 0.48.1 (Patch) - 2026-04-04
+- **Logo panel header:**
+    - ASCII logo centered in header with left and right info panels flanking it via `║` dividers
+    - Left panel (right-aligned): date top, actor name, screen name
+    - Right panel: location top, health, money
+    - Placeholder logo: "actora" in script-style ASCII font (to be replaced with proper logo design)
+    - Tab bar overlap fixed (moved to correct row after header)
+- **Bugs fixed in shell v2:** browser tab bar row collision resolved
+
 ## Version 0.48.0 (Minor) - 2026-04-04
 - **Shell v2 — new balanced header/footer structure:**
     - Row 0: `══ Actora ══` title (full terminal width)
