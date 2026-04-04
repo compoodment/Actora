@@ -117,6 +117,11 @@ Major structural decisions. Immutable — never edit an entry. If a decision cha
 **Decision:** Profile accessible via [1] Menu → Profile. P key freed (not reassigned — Backspace became the universal Back key instead).
 **Alternatives rejected:** Keep P = Profile as standalone hotkey, P = Back.
 
+### DEC-017: Q/E available from any non-input screen
+**Date:** 2026-04-02
+**Context:** User doesn't want to navigate back to Life View just to advance time or skip. You should be able to advance/skip from Browser, Actions, Profile, future Education/Company views, etc.
+**Decision:** Q and E work from any screen that isn't actively consuming input. The game should not require returning to Life View to perform time actions.
+**Alternatives rejected:** Q/E only on Life View.
 ### DEC-018: Actions use a monthly time budget, not slot limits
 **Date:** 2026-04-04
 **Context:** Action quantity cap design. Slot-based limits (e.g. "2 actions per month") are arbitrary and don't model real life. Time is the real resource.
@@ -187,8 +192,3 @@ Future: real books get actual read times from external data lookup.
 **Why both number and label:** Number = precise feedback. Label = human meaning + gameplay consequence signal. Neither alone sufficient.
 **Alternatives rejected:** Label only (loses precision), number only (loses human meaning), merging Mood into Happiness (they operate on different timescales).
 
-### DEC-017: Q/E available from any non-input screen
-**Date:** 2026-04-02
-**Context:** User doesn't want to navigate back to Life View just to advance time or skip. You should be able to advance/skip from Browser, Actions, Profile, future Education/Company views, etc.
-**Decision:** Q and E work from any screen that isn't actively consuming input. The game should not require returning to Life View to perform time actions.
-**Alternatives rejected:** Q/E only on Life View.
