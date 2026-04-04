@@ -140,6 +140,12 @@ Future: real books get actual read times from external data lookup.
 **Alternatives rejected:** Keep current pool, add more AI-generated traits.
 
 
+### DEC-026: Skip time limit — 10 years for humans, extendable for passive commitments
+**Date:** 2026-04-04
+**Context:** Unlimited skip time exists for development convenience. In real gameplay, skipping decades feels disconnected from the character's life. But some situations (jail, coma, isolation) might warrant longer passive runs.
+**Decision:** Cap skip time at ~10 years for normal human gameplay. Extend the cap contextually for long passive commitments (e.g. jail sentence, coma, prolonged isolation). Passive simulation still runs month-by-month during any skip — needs, events, and stat changes all accumulate. The cap prevents players from accidentally bypassing major life content.
+**Alternatives rejected:** No cap (too disconnected), fixed cap regardless of context (penalizes edge cases).
+
 ### DEC-021: Stat list redesign — 13 stats replacing 11
 **Date:** 2026-04-04
 **Context:** Original 11-stat list had Creativity (vague scope), no cognitive retention stat, no stress mechanism. Age curves not designed.

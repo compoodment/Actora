@@ -108,7 +108,7 @@ Each system uses this format:
 | Wisdom | Nothing | Decision quality events, elder life outcomes, mentoring | Grows lifelong, no peak |
 | Discipline | Nothing | Education/work consistency, action reliability | Driven by lifestyle |
 | Willpower | Nothing | Resistance to negative forces, addiction resistance | Driven by lifestyle |
-| Looks | Nothing | Social first impressions, certain relationship events | Peaks young adulthood, natural decline from 40s |
+| Looks | Nothing | Social first impressions, certain relationship events | Peaks young adulthood, natural decline from 40s. Note: Looks curve is more culturally/contextually variable than physical stats — grooming, style, and confidence modify where a character lands on the curve. |
 | Fertility | Nothing | Chance of conception — player has agency over this via health/lifestyle | Age-dependent, peaks 20-35 |
 
 **Why these stats:**
@@ -161,8 +161,8 @@ Driven, Chill, Curious, Social, Disciplined, Impulsive, Empathetic, Resilient, I
 
 **Design (interview 2026-04-04):**
 - Skills are practiced competencies that grow through doing. They start at 0 (or low based on life stage/context) and grow via: actions, events, relationships, and passive time in environments.
-- Player-facing label: **Talents** (feels more human than "Skills"). Internal code: `skills`.
-- **Talents** (distinct from Skills): things absorbed passively from context — household environment, genetics, early childhood. Not practiced, inherited or absorbed. Future system — tracked with a `source` field on the skill record to distinguish from practiced skills.
+- Player-facing label: **Talents** (feels more human than "Skills"). Internal code: `skills`. Note: "Talents" serves two meanings — (1) the UI label for the whole skills section in Profile, and (2) a future sub-concept for passively/genetically inherited abilities (distinct from practiced skills).
+- **Talents (inherited, future):** things absorbed passively from context — household environment, genetics, early childhood. Not practiced, inherited or absorbed. Future system — tracked with a `source` field on the skill record to distinguish from practiced skills.
 - Skills discovered/unlocked through: (1) actions (reading math → Mathematics skill appears), (2) events (witness crime → Criminal knowledge), (3) relationships (friend teaches you something). Future: passive environment exposure over time.
 - Trait gives both: a starting bonus to related skills AND a faster growth rate when practising. Both, not either.
 - Starting skill values: age-based baseline + trait modifier. A 16-year-old has basic cooking from household context. A child of wealthy neglectful parents may have low practical skills but high exposure to wealth behaviors.

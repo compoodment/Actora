@@ -50,4 +50,6 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 - **Simulation depth per actor** — high-detail simulation for all tracked actors every turn is a performance concern at scale. Revisit when actor count grows. Connects to the layered simulation depth principle in identity.md. *(2026-04-02)*
 - **Cancel / reorder queued actions** — Actions screen currently shows queued actions as display-only. Future: allow cancelling or reordering. *(2026-04-04)*
 - **Heartbeat routing split** — optionally split Actora-specific heartbeat beats from general infra/memory hygiene beats. Could use a separate cron for infra checks. Low priority. *(2026-04-04)*
+- **Skip time limit** — cap normal human skip at ~10 years. Contextual extension for passive commitments (jail, coma). Passive simulation still runs during skip. Currently unlimited for development. *(2026-04-04)*
+- **Event audit** — all existing passive events were auto-generated and never reviewed. Need pass to: verify stat effects, balance passive simulation outcomes for characters who never interact, ensure "ghost player" life quality is realistic. Do before action system is considered complete. *(2026-04-04)*
 - **Inventory / objects** — not yet designed. Protected future concern per roadmap (Property/Household/Inventory layer). Needs a design interview when dependencies are ready. *(2026-04-02)*
