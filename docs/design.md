@@ -264,12 +264,15 @@ Current priority: get the TUI working well before thinking about visual UI.
 
 The terminal is a temporary shell — the simulation core must remain UI-agnostic. Future presentation forms (panel UI, map views, mixed micro-to-macro) should be possible without core rewrites.
 
-Current TUI shell direction:
-- favor a compact stacked shell header for major in-game screens rather than a single overloaded command bar
-- keep shell identity visible (Actora, actor, screen, simulation progression)
-- keep compact actor/world state visible near the top (location/date context, health, money)
-- use centered, menu-like primary commands and show lower control hints only when relevant to the current surface
-- prefer visible mockups/drafts before implementing meaningful shell/layout changes so visual flaws are caught before patching the real UI
+Current TUI shell structure (v2 implemented v0.48.0, logo panel layout in progress):
+- Row 0: `═══` separator (full width)
+- Rows 1-4: three-panel logo row — left panel (date/actor/screen, right-aligned), center (ASCII logo), right panel (location/health/money)
+- Row 5: `═══` separator (full width)
+- Body rows (screen content)
+- Row N-2: `═══` separator (full width)
+- Row N-1: primary commands footer (centered, screen-specific)
+- Logo header pending final logo design — currently using word "actora" in ASCII script font as placeholder
+- Prefer visible mockups/drafts before implementing meaningful shell/layout changes
 
 ---
 
