@@ -1,7 +1,7 @@
 ---
 title: Rules
 tags: [core, reference, stable]
-updated: 2026-04-02
+updated: 2026-04-04
 ---
 
 # Actora Rules
@@ -53,6 +53,8 @@ All project constraints in one place. If it says "don't" or "must", it lives her
 7. Don't mix unrelated cleanup into one task
 8. Don't assume claimed completion means real completion — VPS truth is the final check
 9. **When verifying a control/hotkey change: check that old keys are GONE, not just that new keys work. Both directions must be verified. Partial re-wiring is how broken state accumulates.**
+10. **Playtest workflow: present findings first, apply only after explicit approval.** Do not apply fixes mid-playtest without reporting findings and getting a go-ahead first.
+11. **TUI overlay verification: when checking if a popup is visible in tmux, grep for the popup box content — never the background screen header.** The Life View header is always visible under any overlay. Checking "Life View • ..." as evidence a popup closed is wrong.
 
 ## Worker output review checklist
 

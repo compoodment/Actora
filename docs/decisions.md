@@ -1,7 +1,7 @@
 ---
 title: Decisions
 tags: [core, decisions, stable]
-updated: 2026-04-02
+updated: 2026-04-04
 ---
 
 # Actora Decisions
@@ -33,13 +33,13 @@ Major structural decisions. Immutable — never edit an entry. If a decision cha
 **Decision:** Only `main.py` knows about curses. World, Human, events, identity are pure simulation.
 **Alternatives rejected:** Curses calls scattered through simulation code.
 
-### DEC-003: Options popup replaces standalone Quit key
+### DEC-003: Options popup replaces standalone Quit key *(superseded by DEC-015)*
 **Date:** 2026-04-01
 **Context:** Shell redesign interview — Quit as a top-level key wastes a primary command slot.
 **Decision:** `[4]` = Options popup containing quit game + misc/system actions. Not a standalone quit key.
 **Alternatives rejected:** `Q` as permanent top-level quit, separate Options screen.
 
-### DEC-004: Menu as primary navigation hub
+### DEC-004: Menu as primary navigation hub *(superseded by DEC-016)*
 **Date:** 2026-04-01
 **Context:** Shell interview — too many letter keys for navigation creates mnemonic clutter.
 **Decision:** `[3]` = Menu containing Browser / Actions / Profile. Old letter keys (`L`, `H`, `T`, `P`) become legacy once Menu is real.

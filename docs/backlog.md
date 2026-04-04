@@ -1,7 +1,7 @@
 ---
 title: Backlog
 tags: [planning, tracking, wip]
-updated: 2026-04-03
+updated: 2026-04-04
 through: v0.47.1
 ---
 
@@ -18,7 +18,6 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 - **Resume shell experiment** — implement chosen balanced shell direction against the locked control contract
 - **main.py extraction** — identify first sane decomposition seam after shell settles (shell/browser/actions rendering is the likely first candidate)
-- **Stable doc sync** — verify all docs match current implementation after shell work lands
 - **Action system implementation** — narrow first-wave: social + self-improvement categories (foundation screen now exists)
 
 ## Later

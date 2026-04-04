@@ -1,7 +1,7 @@
 ---
 title: Design
 tags: [core, reference, stable]
-updated: 2026-04-02
+updated: 2026-04-04
 ---
 
 # Actora Design
@@ -65,8 +65,8 @@ Each system uses this format:
 ---
 
 ### Actions
-**Status:** In progress (foundation only)
-**Current truth:** Actions screen exists with "Spend time with friend" social action. Categories/Actions/Details three-column layout in worktree experiment. Action queues and resolves on Q (next advance). No categories, no self-improvement actions yet.
+**Status:** In progress (foundation)
+**Current truth:** Actions screen implemented with three-column Categories/Actions/Details layout. Social category exists with "Hang Out" action (sub-selects from friend list). Action queues and resolves on Q (next advance). No self-improvement or other categories yet.
 **Intent:**
 - Two time-shape types: immediate/negligible and month-consuming. Long-running states (education, job, travel) are commitments, not queue items.
 - Categorized: social, personal development, career, criminal, political, etc.

@@ -1,7 +1,7 @@
 ---
 title: Screens
 tags: [implementation, tui, reference]
-updated: 2026-04-03
+updated: 2026-04-04
 ---
 
 # Actora Screens
@@ -161,7 +161,6 @@ All screens are reachable from Life View. Nested screens return to their parent 
 - R: randomize (Stats creation screen only)
 - 0-9: custom numeric input (Skip Time)
 - Tab / →: switch focus between panels (Browser)
-- Esc: back (mirrors B in wizard/questionnaire contexts)
 
 **Note:**
 - [Q] advances month, [E] opens Skip Time — both available from any non-input screen.

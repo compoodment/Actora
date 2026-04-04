@@ -1,15 +1,15 @@
 ---
 title: Codebase
 tags: [implementation, reference, stable]
-updated: 2026-04-03
+updated: 2026-04-04
 through: v0.47.1
-verified: 2026-04-03
+verified: 2026-04-04
 ---
 
 # Actora Codebase
 
 Current repo implementation truth. What the code looks like right now.
-**Last verified against actual code:** 2026-04-03
+**Last verified against actual code:** 2026-04-04
 
 **Version:** 0.45.0+
 **Last Updated:** 2026-04-02
@@ -26,7 +26,7 @@ It is intended to support safe patching, review, and manual verification, alongs
 ## 2. Current File Structure
 
     ./
-    ├── main.py          (3857 lines - TUI, creation wizard, shell, rendering)
+    ├── main.py          (4076 lines - TUI, creation wizard, shell, rendering)
     ├── world.py          (2090 lines - simulation state, links, places, records, social links, mortality, advancement)
     ├── identity.py       (299 lines - name pools, culture-aware identity generation)
     ├── human.py          (289 lines - Human model, lifecycle, spatial, snapshot)
@@ -414,7 +414,7 @@ Current shell-level functions:
 - `run_game_tui(...)` - curses wrapper entry point for ordinary play
 - `start_game()` - top-level orchestration (delegates to creation wizard and TUI)
 
-Current startup flow is human-only. `start_game()` runs the curses-based `CreationWizard`, builds the world through `setup_initial_world_from_character(...)`, and only then hands control to the ordinary-play shell. Interactive CLI input still exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Startup parent ages now vary within a narrow adult range, some worlds now generate older siblings before the player is born through `World.bootstrap_older_siblings_for_newborn(...)`, and only-child worlds still remain possible. Once startup completes, ordinary play now lives inside a curses shell: the split `Life View` keeps identity/location/primary stats/relationships (including social links as `name · tier`) on the left, keeps an accumulating live event feed on the right, opens a dedicated full-detail `Profile` screen with `P`, allows simple left-side/profile/history vertical scrolling under terminal-height pressure, opens the tabbed Browser with `L` (Relationships tab) or `H` (History tab), opens the dedicated Actions screen with `T`, still preserves the dead-focus interrupt before any continuation choices are shown, and now allows shell-owned popup choices to interrupt long skips for major identity-emergence moments during adolescence and meeting events for social link creation.
+Current startup flow is human-only. `start_game()` runs the curses-based `CreationWizard`, builds the world through `setup_initial_world_from_character(...)`, and only then hands control to the ordinary-play shell. Interactive CLI input still exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Startup parent ages now vary within a narrow adult range, some worlds now generate older siblings before the player is born through `World.bootstrap_older_siblings_for_newborn(...)`, and only-child worlds still remain possible. Once startup completes, ordinary play now lives inside a curses shell: the split `Life View` keeps identity/location/primary stats/relationships (including social links as `name · tier`) on the left, keeps an accumulating live event feed on the right, opens a dedicated full-detail `Profile` screen via Menu, allows simple left-side/profile/history vertical scrolling under terminal-height pressure, opens the tabbed Browser via `[1]` Menu (Relationships tab or History tab), opens the dedicated Actions screen via `[1]` Menu, still preserves the dead-focus interrupt before any continuation choices are shown, and now allows shell-owned popup choices to interrupt long skips for major identity-emergence moments during adolescence and meeting events for social link creation.
 
 ### `identity.py`
 Responsible for:
@@ -548,7 +548,7 @@ This function does not perform terminal input, output, or presentation formattin
 ### Character Creation
 Current player creation includes:
 - a curses-based `CreationWizard` with Identity, Location, Appearance, and Creation Mode, then either a questionnaire branch (`Questionnaire`, `Confirm`) or a manual branch (`Stats`, `Traits`, `Confirm`)
-- Identity step with required first name, optional last name, and sex selection (`Male`, `Female`, `Intersex`)
+- Identity step with required first name and last name, and sex selection (`Male`, `Female`, `Intersex`)
 - Location step with country selection first, then city selection within the chosen country; the selected `country_id` / `city_id` are stored in the startup payload
 - gender defaults to match sex and is deferred to puberty emergence during play
 - Appearance step with eye color, hair color, and skin tone; each appearance field supports `Other`, which requires a custom free-text value before continuing
@@ -556,8 +556,8 @@ Current player creation includes:
 - Questionnaire branch with 16 one-at-a-time prompts that derive startup stats and the final 3 traits automatically
 - Manual branch with a Stats step for 0-100 adjustment across all 11 stats (`health`, `happiness`, `intelligence`, `strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`) plus `[R]` to randomize all startup stats
 - Manual Traits step requiring exactly 3 traits from `Curious`, `Calm`, `Fussy`, `Bold`, `Shy`, `Cheerful`, `Stubborn`, `Gentle`, `Restless`, `Alert`
-- Confirm step showing the full character summary, with `Enter` to start the game and `B` to go back
-- current wizard controls are step-specific but centered on `Space` to select/toggle, `Enter` to proceed, `B` / `Backspace` to go back, `↑↓` to navigate, and `←→` to adjust stats
+- Confirm step showing the full character summary, with `Enter` to start the game and `Backspace` to go back
+- current wizard controls are step-specific: `Enter` to proceed, `Backspace` to go back/delete, `↑↓` to navigate, `←→` to adjust stats, `Space` to toggle (multi-select traits only), `Esc` to quit from identity step, `R` to randomize stats
 
 ### Initial World Setup
 Current initialization behavior:
@@ -582,18 +582,15 @@ Current initialization behavior:
 
 ### Time Advancement
 Current advancement behavior:
-- `A` or `Enter` advances 1 month from the persistent actor screen
-- `S` opens a shell-owned skip-time screen from the persistent actor screen
+- `Q` advances 1 month from any non-input screen
+- `E` opens a shell-owned skip-time screen from any non-input screen
 - the skip-time screen currently offers clear preset jumps (`1`, `3`, `6`, `12`, `24`, `60` months) plus a small numeric custom-month input path
 - `Enter` in the skip-time screen advances using the typed custom month count when present; otherwise it advances using the currently highlighted preset
 - skip-time selection remains shell-owned and still delegates actual advancement to `World.simulate_advance_turn(...)`, so larger jumps continue to process month-by-month internally
 - if a pending identity-emergence choice interrupts a longer skip, remaining skipped months are resumed after the choice is resolved
-- `P` opens the dedicated full-detail Profile screen from Life View
-- `L` opens the tabbed Browser on the Relationships tab from the persistent actor screen
-- `H` opens the tabbed Browser on the History tab from the persistent actor screen
-- `T` opens the dedicated Actions screen from the persistent actor screen
-- `B` is the visible back hint in skip-time and lineage, while `Esc` remains a compatibility path
-- `Q` exits the run from the TUI
+- `[1]` opens Menu popup (Browser / Actions / Profile)
+- `Esc` opens Options popup (Quit Game / Help / Settings)
+- `Backspace` is the universal Back key on all navigation screens
 - ordinary play no longer requires typed `lineage`, `back`, or `quit` command words
 
 ### Events
