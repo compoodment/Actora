@@ -44,7 +44,9 @@ class Human:
             "intelligence": 50, # Default values
             "strength": 50,
             "charisma": 50,
-            "creativity": 50,
+            "imagination": 50,
+            "memory": 50,
+            "stress": 10,
             "wisdom": 50,
             "discipline": 50,
             "willpower": 50,
@@ -78,7 +80,9 @@ class Human:
         self.stats["intelligence"] = random.randint(45, 60) # Tighter range for human infant
         self.stats["strength"] = random.randint(30, 70)
         self.stats["charisma"] = random.randint(30, 70)
-        self.stats["creativity"] = random.randint(30, 70)
+        self.stats["imagination"] = random.randint(30, 70)
+        self.stats["memory"] = random.randint(40, 70)
+        self.stats["stress"] = random.randint(5, 20)
         self.stats["wisdom"] = random.randint(20, 50)
         self.stats["discipline"] = random.randint(20, 50)
         self.stats["willpower"] = random.randint(30, 70)
@@ -264,7 +268,9 @@ class Human:
             "secondary_statistics": {
                 "strength": self.stats["strength"],
                 "charisma": self.stats["charisma"],
-                "creativity": self.stats["creativity"],
+                "imagination": self.stats.get("imagination", 50),
+                "memory": self.stats.get("memory", 50),
+                "stress": self.stats.get("stress", 10),
                 "wisdom": self.stats["wisdom"],
                 "discipline": self.stats["discipline"],
                 "willpower": self.stats["willpower"],
