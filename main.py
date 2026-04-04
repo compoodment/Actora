@@ -3829,7 +3829,6 @@ class ActoraTUI:
         candidates = continuity_state["continuity_candidates"]
         content_left, content_width = get_content_bounds(width, max_width=96)
         lines = [
-            center_text(self.last_message, content_width),
             "",
         ]
         highlight_index = None
