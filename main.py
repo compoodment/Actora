@@ -3355,7 +3355,7 @@ class ActoraTUI:
         for i in range(4):
             logo_line = LOGO[i] if i < len(LOGO) else ""
             logo_padded = f"  {logo_line:<{logo_w - 2}}"
-            left_text = f" {left_lines[i]:<{panel_w - 1}}" if i < len(left_lines) else " " * panel_w
+            left_text = f"{left_lines[i]:>{panel_w - 1}} " if i < len(left_lines) else " " * panel_w
             right_text = f" {right_lines[i]:<{panel_w - 1}}" if i < len(right_lines) else " " * panel_w
             row_text = f"{left_text}{divider}{logo_padded}{divider}{right_text}"
             try:
