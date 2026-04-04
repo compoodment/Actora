@@ -53,15 +53,16 @@ Each system uses this format:
 ---
 
 ### Social Perception & Reputation
-**Status:** Not started
+**Status:** Not started (direction set 2026-04-04)
 **Current truth:** Nothing implemented.
 **Intent:**
-- Multi-axis, not a single karma score.
-- Axes: trustworthiness, danger level, status, charisma, notoriety, etc.
-- How people perceive you affects opportunities, who approaches you, what's available.
+- Start with one general reputation axis. Expand to multi-axis later (trustworthiness, danger level, status, notoriety, etc.).
+- Reputation is how the *world* perceives you — distinct from individual relationship closeness. Affects: who approaches you, what opportunities appear, what doors open or close.
 - Crime makes some people avoid you and others seek you out.
-- Presidential power changes how the world perceives you.
-**Open questions:** Full design deferred until actor/link/context foundations are mature.
+- Presidential power, public acts, social status all feed into reputation.
+- First implementation: single numeric reputation score per actor. Multi-axis is a later layer.
+**Why single axis first:** Building multi-axis reputation before the systems that feed it (crime, politics, career) exist is premature. One axis gives the scaffold; axes are added as each domain system ships.
+**Open questions:** Full mechanical design deferred until link/record/context foundations are mature.
 
 ---
 
@@ -216,6 +217,24 @@ Driven, Chill, Curious, Social, Disciplined, Impulsive, Empathetic, Resilient, I
 - Implement incrementally: add sections as systems land, don't rebuild the whole Profile at once.
 
 **Open questions:** Does Profile need its own navigation (Tab between sections), or is it always Enter→Bsp drill pattern?
+
+---
+
+### Physical Conditions
+**Status:** Not started (concept defined 2026-04-04)
+**Current truth:** Nothing implemented. Health stat exists but no condition states.
+
+**Design:**
+- Physical Conditions are temporary states that modify what actions are available and how effective they are.
+- Examples: Injured (physical actions unavailable or penalized), Sick (all action effectiveness reduced, health drains), Recovering (some actions unavailable, health gradually restoring), Exhausted (time budget reduced).
+- Conditions are not permanent — they resolve over time or through rest/treatment actions.
+- Conditions are distinct from the Health stat: Health is a long-term numeric measure; Conditions are short-term structural states.
+- A character can have multiple conditions simultaneously (e.g. Injured + Sick).
+- Conditions affect Profile display and should be visible to the player.
+- This system is the bridge between the Health stat and the action/time-budget system.
+
+**Build dependency:** Requires basic Health system and action effectiveness modifiers to be meaningful.
+**Open questions:** How long do conditions last? Are they event-triggered only, or can player actions cause them? Can conditions be ignored at a cost?
 
 ---
 

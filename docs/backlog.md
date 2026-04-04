@@ -51,5 +51,7 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 - **Cancel / reorder queued actions** — Actions screen currently shows queued actions as display-only. Future: allow cancelling or reordering. *(2026-04-04)*
 - **Heartbeat routing split** — optionally split Actora-specific heartbeat beats from general infra/memory hygiene beats. Could use a separate cron for infra checks. Low priority. *(2026-04-04)*
 - **Skip time limit** — cap normal human skip at ~10 years. Contextual extension for passive commitments (jail, coma). Passive simulation still runs during skip. Currently unlimited for development. *(2026-04-04)*
+- **Context-driven mood labels** — current design is fixed label set. Future: labels driven by context (why mood is low matters — "Grieving" vs "Burnout" at same numeric value). Add when event system is rich enough to supply context. *(2026-04-04)*
+- **Physical Conditions system** — temporary states (Injured, Sick, Recovering, Exhausted) that modify action availability and effectiveness. Bridges Health stat and action system. *(2026-04-04)*
 - **Event audit** — all existing passive events were auto-generated and never reviewed. Need pass to: verify stat effects, balance passive simulation outcomes for characters who never interact, ensure "ghost player" life quality is realistic. Do before action system is considered complete. *(2026-04-04)*
 - **Inventory / objects** — not yet designed. Protected future concern per roadmap (Property/Household/Inventory layer). Needs a design interview when dependencies are ready. *(2026-04-02)*
