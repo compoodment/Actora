@@ -1085,7 +1085,7 @@ class CreationWizard:
             if self.location_mode == "country":
                 footer_text = "[↑↓] Move   [Enter] Select Country   [Bsp] Back"
             else:
-                footer_text = "[↑↓] Move   [Enter] Continue   [Bsp] Back Country"
+                footer_text = "[↑↓] Move   [Enter] Select City   [Bsp] Back"
         elif self.step_index == 2:
             footer_text = "[↑↓] Move   [←→] Adjust   [Enter] Continue   [Bsp] Back"
         elif self.step_index == 3:
@@ -2753,6 +2753,10 @@ class ActoraTUI:
             self.history_scroll += 1
 
     def handle_profile_key(self, key):
+        if key == 27:
+            self.options_popup_active = True
+            self.options_selection = 0
+            return
         if key in (ord("q"), ord("Q")):
             now = time.monotonic()
             if now - self.last_advance_time < ADVANCE_THROTTLE_SECONDS:
@@ -2929,6 +2933,10 @@ class ActoraTUI:
             (self.browser_tab == "relationships" and self.rel_browser_search_active)
             or (self.browser_tab == "history" and self.history_search_active)
         )
+        if not search_active and key == 27:  # Esc → Options
+            self.options_popup_active = True
+            self.options_selection = 0
+            return
         if not search_active and key == 9:  # Tab key — switch tabs
             if self.browser_tab == "relationships":
                 self.browser_tab = "history"
@@ -2956,6 +2964,10 @@ class ActoraTUI:
 
     def handle_actions_key(self, key):
         """Handles keys for the Actions screen."""
+        if key == 27:
+            self.options_popup_active = True
+            self.options_selection = 0
+            return
         if key in (ord("q"), ord("Q")):
             now = time.monotonic()
             if now - self.last_advance_time < ADVANCE_THROTTLE_SECONDS:
@@ -3014,12 +3026,20 @@ class ActoraTUI:
 
 
     def handle_death_ack_key(self, key):
+        if key == 27:
+            self.options_popup_active = True
+            self.options_selection = 0
+            return
         if key in (ord("q"), ord("Q")):
             return  # Q blocked on death screen — use Esc for Options
         elif key in (curses.KEY_ENTER, 10, 13):
             self.acknowledge_death()
 
     def handle_skip_time_key(self, key):
+        if key == 27:
+            self.options_popup_active = True
+            self.options_selection = 0
+            return
         # Q blocked during skip time — user is actively doing a time action
         if key in (ord("q"), ord("Q")):
             return  # do nothing
@@ -3040,6 +3060,10 @@ class ActoraTUI:
                 self.skip_custom_value += chr(key)
 
     def handle_continuation_key(self, key):
+        if key == 27:
+            self.options_popup_active = True
+            self.options_selection = 0
+            return
         continuity_state = self.get_continuity_state()
         candidates = continuity_state["continuity_candidates"]
         if key in (ord("q"), ord("Q")):
@@ -3061,6 +3085,10 @@ class ActoraTUI:
             self.open_continuation_detail()
 
     def handle_continuation_detail_key(self, key):
+        if key == 27:
+            self.options_popup_active = True
+            self.options_selection = 0
+            return
         if key in (ord("q"), ord("Q")):
             return  # Q blocked on continuation screen — use Esc for Options
         elif key in BACK_KEYS:
@@ -3142,18 +3170,18 @@ class ActoraTUI:
     def render_footer(self, stdscr, height, width):
         footer_hints = {
             "main": "[Q] Advance Month   [E] Skip Time  |  [1] Menu  |  [Esc] Options",
-            "profile": "[↑↓] Scroll   [Bsp] Back   [Q] Advance",
+            "profile": "[↑↓] Scroll   [Bsp] Back   [Q] Advance   [Esc] Options",
             "lineage": "[↑↓] Move   [A] All   [L] Living   [D] Dead   [/] Search   [Bsp] Back   [Q] Advance",
             "relationship_browser": "[↑↓] Filter/Move   [/] Search   [Tab/→] Switch   [Bsp/←] Back   [Q] Advance",
             "history": "[↑↓] Scroll   [/] Jump to Year   [Bsp] Back   [Q] Advance",
-            "browser": "[Tab] Switch Tab   [↑↓] Move   [/] Search   [Bsp] Back   [Q] Advance",
+            "browser": "[Tab] Switch Tab   [↑↓] Move   [/] Search   [Bsp] Back   [Q] Advance   [Esc] Options",
             "browser_rel_search": "Type search   [Enter] Confirm   [Esc] Cancel   [Q] Advance",
-            "actions": "[↑↓] Move   [←→] Focus   [Enter] Select   [Bsp] Back   [Q] Advance",
+            "actions": "[↑↓] Move   [←→] Focus   [Enter] Select   [Bsp] Back   [Q] Advance   [Esc] Options",
             "history_search": "Type year [0-9]   [Enter] Continue   [Esc] Cancel   [Q] Advance",
             "lineage_search": "Type search   [Enter] Continue   [Esc] Cancel   [Q] Advance",
-            "skip_time": "[↑↓] Move   [0-9] Custom   [Bksp] Erase   [Enter] Continue   [Bsp] Back",
-            "death_ack": "[Enter] Continue",
-            "continuation_detail": "[Enter] Continue   [Bsp] Back",
+            "skip_time": "[↑↓] Move   [0-9] Custom   [Bksp] Erase   [Enter] Continue   [Bsp] Back   [Esc] Options",
+            "death_ack": "[Enter] Continue   [Esc] Options",
+            "continuation_detail": "[Enter] Continue   [Bsp] Back   [Esc] Options",
         }
         if self.screen_name == "lineage" and self.lineage_search_active:
             footer_text = footer_hints["lineage_search"]
@@ -3166,14 +3194,14 @@ class ActoraTUI:
         elif self.screen_name == "continuation":
             continuity_state = self.get_continuity_state()
             if continuity_state["continuity_candidates"]:
-                footer_text = "[↑↓] Move   [Enter] Continue   [Bsp] Back"
+                footer_text = "[↑↓] Move   [Enter] Continue   [Bsp] Back   [Esc] Options"
             else:
-                footer_text = "[Bsp] Back"
+                footer_text = "[Bsp] Back   [Esc] Options"
         else:
             footer_text = footer_hints.get(self.screen_name, "")
         content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
-        hline_char = getattr(curses, "ACS_HLINE", ord("-"))
-        stdscr.hline(height - 2, content_left, hline_char, content_width)
+        full_hline = "═" * max(0, width - 1)
+        stdscr.addnstr(height - 2, 0, full_hline, width - 1, curses.A_BOLD)
         stdscr.addnstr(
             height - 1,
             content_left,
@@ -3281,21 +3309,44 @@ class ActoraTUI:
         focused_actor_name = focused_actor.get_full_name() if focused_actor is not None else "Unknown"
         chrome = build_screen_chrome(self.screen_name, self.world, focused_actor_name)
         content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
-        title_text = build_centered_rule("Actora", content_width)
+        full_hline = "═" * max(0, width - 1)
+
+        # Row 0: ══ Actora ══ (full width)
+        stdscr.addnstr(0, 0, build_centered_rule("Actora", width - 1), width - 1, curses.A_BOLD)
+        # Row 1: Screen │ Actor │ Date (content width)
         subtitle_text = center_text(
-            f"{chrome['title']} • {chrome['subtitle']} • {chrome['date_text']}",
+            f"{chrome['title']}  │  {chrome['subtitle']}  │  {chrome['date_text']}",
             content_width,
         )
-        bottom_rule = "═" * content_width
-        stdscr.addnstr(0, content_left, title_text, content_width, curses.A_BOLD)
         stdscr.addnstr(1, content_left, subtitle_text, content_width)
-        stdscr.addnstr(2, content_left, bottom_rule, content_width, curses.A_BOLD)
+        # Row 2: separator (full width)
+        stdscr.addnstr(2, 0, full_hline, width - 1, curses.A_BOLD)
+        # Row 3: state line — location left, health+money right
+        snapshot = self.get_snapshot_data() if hasattr(self, '_cached_snapshot') else None
+        try:
+            snapshot = self.get_snapshot_data()
+            loc = snapshot.get("location", {})
+            stats = snapshot.get("statistics", {})
+            city = loc.get("current_place_name", "")
+            country = loc.get("jurisdiction_place_name", "")
+            location_str = f"  {city}, {country}" if city and country else f"  {city or country or 'Unknown'}"
+            health = stats.get("health", 0)
+            money = stats.get("money", 0)
+            money_str = f"${money:,.0f}" if isinstance(money, (int, float)) else str(money)
+            right_str = f"Health: {health}   {money_str}  "
+            left_part = location_str.ljust(content_width - len(right_str))
+            state_line = (left_part + right_str)[:content_width]
+        except Exception:
+            state_line = ""
+        stdscr.addnstr(3, content_left, state_line, content_width)
+        # Row 4: separator (full width)
+        stdscr.addnstr(4, 0, full_hline, width - 1, curses.A_BOLD)
 
     def render_main(self, stdscr, height, width):
         snapshot_data = self.get_snapshot_data()
         snapshot_sections = build_snapshot_sections(snapshot_data)
-        top = 4
-        body_height = height - 6
+        top = 6
+        body_height = height - 8
         self._main_body_height = body_height
         content_left, content_width = get_content_bounds(width, max_width=112)
         left_width, right_left, right_width = split_centered_columns(content_left, content_width, left_ratio=0.5)
@@ -3335,8 +3386,8 @@ class ActoraTUI:
             )
 
     def render_profile(self, stdscr, height, width):
-        top = 4
-        body_height = height - 6
+        top = 6
+        body_height = height - 8
         self._profile_body_height = body_height
         content_left, content_width = get_content_bounds(width, max_width=88)
         profile_lines = expand_render_lines(self.build_profile_lines(self.get_snapshot_data()), content_width)
@@ -3368,8 +3419,8 @@ class ActoraTUI:
         lineage_entries = browser_state["entries"]
         selected_detail = browser_state["selected_detail"]
 
-        top = 4
-        body_height = height - 6
+        top = 7
+        body_height = height - 9
         content_left, content_width = get_content_bounds(width, max_width=112)
         left_width, right_left, right_width = split_centered_columns(content_left, content_width)
         filter_label = LINEAGE_FILTER_LABELS[browser_state["filter_mode"]]
@@ -3437,8 +3488,8 @@ class ActoraTUI:
         entries = browser_state["entries"]
         selected_detail = browser_state["selected_detail"]
 
-        top = 5
-        body_height = height - 7
+        top = 7
+        body_height = height - 9
         content_left, content_width = get_content_bounds(width, max_width=120)
 
         filter_col_width = 12
@@ -3524,8 +3575,8 @@ class ActoraTUI:
         draw_text_block(stdscr, top, detail_left, detail_width, body_height, right_lines)
 
     def render_history(self, stdscr, height, width):
-        top = 5
-        body_height = height - 7
+        top = 7
+        body_height = height - 9
         self._history_body_height = body_height
         content_left, content_width = get_content_bounds(width, max_width=104)
         self._history_content_width = content_width
@@ -3560,14 +3611,14 @@ class ActoraTUI:
         """Renders the unified Browser screen with Relationships and History tabs."""
         content_left, content_width = get_content_bounds(width, max_width=120, min_margin=1)
 
-        # Tab bar on row 3 with a separating bottom rule so tabs read as shell chrome.
+        # Tab bar on row 5 with a separating bottom rule (header now occupies rows 0-4)
         rel_label = "[ Relationships ]" if self.browser_tab == "relationships" else "  Relationships  "
         hist_label = "[ History ]" if self.browser_tab == "history" else "  History  "
         tab_bar = f"{rel_label}     │     {hist_label}"
         try:
-            stdscr.addnstr(3, content_left, center_text(tab_bar, content_width), content_width)
+            stdscr.addnstr(5, content_left, center_text(tab_bar, content_width), content_width)
             hline_char = getattr(curses, "ACS_HLINE", ord("-"))
-            stdscr.hline(4, content_left, hline_char, content_width)
+            stdscr.hline(6, content_left, hline_char, content_width)
         except curses.error:
             pass
 
@@ -3578,8 +3629,8 @@ class ActoraTUI:
 
     def render_actions(self, stdscr, height, width):
         """Renders the Actions screen: Categories | Actions | Details."""
-        top = 4
-        body_height = height - 6
+        top = 6
+        body_height = height - 8
         content_left, content_width = get_content_bounds(width, max_width=120)
         col_w = content_width // 3
         cat_left = content_left
@@ -3609,16 +3660,37 @@ class ActoraTUI:
         # Divider 1
         draw_vertical_divider(stdscr, top, act_left - 1, body_height)
 
-        # Actions column
+        # Actions column — available actions + queued section
+        avail_rows = max(1, body_height // 2 - 2)
         if not actions:
             stdscr.addnstr(top + 1, act_left, " (none yet)", col_w - 1, curses.A_DIM)
         else:
             for i, action in enumerate(actions):
+                if i >= avail_rows:
+                    break
                 label = f" {action['label']}"
                 attr = curses.A_REVERSE if (i == act_idx and self.actions_focus == "actions") else curses.A_NORMAL
                 row = top + 1 + i
                 if row < height:
                     stdscr.addnstr(row, act_left, label.ljust(col_w - 1), col_w - 1, attr)
+
+        # Queued section divider + list
+        queue_top = top + avail_rows + 2
+        if queue_top < height - 2:
+            try:
+                stdscr.hline(queue_top - 1, act_left, getattr(curses, "ACS_HLINE", ord("-")), col_w - 1)
+            except curses.error:
+                pass
+            stdscr.addnstr(queue_top, act_left, " Queued", col_w - 1, curses.A_BOLD)
+            if self.active_actions:
+                for i, queued in enumerate(self.active_actions):
+                    row = queue_top + 1 + i
+                    if row >= height - 1:
+                        break
+                    stdscr.addnstr(row, act_left, f"  {queued['label']}", col_w - 1)
+            else:
+                if queue_top + 1 < height - 1:
+                    stdscr.addnstr(queue_top + 1, act_left, " (nothing queued)", col_w - 1, curses.A_DIM)
 
         # Divider 2
         draw_vertical_divider(stdscr, top, det_left - 1, body_height)
@@ -3757,15 +3829,12 @@ class ActoraTUI:
         candidates = continuity_state["continuity_candidates"]
         content_left, content_width = get_content_bounds(width, max_width=96)
         lines = [
-            center_text(self.last_message, content_width),
             "",
         ]
         highlight_index = None
 
         if not candidates:
             lines.append("No living family members were found.")
-            lines.append("")
-            lines.append("[Bsp] Back to death summary")
         else:
             self.continuation_selection = max(
                 0,
