@@ -6,6 +6,11 @@ updated: 2026-04-03
 
 # Actora Changelog
 
+## Version 0.47.2 (Patch) - 2026-04-04
+- **Bug fix:** `gender_choice_offered` was missing from `ActoraTUI.__init__` — caused crash on first gender popup during play
+- **Polish:** continuation no-candidates screen removed stale "Press B / Q to quit" text — now shows `[Bsp] Back to death summary`
+- **Doc sync:** full pass across all 12 docs — codebase, decisions, design, screens, rules, backlog, guide updated to match v0.47.x reality
+
 ## Version 0.47.1 (Patch) - 2026-04-04
 - **Wizard polish:**
     - Last name is now required for humans (was previously optional)
