@@ -129,7 +129,21 @@ Each system uses this format:
 **Current truth:** 10 traits (old pool: Curious, Calm, Fussy, Bold, Shy, Cheerful, Stubborn, Gentle, Restless, Alert), pick 3 at creation. Trait-gated events exist. Old pool was auto-generated; does not reflect design intent.
 
 **New trait pool (12 traits, adjective form, pick 4 at creation — interview 2026-04-04):**
-Driven, Chill, Curious, Social, Disciplined, Impulsive, Empathetic, Resilient, Introverted, Extraverted, Restless, Ambitious
+
+| Trait | Sleep modifier | Primary mechanical effect |
+|-------|---------------|--------------------------|
+| Driven | -0.5h/night | More free time; actions more effective across categories |
+| Chill | +0.5h/night | Less free time; stress events less severe; recovery faster |
+| Curious | neutral | Study/read actions more effective; Intelligence ceiling +; faster academic skill growth |
+| Social | neutral | Social actions stronger; closeness gains higher; relationship events more frequent |
+| Disciplined | -0.5h/night | More free time; work/study actions more consistent; less action failure variance |
+| Impulsive | neutral | Event outcomes more volatile (higher risk and reward); some actions execute faster |
+| Empathetic | neutral | Relationship events richer; NPC reactions warmer; social perception gains faster |
+| Resilient | neutral | Negative stat hits reduced; recovery from conditions faster; mood stabilizes quicker |
+| Introverted | +0.5h/night | Solo actions more effective; social actions less effective; skill growth faster when alone |
+| Extraverted | -0.5h/night | Social actions more effective; Charisma ceiling +; relationship formation faster |
+| Restless | -1h/night | Most free time; short-term focus bonus but sustained tasks less consistent |
+| Ambitious | neutral | Career/reputation actions more effective; social actions with higher-status actors boosted; Stress accumulates when goals unmet |
 
 **Why these traits:**
 - Adjective form chosen: "you are Driven" reads more naturally than "you have Drive." Industry standard (Dwarf Fortress, RimWorld, Sims all use adjective traits).

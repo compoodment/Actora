@@ -13,6 +13,7 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Now
 
+- **Questionnaire trait output update** — questionnaire wizard generates traits from the old pool logic. Must be updated to produce traits from the new 12-trait pool and output 4 traits instead of 3. Connected to trait pool implementation task.
 - **Trait pool + stat redesign implementation** — design complete (DEC-021/022). Implement: (1) replace old 10-trait pool with new 12 traits as TRAIT_DEFINITIONS dict, (2) change pick-3 to pick-4 at creation, (3) add Memory and Stress stats, rename Creativity→Imagination, (4) update wizard to show new traits and 4-pick validation, (5) update all event stat references for renamed/new stats.
 - **Action system first wave** — time-budget model (monthly free hours), sub-type selections per action (exercise type, book subject, rest type), individual time costs per sub-action. Social: Hang Out resolves with +5 closeness. Personal: Exercise, Read, Rest with sub-types. Do before Education.
 - **Action time budget** — derive monthly free hours from sleep baseline (240hr/month) minus maintenance. Restless trait modifier. Wire to action queue so you can't queue more than fits.
