@@ -53,7 +53,7 @@ That gets you oriented. Only read other docs when the task requires them.
 | Idea becomes active work | `backlog.md` → Now |
 | Active work finished | Delete from `backlog.md`, add to `changelog.md` |
 | Major structural decision made | `decisions.md` |
-| Interview produced design intent | `design.md` |
+| Interview produced design intent (systems, stats, traits, skills, mechanics) | `design.md` |
 | Interview produced screen/layout truth | `screens.md` |
 | Interview produced hotkey/control truth | `controls.md` — update immediately, it is the only canonical home for hotkey decisions |
 | New project rule / constraint | `rules.md` |
