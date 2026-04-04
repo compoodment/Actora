@@ -21,7 +21,6 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Next
 
-- **Resume shell experiment** — implement chosen balanced shell direction against the locked control contract
 - **main.py extraction** — identify first sane decomposition seam after shell settles (shell/browser/actions rendering is the likely first candidate)
 - **Action system implementation** — narrow first-wave: social + self-improvement categories (foundation screen now exists)
 
