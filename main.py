@@ -3335,13 +3335,13 @@ class ActoraTUI:
 
         left_lines = [
             chrome["subtitle"],
+            chrome["title"],
             "",
             loc_str,
-            "",
         ]
         right_lines = [
-            chrome["title"],
             chrome["date_text"],
+            "",
             f"Health: {health}",
             money_str,
         ]
