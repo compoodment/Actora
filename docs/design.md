@@ -32,6 +32,7 @@ Each system uses this format:
 - Parents feel real — consistent appearance, traits, personality visible in your character.
 - Later: parent backstory depth, grandparent lineage, family history context.
 **Open questions:** None currently blocking.
+**Pending:** Trait pool redesign (DEC-020). Current pool was auto-generated; needs replacement with real personality words that have gameplay effects.
 
 ---
 
@@ -109,6 +110,19 @@ Each system uses this format:
 
 **Stat application rule:** stat changes must flow through `world.apply_outcome`, not scattered direct mutation.
 **Open questions:** None blocking — stats wire in as each domain system is built.
+---
+
+### Traits
+**Status:** Partially implemented (redesign pending)
+**Current truth:** 10 traits, pick 3 at creation. Trait-gated events exist (2 per trait). Current pool: Curious, Calm, Fussy, Bold, Shy, Cheerful, Stubborn, Gentle, Restless, Alert.
+**Intent:**
+- Traits should read as real human personality words — not database labels.
+- Each trait should have a meaningful effect beyond just event eligibility gating.
+- Traits affect time budget: sleep hours vary by trait (e.g. Restless = less sleep = more free time per month).
+- Future: traits influence action effectiveness, NPC reactions, event outcomes, social dynamics.
+- The pool should feel like genuine options a player would think about when making a character.
+**Redesign direction (DEC-020):** Replace current pool. New traits must: (1) be recognizable personality words, (2) have real gameplay effects, (3) feel meaningful to pick. "Fussy" and similar weak labels removed.
+**Open questions:** How many traits? Still 3? Should traits evolve during play?
 
 ---
 
