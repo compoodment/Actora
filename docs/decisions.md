@@ -128,8 +128,9 @@ Sub-actions carry individual time costs — a specific book has its own read tim
 ### DEC-019: Action sub-selections — each action has a sub-type with individual properties
 **Date:** 2026-04-04
 **Context:** Exercise, Read, Rest are categories, not actions. Each sub-type (running, math book, nap) has distinct outcomes and time costs.
-**Decision:** Actions with sub-types open a sub-selection UI on Enter. Each sub-type has: label, time cost, stat outcome. Exercise sub-types affect physical stats. Read sub-types affect knowledge stats (subject area = which stat). Rest sub-types affect recovery stats (nap vs music vs stare at wall).
-Future: real books get real read times from external data. Real workouts get real durations.
+**Decision:** Actions with sub-types open a sub-selection UI on Enter. Each sub-type has: label, time cost in hours, stat outcome. Exercise sub-types affect physical stats (e.g. home workout ~1hr, gym session ~1.5hr). Read sub-types affect knowledge stats by subject (math → intelligence, history → wisdom, etc.). Rest sub-types affect recovery (nap ~1hr, music/stare-at-wall ~0.5hr).
+Time costs are estimated initially but should eventually reflect real-world durations: books sourced from real page-count data, workouts from standard exercise guides.
+Future: real books get actual read times from external data lookup.
 **Alternatives rejected:** Single generic action with variable outcome, flat action list without sub-types.
 
 ### DEC-020: Trait pool redesign — traits must be meaningful and non-weird

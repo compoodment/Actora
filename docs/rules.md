@@ -12,6 +12,9 @@ All project constraints in one place. If it says "don't" or "must", it lives her
 
 ## Code rules
 
+> **Note:** Menu and Options popups share ~90% identical rendering logic. When adding a third popup type, extract a shared `render_popup(items, title, hint, selection)` helper rather than copy-pasting again.
+
+
 1. Simulation core stays UI-agnostic — only `main.py` knows about curses
 2. State mutation flows through controlled world-owned methods, not direct field pokes
 3. Don't hard-bake human-only assumptions into architecture that should be species-general later
