@@ -114,8 +114,9 @@ Don't blur these. Don't present proposals as implemented. Don't assume docs auto
 ## Anti-drift rules
 
 
-0. **Interview documentation standard:** After any design interview or decision session, write results to docs as full system anchors — not bullet summaries. Each anchor must include: current truth, intent, design rules, the "why" behind decisions, and open questions. The doc must survive without the session. A reader with no session context must understand what was decided, why, and what remains open.
-1. After every meaningful change: sync docs + memory immediately — don't batch it to later
+0. **Compare views actively during design:** When design decisions are non-trivial, present both sides and challenge each other's reasoning. Don't default to agreement — push back when there's a real counter-argument.
+1. **Interview documentation standard:** After any design interview or decision session, write results to docs as full system anchors — not bullet summaries. Each anchor must include: current truth, intent, design rules, the "why" behind decisions, and open questions. The doc must survive without the session. A reader with no session context must understand what was decided, why, and what remains open.
+2. After every meaningful change: sync docs + memory immediately — don't batch it to later
 2. **Cascade check:** when updating any doc, check if other docs reference or depend on the same information and update them too. One doc change can make others stale.
 3. **Forward-thinking check:** after any decision, interview, or new system lands, ask: "does this create a new ongoing obligation?" If yes, add the rule/workflow/routing entry NOW, not later. Don't wait for the user to notice it's missing.
 4. Before starting any task: targeted memory_search + read only the relevant files
