@@ -2,7 +2,7 @@
 title: Codebase
 tags: [implementation, reference, stable]
 updated: 2026-04-04
-through: v0.48.1
+through: v0.48.2
 verified: 2026-04-04
 ---
 
@@ -555,7 +555,7 @@ Current player creation includes:
 - Creation Mode step with a choice between questionnaire-based generation and manual setup
 - Questionnaire branch with 16 one-at-a-time prompts that derive startup stats and the final 3 traits automatically
 - Manual branch with a Stats step for 0-100 adjustment across all 11 stats (`health`, `happiness`, `intelligence`, `strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`) plus `[R]` to randomize all startup stats
-- Manual Traits step requiring exactly 3 traits from `Curious`, `Calm`, `Fussy`, `Bold`, `Shy`, `Cheerful`, `Stubborn`, `Gentle`, `Restless`, `Alert`
+- Manual Traits step requiring exactly 4 traits from the new pool: `Driven`, `Chill`, `Curious`, `Social`, `Disciplined`, `Impulsive`, `Empathetic`, `Resilient`, `Introverted`, `Extraverted`, `Restless`, `Ambitious`
 - Confirm step showing the full character summary, with `Enter` to start the game and `Backspace` to go back
 - current wizard controls are step-specific: `Enter` to proceed, `Backspace` to go back/delete, `↑↓` to navigate, `←→` to adjust stats, `Space` to toggle (multi-select traits only), `Esc` to quit from identity step, `R` to randomize stats
 

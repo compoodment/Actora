@@ -31,8 +31,7 @@ Each system uses this format:
 - Siblings share family resemblance with natural variation.
 - Parents feel real — consistent appearance, traits, personality visible in your character.
 - Later: parent backstory depth, grandparent lineage, family history context.
-**Open questions:** None currently blocking.
-**Pending:** Trait pool redesign (DEC-020). Current pool was auto-generated; needs replacement with real personality words that have gameplay effects.
+**Open questions:** Trait pool redesign is in progress (see Traits section). Wizard currently shows wrong trait pool and wrong count (3 instead of 4) — fix is a Now backlog item.
 
 ---
 

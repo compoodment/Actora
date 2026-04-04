@@ -107,12 +107,15 @@ Details column follows action selection automatically. Queued actions resolve on
 
 ### Profile
 
-Read-only for now. Future: commitments, health, property sections.
+Currently read-only display. Being redesigned as a dashboard (summary rows + Enter to drill into categories).
 
 | Key | Action |
 |-----|--------|
-| W/S or ↑↓ | Scroll (when content grows) |
-| Backspace | Close Profile |
+| W/S or ↑↓ | Scroll / navigate summary rows |
+| Enter | Open selected category detail |
+| Backspace | Back (from detail → summary, or close Profile) |
+
+Note: contract will expand as dashboard sections are implemented. Enter→Bsp drill pattern is the design standard.
 
 ---
 

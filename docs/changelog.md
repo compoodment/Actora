@@ -6,6 +6,18 @@ updated: 2026-04-04
 
 # Actora Changelog
 
+## Version 0.48.2 (Patch) - 2026-04-05
+- **Trait pool redesigned (DEC-022):**
+    - New 12-trait pool: Driven, Chill, Curious, Social, Disciplined, Impulsive, Empathetic, Resilient, Introverted, Extraverted, Restless, Ambitious
+    - Creation changed from pick-3 to pick-4
+    - Wizard traits step updated (footer, validation, counter)
+    - Questionnaire still outputs old pool — update pending (backlog Now)
+- **Documentation overhaul:**
+    - Full character system design interview captured in design.md
+    - Stats redesign (13 stats, DEC-021), Traits redesign (DEC-022), Skills/Talents (DEC-023), Needs/Drives (DEC-024), Mood (DEC-025), Skip time limit (DEC-026), Reputation direction (DEC-027)
+    - New system anchors in design.md: Skills & Talents, Needs & Drives, Mood, Profile Dashboard, Physical Conditions
+    - Identity glossary expanded, roadmap updated, rules expanded
+
 ## Version 0.48.1 (Patch) - 2026-04-04
 - **Logo panel header:**
     - ASCII logo centered in header with left and right info panels flanking it via `║` dividers

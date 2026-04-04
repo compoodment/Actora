@@ -2,7 +2,7 @@
 title: Backlog
 tags: [planning, tracking, wip]
 updated: 2026-04-04
-through: v0.48.1
+through: v0.48.2
 ---
 
 # Actora Backlog
@@ -16,7 +16,6 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 - **Questionnaire trait output update** — questionnaire wizard generates traits from the old pool logic. Must be updated to produce traits from the new 12-trait pool and output 4 traits instead of 3. Connected to trait pool implementation task.
 - **Stat redesign implementation** — rename Creativity→Imagination in Human.stats, add Memory and Stress stats, update all references in events.py, world.py, main.py. Update questionnaire stat outputs. Connected to trait implementation.
 - **Profile dashboard redesign** — implement summary row per category (Stats/Traits/Skills/Needs/Mood), Enter→drill detail pattern. Reusable component for future category screens. Build incrementally as systems land.
-- **Trait pool + stat redesign implementation** — design complete (DEC-021/022). Implement: (1) replace old 10-trait pool with new 12 traits as TRAIT_DEFINITIONS dict, (2) change pick-3 to pick-4 at creation, (3) add Memory and Stress stats, rename Creativity→Imagination, (4) update wizard to show new traits and 4-pick validation, (5) update all event stat references for renamed/new stats.
 - **Action system first wave** — time-budget model (monthly free hours), sub-type selections per action (exercise type, book subject, rest type), individual time costs per sub-action. Social: Hang Out resolves with +5 closeness. Personal: Exercise, Read, Rest with sub-types. Do before Education.
 - **Action time budget** — derive monthly free hours from sleep baseline (240hr/month) minus maintenance. Wire trait sleep modifiers (each trait has a `sleep_modifier` field in TRAIT_DEFINITIONS). Wire to action queue so you can't queue more than fits.
 
@@ -32,10 +31,10 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 ## Later
 
 - **Education foundation** — first mid-stage domain layer per roadmap, depends on action system *(2026-03-31)*
-- **Actor skills** — learned capabilities / proficiencies distinct from stats/traits. Actions and later systems depend on this. *(2026-04-01)*
-- **Actor personalities** — structural NPC behavior layer distinct from traits. Influences action preference, NPC response, relationship behavior, event choice weighting. *(2026-04-01)*
+- **Actor skills (Skills/Talents system)** — system architecture designed (DEC-023, design.md Skills & Talents). Implementation: TRAIT_DEFINITIONS skill_growth_modifiers wiring, skill discovery mechanics, Profile Talents section. Depends on action system. *(2026-04-01, updated 2026-04-04)*
+- **Actor personalities (NPC behavior layer)** — NPC decision-making layer distinct from player-facing traits. Influences NPC action preference, response patterns, relationship behavior. Note: player Trait evolution (DEC-022) covers the player side; this is specifically for NPC simulation depth. *(2026-04-01)*
 - **Ethnicity + trait inheritance + sibling similarity** — parked until identity generation is mature *(2026-03-31)*
-- **Multi-axis social perception / reputation** — depends on stronger social foundations *(2026-03-27)*
+- **Multi-axis social perception / reputation** — single reputation axis ships first (DEC-027), multi-axis expands as domain systems (crime, career, politics) land. Depends on stronger social foundations. *(2026-03-27, updated 2026-04-04)*
 - **Professional doc structure upgrade** — remaining ADR patterns, review checklists beyond what's already done *(2026-04-02)*
 - **Contabo Firewall** — optional second security layer on top of existing UFW host firewall *(2026-04-01)*
 - **NPC identity auto-resolve** — gender/sexuality must silently resolve for non-played actors at age threshold *(2026-04-01)*

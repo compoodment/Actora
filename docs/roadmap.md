@@ -64,7 +64,9 @@ Depends on: actor/link foundations, structured place/context maturity.
 
 Valid and likely, but must follow the backbone. Listed in rough dependency order.
 
-**Action System (first wave)** — time-budget model + sub-type selections. Precedes Education.
+**Stats/Traits/Skills foundation** — stat redesign (13 stats, DEC-021), trait pool redesign (12 traits, DEC-022), Skills/Talents architecture (DEC-023). These are actor-level foundations that most domain systems depend on. In progress.
+
+**Action System (first wave)** — time-budget model + sub-type selections. Precedes Education. Depends on Stats/Traits foundation.
 
 **Education / Training** — after action system first wave ships.
 

@@ -62,14 +62,22 @@ All screens are reachable from Life View. Nested screens return to their parent 
 ---
 
 ### Profile (via Menu → Profile)
-**Purpose:** Full actor detail. Who you are, what you've committed to.
-**What lives here:**
+**Purpose:** Full actor detail. Who you are, what you've committed to. Being redesigned as a dashboard.
+**What lives here (current):**
 - Full stats (primary + secondary)
 - Appearance
 - Traits
 - Sexuality, gender
-- Future: Commitments section (education, jobs — long-term active states)
-- Future: Domain sections as systems mature (health conditions, property, etc.)
+
+**Dashboard design (in progress — DEC-2026-04-04):**
+- Summary row per category: Stats, Traits, Skills/Talents, Needs, Mood
+- Enter on any row → drill into category detail view
+- Reusable pattern for any future category-based screen
+- Implement incrementally as systems land
+
+**Future:**
+- Commitments section (education, jobs — long-term active states)
+- Domain sections as systems mature (health conditions, property, etc.)
 
 **What does NOT live here:**
 - Event history (→ Browser / History tab)
