@@ -6,6 +6,23 @@ updated: 2026-04-03
 
 # Actora Changelog
 
+## Version 0.48.0 (Minor) - 2026-04-04
+- **Shell v2 — new balanced header/footer structure:**
+    - Row 0: `══ Actora ══` title (full terminal width)
+    - Row 1: `Screen  │  Actor  │  Date` subtitle (content width)
+    - Row 2: separator (full width)
+    - Row 3: state line — city, country left; Health + money right
+    - Row 4: separator (full width)
+    - Body rows
+    - Row N-2: separator (full width)
+    - Row N-1: primary commands footer (centered)
+- **Esc opens Options on all non-Life View screens:** Browser, Actions, Profile, Skip Time, Death, Continuation, Continuation Detail
+- **Browser tab bar** moved to rows 5/6 to clear the new header rows (was overlapping separator)
+- **City footer** now correctly says `[Enter] Select City` instead of `[Enter] Continue`
+- **Continuation no-candidates:** removed redundant `"No one is available to continue."` body text and `[Bsp] Back to death summary` hint
+- **Actions screen queued section:** Queued actions now displayed in lower half of Actions column, below available actions, with divider separator. Shows `(nothing queued)` when empty.
+- **Bug logged:** Skip Time custom `0` advances 1 month — see bugs.md
+
 ## Version 0.47.2 (Patch) - 2026-04-04
 - **Bug fix:** `gender_choice_offered` was missing from `ActoraTUI.__init__` — caused crash on first gender popup during play
 - **Polish:** continuation no-candidates screen removed stale "Press B / Q to quit" text — now shows `[Bsp] Back to death summary`
