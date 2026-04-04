@@ -21,6 +21,8 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Next
 
+- **Logo redesign** — replace placeholder "actora" script ASCII with a proper custom logo design. Layout already built and waiting for it.
+
 - **main.py extraction** — identify first sane decomposition seam after shell settles (shell/browser/actions rendering is the likely first candidate)
 - **Action system implementation** — narrow first-wave: social + self-improvement categories (foundation screen now exists)
 
