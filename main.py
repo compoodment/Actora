@@ -2384,6 +2384,7 @@ class ActoraTUI:
             self.options_popup_active = False
             self.quit_confirmation_active = True
             self.quit_from_options = True
+        # Items 1 and 2 (Help, Settings) are not yet implemented — do nothing
 
     def open_browser(self, tab="relationships"):
         """Opens the unified Browser screen on the specified tab."""
@@ -3763,7 +3764,8 @@ class ActoraTUI:
 
         if not candidates:
             lines.append("No living family members were found.")
-            lines.append("Press B to review the death summary, or Q to quit the game.")
+            lines.append("")
+            lines.append("[Bsp] Back to death summary")
         else:
             self.continuation_selection = max(
                 0,
