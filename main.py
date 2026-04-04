@@ -3311,16 +3311,25 @@ class ActoraTUI:
         content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
         full_hline = "═" * max(0, width - 1)
 
-        # Row 0: ══ Actora ══ (full width)
-        stdscr.addnstr(0, 0, build_centered_rule("Actora", width - 1), width - 1, curses.A_BOLD)
-        # Row 1: Screen │ Actor │ Date (content width)
+        # Rows 0-2: ASCII logo centered
+        logo_lines = [
+            r" ____  ____  _____  ____  _____  ____  ",
+            r"/ () \/ (__`|_ _|/ () \| () ) / () \ ",
+            r"/__/\__\\____) |_| \____/|_|\_\/__/\__\ ",
+        ]
+        for row_idx, line in enumerate(logo_lines):
+            padded = center_text(line, width - 1)
+            stdscr.addnstr(row_idx, 0, padded, width - 1, curses.A_BOLD)
+        # Row 3: separator after logo
+        stdscr.addnstr(3, 0, full_hline, width - 1, curses.A_BOLD)
+        # Row 4: Screen │ Actor │ Date (content width)
         subtitle_text = center_text(
             f"{chrome['title']}  │  {chrome['subtitle']}  │  {chrome['date_text']}",
             content_width,
         )
-        stdscr.addnstr(1, content_left, subtitle_text, content_width)
-        # Row 2: separator (full width)
-        stdscr.addnstr(2, 0, full_hline, width - 1, curses.A_BOLD)
+        stdscr.addnstr(4, content_left, subtitle_text, content_width)
+        # Row 5: separator (full width)
+        stdscr.addnstr(5, 0, full_hline, width - 1, curses.A_BOLD)
         # Row 3: state line — location left, health+money right
         snapshot = self.get_snapshot_data() if hasattr(self, '_cached_snapshot') else None
         try:
@@ -3338,15 +3347,15 @@ class ActoraTUI:
             state_line = (left_part + right_str)[:content_width]
         except Exception:
             state_line = ""
-        stdscr.addnstr(3, content_left, state_line, content_width)
-        # Row 4: separator (full width)
-        stdscr.addnstr(4, 0, full_hline, width - 1, curses.A_BOLD)
+        stdscr.addnstr(6, content_left, state_line, content_width)
+        # Row 7: separator (full width)
+        stdscr.addnstr(7, 0, full_hline, width - 1, curses.A_BOLD)
 
     def render_main(self, stdscr, height, width):
         snapshot_data = self.get_snapshot_data()
         snapshot_sections = build_snapshot_sections(snapshot_data)
-        top = 6
-        body_height = height - 8
+        top = 10
+        body_height = height - 12
         self._main_body_height = body_height
         content_left, content_width = get_content_bounds(width, max_width=112)
         left_width, right_left, right_width = split_centered_columns(content_left, content_width, left_ratio=0.5)
@@ -3386,8 +3395,8 @@ class ActoraTUI:
             )
 
     def render_profile(self, stdscr, height, width):
-        top = 6
-        body_height = height - 8
+        top = 10
+        body_height = height - 12
         self._profile_body_height = body_height
         content_left, content_width = get_content_bounds(width, max_width=88)
         profile_lines = expand_render_lines(self.build_profile_lines(self.get_snapshot_data()), content_width)
@@ -3419,8 +3428,8 @@ class ActoraTUI:
         lineage_entries = browser_state["entries"]
         selected_detail = browser_state["selected_detail"]
 
-        top = 7
-        body_height = height - 9
+        top = 11
+        body_height = height - 13
         content_left, content_width = get_content_bounds(width, max_width=112)
         left_width, right_left, right_width = split_centered_columns(content_left, content_width)
         filter_label = LINEAGE_FILTER_LABELS[browser_state["filter_mode"]]
@@ -3488,8 +3497,8 @@ class ActoraTUI:
         entries = browser_state["entries"]
         selected_detail = browser_state["selected_detail"]
 
-        top = 7
-        body_height = height - 9
+        top = 11
+        body_height = height - 13
         content_left, content_width = get_content_bounds(width, max_width=120)
 
         filter_col_width = 12
@@ -3575,8 +3584,8 @@ class ActoraTUI:
         draw_text_block(stdscr, top, detail_left, detail_width, body_height, right_lines)
 
     def render_history(self, stdscr, height, width):
-        top = 7
-        body_height = height - 9
+        top = 11
+        body_height = height - 13
         self._history_body_height = body_height
         content_left, content_width = get_content_bounds(width, max_width=104)
         self._history_content_width = content_width
@@ -3611,14 +3620,14 @@ class ActoraTUI:
         """Renders the unified Browser screen with Relationships and History tabs."""
         content_left, content_width = get_content_bounds(width, max_width=120, min_margin=1)
 
-        # Tab bar on row 5 with a separating bottom rule (header now occupies rows 0-4)
+        # Tab bar on row 7 with a separating bottom rule (header now occupies rows 0-6)
         rel_label = "[ Relationships ]" if self.browser_tab == "relationships" else "  Relationships  "
         hist_label = "[ History ]" if self.browser_tab == "history" else "  History  "
         tab_bar = f"{rel_label}     │     {hist_label}"
         try:
-            stdscr.addnstr(5, content_left, center_text(tab_bar, content_width), content_width)
+            stdscr.addnstr(9, content_left, center_text(tab_bar, content_width), content_width)
             hline_char = getattr(curses, "ACS_HLINE", ord("-"))
-            stdscr.hline(6, content_left, hline_char, content_width)
+            stdscr.hline(10, content_left, hline_char, content_width)
         except curses.error:
             pass
 
@@ -3629,8 +3638,8 @@ class ActoraTUI:
 
     def render_actions(self, stdscr, height, width):
         """Renders the Actions screen: Categories | Actions | Details."""
-        top = 6
-        body_height = height - 8
+        top = 10
+        body_height = height - 12
         content_left, content_width = get_content_bounds(width, max_width=120)
         col_w = content_width // 3
         cat_left = content_left
