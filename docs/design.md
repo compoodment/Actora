@@ -90,39 +90,132 @@ Each system uses this format:
 ---
 
 ### Stats — Contract & Intent
-**Status:** Partially implemented
-**Current truth:** 11 stats displayed (3 primary + 8 secondary). Happiness wired to friend death. Everything else is decoration for now.
-**Intent:** Stats should affect real simulation outcomes. Every stat should have at least one real effect before being considered complete. When building a new system, check this table and wire into relevant stats deliberately.
+**Status:** Partially implemented (redesign in progress — see below)
+**Current truth:** 11 stats (Health, Happiness, Intelligence, Strength, Charisma, Creativity, Wisdom, Discipline, Willpower, Looks, Fertility). Happiness wired to friend death. Everything else is display-only decoration.
 
-| Stat | Currently affects | Intended to affect |
-|------|------------------|--------------------|
-| Health | Nothing (displayed only) | Mortality risk, energy for actions, illness chance |
-| Happiness | Friend death (-8/-18) | Event eligibility, action effectiveness, mental health events |
-| Intelligence | Nothing | Education performance, questionnaire outcomes, job eligibility |
-| Strength | Nothing | Physical actions, certain job eligibility |
-| Charisma | Nothing | Social actions effectiveness, relationship formation speed |
-| Creativity | Nothing | Certain career paths, event outcomes |
-| Wisdom | Nothing | Decision quality events, elder life outcomes |
-| Discipline | Nothing | Education performance, work consistency |
-| Willpower | Nothing | Overcoming negative events, addiction resistance |
-| Looks | Nothing | Social first impressions, certain relationship events |
-| Fertility | Nothing | Chance of having children |
+**Redesigned stat list (13 stats, interview 2026-04-04):**
 
-**Stat application rule:** stat changes must flow through `world.apply_outcome`, not scattered direct mutation.
-**Open questions:** None blocking — stats wire in as each domain system is built.
+| Stat | Affects now | Intended to affect | Age curve |
+|------|------------|-------------------|-----------|
+| Health | Mortality baseline | Mortality risk, energy for actions, illness chance | Declines from ~40, sharper after 70 |
+| Happiness | Friend death (-8/-18) | Event eligibility, action effectiveness, depression risk | Driven by events, not age |
+| Intelligence | Nothing | Education performance, questionnaire outcomes, job eligibility | Stable across life |
+| Memory | Nothing | Skill learning speed, job performance, event recall | Stable until ~50, declines after (accelerated by substance abuse, sleep deprivation) |
+| Stress | Nothing | Degrades other stats when high, action effectiveness, illness risk | Driven by events/circumstances |
+| Strength | Nothing | Physical actions, job eligibility, certain events | Peaks 18-25, slow decline from 30, sharper after 60 |
+| Charisma | Nothing | Social action effectiveness, relationship formation speed | Driven by events/lifestyle |
+| Imagination | Nothing | Quality ceiling for creative output, creative skill growth rate | Peaks young/young adult, maintainable with practice |
+| Wisdom | Nothing | Decision quality events, elder life outcomes, mentoring | Grows lifelong, no peak |
+| Discipline | Nothing | Education/work consistency, action reliability | Driven by lifestyle |
+| Willpower | Nothing | Resistance to negative forces, addiction resistance | Driven by lifestyle |
+| Looks | Nothing | Social first impressions, certain relationship events | Peaks young adulthood, natural decline from 40s |
+| Fertility | Nothing | Chance of conception — player has agency over this via health/lifestyle | Age-dependent, peaks 20-35 |
+
+**Why these stats:**
+- Memory added: cognitive retention is distinct from Intelligence (raw processing). Degrades via lifestyle — meaningful player choice.
+- Stress added: the pressure valve. Without it, there's no mechanism for overwork/relationship/sleep debt to cascade into other effects.
+- Creativity renamed Imagination: Imagination is the character's intrinsic creative capacity. What the player *does* with it (inventing, painting, writing) is their choice. High Imagination raises the quality ceiling of creative output.
+- Fertility kept: gives players agency over family planning; improves via health/lifestyle actions.
+
+**Age curve design principle:** Curves are baseline tendencies for a sedentary lifestyle. Actions and lifestyle modify where a character actually lands on the curve. A highly active Elder has better Strength than a sedentary Young Adult. Implement basic curves for Strength and Health first; full lifestyle-interaction version is a later pass.
+
+**Stat application rule:** all stat changes must flow through `world.apply_outcome`, never scattered direct mutation.
+**Open questions:** None blocking — stats wire in as each domain system is built. Event audit needed when passive events are revised.
 ---
 
 ### Traits
-**Status:** Partially implemented (redesign pending)
-**Current truth:** 10 traits, pick 3 at creation. Trait-gated events exist (2 per trait). Current pool: Curious, Calm, Fussy, Bold, Shy, Cheerful, Stubborn, Gentle, Restless, Alert.
-**Intent:**
-- Traits should read as real human personality words — not database labels.
-- Each trait should have a meaningful effect beyond just event eligibility gating.
-- Traits affect time budget: sleep hours vary by trait (e.g. Restless = less sleep = more free time per month).
-- Future: traits influence action effectiveness, NPC reactions, event outcomes, social dynamics.
-- The pool should feel like genuine options a player would think about when making a character.
-**Redesign direction (DEC-020):** Replace current pool. New traits must: (1) be recognizable personality words, (2) have real gameplay effects, (3) feel meaningful to pick. "Fussy" and similar weak labels removed.
-**Open questions:** How many traits? Still 3? Should traits evolve during play?
+**Status:** Redesign in progress (DEC-020)
+**Current truth:** 10 traits (old pool: Curious, Calm, Fussy, Bold, Shy, Cheerful, Stubborn, Gentle, Restless, Alert), pick 3 at creation. Trait-gated events exist. Old pool was auto-generated; does not reflect design intent.
+
+**New trait pool (12 traits, adjective form, pick 4 at creation — interview 2026-04-04):**
+Driven, Chill, Curious, Social, Disciplined, Impulsive, Empathetic, Resilient, Introverted, Extraverted, Restless, Ambitious
+
+**Why these traits:**
+- Adjective form chosen: "you are Driven" reads more naturally than "you have Drive." Industry standard (Dwarf Fortress, RimWorld, Sims all use adjective traits).
+- Each covers a distinct personality axis: effort/pace (Driven/Chill), curiosity, social energy (Social/Introverted/Extraverted/Empathetic), structure (Disciplined), impulse (Impulsive/Restless), toughness (Resilient), goal-seeking (Ambitious).
+- Driven vs Ambitious: Driven = sustained energy and effort. Ambitious = goal-seeking and status-climbing. Distinct mechanics.
+- Introverted AND Extraverted both present: they're a pair. Having one without the other is incomplete.
+- Pool expandable — defined as a dict, adding a new trait = one entry.
+
+**Trait data structure (each trait must define):**
+- `label`: display name
+- `sleep_modifier`: hours/night adjustment (positive = more sleep = less free time, negative = less sleep = more free time)
+- `stat_modifiers`: which stats get ceiling extension or growth rate bonus (e.g. Curious: Intelligence ceiling +10)
+- `skill_growth_modifiers`: which skill categories grow faster (e.g. Curious: study skills +20% growth)
+- `event_tags`: events that this trait makes more/less likely
+- `action_effectiveness`: action categories that perform better/worse
+
+**Trait evolution:**
+- Traits drift gradually through lifestyle, not dramatic milestone moments. A Driven character who rests constantly slowly drifts toward Chill. The player notices when checking their traits over a long run.
+- Major life events (trauma, transformation) can accelerate drift — layered on top of lifestyle drift, not replacing it.
+- Traits are species-specific: humans get the human pool. Other species get their own pool. The trait system is Actor-level architecture, the pool is per-species content.
+
+**Open questions:** Should traits have a visible drift indicator in Profile? Can you actively resist drift through actions?
+
+
+---
+
+### Skills & Talents
+**Status:** Not started (architecture designed 2026-04-04)
+**Current truth:** Nothing implemented. Skills referenced in trait modifiers but no system exists.
+
+**Design (interview 2026-04-04):**
+- Skills are practiced competencies that grow through doing. They start at 0 (or low based on life stage/context) and grow via: actions, events, relationships, and passive time in environments.
+- Player-facing label: **Talents** (feels more human than "Skills"). Internal code: `skills`.
+- **Talents** (distinct from Skills): things absorbed passively from context — household environment, genetics, early childhood. Not practiced, inherited or absorbed. Future system — tracked with a `source` field on the skill record to distinguish from practiced skills.
+- Skills discovered/unlocked through: (1) actions (reading math → Mathematics skill appears), (2) events (witness crime → Criminal knowledge), (3) relationships (friend teaches you something). Future: passive environment exposure over time.
+- Trait gives both: a starting bonus to related skills AND a faster growth rate when practising. Both, not either.
+- Starting skill values: age-based baseline + trait modifier. A 16-year-old has basic cooking from household context. A child of wealthy neglectful parents may have low practical skills but high exposure to wealth behaviors.
+- Skill growth interacts with relevant stat: high Imagination → faster growth ceiling for creative skills. High Intelligence → faster growth for academic skills. Stat = raw capacity, Skill = what you've done with it.
+
+**Profile display:** Talents section in Profile dashboard. Summary row shows top skills. Enter → drill into detail.
+**Open questions:** Skill degradation over time if not practised? Skill prerequisites for certain actions?
+
+---
+
+### Needs & Drives
+**Status:** Not started (architecture designed 2026-04-04)
+**Current truth:** Nothing implemented. Sleep handled as time budget only.
+
+**Design (interview 2026-04-04):**
+- Needs are background simulation pressures — not meters to micromanage. The player notices when ignored, but doesn't babysit them.
+- **Sleep:** Time budget only. Monthly free time = total hours − sleep hours − obligatory maintenance. Sleep hours vary by trait modifier. No sleep action, no deprivation state (for now). Never a player-managed mechanic.
+- **Social contact:** If a character goes ~6 months with truly zero social interaction, Happiness begins to drain. Threshold is realistic, not inflated, because time skip runs passive social events month-by-month — isolation only accumulates if the character is genuinely isolated by circumstance. Ignoring social needs long-term → depression risk → action effectiveness reduction → health impact chain.
+- **Future needs (when supporting systems exist):** Physical activity (health/stress), creative outlet (imagination/mood), purpose/meaning (happiness/wisdom). Each added when the systems they connect to are built.
+- Needs do not interrupt play. They produce consequences through the event and stat system, not through forced pop-ups.
+
+**Open questions:** Should neglected needs surface as visible warnings in Profile, or remain purely in background stat changes?
+
+---
+
+### Mood
+**Status:** Not started (architecture designed 2026-04-04)
+**Current truth:** Nothing implemented. Happiness covers long-term satisfaction but short-term emotional state has no representation.
+
+**Design (interview 2026-04-04):**
+- Mood is short-term emotional state. Distinct from Happiness (long-term life satisfaction). They interact: sustained bad mood → Happiness drain; high Happiness buffers mood drops.
+- **Internal representation:** Numeric -50 to +50. 0 = neutral. Driven by events, circumstances, needs fulfillment/neglect.
+- **Player-visible:** Both the number AND a contextual descriptive label. Example: "-20 · Grieving — social actions less effective." Labels carry mechanical signal, not just feeling description.
+- **Label design:** Fixed set first (shippable), context-driven labels later when event system is rich enough to know why mood is low. Each label specifies: mood range it applies to, context that activates it, mechanical effect it signals.
+- **Mood affects:** action effectiveness, event eligibility, NPC reactions, skill growth rate.
+
+**Why both number and label:** Number gives the player precise feedback. Label translates it into human meaning AND communicates the gameplay consequence. Neither alone is sufficient.
+**Open questions:** How many distinct mood labels? How does Stress stat interact with Mood (are they the same axis or separate)?
+
+---
+
+### Profile — Dashboard Design
+**Status:** Not started (current Profile is read-only display only)
+**Current truth:** Profile shows full stats and actor details but is a flat list, not interactive.
+
+**Design (interview 2026-04-04):**
+- Profile becomes a dashboard: summary row per category, Enter on any row → drill into category detail.
+- Categories: Stats, Traits, Skills/Talents, Needs, Mood, (future: Commitments, History).
+- Summary rows show key values at a glance. Detail views show full data + context + future: explanations of why values are what they are.
+- This is a reusable pattern: any future category-based screen should follow the same summary→detail structure.
+- Implement incrementally: add sections as systems land, don't rebuild the whole Profile at once.
+
+**Open questions:** Does Profile need its own navigation (Tab between sections), or is it always Enter→Bsp drill pattern?
 
 ---
 

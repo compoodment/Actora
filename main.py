@@ -40,7 +40,7 @@ CREATION_SEX_OPTIONS = ["Male", "Female", "Intersex"]
 CREATION_EYE_COLOR_OPTIONS = ["Brown", "Blue", "Green", "Hazel", "Gray", "Amber", "Other"]
 CREATION_HAIR_COLOR_OPTIONS = ["Black", "Brown", "Blonde", "Red", "Auburn", "Other"]
 CREATION_SKIN_TONE_OPTIONS = ["Light", "Fair", "Medium", "Olive", "Tan", "Brown", "Dark", "Other"]
-CREATION_TRAIT_POOL = ["Curious", "Calm", "Fussy", "Bold", "Shy", "Cheerful", "Stubborn", "Gentle", "Restless", "Alert"]
+CREATION_TRAIT_POOL = ["Driven", "Chill", "Curious", "Social", "Disciplined", "Impulsive", "Empathetic", "Resilient", "Introverted", "Extraverted", "Restless", "Ambitious"]
 QUESTIONNAIRE_QUESTIONS = [
     {
         "style": "situational",
@@ -1049,7 +1049,7 @@ class CreationWizard:
         return True
 
     def can_advance_traits(self):
-        return len(self.data["traits"]) == 3
+        return len(self.data["traits"]) == 4
 
     def build_result(self):
         appearance = {}
@@ -1210,8 +1210,8 @@ class CreationWizard:
     def render_traits(self, height, width):
         content_left, content_width = get_content_bounds(width, max_width=84)
         lines = [
-            "Select 3 traits.",
-            f"Selected: {len(self.data['traits'])}/3",
+            "Select 4 traits.",
+            f"Selected: {len(self.data['traits'])}/4",
             "",
         ]
         highlight_index = None
@@ -1221,7 +1221,7 @@ class CreationWizard:
             marker = "[x]" if trait in self.data["traits"] else "[ ]"
             lines.append(f"{marker} {trait}")
         if not self.can_advance_traits():
-            lines.extend(["", "Choose 3 traits to continue."])
+            lines.extend(["", "Choose 4 traits to continue."])
         draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
 
     def render_mode_selection(self, height, width):
@@ -1550,7 +1550,7 @@ class CreationWizard:
             trait = CREATION_TRAIT_POOL[self.trait_index]
             if trait in self.data["traits"]:
                 self.data["traits"].remove(trait)
-            elif len(self.data["traits"]) < 3:
+            elif len(self.data["traits"]) < 4:
                 self.data["traits"].append(trait)
             return
         if key in (curses.KEY_ENTER, 10, 13) and self.can_advance_traits():

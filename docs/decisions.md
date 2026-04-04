@@ -139,6 +139,42 @@ Future: real books get actual read times from external data lookup.
 **Decision:** Replace the current trait pool with a clean redesigned set. Traits must: (1) be recognizable human personality words, (2) have actual gameplay effects (not just event eligibility flavor), (3) feel meaningful to pick. Fussy, Restless, Alert removed or renamed. New pool to be designed as a separate task before action system ships.
 **Alternatives rejected:** Keep current pool, add more AI-generated traits.
 
+
+### DEC-021: Stat list redesign — 13 stats replacing 11
+**Date:** 2026-04-04
+**Context:** Original 11-stat list had Creativity (vague scope), no cognitive retention stat, no stress mechanism. Age curves not designed.
+**Decision:** Replace 11 stats with 13: Health, Happiness, Intelligence, Memory, Stress, Strength, Charisma, Imagination, Wisdom, Discipline, Willpower, Looks, Fertility. Creativity renamed Imagination (character's intrinsic creative capacity; what the player does with it is their choice). Memory added (lifestyle-degradable cognitive retention, distinct from Intelligence). Stress added (pressure valve; high Stress degrades other stats). Fertility kept (player agency over family planning).
+**Age curves:** Strength peaks 18-25; Health declines from ~40; Memory declines from ~50; Wisdom grows lifelong; Imagination peaks young; Looks peaks young adulthood. All curves are lifestyle-modifiable baselines, not deterministic paths.
+**Stat cap:** Soft cap 100. Trait-extended ceiling possible (e.g. relevant trait lets a stat exceed 100).
+**Alternatives rejected:** Cutting Fertility (would remove player agency), keeping Creativity as stat name (scope too broad), flat age curves.
+
+### DEC-022: Trait pool redesign — 12 traits replacing 10
+**Date:** 2026-04-04
+**Context:** Original 10-trait pool (Fussy, Calm, Alert, etc.) was AI-generated without care. Traits had no real gameplay effects beyond event eligibility.
+**Decision:** New pool of 12 traits (adjective form, pick 4 at creation): Driven, Chill, Curious, Social, Disciplined, Impulsive, Empathetic, Resilient, Introverted, Extraverted, Restless, Ambitious. Each trait defines: sleep modifier, stat ceiling/growth modifiers, skill growth modifiers, event tags, action effectiveness modifiers. Defined as a data dict — adding a new trait = one dict entry, no code hunting.
+**Trait evolution:** Traits drift gradually through lifestyle (you become what you do). Major life events can accelerate drift. No dramatic pop-up — player notices over long runs.
+**Species:** Trait system is Actor-level architecture. The pool is per-species content. Humans get this pool; other species get their own.
+**Alternatives rejected:** 3 traits at creation (too few for meaningful expression), fixed traits (unrealistic, humans adapt).
+
+### DEC-023: Skills & Talents architecture
+**Date:** 2026-04-04
+**Context:** Skills needed as a layer distinct from stats (practiced competency vs raw capacity) and traits (personality vs learned ability).
+**Decision:** Skills are practiced competencies starting at 0, growing through actions/events/relationships. Player-facing label: Talents. Internal code: `skills`. Talents (passive/inherited) are a future sub-system with a `source` field to distinguish them from practiced skills. Trait gives both a starting bonus AND a faster growth rate for related skills. Stat determines the growth ceiling (high Imagination → higher ceiling for creative skills). Skills discoverable/unlockable through play, not a fixed starting list.
+**Alternatives rejected:** Skills as a renamed stat (they're fundamentally different — practiced, not intrinsic), flat skill list with no discovery.
+
+### DEC-024: Needs & Drives — sleep as time budget only, social as background pressure
+**Date:** 2026-04-04
+**Context:** Needed to decide: are needs micromanagement meters (Sims-style) or background simulation pressures?
+**Decision:** Needs are background pressure — player notices consequences when ignored, never babysits a meter. Sleep is purely a time budget constraint: monthly free time = total hours − sleep hours − maintenance. No sleep action, no deprivation state (for now). Social need: ~6 months true isolation → Happiness drain begins. Threshold is realistic because time skip runs passive events month-by-month — isolation only accumulates if genuinely isolated. Ignoring social need long-term → depression risk → effectiveness reduction → health chain. Future needs (physical activity, creative outlet, purpose) added when supporting systems exist.
+**Alternatives rejected:** Sims-style micromanagement meters (tedious, wrong for the game feel), ignoring needs entirely (removes meaningful simulation depth).
+
+### DEC-025: Mood system — numeric + contextual label, both visible
+**Date:** 2026-04-04
+**Context:** Happiness covers long-term satisfaction. Short-term emotional state had no representation. Needed a mechanic that responds to immediate events.
+**Decision:** Mood is short-term emotional state, distinct from Happiness. Internal: numeric -50 to +50 (0 = neutral). Player-visible: both the number AND a contextual descriptive label that carries mechanical signal. Example: "-20 · Grieving — social actions less effective." Labels are a fixed set first, context-driven later. Mood affects: action effectiveness, event eligibility, NPC reactions, skill growth. Sustained bad mood → Happiness drain. High Happiness buffers mood drops.
+**Why both number and label:** Number = precise feedback. Label = human meaning + gameplay consequence signal. Neither alone sufficient.
+**Alternatives rejected:** Label only (loses precision), number only (loses human meaning), merging Mood into Happiness (they operate on different timescales).
+
 ### DEC-017: Q/E available from any non-input screen
 **Date:** 2026-04-02
 **Context:** User doesn't want to navigate back to Life View just to advance time or skip. You should be able to advance/skip from Browser, Actions, Profile, future Education/Company views, etc.

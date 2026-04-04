@@ -137,7 +137,7 @@ These terms have specific meanings in Actora. Use them consistently across all d
 | **Structural status** | Whether an actor is "active" or "dead" — the narrow lifecycle state. |
 | **Record** | A world-owned structured event/history entry (event, birth, death, family_bootstrap, actor_entry). |
 | **Life stage** | Derived from age: Infant → Child → Teenager → Young Adult → Adult → Elder. |
-| **Trait** | One of 10 personality descriptors (pick 3 at creation). Affects event eligibility and time budget (sleep hours). Current pool pending redesign (DEC-020). |
-| **Stat** | One of 11 numeric attributes (health, happiness, intelligence + 8 secondary). |
+| **Trait** | One of 12 personality descriptors (pick 4 at creation). Affects event eligibility, time budget (sleep hours), stat ceilings, skill growth rates, and action effectiveness. Pool: Driven, Chill, Curious, Social, Disciplined, Impulsive, Empathetic, Resilient, Introverted, Extraverted, Restless, Ambitious. Traits drift through lifestyle over time. |
+| **Stat** | One of 13 numeric attributes: Health, Happiness, Intelligence, Memory, Stress, Strength, Charisma, Imagination, Wisdom, Discipline, Willpower, Looks, Fertility. All changes via world.apply_outcome only. |
 | **Shell** | The persistent TUI frame: header, footer, screen body. |
 | **Browser** | The tabbed screen containing Relationships and History tabs. |
