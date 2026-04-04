@@ -1,7 +1,7 @@
 ---
 title: Changelog
 tags: [implementation, reference, stable]
-updated: 2026-04-03
+updated: 2026-04-04
 ---
 
 # Actora Changelog

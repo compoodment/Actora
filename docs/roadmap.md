@@ -1,7 +1,7 @@
 ---
 title: Roadmap
 tags: [core, reference, stable]
-updated: 2026-04-02
+updated: 2026-04-04
 ---
 
 # Actora Roadmap
@@ -64,7 +64,9 @@ Depends on: actor/link foundations, structured place/context maturity.
 
 Valid and likely, but must follow the backbone. Listed in rough dependency order.
 
-**Education / Training** — after actor, event, link, state-mutation foundations are stable.
+**Action System (first wave)** — time-budget model + sub-type selections. Precedes Education.
+
+**Education / Training** — after action system first wave ships.
 
 **Work / Role** — after education/training or equivalent readiness rules exist.
 

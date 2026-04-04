@@ -1,7 +1,7 @@
 ---
 title: Identity
 tags: [core, identity, stable]
-updated: 2026-04-02
+updated: 2026-04-04
 ---
 
 # Actora Identity
@@ -137,7 +137,7 @@ These terms have specific meanings in Actora. Use them consistently across all d
 | **Structural status** | Whether an actor is "active" or "dead" — the narrow lifecycle state. |
 | **Record** | A world-owned structured event/history entry (event, birth, death, family_bootstrap, actor_entry). |
 | **Life stage** | Derived from age: Infant → Child → Teenager → Young Adult → Adult → Elder. |
-| **Trait** | One of 10 personality descriptors (pick 3 at creation). Affects event eligibility. |
+| **Trait** | One of 10 personality descriptors (pick 3 at creation). Affects event eligibility and time budget (sleep hours). Current pool pending redesign (DEC-020). |
 | **Stat** | One of 11 numeric attributes (health, happiness, intelligence + 8 secondary). |
 | **Shell** | The persistent TUI frame: header, footer, screen body. |
 | **Browser** | The tabbed screen containing Relationships and History tabs. |
