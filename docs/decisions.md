@@ -140,6 +140,12 @@ Future: real books get actual read times from external data lookup.
 **Alternatives rejected:** Keep current pool, add more AI-generated traits.
 
 
+### DEC-027: Reputation starts as single axis, expands to multi-axis later
+**Date:** 2026-04-04
+**Context:** Reputation/social standing is a needed system but multi-axis reputation (trustworthiness, status, notoriety, danger level) requires many supporting systems that don't exist yet (crime, politics, career).
+**Decision:** Implement reputation as a single numeric axis first. Each actor has one reputation score that reflects general world perception. Add more axes as each domain system (crime, career, politics) ships. Single axis gives the scaffold without false precision.
+**Alternatives rejected:** Full multi-axis from start (premature, supporting systems don't exist), no reputation system (loses meaningful gameplay layer).
+
 ### DEC-026: Skip time limit — 10 years for humans, extendable for passive commitments
 **Date:** 2026-04-04
 **Context:** Unlimited skip time exists for development convenience. In real gameplay, skipping decades feels disconnected from the character's life. But some situations (jail, coma, isolation) might warrant longer passive runs.

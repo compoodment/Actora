@@ -122,7 +122,7 @@ Current stored fields:
 - `sexuality` (`None` until emergence during play for the focused player; randomized for generated NPC humans)
 - `birth_year`
 - `birth_month`
-- `stats` (dictionary containing primary stats `health`, `happiness`, `intelligence` plus secondary stats `strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`)
+- `stats` (dictionary containing: `health`, `happiness`, `intelligence`, `memory`, `stress`, `strength`, `charisma`, `imagination`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`) — **Note:** Memory, Stress added and Creativity renamed Imagination per DEC-021; not yet implemented in code as of v0.48.x
 - `money`
 - `appearance` (dictionary containing `eye_color`, `hair_color`, `skin_tone`)
 - `traits` (list of up to three simple personality descriptors)

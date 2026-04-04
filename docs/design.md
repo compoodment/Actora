@@ -99,12 +99,12 @@ Each system uses this format:
 | Stat | Affects now | Intended to affect | Age curve |
 |------|------------|-------------------|-----------|
 | Health | Mortality baseline | Mortality risk, energy for actions, illness chance | Declines from ~40, sharper after 70 |
-| Happiness | Friend death (-8/-18) | Event eligibility, action effectiveness, depression risk | Driven by events, not age |
+| Happiness | Friend death (-8/-18) | Event eligibility, action effectiveness, depression risk | No natural age curve — driven entirely by events and circumstances |
 | Intelligence | Nothing | Education performance, questionnaire outcomes, job eligibility | Stable across life |
 | Memory | Nothing | Skill learning speed, job performance, event recall | Stable until ~50, declines after (accelerated by substance abuse, sleep deprivation) |
-| Stress | Nothing | Degrades other stats when high, action effectiveness, illness risk | Driven by events/circumstances |
+| Stress | Nothing | Degrades other stats when high, action effectiveness, illness risk | No natural age curve — driven entirely by events and circumstances |
 | Strength | Nothing | Physical actions, job eligibility, certain events | Peaks 18-25, slow decline from 30, sharper after 60 |
-| Charisma | Nothing | Social action effectiveness, relationship formation speed | Driven by events/lifestyle |
+| Charisma | Nothing | Social action effectiveness, relationship formation speed | No natural age curve — modified by social experience and lifestyle |
 | Imagination | Nothing | Quality ceiling for creative output, creative skill growth rate | Peaks young/young adult, maintainable with practice |
 | Wisdom | Nothing | Decision quality events, elder life outcomes, mentoring | Grows lifelong, no peak |
 | Discipline | Nothing | Education/work consistency, action reliability | Driven by lifestyle |

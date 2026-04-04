@@ -139,5 +139,10 @@ These terms have specific meanings in Actora. Use them consistently across all d
 | **Life stage** | Derived from age: Infant → Child → Teenager → Young Adult → Adult → Elder. |
 | **Trait** | One of 12 personality descriptors (pick 4 at creation). Affects event eligibility, time budget (sleep hours), stat ceilings, skill growth rates, and action effectiveness. Pool: Driven, Chill, Curious, Social, Disciplined, Impulsive, Empathetic, Resilient, Introverted, Extraverted, Restless, Ambitious. Traits drift through lifestyle over time. |
 | **Stat** | One of 13 numeric attributes: Health, Happiness, Intelligence, Memory, Stress, Strength, Charisma, Imagination, Wisdom, Discipline, Willpower, Looks, Fertility. All changes via world.apply_outcome only. |
+| **Skill** | A practiced competency that grows through doing. Starts at 0 (or low baseline). Grows via actions, events, relationships. Player-facing label: Talent. Internal code: `skill`. |
+| **Talent (inherited)** | Future concept: a skill-like competency absorbed passively from context (household, genetics, early childhood) rather than practiced. Tracked with `source` field on skill record. |
+| **Mood** | Short-term emotional state. Internal: -50 to +50 numeric. Player-visible: number + contextual label with mechanical signal (e.g. "-20 · Grieving — social actions less effective"). Distinct from Happiness (long-term). |
+| **Need** | A background simulation pressure (Sleep, Social contact, etc.). Not a meter to babysit — consequences accumulate when ignored. Never interrupts play directly. |
+| **Physical Condition** | A temporary state (Injured, Sick, Recovering, Exhausted) that modifies action availability and effectiveness. Distinct from the Health stat. |
 | **Shell** | The persistent TUI frame: header, footer, screen body. |
 | **Browser** | The tabbed screen containing Relationships and History tabs. |
