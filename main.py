@@ -1691,6 +1691,7 @@ class ActoraTUI:
         self.menu_selection = 0  # 0=Browser, 1=Actions, 2=Profile
         self.options_popup_active = False
         self.options_selection = 0
+        self.gender_choice_offered = False
         self.sexuality_choice_offered = False
         self.identity_popup_suppressed_for_resumed_adult = False
         self.gender_choice_age = random.randint(12, 15)
@@ -2642,7 +2643,8 @@ class ActoraTUI:
             self.identity_popup_suppressed_for_resumed_adult = True
         else:
             self.gender_choice_offered = False
-            self.sexuality_choice_offered = False
+            self.gender_choice_offered = False
+        self.sexuality_choice_offered = False
         self.gender_choice_age = random.randint(12, 15)
         self.sexuality_choice_age = random.randint(14, 17)
         self.meeting_event_last_total_months = 0
