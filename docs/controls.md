@@ -17,7 +17,7 @@ Canonical control contract for all TUI surfaces. If it's not here, it's not offi
 | Q | Advance month | Blocked: text input, search, popups, wizard, continuation, death screen |
 | E | Skip time | Same blocks as Q |
 | Backspace | Back / cancel | Navigation; overridden to delete-char in text input |
-| Esc | Options popup | Outside text input/search; closes Options if already open |
+| Esc | Options popup | All game screens outside text input/search/wizard; closes Options if already open |
 | Enter | Proceed / confirm | Screen transitions, popup confirm, confirmation screens |
 | [1] | Menu | Always visible; opens Browser / Actions / Profile |
 | [2][3][4] | Reserved | Future domain systems |
@@ -49,7 +49,7 @@ This means in Skip Time custom input, Esc exits the input (not Options). Same ru
 | Text input field | Backspace = delete char, WASD = type characters, Esc = exit text mode |
 | Search / year jump / custom input | Backspace = delete char, WASD = type characters, Esc = cancel/exit input (Options blocked) |
 | Any popup open | Q/E blocked, [1] blocked |
-| Character creation wizard | Q/E blocked, [1] blocked; Esc = quit on identity step, blocked on all other wizard steps |
+| Character creation wizard | Q/E blocked, [1] blocked; Esc = quit on identity step only, blocked on all other wizard steps |
 | Continuation/death screen | Q/E blocked |
 
 ---

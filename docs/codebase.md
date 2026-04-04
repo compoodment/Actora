@@ -20,7 +20,7 @@ It is intended to support safe patching, review, and manual verification, alongs
 ## 1. Stack
 
 - **Language:** Python
-- **Interface:** Terminal with a curses-based startup character creation wizard and a curses TUI shell for ordinary play with a split Life View, dedicated profile screen, tabbed Browser (Relationships tab + History tab replacing older separate lineage/history screens), a dedicated Actions screen with social action support, death/continuation interrupts, skip-time utility flow, and meeting/social event popups
+- **Interface:** Terminal with a curses-based startup character creation wizard and a curses TUI shell for ordinary play. Shell v2 (v0.48.0): 5-row header chrome (title, screen/actor/date, state line with location+health+money, separators), body, footer with primary commands. Split Life View, dedicated profile screen, tabbed Browser (Relationships tab + History tab replacing older separate lineage/history screens), a dedicated Actions screen with social action support, death/continuation interrupts, skip-time utility flow, and meeting/social event popups
 - **Structure:** Small modular prototype with separated simulation and rendering responsibilities
 
 ## 2. Current File Structure

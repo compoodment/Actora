@@ -63,7 +63,7 @@ Major structural decisions. Immutable — never edit an entry. If a decision cha
 **Decision:** Ordinary relationship/life upkeep should happen through thresholds/system logic. Active actions provide stronger gains, targeted attention, and playstyle expression. Applies beyond relationships to jobs and other systems.
 **Alternatives rejected:** Fully manual maintenance, fully automatic with no player agency.
 
-### DEC-008: Balanced shell header direction
+### DEC-008: Balanced shell header direction *(implemented v0.48.0)*
 **Date:** 2026-04-01
 **Context:** Shell redesign interview — needed a chosen visual direction.
 **Decision:** Option 2 (Balanced): centered Actora title, actor + turn line, screen-name line, compact state line (location/date left, health/money right), centered numbered primary commands, local controls only when relevant.
