@@ -3660,16 +3660,37 @@ class ActoraTUI:
         # Divider 1
         draw_vertical_divider(stdscr, top, act_left - 1, body_height)
 
-        # Actions column
+        # Actions column — available actions + queued section
+        avail_rows = max(1, body_height // 2 - 2)
         if not actions:
             stdscr.addnstr(top + 1, act_left, " (none yet)", col_w - 1, curses.A_DIM)
         else:
             for i, action in enumerate(actions):
+                if i >= avail_rows:
+                    break
                 label = f" {action['label']}"
                 attr = curses.A_REVERSE if (i == act_idx and self.actions_focus == "actions") else curses.A_NORMAL
                 row = top + 1 + i
                 if row < height:
                     stdscr.addnstr(row, act_left, label.ljust(col_w - 1), col_w - 1, attr)
+
+        # Queued section divider + list
+        queue_top = top + avail_rows + 2
+        if queue_top < height - 2:
+            try:
+                stdscr.hline(queue_top - 1, act_left, getattr(curses, "ACS_HLINE", ord("-")), col_w - 1)
+            except curses.error:
+                pass
+            stdscr.addnstr(queue_top, act_left, " Queued", col_w - 1, curses.A_BOLD)
+            if self.active_actions:
+                for i, queued in enumerate(self.active_actions):
+                    row = queue_top + 1 + i
+                    if row >= height - 1:
+                        break
+                    stdscr.addnstr(row, act_left, f"  {queued['label']}", col_w - 1)
+            else:
+                if queue_top + 1 < height - 1:
+                    stdscr.addnstr(queue_top + 1, act_left, " (nothing queued)", col_w - 1, curses.A_DIM)
 
         # Divider 2
         draw_vertical_divider(stdscr, top, det_left - 1, body_height)
