@@ -91,6 +91,9 @@ The compaction summary is NOT a substitute for reading these docs. The docs are 
 5. Don't leave conclusions trapped in chat only
 
 ### Implementation workflow
+
+**Before EVERY step, re-read this list. Not from memory — scroll back to this section.**
+
 1. Check `rules.md` constraints
 2. **Design gate:** Does this task touch a system with mechanical depth? If yes, check `design.md` — is there a completed interview/anchor for this system? If not, STOP. Flag as design-pending, do not implement.
 3. Read relevant docs from the doc map above
@@ -102,6 +105,27 @@ The compaction summary is NOT a substitute for reading these docs. The docs are 
 9. `git add -A && git commit && git push`
 10. **Doc sync (mandatory, never skip):** Update changelog, backlog, codebase. Cascade check — does this change make other docs stale? Do this BEFORE asking "what's next?"
 11. Update daily memory log
+
+**After step 11, post a completion block:**
+```
+✅ Implementation complete:
+- [ ] rules.md checked
+- [ ] design gate passed
+- [ ] relevant docs read: [list]
+- [ ] scope scan done (if rename/replace)
+- [ ] spec written (if non-trivial)
+- [ ] compiled clean
+- [ ] playtested (if TUI)
+- [ ] diff reviewed line-by-line
+- [ ] review checklist passed
+- [ ] committed + pushed
+- [ ] changelog updated
+- [ ] backlog updated
+- [ ] codebase.md updated
+- [ ] cascade check done
+- [ ] daily memory updated
+```
+If any box is unchecked, go back and do it. Do not proceed.
 
 ### Version milestone workflow
 1. All of implementation workflow above
