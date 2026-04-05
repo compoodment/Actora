@@ -101,7 +101,17 @@ Three columns: Categories / Actions / Details. Details is currently display-only
 | Enter | Queue selected action | On an action |
 | Backspace | Close Actions | |
 
-Details column follows action selection automatically. Queued actions resolve on Q (next advance).
+Details column follows action selection automatically. Queued actions resolve on Q (first month of advance).
+
+**Sub-type picker popup (Exercise, Read, Rest):**
+
+| Key | Action |
+|-----|--------|
+| W/S or Up/Down | Move between sub-types |
+| Enter | Queue selected sub-type |
+| Backspace | Cancel / close picker |
+
+Budget enforcement: rejects queue if time cost exceeds remaining free hours.
 
 ---
 

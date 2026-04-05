@@ -127,7 +127,9 @@ All screens are reachable from Life View. Nested screens return to their parent 
 - Profile commitments (Profile shows them as state; Actions is where you act on them)
 
 **Filtering/navigation:**
-- Category tabs or sections (Social / Personal / Career / etc.)
+- Category sidebar: Social, Personal (implemented). Career, etc. (future).
+- Time Budget display in details column: total free hours, queued hours, remaining hours.
+- Sub-type picker popup: Exercise, Read, Rest each open a picker showing sub-type options with time costs.
 - **Age/context/era gating** — silently hidden (if you literally cannot do it right now regardless of effort, don't show it)
 - **Resource/prerequisite gating** — shown as unavailable with reason (if you could do it but currently can't, e.g. no money, show it greyed with context)
 

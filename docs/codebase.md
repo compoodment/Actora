@@ -26,10 +26,10 @@ It is intended to support safe patching, review, and manual verification, alongs
 ## 2. Current File Structure
 
     ./
-    ├── main.py          (4076 lines - TUI, creation wizard, shell, rendering)
-    ├── world.py          (2090 lines - simulation state, links, places, records, social links, mortality, advancement)
+    ├── main.py          (4388 lines - TUI, creation wizard, shell, rendering)
+    ├── world.py          (2135 lines - simulation state, links, places, records, social links, mortality, advancement)
     ├── identity.py       (299 lines - name pools, culture-aware identity generation)
-    ├── human.py          (289 lines - Human model, lifecycle, spatial, snapshot)
+    ├── human.py          (295 lines - Human model, lifecycle, spatial, snapshot)
     ├── events.py         (388 lines - human monthly events, meeting events)
     └── docs/
         ├── architecture
@@ -125,7 +125,7 @@ Current stored fields:
 - `stats` (dictionary containing: `health`, `happiness`, `intelligence`, `memory`, `stress`, `strength`, `charisma`, `imagination`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`) — implemented in code as of v0.48.2/v0.48.3
 - `money`
 - `appearance` (dictionary containing `eye_color`, `hair_color`, `skin_tone`)
-- `traits` (list of up to three simple personality descriptors)
+- `traits` (list of list of 4 personality traits from the 12-trait pool (Driven, Chill, Curious, Social, Disciplined, Impulsive, Empathetic, Resilient, Introverted, Extraverted, Restless, Ambitious). Each trait has mechanical definitions in TRAIT_DEFINITIONS)
 - `current_place_id`
 - `residence_place_id`
 - `jurisdiction_place_id`
@@ -395,7 +395,7 @@ Responsible for:
 - rendering the shell-owned dead-focus interrupt and continuation handoff flow when present
 - rendering lineage list/detail browsing without typed command words
 - rendering a tabbed Browser shell (Relationships tab + History tab) that replaced the older separate lineage and history screens
-- rendering a dedicated Actions screen with available social actions and pending action display
+- rendering a dedicated Actions screen with Social and Personal action categories, sub-type picker popups, time budget display, and pending action queue
 - rendering meeting event popups where the player can choose to introduce themselves or keep to themselves
 - social action queueing ("Spend time with friend") and resolution on month advance
 
@@ -559,8 +559,8 @@ Current player creation includes:
 - gender defaults to match sex and is deferred to puberty emergence during play
 - Appearance step with eye color, hair color, and skin tone; each appearance field supports `Other`, which requires a custom free-text value before continuing
 - Creation Mode step with a choice between questionnaire-based generation and manual setup
-- Questionnaire branch with 16 one-at-a-time prompts that derive startup stats and the final 3 traits automatically
-- Manual branch with a Stats step for 0-100 adjustment across all 11 stats (`health`, `happiness`, `intelligence`, `strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`) plus `[R]` to randomize all startup stats
+- Questionnaire branch with 16 one-at-a-time prompts that derive startup stats and traits automatically (NOTE: currently broken — outputs 3 traits from old pool instead of 4 from new pool; needs design interview)
+- Manual branch with a Stats step for 0-100 adjustment across all 13 stats (`health`, `happiness`, `intelligence`, `memory`, `stress`, `strength`, `charisma`, `imagination`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`) plus `[R]` to randomize all startup stats
 - Manual Traits step requiring exactly 4 traits from the new pool: `Driven`, `Chill`, `Curious`, `Social`, `Disciplined`, `Impulsive`, `Empathetic`, `Resilient`, `Introverted`, `Extraverted`, `Restless`, `Ambitious`
 - Confirm step showing the full character summary, with `Enter` to start the game and `Backspace` to go back
 - current wizard controls are step-specific: `Enter` to proceed, `Backspace` to go back/delete, `↑↓` to navigate, `←→` to adjust stats, `Space` to toggle (multi-select traits only), `Esc` to quit from identity step, `R` to randomize stats
@@ -631,7 +631,7 @@ Current snapshots display:
 - residence remains internal and is not rendered in the snapshot yet
 - temporary occupancy remains internal and is not rendered in the snapshot yet
 - Life View statistics (health, happiness, intelligence, money)
-- Profile screen secondary statistics (`strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`)
+- Profile screen secondary statistics (`strength`, `charisma`, `imagination`, `memory`, `wisdom`, `discipline`, `willpower`, `stress`, `looks`, `fertility`)
 - relationships as a list of all living linked family entries with sex-aware labels (`Mother`, `Father`, `Brother`, `Sister`, `Son`, `Daughter`, `Sibling`, `Child`), plus social link entries displayed as `name · tier`
 - dead relatives are excluded from Life View relationship output; former social links (status `former`) are also excluded
 - `No living family.` is shown when the current living-family relationship list is empty

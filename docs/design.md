@@ -67,7 +67,7 @@ Each system uses this format:
 
 ### Actions
 **Status:** In progress (foundation)
-**Current truth:** Actions screen implemented with three-column Categories/Actions/Details layout. Social category exists with "Hang Out" action (sub-selects from friend list). Action queues and resolves on Q (next advance). No self-improvement or other categories yet.
+**Current truth:** Actions screen with three-column layout. Two categories: Social (Hang Out — friend picker, +5 closeness, +3 happiness, -2 stress) and Personal (Exercise, Read, Rest — each with sub-type picker popup, individual time costs and stat effects). Time budget system: 360h/month baseline, trait sleep modifiers, queue enforces budget. Actions resolve on Q (first month of advance). Sub-type picker popups for Exercise (Home Workout/Gym/Run), Read (Fiction/Non-Fiction/History/Science), Rest (Nap/Music/Walk). All stat changes route through world.apply_outcome.
 **Intent:**
 - Two time-shape types: immediate/negligible and month-consuming. Long-running states (education, job, travel) are commitments, not queue items.
 - Categorized: social, personal development, career, criminal, political, etc.
@@ -90,8 +90,8 @@ Each system uses this format:
 ---
 
 ### Stats — Contract & Intent
-**Status:** Partially implemented (redesign in progress — see below)
-**Current truth:** 11 stats (Health, Happiness, Intelligence, Strength, Charisma, Creativity, Wisdom, Discipline, Willpower, Looks, Fertility). Happiness wired to friend death. Everything else is display-only decoration.
+**Status:** Implemented (v0.48.3)
+**Current truth:** 13 stats in code (Health, Happiness, Intelligence, Memory, Stress, Strength, Charisma, Imagination, Wisdom, Discipline, Willpower, Looks, Fertility). Happiness wired to friend death and Hang Out action (+3). Stress reduced by Hang Out (-2) and Rest actions. Exercise affects Strength/Health. Read affects Intelligence/Wisdom/Imagination/Happiness. Most stats still display-only beyond these action effects.
 
 **Redesigned stat list (13 stats, interview 2026-04-04):**
 
@@ -124,8 +124,8 @@ Each system uses this format:
 ---
 
 ### Traits
-**Status:** Redesign in progress (DEC-020)
-**Current truth:** 10 traits (old pool: Curious, Calm, Fussy, Bold, Shy, Cheerful, Stubborn, Gentle, Restless, Alert), pick 3 at creation. Trait-gated events exist. Old pool was auto-generated; does not reflect design intent.
+**Status:** Implemented in code (v0.48.2, DEC-022)
+**Current truth:** 12 traits in code (Driven, Chill, Curious, Social, Disciplined, Impulsive, Empathetic, Resilient, Introverted, Extraverted, Restless, Ambitious), pick 4 at manual creation. TRAIT_DEFINITIONS dict with sleep_modifier per trait. Trait-gated events remapped to new pool. Questionnaire still uses old trait names and picks 3 — design interview needed before fixing.
 
 **New trait pool (12 traits, adjective form, pick 4 at creation — interview 2026-04-04):**
 

@@ -50,7 +50,7 @@ HUMAN_MONTHLY_EVENTS = [
     _event("infant_lost_sock", "One of your socks vanished under circumstances nobody could explain.", life_stages=["Infant"], outcome={"stat_changes": {}}, tags=["goofy", "infant"]),
     _event("infant_scary_noise", "A sudden loud noise left you crying for a while.", life_stages=["Infant"], min_age_months=2, outcome={"stat_changes": {"happiness": -1}}, tags=["negative", "infant"]),
     _event("infant_first_wave", "You made something close enough to a wave that everyone decided it counted.", life_stages=["Infant"], min_age_months=6, outcome={"stat_changes": {"intelligence": 1}}, tags=["positive", "infant"]),
-    _event("fussy_refused_meal", "You refused to eat something and made a whole thing about it.", life_stages=["Infant", "Child"], outcome={"stat_changes": {"happiness": -1}}, tags=["negative"], required_traits=["Fussy"]),
+    _event("fussy_refused_meal", "You refused to eat something and made a whole thing about it.", life_stages=["Infant", "Child"], outcome={"stat_changes": {"happiness": -1}}, tags=["negative"], required_traits=["Disciplined"]),
 
     # Child-specific events (Age 3-9 = Months 36-119)
     _event("child_imaginary_friend", "You made a new imaginary friend!", life_stages=["Child"], outcome={"stat_changes": {"happiness": 2}}, tags=["positive", "child"]),
@@ -70,8 +70,8 @@ HUMAN_MONTHLY_EVENTS = [
     _event("child_wrong_snack", "You put something questionable in your mouth. Regret followed immediately.", life_stages=["Child"], min_age_months=36, outcome={"stat_changes": {"health": -1}}, tags=["goofy", "child"]),
     _event("child_secret_word", "You invented a secret word that seemed brilliant at the time.", life_stages=["Child"], outcome={"stat_changes": {}}, tags=["goofy", "child"]),
     _event("curious_bug_watch", "You spent an hour watching a bug and learned something nobody asked about.", life_stages=["Child", "Teenager"], outcome={"stat_changes": {"intelligence": 1, "wisdom": 1}}, tags=["positive"], required_traits=["Curious"]),
-    _event("cheerful_silly_song", "You made up a silly song and somehow got other people singing it too.", life_stages=["Child", "Teenager"], outcome={"stat_changes": {"happiness": 1, "charisma": 1}}, tags=["positive"], required_traits=["Cheerful"]),
-    _event("gentle_cared_for_animal", "You were unusually patient with a frightened little animal.", life_stages=["Child", "Teenager"], outcome={"stat_changes": {"charisma": 1, "wisdom": 1}}, tags=["positive"], required_traits=["Gentle"]),
+    _event("cheerful_silly_song", "You made up a silly song and somehow got other people singing it too.", life_stages=["Child", "Teenager"], outcome={"stat_changes": {"happiness": 1, "charisma": 1}}, tags=["positive"], required_traits=["Extraverted"]),
+    _event("gentle_cared_for_animal", "You were unusually patient with a frightened little animal.", life_stages=["Child", "Teenager"], outcome={"stat_changes": {"charisma": 1, "wisdom": 1}}, tags=["positive"], required_traits=["Empathetic"]),
     _event("restless_wandered_far", "You wandered further than intended and discovered something unexpected.", life_stages=["Child", "Teenager", "Young Adult"], outcome={"stat_changes": {"intelligence": 1, "health": 1}}, tags=["positive"], required_traits=["Restless"]),
 
     # Teenager-specific events (Age 10-17)
@@ -94,16 +94,16 @@ HUMAN_MONTHLY_EVENTS = [
     _event("teen_got_lost_briefly", "You took a wrong turn and were briefly, stubbornly lost.", life_stages=["Teenager"], outcome={"stat_changes": {"happiness": -1, "intelligence": 1}}, tags=["negative", "teenager"]),
     _event("teen_lost_argument_with_self", "You had an argument with yourself. You lost.", life_stages=["Teenager", "Young Adult"], outcome={"stat_changes": {}}, tags=["goofy"]),
     _event("curious_question_spree", "You asked so many questions today that someone walked away mid-conversation.", life_stages=["Child", "Teenager"], outcome={"stat_changes": {"intelligence": 1, "charisma": -1}}, tags=["neutral"], required_traits=["Curious"]),
-    _event("calm_defused_tension", "Your calm presence defused a tense situation.", life_stages=["Teenager", "Young Adult", "Adult", "Elder"], outcome={"stat_changes": {"charisma": 1, "wisdom": 1}}, tags=["positive"], required_traits=["Calm"]),
-    _event("bold_dare_accepted", "You accepted a dare without thinking twice. It went surprisingly well.", life_stages=["Teenager", "Young Adult"], outcome={"stat_changes": {"happiness": 2, "health": -1}}, tags=["positive"], required_traits=["Bold"]),
-    _event("bold_spoke_up", "You spoke up when nobody else would. It mattered.", life_stages=["Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"charisma": 2, "willpower": 1}}, tags=["positive"], required_traits=["Bold"]),
-    _event("shy_avoided_crowd", "You avoided a crowded event and felt relieved.", life_stages=["Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"happiness": 1, "charisma": -1}}, tags=["neutral"], required_traits=["Shy"]),
-    _event("shy_quiet_connection", "A quiet one-on-one conversation left you feeling understood.", life_stages=["Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"happiness": 2}}, tags=["positive"], required_traits=["Shy"]),
-    _event("cheerful_brightened_day", "Your mood was contagious today. Several people smiled because of you.", life_stages=["Child", "Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"happiness": 1, "charisma": 1}}, tags=["positive"], required_traits=["Cheerful"]),
-    _event("stubborn_refused_change", "You refused to change your mind about something. You were right.", life_stages=["Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"willpower": 1}}, tags=["neutral"], required_traits=["Stubborn"]),
-    _event("stubborn_argument_won", "You argued your point until the other person gave up. Whether you were right is debatable.", life_stages=["Teenager", "Adult"], outcome={"stat_changes": {"willpower": 1, "charisma": -1}}, tags=["neutral"], required_traits=["Stubborn"]),
+    _event("calm_defused_tension", "Your calm presence defused a tense situation.", life_stages=["Teenager", "Young Adult", "Adult", "Elder"], outcome={"stat_changes": {"charisma": 1, "wisdom": 1}}, tags=["positive"], required_traits=["Chill"]),
+    _event("bold_dare_accepted", "You accepted a dare without thinking twice. It went surprisingly well.", life_stages=["Teenager", "Young Adult"], outcome={"stat_changes": {"happiness": 2, "health": -1}}, tags=["positive"], required_traits=["Driven"]),
+    _event("bold_spoke_up", "You spoke up when nobody else would. It mattered.", life_stages=["Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"charisma": 2, "willpower": 1}}, tags=["positive"], required_traits=["Driven"]),
+    _event("shy_avoided_crowd", "You avoided a crowded event and felt relieved.", life_stages=["Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"happiness": 1, "charisma": -1}}, tags=["neutral"], required_traits=["Introverted"]),
+    _event("shy_quiet_connection", "A quiet one-on-one conversation left you feeling understood.", life_stages=["Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"happiness": 2}}, tags=["positive"], required_traits=["Introverted"]),
+    _event("cheerful_brightened_day", "Your mood was contagious today. Several people smiled because of you.", life_stages=["Child", "Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"happiness": 1, "charisma": 1}}, tags=["positive"], required_traits=["Extraverted"]),
+    _event("stubborn_refused_change", "You refused to change your mind about something. You were right.", life_stages=["Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"willpower": 1}}, tags=["neutral"], required_traits=["Resilient"]),
+    _event("stubborn_argument_won", "You argued your point until the other person gave up. Whether you were right is debatable.", life_stages=["Teenager", "Adult"], outcome={"stat_changes": {"willpower": 1, "charisma": -1}}, tags=["neutral"], required_traits=["Resilient"]),
     _event("restless_late_night", "You could not sit still and ended up reorganizing something at 2 AM.", life_stages=["Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"discipline": -1, "imagination": 1}}, tags=["neutral"], required_traits=["Restless"]),
-    _event("alert_caught_danger", "Your quick awareness helped you avoid a small accident.", life_stages=["Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"health": 1}}, tags=["positive"], required_traits=["Alert"]),
+    _event("alert_caught_danger", "Your quick awareness helped you avoid a small accident.", life_stages=["Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"health": 1}}, tags=["positive"], required_traits=["Curious"]),
 
     # Young-adult-specific events (Age 18-24)
     _event("young_adult_budget_meal", "You stretch your money with a simple homemade meal plan.", life_stages=["Young Adult"], outcome={"stat_changes": {"money": 1}}, tags=["neutral", "young_adult"]),
@@ -123,8 +123,8 @@ HUMAN_MONTHLY_EVENTS = [
     _event("young_adult_tiny_victory", "A small personal victory carries you farther than expected.", life_stages=["Young Adult"], outcome={"stat_changes": {"happiness": 1, "intelligence": 1}}, tags=["positive", "young_adult"]),
     _event("young_adult_scary_dream", "A vivid, unsettling dream stuck with you for days.", life_stages=["Young Adult", "Adult"], outcome={"stat_changes": {"happiness": -1}}, tags=["negative", "dark"]),
     _event("young_adult_weird_bird_judgment", "A bird watched you fail at something simple and seemed deeply judgmental.", life_stages=["Young Adult", "Adult", "Elder"], outcome={"stat_changes": {}}, tags=["goofy"]),
-    _event("calm_steady_under_pressure", "You stayed composed while everyone else rushed, and it helped.", life_stages=["Young Adult", "Adult", "Elder"], outcome={"stat_changes": {"discipline": 1, "wisdom": 1}}, tags=["positive"], required_traits=["Calm"]),
-    _event("fussy_high_standards", "Your impossibly high standards actually paid off this time.", life_stages=["Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"discipline": 1, "looks": 1}}, tags=["positive"], required_traits=["Fussy"]),
+    _event("calm_steady_under_pressure", "You stayed composed while everyone else rushed, and it helped.", life_stages=["Young Adult", "Adult", "Elder"], outcome={"stat_changes": {"discipline": 1, "wisdom": 1}}, tags=["positive"], required_traits=["Chill"]),
+    _event("fussy_high_standards", "Your impossibly high standards actually paid off this time.", life_stages=["Teenager", "Young Adult", "Adult"], outcome={"stat_changes": {"discipline": 1, "looks": 1}}, tags=["positive"], required_traits=["Disciplined"]),
 
     # Adult-specific events (Age 25-64)
     _event("adult_home_cooked_meal", "You make time for a decent home-cooked meal and feel better for it.", life_stages=["Adult"], outcome={"stat_changes": {"health": 1}}, tags=["positive", "adult"]),
@@ -144,8 +144,8 @@ HUMAN_MONTHLY_EVENTS = [
     _event("adult_shared_meal_memory", "A familiar smell brings back a memory you had forgotten.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {}}, tags=["neutral"]),
     _event("adult_drawer_mystery", "You opened a drawer to get one thing and forgot why halfway through.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {}}, tags=["goofy"]),
     _event("adult_small_cut", "A minor cut from an ordinary task stung far longer than it should have.", life_stages=["Adult", "Elder"], outcome={"stat_changes": {"health": -1}}, tags=["negative"]),
-    _event("gentle_comforted_someone", "You comforted someone who needed it without being asked.", life_stages=["Child", "Teenager", "Young Adult", "Adult", "Elder"], outcome={"stat_changes": {"happiness": 1, "charisma": 1}}, tags=["positive"], required_traits=["Gentle"]),
-    _event("alert_noticed_detail", "You noticed a small detail that everyone else missed.", life_stages=["Child", "Teenager", "Young Adult", "Adult", "Elder"], outcome={"stat_changes": {"intelligence": 1}}, tags=["positive"], required_traits=["Alert"]),
+    _event("gentle_comforted_someone", "You comforted someone who needed it without being asked.", life_stages=["Child", "Teenager", "Young Adult", "Adult", "Elder"], outcome={"stat_changes": {"happiness": 1, "charisma": 1}}, tags=["positive"], required_traits=["Empathetic"]),
+    _event("alert_noticed_detail", "You noticed a small detail that everyone else missed.", life_stages=["Child", "Teenager", "Young Adult", "Adult", "Elder"], outcome={"stat_changes": {"intelligence": 1}}, tags=["positive"], required_traits=["Curious"]),
 
     # Elder-specific events (Age 65+)
     _event("elder_garden_walk", "You enjoy a gentle walk and appreciate the slower pace of the day.", life_stages=["Elder"], outcome={"stat_changes": {"happiness": 1}}, tags=["positive", "elder"]),
