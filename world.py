@@ -1027,8 +1027,8 @@ class World:
             "strength": random.randint(30, 70),
             "charisma": random.randint(30, 70),
             "imagination": random.randint(30, 70),
-            "memory": random.randint(40, 70),
-            "stress": random.randint(5, 20),
+            "memory": random.randint(-15, 25),   # Signed stat: -50 to +50
+            "stress": random.randint(0, 20),      # Signed stat: -50 to +50
             "wisdom": random.randint(20, 60),
             "discipline": random.randint(20, 60),
             "willpower": random.randint(30, 70),

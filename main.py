@@ -1018,7 +1018,6 @@ class CreationWizard:
         self.questionnaire_answers = []
         self.questionnaire_framing_shown = False
         self.questionnaire_reveal_shown = False
-        self.questionnaire_reveal_shown = False
         self.quit_confirmation_active = False
         self.identity_first_name_error_shown = False
 
