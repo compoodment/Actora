@@ -26,7 +26,7 @@ It is intended to support safe patching, review, and manual verification, alongs
 ## 2. Current File Structure
 
     ./
-    ├── main.py          (4626 lines - TUI, creation wizard, shell, rendering)
+    ├── main.py          (4617 lines - TUI, creation wizard, shell, rendering)
     ├── world.py          (2135 lines - simulation state, links, places, records, social links, mortality, advancement)
     ├── identity.py       (299 lines - name pools, culture-aware identity generation)
     ├── human.py          (295 lines - Human model, lifecycle, spatial, snapshot)
