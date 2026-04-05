@@ -2,7 +2,7 @@
 title: Codebase
 tags: [implementation, reference, stable]
 updated: 2026-04-05
-through: v0.51.5
+through: v0.53.0
 verified: 2026-04-04
 ---
 
@@ -26,11 +26,15 @@ It is intended to support safe patching, review, and manual verification, alongs
 ## 2. Current File Structure
 
     ./
-    ├── main.py          (4616 lines - TUI, creation wizard, shell, rendering)
-    ├── world.py          (2135 lines - simulation state, links, places, records, social links, mortality, advancement)
+    ├── main.py          (3029 lines - ActoraTUI shell, snapshot/event helpers, startup/entrypoints)
+    ├── ui.py            (168 lines - layout/drawing primitives, used by wizard and shell)
+    ├── mechanics.py     (48 lines - game rule constants: traits, actions, time budget)
+    ├── wizard.py        (1267 lines - CreationWizard class, all creation constants and questionnaire)
+    ├── world.py          (2271 lines - simulation state, links, places, records, social links, mortality, advancement, geography)
     ├── identity.py       (299 lines - name pools, culture-aware identity generation)
     ├── human.py          (295 lines - Human model, lifecycle, spatial, snapshot)
     ├── events.py         (388 lines - human monthly events, meeting events)
+    ├── lint_player_text.py (scans all *.py for internal/dev language in player-facing text)
     └── docs/
         ├── architecture
         └── [[changelog]]

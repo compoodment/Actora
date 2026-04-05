@@ -19,7 +19,6 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Next
 
-- **main.py extraction** — identify first sane decomposition seam after shell settles (shell/browser/actions rendering is the likely first candidate). During this pass: flatten `secondary_statistics` into one `statistics` dict with all 13 stats — snapshot should not encode rendering decisions; let the renderer decide what to show where.
 
 ## Later
 
