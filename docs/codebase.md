@@ -2,7 +2,7 @@
 title: Codebase
 tags: [implementation, reference, stable]
 updated: 2026-04-05
-through: v0.50.1
+through: v0.50.2
 verified: 2026-04-04
 ---
 
@@ -122,7 +122,7 @@ Current stored fields:
 - `sexuality` (`None` until emergence during play for the focused player; randomized for generated NPC humans)
 - `birth_year`
 - `birth_month`
-- `stats` (dictionary containing: `health`, `happiness`, `intelligence`, `memory`, `stress`, `strength`, `charisma`, `imagination`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`) — implemented v0.48.3. Note: `stress` and `memory` use signed range -50 to +50 (0 = baseline) per DEC-028 (v0.50.1). All other stats use 0-100.
+- `stats` (dictionary containing: `health`, `happiness`, `intelligence`, `strength`, `charisma`, `imagination`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`, `memory`, `stress`) — 13 stats. `memory` and `stress` use signed range -50 to +50 (0 = baseline) per DEC-028 (v0.50.1). All other stats use 0-100. Memory/Stress display at bottom of secondary stats, visually separated.
 - `money`
 - `appearance` (dictionary containing `eye_color`, `hair_color`, `skin_tone`)
 - `traits` (list of list of 4 personality traits from the 12-trait pool (Driven, Chill, Curious, Social, Disciplined, Impulsive, Empathetic, Resilient, Introverted, Extraverted, Restless, Ambitious). Each trait has mechanical definitions in TRAIT_DEFINITIONS)

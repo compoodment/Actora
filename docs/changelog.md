@@ -6,6 +6,12 @@ updated: 2026-04-05
 
 # Actora Changelog
 
+## Version 0.50.2 (Patch) - 2026-04-05
+- **Polish: Stats screen layout** — Memory and Stress moved to bottom of secondary stats with blank line separator; removes visual ambiguity with 0-100 stats
+- **Fix: Manual stat creator signed range** — Memory and Stress were incorrectly clamped to 0-100 in manual creation wizard; now correctly clamped to -50/+50
+- **Polish: Stats screen Controls panel** — removed duplicate "[R] Randomize all stats" hint (already in footer); updated hint to mention Memory/Stress -50 to +50 range
+- **Fix: CREATION_STAT_ORDER** — Memory and Stress reordered to end of secondary stats list to match new layout
+
 ## Version 0.50.1 (Patch) - 2026-04-05
 - **Stress + Memory signed range (DEC-028):**
     - Both stats now use -50 to +50 range (0 = baseline) instead of 0-100
