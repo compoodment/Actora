@@ -145,6 +145,12 @@ Future: real books get actual read times from external data lookup.
 **Alternatives rejected:** Keep current pool, add more AI-generated traits.
 
 
+### DEC-032: Questionnaire path skips confirmation screen
+**Date:** 2026-04-05
+**Context:** After the questionnaire reveal screen ("The assessment is complete. You are X, Y, Z, and W. Your life begins now."), players were shown the full stat summary confirmation screen. This screen exists for the manual creation path where the player set their own stats and needs to verify. For questionnaire players, the reveal IS the confirmation moment — they didn't choose their stats, so reviewing them is meaningless and breaks the flow.
+**Decision:** Questionnaire path: reveal screen → Enter → Life View directly. Manual path: still gets the confirmation screen. The reveal screen serves as the questionnaire's confirmation.
+**Alternatives rejected:** Showing both reveal and confirm (redundant, breaks flow), removing confirm from manual path too (manual players need to verify their choices).
+
 ### DEC-031: Ethnicity on identity screen, not questionnaire
 **Date:** 2026-04-05
 **Context:** Discussion during questionnaire design interview about whether ethnicity could be inferred from questionnaire answers.
