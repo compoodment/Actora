@@ -41,6 +41,32 @@ CREATION_EYE_COLOR_OPTIONS = ["Brown", "Blue", "Green", "Hazel", "Gray", "Amber"
 CREATION_HAIR_COLOR_OPTIONS = ["Black", "Brown", "Blonde", "Red", "Auburn", "Other"]
 CREATION_SKIN_TONE_OPTIONS = ["Light", "Fair", "Medium", "Olive", "Tan", "Brown", "Dark", "Other"]
 CREATION_TRAIT_POOL = ["Driven", "Chill", "Curious", "Social", "Disciplined", "Impulsive", "Empathetic", "Resilient", "Introverted", "Extraverted", "Restless", "Ambitious"]
+TRAIT_DEFINITIONS = {
+    "Driven": {"sleep_modifier": -0.5},
+    "Chill": {"sleep_modifier": +0.5},
+    "Curious": {"sleep_modifier": 0.0},
+    "Social": {"sleep_modifier": 0.0},
+    "Disciplined": {"sleep_modifier": -0.5},
+    "Impulsive": {"sleep_modifier": 0.0},
+    "Empathetic": {"sleep_modifier": 0.0},
+    "Resilient": {"sleep_modifier": 0.0},
+    "Introverted": {"sleep_modifier": +0.5},
+    "Extraverted": {"sleep_modifier": -0.5},
+    "Restless": {"sleep_modifier": -1.0},
+    "Ambitious": {"sleep_modifier": 0.0},
+}
+
+
+def get_monthly_free_hours(actor):
+    """Returns the actor's monthly free hours based on sleep hours from traits."""
+    sleep_modifier = 0.0
+    for trait in getattr(actor, "traits", []):
+        defn = TRAIT_DEFINITIONS.get(trait, {})
+        sleep_modifier += defn.get("sleep_modifier", 0.0)
+    sleep_hours = (8.0 + sleep_modifier) * 30
+    maintenance_hours = 120
+    return 720 - sleep_hours - maintenance_hours
+
 QUESTIONNAIRE_QUESTIONS = [
     {
         "style": "situational",
@@ -2163,12 +2189,21 @@ class ActoraTUI:
                     for a in self.active_actions
                 )
                 if not already_queued:
+                    focused_actor = self.world.get_focused_actor()
+                    free_hours = get_monthly_free_hours(focused_actor)
+                    used_hours = sum(a.get("time_cost", 0) for a in self.active_actions)
+                    action_cost = 4
+                    if used_hours + action_cost > free_hours:
+                        self.last_message = "Not enough free time. (" + str(int(free_hours - used_hours)) + "h left)"
+                        self.pending_choice = None
+                        return
                     target_actor = self.world.get_actor(target_actor_id)
                     target_name = target_actor.get_full_name() if target_actor else "Someone"
                     self.active_actions.append({
                         "action_type": "spend_time",
                         "target_actor_id": target_actor_id,
                         "label": f"Spend time with {target_name}",
+                        "time_cost": 4,
                     })
                     self.last_message = f"Queued: Spend time with {target_name}."
                 else:
@@ -3006,7 +3041,7 @@ class ActoraTUI:
         active_social = [lnk for lnk in social_links if lnk.get("metadata", {}).get("status") == "active"]
         social_actions = []
         if active_social:
-            social_actions.append({"id": "hang_out", "label": "Hang Out", "links": active_social})
+            social_actions.append({"id": "hang_out", "label": "Hang Out", "links": active_social, "time_cost": 4})
         return [
             {"id": "social", "label": "Social", "actions": social_actions},
         ]
@@ -3771,6 +3806,10 @@ class ActoraTUI:
         draw_vertical_divider(stdscr, top, det_left - 1, body_height)
 
         # Details column
+        focused_actor = self.world.get_focused_actor()
+        free_hours = int(get_monthly_free_hours(focused_actor))
+        queued_hours = int(sum(a.get("time_cost", 0) for a in self.active_actions))
+        remaining_hours = free_hours - queued_hours
         if current_action:
             det_lines = [f" {current_action['label']}", ""]
             if current_action["id"] == "hang_out":
@@ -3789,9 +3828,37 @@ class ActoraTUI:
                         det_lines.append(f"  {target_actor.get_full_name()} · {tier}")
                 else:
                     det_lines.append(" No active social connections yet.")
-            draw_text_block(stdscr, top, det_left, det_width, body_height, det_lines)
+            next_y = draw_text_block(stdscr, top, det_left, det_width, body_height, det_lines)
+            if next_y < top + body_height:
+                next_y = draw_text_block(stdscr, next_y, det_left, det_width, body_height - (next_y - top), [""])
+            budget_lines = [
+                (" Time Budget", curses.A_BOLD),
+                (f"  {free_hours}h free", curses.A_DIM),
+                (f"  {queued_hours}h queued", curses.A_DIM),
+                (f"  {remaining_hours}h left", curses.A_DIM),
+            ]
+            y = next_y
+            for raw_line, attr in budget_lines:
+                for wrapped_line in wrap_text_line(raw_line, det_width):
+                    if y >= top + body_height:
+                        break
+                    stdscr.addnstr(y, det_left, wrapped_line, det_width, attr)
+                    y += 1
         else:
             stdscr.addnstr(top + 1, det_left, " Select an action", det_width, curses.A_DIM)
+            budget_lines = [
+                (" Time Budget", curses.A_BOLD),
+                (f"  {free_hours}h free", curses.A_DIM),
+                (f"  {queued_hours}h queued", curses.A_DIM),
+                (f"  {remaining_hours}h left", curses.A_DIM),
+            ]
+            y = top + 3
+            for raw_line, attr in budget_lines:
+                for wrapped_line in wrap_text_line(raw_line, det_width):
+                    if y >= top + body_height:
+                        break
+                    stdscr.addnstr(y, det_left, wrapped_line, det_width, attr)
+                    y += 1
 
     def build_actor_inspect_detail(self, actor_id, *, relationship_label=None, recent_record_limit=INSPECT_RECORD_LIMIT):
         """Builds one shell-owned inspectability payload for an actor."""
