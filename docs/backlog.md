@@ -1,8 +1,8 @@
 ---
 title: Backlog
 tags: [planning, tracking, wip]
-updated: 2026-04-04
-through: v0.48.2
+updated: 2026-04-05
+through: v0.48.3
 ---
 
 # Actora Backlog
@@ -16,7 +16,6 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 - **Questionnaire full redesign** — the entire questionnaire (questions + answer stat_changes + trait suggestions) was auto-generated and never reviewed. After stat/trait implementation lands: (1) update trait output to use new 12-trait pool + pick 4, (2) review all questions for quality and player-facing language, (3) update stat_changes to use "imagination" instead of "creativity" + consider adding memory/stress outcomes where appropriate. Low priority until stats/traits are stable in code.
 - **Profile dashboard redesign** — implement summary row per category (Stats/Traits/Skills/Needs/Mood), Enter→drill detail pattern. Reusable component for future category screens. Build incrementally as systems land.
 - **Action system first wave** — time-budget model (monthly free hours), sub-type selections per action (exercise type, book subject, rest type), individual time costs per sub-action. Social: Hang Out resolves with +5 closeness. Personal: Exercise, Read, Rest with sub-types. Do before Education.
-- **Action time budget** — derive monthly free hours from sleep baseline (240hr/month) minus maintenance. Wire trait sleep modifiers (each trait has a `sleep_modifier` field in TRAIT_DEFINITIONS). Wire to action queue so you can't queue more than fits.
 
 
 
@@ -25,7 +24,6 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 - **Logo redesign** — replace placeholder "actora" script ASCII with a proper custom logo design. Layout already built and waiting for it.
 
 - **main.py extraction** — identify first sane decomposition seam after shell settles (shell/browser/actions rendering is the likely first candidate). During this pass: flatten `secondary_statistics` into one `statistics` dict with all 13 stats — snapshot should not encode rendering decisions; let the renderer decide what to show where.
-- **Action system implementation** — narrow first-wave: social + self-improvement categories (foundation screen now exists)
 
 ## Later
 

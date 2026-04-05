@@ -6,6 +6,18 @@ updated: 2026-04-04
 
 # Actora Changelog
 
+## Version 0.48.4 (Patch) - 2026-04-05
+- **Action time budget (DEC-018):**
+    - `TRAIT_DEFINITIONS` dict added with all 12 traits and their `sleep_modifier` values
+    - `get_monthly_free_hours(actor)` module-level helper: 720h − sleep hours − 120h maintenance
+    - Default baseline: 360h/month free; Restless trait: 390h; Chill trait: 345h
+    - Queue enforcement: rejects action if used hours + action cost would exceed free hours
+    - `HANG_OUT_TIME_COST = 4` constant (not hardcoded)
+    - Actions screen details column shows Time Budget: Xh free / Yh queued / Zh left
+    - Hang Out queue entry includes `time_cost` field
+- **Fix:** `HANG_OUT_TIME_COST` constant replaces hardcoded `4` in queue enforcement
+- **Bug logged:** action feedback messages not visible on Actions screen (minor)
+
 ## Version 0.48.3 (Patch) - 2026-04-05
 - **Stat redesign implemented (DEC-021):**
     - Creativity renamed Imagination in Human.stats, human.py, world.py, events.py, main.py

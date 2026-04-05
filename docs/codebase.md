@@ -2,7 +2,7 @@
 title: Codebase
 tags: [implementation, reference, stable]
 updated: 2026-04-04
-through: v0.48.3
+through: v0.48.4
 verified: 2026-04-04
 ---
 
@@ -406,6 +406,9 @@ Current shell-level functions:
 - `build_screen_chrome(...)` - shell-owned title/subtitle/date chrome assembly for the current TUI screen, including the history browser
 - `draw_text_block(...)` - small curses text rendering helper with wrapping support
 - `ActoraTUI` — curses shell object managing the split Life View, dedicated profile screen, accumulating live event feed, tabbed Browser (Relationships + History), dedicated Actions screen with social action support, styled header/footer chrome, lineage list/detail, skip-time selection, death acknowledgment, two-step continuation inspection/selection, meeting event popups, simple left-pane/profile/history scrolling, a shell-owned pending-choice popup overlay for major player-facing decisions, and safe footer rendering that avoids writing into the terminal's last column
+- `TRAIT_DEFINITIONS` — module-level dict mapping trait name → `{"sleep_modifier": float}` for all 12 traits
+- `HANG_OUT_TIME_COST = 4` — module-level constant for Hang Out action time cost in hours
+- `get_monthly_free_hours(actor)` — module-level helper; computes monthly free hours from actor traits: `720 - (8 + sleep_modifier_sum) * 30 - 120`
 - `safe_input(prompt)` - narrow shared CLI input boundary helper that exits cleanly on `EOFError` and `KeyboardInterrupt`
 - `CreationWizard` - curses-based character creation wizard with identity, location, appearance, and creation-mode steps, followed by either a questionnaire branch (questionnaire, confirmation) or a manual branch (stats, traits, confirmation)
 - `setup_initial_world_from_character(character_data)` - primary world creation flow from one fully prepared startup character payload
