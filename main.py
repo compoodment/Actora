@@ -41,6 +41,7 @@ CREATION_EYE_COLOR_OPTIONS = ["Brown", "Blue", "Green", "Hazel", "Gray", "Amber"
 CREATION_HAIR_COLOR_OPTIONS = ["Black", "Brown", "Blonde", "Red", "Auburn", "Other"]
 CREATION_SKIN_TONE_OPTIONS = ["Light", "Fair", "Medium", "Olive", "Tan", "Brown", "Dark", "Other"]
 CREATION_TRAIT_POOL = ["Driven", "Chill", "Curious", "Social", "Disciplined", "Impulsive", "Empathetic", "Resilient", "Introverted", "Extraverted", "Restless", "Ambitious"]
+HANG_OUT_TIME_COST = 4  # hours
 TRAIT_DEFINITIONS = {
     "Driven": {"sleep_modifier": -0.5},
     "Chill": {"sleep_modifier": +0.5},
@@ -2192,7 +2193,7 @@ class ActoraTUI:
                     focused_actor = self.world.get_focused_actor()
                     free_hours = get_monthly_free_hours(focused_actor)
                     used_hours = sum(a.get("time_cost", 0) for a in self.active_actions)
-                    action_cost = 4
+                    action_cost = HANG_OUT_TIME_COST
                     if used_hours + action_cost > free_hours:
                         self.last_message = "Not enough free time. (" + str(int(free_hours - used_hours)) + "h left)"
                         self.pending_choice = None
@@ -2203,7 +2204,7 @@ class ActoraTUI:
                         "action_type": "spend_time",
                         "target_actor_id": target_actor_id,
                         "label": f"Spend time with {target_name}",
-                        "time_cost": 4,
+                        "time_cost": HANG_OUT_TIME_COST,
                     })
                     self.last_message = f"Queued: Spend time with {target_name}."
                 else:
@@ -3041,7 +3042,7 @@ class ActoraTUI:
         active_social = [lnk for lnk in social_links if lnk.get("metadata", {}).get("status") == "active"]
         social_actions = []
         if active_social:
-            social_actions.append({"id": "hang_out", "label": "Hang Out", "links": active_social, "time_cost": 4})
+            social_actions.append({"id": "hang_out", "label": "Hang Out", "links": active_social, "time_cost": HANG_OUT_TIME_COST})
         return [
             {"id": "social", "label": "Social", "actions": social_actions},
         ]
