@@ -98,163 +98,239 @@ def format_stat_change_summary(stat_changes):
 
 QUESTIONNAIRE_QUESTIONS = [
     {
-        "style": "situational",
-        "text": "You find something on the ground that isn't yours.",
+        "style": "childhood",
+        "text": "As a kid, what did you do when you had a free afternoon?",
         "options": [
-            {"text": "Try to find who it belongs to", "stat_changes": {"charisma": 6, "wisdom": 4}, "trait_suggest": "Gentle"},
-            {"text": "Keep it - finders keepers", "stat_changes": {"willpower": 5, "looks": 3}},
-            {"text": "Look at it, put it back", "stat_changes": {"intelligence": 5, "imagination": 4}, "trait_suggest": "Curious"},
-            {"text": "Walk past it", "stat_changes": {"discipline": 4, "willpower": 3}},
+            {"text": "I was already outside before anyone noticed I had left", "stat_changes": {"health": 4, "strength": 3}, "trait_suggest": "Restless"},
+            {"text": "I found something to take apart, build, or figure out", "stat_changes": {"intelligence": 5, "imagination": 4}, "trait_suggest": "Curious"},
+            {"text": "I would find one person and spend the whole afternoon with them", "stat_changes": {"charisma": 4, "happiness": 4}, "trait_suggest": "Social"},
+            {"text": "I would end up somewhere quiet, reading or just thinking", "stat_changes": {"intelligence": 4, "wisdom": 4}, "trait_suggest": "Introverted"},
+        ],
+    },
+    {
+        "style": "situational",
+        "text": "When you decide you want something...",
+        "options": [
+            {"text": "I go after it before I talk myself out of it", "stat_changes": {"imagination": 4, "happiness": 3}, "trait_suggest": "Impulsive"},
+            {"text": "I adapt the plan to whatever is in the way and keep moving", "stat_changes": {"willpower": 5, "discipline": 3}, "trait_suggest": "Driven"},
+            {"text": "I sit with it until I am sure it is actually worth pursuing", "stat_changes": {"discipline": 6, "intelligence": 3}, "trait_suggest": "Disciplined"},
+            {"text": "I trust that if it is meant to happen, it will", "stat_changes": {"happiness": 5, "wisdom": 3}, "trait_suggest": "Chill"},
+        ],
+    },
+    {
+        "style": "situational",
+        "text": "In a room full of people you do not know...",
+        "options": [
+            {"text": "I am already talking to someone", "stat_changes": {"charisma": 6, "happiness": 4}, "trait_suggest": "Extraverted"},
+            {"text": "I find the one interesting person and stay there", "stat_changes": {"intelligence": 4, "charisma": 3}, "trait_suggest": "Curious"},
+            {"text": "I watch for a while before deciding who is worth talking to", "stat_changes": {"wisdom": 5, "intelligence": 3}, "trait_suggest": "Introverted"},
+            {"text": "I make sure everyone seems comfortable before I do", "stat_changes": {"charisma": 4, "happiness": 4}, "trait_suggest": "Empathetic"},
         ],
     },
     {
         "style": "spectrum",
-        "text": "When plans suddenly change...",
+        "text": "What does it mean to you to succeed at something?",
         "options": [
-            {"text": "I get excited about what might happen instead", "stat_changes": {"imagination": 6, "happiness": 4}, "trait_suggest": "Cheerful"},
-            {"text": "I feel annoyed but go with it", "stat_changes": {"willpower": 5, "discipline": 4}, "trait_suggest": "Stubborn"},
-            {"text": "I need a minute before I can deal with it", "stat_changes": {"wisdom": 5, "intelligence": 3}, "trait_suggest": "Calm"},
-            {"text": "I just wish things stayed how they were", "stat_changes": {"discipline": 6, "health": 3}},
+            {"text": "Getting there faster and better than anyone expected", "stat_changes": {"strength": 4, "discipline": 5}, "trait_suggest": "Driven"},
+            {"text": "Leaving something behind that would not exist without you", "stat_changes": {"intelligence": 5, "wisdom": 4}, "trait_suggest": "Ambitious"},
+            {"text": "Figuring it out in a way that was entirely your own", "stat_changes": {"imagination": 5, "wisdom": 3}, "trait_suggest": "Curious"},
+            {"text": "Reaching a place where you actually want to be", "stat_changes": {"happiness": 5, "wisdom": 4}, "trait_suggest": "Chill"},
+        ],
+    },
+    {
+        "style": "childhood",
+        "text": "The hardest thing about growing up was...",
+        "options": [
+            {"text": "Waiting. Everything moved too slowly", "stat_changes": {"willpower": 5, "stress": 4}, "trait_suggest": "Restless"},
+            {"text": "Figuring out who I could actually trust", "stat_changes": {"wisdom": 5, "willpower": 4}, "trait_suggest": "Resilient"},
+            {"text": "Not having enough time alone", "stat_changes": {"wisdom": 5, "intelligence": 3}, "trait_suggest": "Introverted"},
+            {"text": "Watching people I cared about struggle", "stat_changes": {"wisdom": 4, "charisma": 4}, "trait_suggest": "Empathetic"},
+        ],
+    },
+    {
+        "style": "spectrum",
+        "text": "When you want something...",
+        "options": [
+            {"text": "I go after it immediately", "stat_changes": {"willpower": 5, "strength": 4}, "trait_suggest": "Impulsive"},
+            {"text": "I figure out the fastest path and start", "stat_changes": {"discipline": 5, "intelligence": 4}, "trait_suggest": "Driven"},
+            {"text": "I make sure I actually want it before I move", "stat_changes": {"wisdom": 5, "discipline": 4}, "trait_suggest": "Disciplined"},
+            {"text": "I let it come to me", "stat_changes": {"happiness": 5, "wisdom": 4}, "trait_suggest": "Chill"},
+        ],
+    },
+    {
+        "style": "situational",
+        "text": "When you meet someone new, what are you actually paying attention to?",
+        "options": [
+            {"text": "The gap between what they say and how they carry themselves", "stat_changes": {"intelligence": 5, "wisdom": 4}, "trait_suggest": "Curious"},
+            {"text": "Whether they are comfortable, or putting on something", "stat_changes": {"charisma": 5, "wisdom": 4}, "trait_suggest": "Empathetic"},
+            {"text": "Whether this is someone who could matter to you", "stat_changes": {"charisma": 4, "intelligence": 4}, "trait_suggest": "Ambitious"},
+            {"text": "Whether they seem like someone who would actually get you", "stat_changes": {"happiness": 5, "charisma": 4}, "trait_suggest": "Social"},
+        ],
+    },
+    {
+        "style": "spectrum",
+        "text": "When do you feel most like yourself?",
+        "options": [
+            {"text": "When I am in motion, doing something", "stat_changes": {"health": 5, "strength": 4}, "trait_suggest": "Restless"},
+            {"text": "When I am deep in something difficult", "stat_changes": {"intelligence": 4, "discipline": 5}, "trait_suggest": "Driven"},
+            {"text": "When I am around people, any people", "stat_changes": {"happiness": 5, "charisma": 4}, "trait_suggest": "Extraverted"},
+            {"text": "When I have space to think without interruption", "stat_changes": {"intelligence": 5, "wisdom": 4}, "trait_suggest": "Introverted"},
+        ],
+    },
+    {
+        "style": "childhood",
+        "text": "Growing up, your relationship with rules was...",
+        "options": [
+            {"text": "I followed them. Structure made sense to me", "stat_changes": {"discipline": 6, "willpower": 4}, "trait_suggest": "Disciplined"},
+            {"text": "I followed them when they made sense, ignored the rest", "stat_changes": {"willpower": 5, "imagination": 4}, "trait_suggest": "Impulsive"},
+            {"text": "I looked for the edges, the exceptions", "stat_changes": {"intelligence": 5, "imagination": 4}, "trait_suggest": "Curious"},
+            {"text": "I thought about why they existed before deciding", "stat_changes": {"wisdom": 5, "discipline": 3}, "trait_suggest": "Resilient"},
+        ],
+    },
+    {
+        "style": "spectrum",
+        "text": "What makes you want to get better at something?",
+        "options": [
+            {"text": "Knowing I am not where I should be yet", "stat_changes": {"intelligence": 5, "discipline": 4}, "trait_suggest": "Ambitious"},
+            {"text": "Wanting to understand it properly, not just well enough", "stat_changes": {"intelligence": 6, "wisdom": 4}, "trait_suggest": "Curious"},
+            {"text": "Seeing someone I respect do it in a way I could not", "stat_changes": {"charisma": 4, "intelligence": 3}, "trait_suggest": "Social"},
+            {"text": "Stumbling into it and finding I actually enjoy it", "stat_changes": {"imagination": 5, "happiness": 3}, "trait_suggest": "Chill"},
+        ],
+    },
+    {
+        "style": "situational",
+        "text": "After a long day with people...",
+        "options": [
+            {"text": "I feel energised. I want more", "stat_changes": {"charisma": 5, "happiness": 4}, "trait_suggest": "Extraverted"},
+            {"text": "I need quiet. Time alone resets me", "stat_changes": {"wisdom": 5, "intelligence": 4}, "trait_suggest": "Introverted"},
+            {"text": "I feel okay but I need to process", "stat_changes": {"wisdom": 4, "charisma": 3}, "trait_suggest": "Empathetic"},
+            {"text": "I did not really notice either way", "stat_changes": {"happiness": 5, "health": 4}, "trait_suggest": "Chill"},
+        ],
+    },
+    {
+        "style": "situational",
+        "text": "When things fall apart...",
+        "options": [
+            {"text": "I start rebuilding before the dust settles", "stat_changes": {"willpower": 6, "discipline": 4}, "trait_suggest": "Driven"},
+            {"text": "I feel it fully, then get back up", "stat_changes": {"willpower": 5, "happiness": 3}, "trait_suggest": "Resilient"},
+            {"text": "I take it apart to understand what went wrong", "stat_changes": {"intelligence": 5, "wisdom": 4}, "trait_suggest": "Curious"},
+            {"text": "I step back until I know what I am walking back into", "stat_changes": {"wisdom": 5, "discipline": 4}, "trait_suggest": "Disciplined"},
         ],
     },
     {
         "style": "gut_pick",
         "text": "Which one is more you?",
         "options": [
-            {"text": "I jump in first and think later", "stat_changes": {"strength": 5, "willpower": 5}, "trait_suggest": "Bold"},
-            {"text": "I watch first, then decide", "stat_changes": {"intelligence": 5, "wisdom": 4}, "trait_suggest": "Alert"},
-            {"text": "I ask someone else what they think", "stat_changes": {"charisma": 6, "happiness": 3}},
-            {"text": "I overthink it until the moment passes", "stat_changes": {"intelligence": 6, "imagination": 3}, "trait_suggest": "Restless"},
+            {"text": "I say what I think, even if the timing is wrong", "stat_changes": {"charisma": 3, "willpower": 5}, "trait_suggest": "Impulsive"},
+            {"text": "I say what I think after I have worked out how to say it", "stat_changes": {"intelligence": 5, "wisdom": 4}, "trait_suggest": "Disciplined"},
+            {"text": "I say what the other person needs to hear", "stat_changes": {"charisma": 6, "wisdom": 4}, "trait_suggest": "Empathetic"},
+            {"text": "I say what I think will move things forward", "stat_changes": {"charisma": 5, "intelligence": 4}, "trait_suggest": "Ambitious"},
+        ],
+    },
+    {
+        "style": "childhood",
+        "text": "As a kid, you were the type who...",
+        "options": [
+            {"text": "Was already onto the next thing before others caught up", "stat_changes": {"health": 4, "imagination": 4}, "trait_suggest": "Restless"},
+            {"text": "Kept working after everyone else had stopped", "stat_changes": {"discipline": 5, "intelligence": 4}, "trait_suggest": "Driven"},
+            {"text": "Got back up every time, even when it hurt", "stat_changes": {"willpower": 6, "health": 4}, "trait_suggest": "Resilient"},
+            {"text": "Always knew when someone nearby was not okay", "stat_changes": {"charisma": 4, "wisdom": 4}, "trait_suggest": "Empathetic"},
         ],
     },
     {
         "style": "situational",
-        "text": "A stranger starts talking to you out of nowhere.",
+        "text": "What makes you trust someone?",
         "options": [
-            {"text": "I talk back like we have been friends for years", "stat_changes": {"charisma": 8, "happiness": 3}, "trait_suggest": "Cheerful"},
-            {"text": "I smile and keep it short", "stat_changes": {"charisma": 4, "discipline": 4}},
-            {"text": "I freeze up a little", "stat_changes": {"intelligence": 4, "wisdom": 3}, "trait_suggest": "Shy"},
-            {"text": "I pretend I did not hear them", "stat_changes": {"willpower": 5, "imagination": 3}},
+            {"text": "Consistent behaviour over a long stretch", "stat_changes": {"wisdom": 5, "discipline": 4}, "trait_suggest": "Disciplined"},
+            {"text": "Honesty, even when it is inconvenient", "stat_changes": {"willpower": 5, "wisdom": 4}, "trait_suggest": "Resilient"},
+            {"text": "The feeling that they actually see you", "stat_changes": {"happiness": 5, "charisma": 4}, "trait_suggest": "Social"},
+            {"text": "That they are curious about the same things you are", "stat_changes": {"intelligence": 5, "charisma": 3}, "trait_suggest": "Curious"},
         ],
     },
     {
         "style": "spectrum",
-        "text": "When someone near you is upset...",
+        "text": "What makes you want to get better at something?",
         "options": [
-            {"text": "I feel it like it is happening to me", "stat_changes": {"happiness": 3, "charisma": 4, "wisdom": 4}, "trait_suggest": "Gentle"},
-            {"text": "I want to help but I keep my distance", "stat_changes": {"wisdom": 5, "discipline": 4}, "trait_suggest": "Calm"},
-            {"text": "I try to fix the problem", "stat_changes": {"intelligence": 5, "strength": 3}, "trait_suggest": "Bold"},
-            {"text": "I do not really notice unless they tell me", "stat_changes": {"willpower": 5, "discipline": 4}},
-        ],
-    },
-    {
-        "style": "gut_pick",
-        "text": "Pick the one that fits:",
-        "options": [
-            {"text": "I have taken something apart just to see how it works", "stat_changes": {"intelligence": 7, "imagination": 4}, "trait_suggest": "Curious"},
-            {"text": "I have never understood why people break things on purpose", "stat_changes": {"discipline": 5, "health": 4}, "trait_suggest": "Calm"},
-            {"text": "I would rather build something new than fix something old", "stat_changes": {"imagination": 7, "intelligence": 3}, "trait_suggest": "Restless"},
-            {"text": "I do not really care how things work as long as they do", "stat_changes": {"willpower": 5, "happiness": 3}},
+            {"text": "I want to be better at it than I was before", "stat_changes": {"intelligence": 5, "discipline": 4}, "trait_suggest": "Ambitious"},
+            {"text": "I want to understand it properly, not just enough", "stat_changes": {"intelligence": 6, "wisdom": 4}, "trait_suggest": "Curious"},
+            {"text": "Someone I respect does it", "stat_changes": {"charisma": 4, "intelligence": 3}, "trait_suggest": "Social"},
+            {"text": "It came up and seemed interesting", "stat_changes": {"imagination": 5, "happiness": 3}, "trait_suggest": "Chill"},
         ],
     },
     {
         "style": "situational",
-        "text": "You are given a set of rules you think are stupid.",
+        "text": "When someone underestimates you...",
         "options": [
-            {"text": "I follow them anyway", "stat_changes": {"discipline": 7, "willpower": 3}},
-            {"text": "I ignore the ones I disagree with", "stat_changes": {"willpower": 6, "imagination": 3}, "trait_suggest": "Stubborn"},
-            {"text": "I try to change them", "stat_changes": {"charisma": 5, "intelligence": 4}, "trait_suggest": "Bold"},
-            {"text": "I follow them while complaining the entire time", "stat_changes": {"happiness": -3, "willpower": 4}, "trait_suggest": "Fussy"},
+            {"text": "I use it", "stat_changes": {"willpower": 5, "charisma": 4}, "trait_suggest": "Ambitious"},
+            {"text": "I prove them wrong quietly", "stat_changes": {"discipline": 5, "willpower": 4}, "trait_suggest": "Resilient"},
+            {"text": "I do not really notice", "stat_changes": {"happiness": 5, "wisdom": 4}, "trait_suggest": "Chill"},
+            {"text": "I wonder what gave them that impression", "stat_changes": {"intelligence": 5, "wisdom": 3}, "trait_suggest": "Curious"},
         ],
     },
     {
         "style": "spectrum",
-        "text": "If I want something, I want it...",
+        "text": "A good day is one where...",
         "options": [
-            {"text": "Right now, no waiting", "stat_changes": {"willpower": 5, "strength": 4}, "trait_suggest": "Restless"},
-            {"text": "Soon, but I can be patient", "stat_changes": {"discipline": 5, "happiness": 4}},
-            {"text": "I will plan for it and get it eventually", "stat_changes": {"wisdom": 6, "discipline": 5}, "trait_suggest": "Calm"},
-            {"text": "I think about it so long I sometimes forget I wanted it", "stat_changes": {"imagination": 5, "intelligence": 4}},
-        ],
-    },
-    {
-        "style": "gut_pick",
-        "text": "Honestly?",
-        "options": [
-            {"text": "I say what I think, even if people do not want to hear it", "stat_changes": {"willpower": 7, "charisma": -2}, "trait_suggest": "Stubborn"},
-            {"text": "I keep most of my real opinions to myself", "stat_changes": {"wisdom": 5, "discipline": 4}, "trait_suggest": "Shy"},
-            {"text": "I adjust what I say depending on who I am talking to", "stat_changes": {"charisma": 6, "imagination": 3}},
-            {"text": "I do not really have strong opinions about most things", "stat_changes": {"happiness": 4, "health": 3}},
+            {"text": "Everything on the list got done", "stat_changes": {"discipline": 6, "happiness": 4}, "trait_suggest": "Disciplined"},
+            {"text": "Something unexpected happened and you handled it", "stat_changes": {"happiness": 5, "willpower": 4}, "trait_suggest": "Impulsive"},
+            {"text": "You moved something forward that actually mattered", "stat_changes": {"discipline": 5, "intelligence": 4}, "trait_suggest": "Driven"},
+            {"text": "You did not feel like you owed anyone your time", "stat_changes": {"happiness": 6, "health": 4}, "trait_suggest": "Chill"},
         ],
     },
     {
         "style": "situational",
-        "text": "Someone dares you to do something risky.",
+        "text": "When someone near you is struggling...",
         "options": [
-            {"text": "Already doing it", "stat_changes": {"strength": 5, "willpower": 5, "health": -3}, "trait_suggest": "Bold"},
-            {"text": "I think about it, then probably do it", "stat_changes": {"intelligence": 4, "willpower": 4}},
-            {"text": "I laugh it off and say no", "stat_changes": {"wisdom": 5, "discipline": 4}, "trait_suggest": "Calm"},
-            {"text": "I dare them to do it first", "stat_changes": {"charisma": 5, "imagination": 4}, "trait_suggest": "Cheerful"},
+            {"text": "You feel it before they say a word", "stat_changes": {"charisma": 5, "wisdom": 4}, "trait_suggest": "Empathetic"},
+            {"text": "You quietly make things easier without making a thing of it", "stat_changes": {"charisma": 5, "happiness": 4}, "trait_suggest": "Social"},
+            {"text": "You give them space until they are ready", "stat_changes": {"wisdom": 5, "intelligence": 3}, "trait_suggest": "Introverted"},
+            {"text": "You ask what they need and then do it", "stat_changes": {"willpower": 4, "discipline": 4}, "trait_suggest": "Driven"},
         ],
     },
     {
         "style": "spectrum",
-        "text": "Losing at something makes me...",
+        "text": "Downtime feels like...",
         "options": [
-            {"text": "Want to try again immediately", "stat_changes": {"willpower": 7, "strength": 4}, "trait_suggest": "Stubborn"},
-            {"text": "Frustrated, but I get over it", "stat_changes": {"discipline": 5, "wisdom": 3}},
-            {"text": "Question whether it was worth trying", "stat_changes": {"intelligence": 5, "imagination": 3}},
-            {"text": "Not care that much honestly", "stat_changes": {"happiness": 5, "looks": 3}},
-        ],
-    },
-    {
-        "style": "gut_pick",
-        "text": "I notice...",
-        "options": [
-            {"text": "Details that other people miss completely", "stat_changes": {"intelligence": 6, "wisdom": 4}, "trait_suggest": "Alert"},
-            {"text": "How people are feeling before they say anything", "stat_changes": {"charisma": 5, "wisdom": 5}, "trait_suggest": "Gentle"},
-            {"text": "When something is about to go wrong", "stat_changes": {"wisdom": 6, "intelligence": 4}, "trait_suggest": "Alert"},
-            {"text": "Mostly whatever is right in front of me", "stat_changes": {"strength": 4, "happiness": 4}},
+            {"text": "A waste. I always find something to fill it", "stat_changes": {"health": 4, "discipline": 3}, "trait_suggest": "Restless"},
+            {"text": "Something I have to earn", "stat_changes": {"discipline": 5, "stress": 4}, "trait_suggest": "Driven"},
+            {"text": "Exactly what I needed", "stat_changes": {"happiness": 6, "health": 4}, "trait_suggest": "Chill"},
+            {"text": "A chance to think without pressure", "stat_changes": {"wisdom": 5, "intelligence": 4}, "trait_suggest": "Introverted"},
         ],
     },
     {
         "style": "situational",
-        "text": "You have one free afternoon with nothing planned.",
+        "text": "What kind of problem actually satisfies you to solve?",
         "options": [
-            {"text": "I am already outside doing something", "stat_changes": {"health": 5, "strength": 4}, "trait_suggest": "Restless"},
-            {"text": "I make something - draw, write, build, whatever", "stat_changes": {"imagination": 7, "intelligence": 3}, "trait_suggest": "Curious"},
-            {"text": "I find someone to hang out with", "stat_changes": {"charisma": 6, "happiness": 4}, "trait_suggest": "Cheerful"},
-            {"text": "I sit somewhere quiet and do absolutely nothing", "stat_changes": {"wisdom": 5, "happiness": 4}, "trait_suggest": "Calm"},
-        ],
-    },
-    {
-        "style": "spectrum",
-        "text": "How much do I care about how I look?",
-        "options": [
-            {"text": "More than I would ever admit", "stat_changes": {"looks": 8, "discipline": 3}, "trait_suggest": "Fussy"},
-            {"text": "Enough to make an effort most days", "stat_changes": {"looks": 5, "charisma": 3}},
-            {"text": "Only when it matters", "stat_changes": {"wisdom": 4, "willpower": 3}},
-            {"text": "Genuinely not that much", "stat_changes": {"happiness": 4, "imagination": 3}},
+            {"text": "One that asked more of you than you expected", "stat_changes": {"willpower": 5, "intelligence": 4}, "trait_suggest": "Resilient"},
+            {"text": "One no one had bothered to look at properly", "stat_changes": {"intelligence": 6, "imagination": 4}, "trait_suggest": "Curious"},
+            {"text": "One where solving it changed how you see things", "stat_changes": {"intelligence": 5, "wisdom": 4}, "trait_suggest": "Ambitious"},
+            {"text": "One where you figured it out with someone else alongside you", "stat_changes": {"charisma": 5, "intelligence": 3}, "trait_suggest": "Social"},
         ],
     },
     {
         "style": "gut_pick",
-        "text": "My gut feeling is usually...",
+        "text": "Which fits better?",
         "options": [
-            {"text": "Right, and I trust it completely", "stat_changes": {"willpower": 7, "wisdom": 4}, "trait_suggest": "Bold"},
-            {"text": "Right, but I double check anyway", "stat_changes": {"intelligence": 6, "wisdom": 4}, "trait_suggest": "Alert"},
-            {"text": "Hit or miss honestly", "stat_changes": {"imagination": 4, "happiness": 3}},
-            {"text": "Something I mostly ignore", "stat_changes": {"discipline": 6, "intelligence": 3}},
+            {"text": "I get energy from being around people", "stat_changes": {"charisma": 6, "happiness": 5}, "trait_suggest": "Extraverted"},
+            {"text": "I lose energy being around people", "stat_changes": {"wisdom": 5, "intelligence": 5}, "trait_suggest": "Introverted"},
         ],
     },
     {
-        "style": "situational",
-        "text": "A friend gives you something you hate.",
+        "style": "gut_pick",
+        "text": "Which fits better?",
         "options": [
-            {"text": "I smile and say thank you", "stat_changes": {"charisma": 6, "discipline": 3}},
-            {"text": "I tell them honestly", "stat_changes": {"willpower": 5, "charisma": -2}, "trait_suggest": "Stubborn"},
-            {"text": "I keep it but never use it", "stat_changes": {"wisdom": 4, "discipline": 4}, "trait_suggest": "Shy"},
-            {"text": "I feel bad about not liking it for way too long", "stat_changes": {"happiness": -3, "wisdom": 4}, "trait_suggest": "Gentle"},
+            {"text": "I think things through before I act", "stat_changes": {"discipline": 6, "wisdom": 5}, "trait_suggest": "Disciplined"},
+            {"text": "I act and figure it out as I go", "stat_changes": {"willpower": 5, "imagination": 5}, "trait_suggest": "Impulsive"},
+        ],
+    },
+    {
+        "style": "formative",
+        "text": "The thing that shaped you most was...",
+        "options": [
+            {"text": "Someone who believed in you when you did not", "stat_changes": {"willpower": 6, "happiness": 4}, "trait_suggest": "Resilient"},
+            {"text": "Something you had to figure out alone", "stat_changes": {"intelligence": 5, "wisdom": 5}, "trait_suggest": "Curious"},
+            {"text": "A moment when you realised what you actually wanted", "stat_changes": {"intelligence": 4, "discipline": 4}, "trait_suggest": "Ambitious"},
+            {"text": "Learning how to be around people properly", "stat_changes": {"charisma": 6, "happiness": 4}, "trait_suggest": "Extraverted"},
         ],
     },
 ]
@@ -940,6 +1016,9 @@ class CreationWizard:
         self.question_index = 0
         self.question_option_index = 0
         self.questionnaire_answers = []
+        self.questionnaire_framing_shown = False
+        self.questionnaire_reveal_shown = False
+        self.questionnaire_reveal_shown = False
         self.quit_confirmation_active = False
         self.identity_first_name_error_shown = False
 
@@ -983,12 +1062,17 @@ class CreationWizard:
         return 5 if self.selected_mode == "questionnaire" else 6
 
     def build_questionnaire_starting_stats(self):
-        return {stat_name: 50 for stat_name in CREATION_STAT_ORDER}
+        stats = {stat_name: 50 for stat_name in CREATION_STAT_ORDER}
+        stats["stress"] = 0  # Stress is a signed stat (-50 to +50); 0 = no pressure at baseline
+        stats["memory"] = 0  # Memory is a signed stat; 0 = average baseline (not seeded by questionnaire)
+        return stats
 
     def reset_questionnaire_progress(self):
         self.question_index = 0
         self.question_option_index = 0
         self.questionnaire_answers = []
+        self.questionnaire_framing_shown = False
+        self.questionnaire_reveal_shown = False
 
     def begin_questionnaire(self):
         self.selected_mode = "questionnaire"
@@ -1003,30 +1087,44 @@ class CreationWizard:
     def finalize_questionnaire_results(self):
         stats = self.build_questionnaire_starting_stats()
         trait_counts = {}
+
+        # Hard-block pairs: answers for one side subtract from the other
+        BLOCKING_PAIRS = [
+            ("Introverted", "Extraverted"),
+            ("Disciplined", "Impulsive"),
+        ]
+
         for option in self.questionnaire_answers:
             for stat_name, delta in option["stat_changes"].items():
                 stats[stat_name] = stats.get(stat_name, 50) + delta
             suggested_trait = option.get("trait_suggest")
             if suggested_trait:
                 trait_counts[suggested_trait] = trait_counts.get(suggested_trait, 0) + 1
+                # Active competition: subtract from the blocked counterpart
+                for pair in BLOCKING_PAIRS:
+                    if suggested_trait == pair[0]:
+                        trait_counts[pair[1]] = trait_counts.get(pair[1], 0) - 1
+                    elif suggested_trait == pair[1]:
+                        trait_counts[pair[0]] = trait_counts.get(pair[0], 0) - 1
 
         for stat_name in stats:
-            stats[stat_name] = max(0, min(100, stats[stat_name]))
+            stats[stat_name] = max(-50 if stat_name in ("stress", "memory") else 0, min(50 if stat_name in ("stress", "memory") else 100, stats[stat_name]))
 
         ranked_traits = []
         count_groups = {}
         for trait_name, count in trait_counts.items():
-            count_groups.setdefault(count, []).append(trait_name)
+            if count > 0:  # Only include traits with positive scores
+                count_groups.setdefault(count, []).append(trait_name)
         for count in sorted(count_groups.keys(), reverse=True):
             tied_traits = list(count_groups[count])
             random.shuffle(tied_traits)
             ranked_traits.extend(tied_traits)
 
-        selected_traits = ranked_traits[:3]
-        if len(selected_traits) < 3:
+        selected_traits = ranked_traits[:4]
+        if len(selected_traits) < 4:
             remaining_pool = [trait for trait in CREATION_TRAIT_POOL if trait not in selected_traits]
             random.shuffle(remaining_pool)
-            selected_traits.extend(remaining_pool[: 3 - len(selected_traits)])
+            selected_traits.extend(remaining_pool[: 4 - len(selected_traits)])
 
         self.data["stats"] = stats
         self.data["traits"] = selected_traits
@@ -1371,6 +1469,23 @@ class CreationWizard:
         draw_vertical_divider(self.stdscr, 5, right_left - 2, body_height)
         draw_text_block(self.stdscr, 5, right_left, right_width, body_height, right_lines)
 
+    def render_questionnaire_framing(self, height, width):
+        content_left, content_width = get_content_bounds(width, max_width=92)
+        lines = [
+            "",
+            "",
+            "Before we begin",
+            "",
+            "Every person who enters the simulation is assessed.",
+            "This is standard.",
+            "",
+            "Answer as honestly as you can. There is no record of what you choose",
+            "only of who you become.",
+            "",
+            "",
+        ]
+        draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines)
+
     def render_questionnaire(self, height, width):
         content_left, content_width = get_content_bounds(width, max_width=92)
         question = QUESTIONNAIRE_QUESTIONS[self.question_index]
@@ -1401,6 +1516,28 @@ class CreationWizard:
         ]
         draw_box(self.stdscr, top, left, box_height, box_width, title="Quit")
         draw_panel_text(self.stdscr, top, left, box_height, box_width, lines)
+
+    def render_questionnaire_reveal(self, height, width):
+        content_left, content_width = get_content_bounds(width, max_width=92)
+        traits = self.data.get("traits", [])
+        if len(traits) >= 4:
+            trait_line = f"You are {traits[0]}, {traits[1]}, {traits[2]}, and {traits[3]}."
+        elif traits:
+            trait_line = "You are " + ", ".join(traits) + "."
+        else:
+            trait_line = ""
+        lines = [
+            "",
+            "",
+            "The assessment is complete.",
+            "",
+            trait_line,
+            "",
+            "Your life begins now.",
+            "",
+            "",
+        ]
+        draw_text_block(self.stdscr, 5, content_left, content_width, height - 7, lines)
 
     def render_confirm(self, height, width):
         content_left, content_width = get_content_bounds(width, max_width=92)
@@ -1451,9 +1588,14 @@ class CreationWizard:
             self.render_mode_selection(height, width)
         elif self.step_index == 4:
             if self.selected_mode == "questionnaire":
-                self.render_questionnaire(height, width)
+                if not self.questionnaire_framing_shown:
+                    self.render_questionnaire_framing(height, width)
+                else:
+                    self.render_questionnaire(height, width)
             else:
                 self.render_stats(height, width)
+        elif self.step_index == 5 and self.selected_mode == "questionnaire" and not self.questionnaire_reveal_shown:
+            self.render_questionnaire_reveal(height, width)
         elif self.step_index == 5 and self.selected_mode == "manual":
             self.render_traits(height, width)
         else:
@@ -1692,9 +1834,14 @@ class CreationWizard:
             if self.question_index >= len(QUESTIONNAIRE_QUESTIONS) - 1:
                 self.finalize_questionnaire_results()
                 self.step_index = 5
+                self.questionnaire_reveal_shown = False
                 return
             self.question_index += 1
             self.question_option_index = 0
+
+    def handle_questionnaire_reveal_key(self, key):
+        if key in (curses.KEY_ENTER, 10, 13, ord(' ')):
+            self.questionnaire_reveal_shown = True
 
     def handle_confirm_key(self, key):
         if key in BACK_KEYS:
@@ -1732,9 +1879,15 @@ class CreationWizard:
                 self.handle_mode_key(key)
             elif self.step_index == 4:
                 if self.selected_mode == "questionnaire":
-                    self.handle_questionnaire_key(key)
+                    if not self.questionnaire_framing_shown:
+                        if key in (curses.KEY_ENTER, 10, 13, ord(' ')):
+                            self.questionnaire_framing_shown = True
+                    else:
+                        self.handle_questionnaire_key(key)
                 else:
                     self.handle_stats_key(key)
+            elif self.step_index == 5 and self.selected_mode == "questionnaire" and not self.questionnaire_reveal_shown:
+                self.handle_questionnaire_reveal_key(key)
             elif self.step_index == 5 and self.selected_mode == "manual":
                 self.handle_traits_key(key)
             else:
