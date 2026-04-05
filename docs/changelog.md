@@ -6,6 +6,13 @@ updated: 2026-04-05
 
 # Actora Changelog
 
+## Version 0.51.3 (Patch) - 2026-04-05
+- **Fix: appearance Enter→custom text field** — pressing Enter on a select field set to "Other" now moves focus to the custom text input row instead of trying to advance the step
+- **Fix: questionnaire framing Backspace** — Backspace on the framing screen now navigates back to mode selection (step 3)
+- **Fix: Skip Time custom 0 silent advance** — entering "0" as custom months and pressing Enter now shows "Enter a number greater than 0." instead of silently advancing 1 month via preset fallback
+- **Fix: duplicate skip markers on interrupted skip** — resumed skip segments no longer emit a new skip marker in the event log; only the original skip call emits one
+- **Fix: action feedback visible on Actions screen** — `last_message` (e.g. "Already queued", "Not enough free time") now renders at the bottom of the details column on the Actions screen
+
 ## Version 0.51.2 (Patch) - 2026-04-05
 - **Shell geometry centralized** — `HEADER_ROWS`, `FOOTER_ROWS`, `BROWSER_CHROME_ROWS` class constants replace all hardcoded row numbers throughout `ActoraTUI`
     - Any future header/footer change requires updating exactly three constants; no body renderer needs editing
