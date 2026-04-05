@@ -64,7 +64,7 @@ All screens are reachable from Life View. Nested screens return to their parent 
 ### Profile (via Menu → Profile)
 **Purpose:** Full actor detail. Who you are, what you've committed to. Being redesigned as a dashboard.
 **What lives here (current):**
-- Full stats (primary + secondary)
+- Full stats (primary + secondary). Memory and Stress displayed at bottom of secondary stats, separated by a blank line (signed range -50 to +50)
 - Appearance
 - Traits
 - Sexuality, gender
