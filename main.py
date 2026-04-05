@@ -3651,6 +3651,23 @@ class ActoraTUI:
         draw_box(stdscr, top, left, box_height, box_width, title="Quit")
         draw_panel_text(stdscr, top, left, box_height, box_width, lines)
 
+    _LOGO_LINES = [
+        "╗▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄╔",
+        "║█░░▒▒▓█▄░▄█▓▒▒░░█║",
+        "║█░▒▒▓█▀░▄░▀█▓▒▒░█║",
+        "║█░▒▒▓█▒▒█▒▒█▓▒▒░█║",
+        "║█░▒▒▓█▄▀▓▀▄█▓▒▒░█║",
+        "║█░░▒▒▓█▓▄▓█▓▒▒░░█║",
+        "╝▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀╚",
+    ]
+
+    def _get_logo_layout(self, width):
+        """Returns (logo_x, logo_w, logo_center) — the canonical horizontal anchor for all shell layers."""
+        logo_w = max(len(l) for l in self._LOGO_LINES)
+        logo_x = (max(1, width - 1) - logo_w) // 2
+        logo_center = logo_x + logo_w // 2
+        return logo_x, logo_w, logo_center
+
     def render_header(self, stdscr, width):
         focused_actor = self.get_focused_actor()
         focused_actor_name = focused_actor.get_full_name() if focused_actor is not None else "Unknown"
@@ -3658,16 +3675,8 @@ class ActoraTUI:
         full_hline = "═" * max(0, width - 1)
         divider = "║"
 
-        LOGO = [
-            "╗▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄╔",
-            "║█░░▒▒▓█▄░▄█▓▒▒░░█║",
-            "║█░▒▒▓█▀░▄░▀█▓▒▒░█║",
-            "║█░▒▒▓█▒▒█▒▒█▓▒▒░█║",
-            "║█░▒▒▓█▄▀▓▀▄█▓▒▒░█║",
-            "║█░░▒▒▓█▓▄▓█▓▒▒░░█║",
-            "╝▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀╚",
-        ]
-        logo_w = max(len(l) for l in LOGO)  # actual character width, no padding
+        LOGO = self._LOGO_LINES
+        logo_x, logo_w, _logo_center = self._get_logo_layout(width)
 
         # Left panel content
         try:
@@ -3698,9 +3707,7 @@ class ActoraTUI:
             "",
         ]
 
-        # Logo is centered. Left/right info panels flank it.
-        # All 7 rows use the same logo_x so ║ aligns vertically on all lines.
-        logo_x = (width - 1 - logo_w) // 2
+        # Logo is centered via _get_logo_layout — canonical anchor for all shell layers.
         panel_left_w = logo_x           # columns 0 to logo_x-1
         panel_right_w = width - 1 - logo_x - logo_w  # columns after logo to end
 
@@ -3739,8 +3746,12 @@ class ActoraTUI:
         body_height = height - 8
         self._main_body_height = body_height
         content_left, content_width = get_content_bounds(width, max_width=112)
-        left_width, right_left, right_width = split_centered_columns(content_left, content_width, left_ratio=0.5)
-        divider_x = right_left - 2
+        _, _logo_w, logo_center = self._get_logo_layout(width)
+        # Pin divider to logo center so body │ and header ║ share the same column.
+        divider_x = logo_center
+        left_width = divider_x - content_left - 1
+        right_left = divider_x + 2
+        right_width = content_left + content_width - right_left
 
         left_sections = [
             section
