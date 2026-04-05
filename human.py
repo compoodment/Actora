@@ -45,8 +45,8 @@ class Human:
             "strength": 50,
             "charisma": 50,
             "imagination": 50,
-            "memory": 50,
-            "stress": 10,
+            "memory": 0,   # Signed stat: -50 (declining) to +50 (sharp). 0 = average baseline.
+            "stress": 0,   # Signed stat: -50 (no pressure) to +50 (severe). 0 = baseline.
             "wisdom": 50,
             "discipline": 50,
             "willpower": 50,
@@ -81,8 +81,8 @@ class Human:
         self.stats["strength"] = random.randint(30, 70)
         self.stats["charisma"] = random.randint(30, 70)
         self.stats["imagination"] = random.randint(30, 70)
-        self.stats["memory"] = random.randint(40, 70)
-        self.stats["stress"] = random.randint(5, 20)
+        self.stats["memory"] = random.randint(-10, 20)   # Signed: slight variation around 0
+        self.stats["stress"] = random.randint(0, 15)       # Signed: most start near baseline
         self.stats["wisdom"] = random.randint(20, 50)
         self.stats["discipline"] = random.randint(20, 50)
         self.stats["willpower"] = random.randint(30, 70)
@@ -269,8 +269,8 @@ class Human:
                 "strength": self.stats["strength"],
                 "charisma": self.stats["charisma"],
                 "imagination": self.stats.get("imagination", 50),
-                "memory": self.stats.get("memory", 50),
-                "stress": self.stats.get("stress", 10),
+                "memory": self.stats.get("memory", 0),
+                "stress": self.stats.get("stress", 0),
                 "wisdom": self.stats["wisdom"],
                 "discipline": self.stats["discipline"],
                 "willpower": self.stats["willpower"],
@@ -282,12 +282,17 @@ class Human:
         }
 
     # --- Stat Management Helper Methods ---
+    SIGNED_STATS = {"stress", "memory"}  # Range: -50 to +50
+
     def modify_stat(self, stat_name, change):
-        """Modifies a specified stat, clamping between 0 and 100 if applicable."""
+        """Modifies a specified stat. Signed stats (stress, memory) clamp to -50/+50. Others clamp to 0/100."""
         if stat_name in self.stats:
             current_value = self.stats[stat_name]
             new_value = current_value + change
-            self.stats[stat_name] = min(100, max(0, new_value))
+            if stat_name in self.SIGNED_STATS:
+                self.stats[stat_name] = min(50, max(-50, new_value))
+            else:
+                self.stats[stat_name] = min(100, max(0, new_value))
         elif stat_name == "money":
             self.money += change
         else:

@@ -42,8 +42,8 @@ def _normalize_human_stats(stats):
         if stat_name in _CANONICAL_HUMAN_STAT_KEYS
     }
     normalized_stats["imagination"] = _extract_imagination_value(source_stats)
-    normalized_stats.setdefault("memory", random.randint(40, 70))
-    normalized_stats.setdefault("stress", random.randint(5, 20))
+    normalized_stats.setdefault("memory", random.randint(-10, 20))  # Signed: -50 to +50
+    normalized_stats.setdefault("stress", random.randint(0, 15))      # Signed: -50 to +50
     return normalized_stats
 from identity import (
     CULTURE_NAME_POOLS,
