@@ -20,13 +20,13 @@ It is intended to support safe patching, review, and manual verification, alongs
 ## 1. Stack
 
 - **Language:** Python
-- **Interface:** Terminal with a curses-based startup character creation wizard and a curses TUI shell for ordinary play. Shell v2 (v0.48.0): 5-row header chrome (title, screen/actor/date, state line with location+health+money, separators), body, footer with primary commands. Split Life View, dedicated profile screen, tabbed Browser (Relationships tab + History tab replacing older separate lineage/history screens), a dedicated Actions screen with social action support, death/continuation interrupts, skip-time utility flow, and meeting/social event popups
+- **Interface:** Terminal with a curses-based startup character creation wizard and a curses TUI shell for ordinary play. Shell v2 (v0.48.0+): 7-row header (custom logo crest + flanking info panels, rows 0-6), body, 2-row footer. Split Life View, dedicated profile screen, tabbed Browser (Relationships tab + History tab), dedicated Actions screen, death/continuation interrupts, skip-time flow, and meeting/social event popups. Shell geometry centralized in `ActoraTUI` class constants: `HEADER_ROWS=7`, `FOOTER_ROWS=2`, `BROWSER_CHROME_ROWS=2` — all body renderers derive `top` and `body_height` from these.
 - **Structure:** Small modular prototype with separated simulation and rendering responsibilities
 
 ## 2. Current File Structure
 
     ./
-    ├── main.py          (4574 lines - TUI, creation wizard, shell, rendering)
+    ├── main.py          (4590 lines - TUI, creation wizard, shell, rendering)
     ├── world.py          (2135 lines - simulation state, links, places, records, social links, mortality, advancement)
     ├── identity.py       (299 lines - name pools, culture-aware identity generation)
     ├── human.py          (295 lines - Human model, lifecycle, spatial, snapshot)
@@ -405,7 +405,7 @@ Current shell-level functions:
 - `build_death_lines(...)` - shell-owned dead-focus interrupt copy assembly
 - `build_screen_chrome(...)` - shell-owned title/subtitle/date chrome assembly for the current TUI screen, including the history browser
 - `draw_text_block(...)` - small curses text rendering helper with wrapping support
-- `ActoraTUI` — curses shell object managing the split Life View, dedicated profile screen, accumulating live event feed, tabbed Browser (Relationships + History), dedicated Actions screen with social action support, styled header/footer chrome, lineage list/detail, skip-time selection, death acknowledgment, two-step continuation inspection/selection, meeting event popups, simple left-pane/profile/history scrolling, a shell-owned pending-choice popup overlay for major player-facing decisions, and safe footer rendering that avoids writing into the terminal's last column
+- `ActoraTUI` — curses shell object managing the split Life View, dedicated profile screen, accumulating live event feed, tabbed Browser (Relationships + History), dedicated Actions screen with social action support, styled header/footer chrome, lineage list/detail, skip-time selection, death acknowledgment, two-step continuation inspection/selection, meeting event popups, simple left-pane/profile/history scrolling, a shell-owned pending-choice popup overlay for major player-facing decisions, and safe footer rendering that avoids writing into the terminal's last column. Class constants `HEADER_ROWS`, `FOOTER_ROWS`, `BROWSER_CHROME_ROWS` are the canonical shell geometry anchors. `_get_logo_layout(width)` returns `(logo_x, logo_w, logo_center)` — used by both `render_header` and `render_main` to guarantee the body │ divider aligns with the logo center column.
 - `EXERCISE_SUBTYPES`, `READ_SUBTYPES`, `REST_SUBTYPES` — module-level sub-type definition lists with `id`, `label`, `time_cost`, `stat_changes`, `event_text`
 - `EXERCISE_TIME_COST`, `READ_TIME_COST`, `REST_TIME_COST` — module-level time cost constants
 - `format_stat_change_summary(stat_changes)` — formats stat changes as plain "+Stat" labels for display
