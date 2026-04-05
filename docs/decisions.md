@@ -145,6 +145,12 @@ Future: real books get actual read times from external data lookup.
 **Alternatives rejected:** Keep current pool, add more AI-generated traits.
 
 
+### DEC-028: Stress and Memory use signed range (-50 to +50), not 0-100
+**Date:** 2026-04-05
+**Context:** Stress and Memory were added as standard 0-100 stats (DEC-021). But Stress as 0-100 implies a character starts at "50 stress" which is already under moderate pressure at creation. Memory at 0-100 similarly implies a character starts with "50 memory" as an absolute score. Both are better modelled as deviation from baseline: 0 = neutral/average, positive = above baseline, negative = below.
+**Decision:** Stress range: -50 (no pressure) to +50 (severe pressure). 0 = baseline. Memory range: -50 (declining/impaired) to +50 (sharp/retentive). 0 = average. This matches Mood's -50 to +50 range (DEC-025) and creates a consistent signed-deviation model for these stats. `modify_stat` clamping, Profile display, questionnaire baseline, and future mechanical checks must all be updated to reflect this range. Implementation deferred until after questionnaire is written and shipped.
+**Alternatives rejected:** Keep 0-100 (misleading baseline semantics), use 0-100 but reframe 50 as neutral in docs only (inconsistent with actual code behaviour).
+
 ### DEC-027: Reputation starts as single axis, expands to multi-axis later
 **Date:** 2026-04-04
 **Context:** Reputation/social standing is a needed system but multi-axis reputation (trustworthiness, status, notoriety, danger level) requires many supporting systems that don't exist yet (crime, politics, career).
