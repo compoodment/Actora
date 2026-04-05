@@ -1842,7 +1842,17 @@ class CreationWizard:
 
     def handle_questionnaire_reveal_key(self, key):
         if key in (curses.KEY_ENTER, 10, 13, ord(' ')):
-            self.questionnaire_reveal_shown = True
+            # Questionnaire reveal IS the confirmation — go straight to game, skip confirm screen
+            self.running = False
+        if key in BACK_KEYS:
+            # Backspace goes back to last question
+            self.questionnaire_reveal_shown = False
+            self.step_index = 4
+            self.questionnaire_framing_shown = True
+            if self.questionnaire_answers:
+                self.questionnaire_answers.pop()
+                self.question_index = max(0, len(self.questionnaire_answers))
+                self.question_option_index = 0
 
     def handle_confirm_key(self, key):
         if key in BACK_KEYS:
@@ -1889,6 +1899,8 @@ class CreationWizard:
                     self.handle_stats_key(key)
             elif self.step_index == 5 and self.selected_mode == "questionnaire" and not self.questionnaire_reveal_shown:
                 self.handle_questionnaire_reveal_key(key)
+                if not self.running:
+                    return self.build_result()
             elif self.step_index == 5 and self.selected_mode == "manual":
                 self.handle_traits_key(key)
             else:
