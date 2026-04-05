@@ -88,13 +88,15 @@ That gets you oriented. Only read other docs when the task requires them.
 
 ### Implementation workflow
 1. Check `rules.md` constraints
-2. Read relevant docs from the doc map above
-3. Choose execution path: direct edit (tiny) / Codex / Claude Code (medium+)
-4. Spec before apply for anything non-trivial
-5. Verify: `python3 -c "import main"` + tmux playtest if TUI
-6. `git add -A && git commit && git push`
-7. Update affected docs (codebase, changelog, backlog) — check if the change makes other docs stale too
-8. Update daily memory log
+2. **Design gate:** Does this task touch a system with mechanical depth? If yes, check `design.md` — is there a completed interview/anchor for this system? If not, STOP. Flag as design-pending, do not implement.
+3. Read relevant docs from the doc map above
+4. Choose execution path: direct edit (tiny) / Codex / Claude Code (medium+)
+5. Spec before apply for anything non-trivial
+6. Verify: `python3 -c "import main"` + tmux playtest if TUI
+7. **Review worker output:** read the actual diff, not just compilation. Check against rules.md, especially player-facing text, state mutation paths, and code rules.
+8. `git add -A && git commit && git push`
+9. Update affected docs (codebase, changelog, backlog) — check if the change makes other docs stale too
+10. Update daily memory log
 
 ### Version milestone workflow
 1. All of implementation workflow above

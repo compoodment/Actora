@@ -123,3 +123,5 @@ Don't blur these. Don't present proposals as implemented. Don't assume docs auto
 6. After compaction: re-read memory/daily + MEMORY.md + guide.md + rules.md + backlog.md (Now); don't bulk-read other docs unless the task needs them
 7. Before any config edit: create a backup first
 8. For meaningful repo/file edits: create a local pre-edit backup in `.backups/`
+9. **Design before implementation:** If a task touches a system with mechanical depth (traits, stats, skills, questionnaire, needs, mood, actions), it requires a design interview first. Do not patch, hack, or "quick fix" systems that need real design. If there's no interview to reference, flag the task as design-pending and stop. Building on undesigned foundations is how we get things we have to tear out later.
+10. **Check workflow during execution, not just at the start:** Reading guide.md once is not enough. Before each step of the implementation workflow (dispatch, review, commit, doc sync), re-verify you're following it. The failure mode is: read → understand → get momentum → cut corners. The workflow exists specifically to prevent this.
