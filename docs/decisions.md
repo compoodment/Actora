@@ -145,6 +145,37 @@ Future: real books get actual read times from external data lookup.
 **Alternatives rejected:** Keep current pool, add more AI-generated traits.
 
 
+### DEC-031: Ethnicity on identity screen, not questionnaire
+**Date:** 2026-04-05
+**Context:** Discussion during questionnaire design interview about whether ethnicity could be inferred from questionnaire answers.
+**Decision:** Ethnicity is identity, not psychology. It belongs on the identity screen (alongside name, sex, gender) as a player choice, not derived from personality answers. When the ethnicity system is built, it lives on the identity screen.
+**Alternatives rejected:** Inferring ethnicity from questionnaire patterns (would be reductive and inaccurate — ethnicity is who you are, not how you answer psychological questions).
+
+### DEC-030: Questionnaire trait blocking via active tally competition
+**Date:** 2026-04-05
+**Context:** Some trait pairs are mechanically mutually exclusive. Introverted and Extraverted cannot coexist (they have opposing mechanical effects). Disciplined and Impulsive cannot coexist (consistency vs volatility directly conflict).
+**Decision:** Hard-block pairs: Introverted↔Extraverted, Disciplined↔Impulsive. Implemented via active tally competition: any answer that suggests Introverted also subtracts 1 from Extraverted's tally (and vice versa). Same for Disciplined↔Impulsive. This means they compete organically throughout the questionnaire rather than requiring post-processing cleanup. Other "opposite" pairs (Driven↔Chill, Restless↔Disciplined) are soft — the questionnaire makes them unlikely to co-occur but doesn't prevent it, because real personalities can be contradictory.
+**Alternatives rejected:** Post-tally cleanup (less organic, easier to game), blocking all "opposite" pairs (too restrictive — Driven+Chill is a valid personality).
+
+### DEC-029: Questionnaire framing and reveal screen text
+**Date:** 2026-04-05
+**Context:** The questionnaire needs framing before Q1 and a reveal after Q24. Tone should match Actora's simulation-real world tone, not sound like a game UI or a BuzzFeed quiz.
+**Decision:**
+Framing screen (before Q1):
+  "Before we begin
+  Every person who enters the simulation is assessed.
+  This is standard.
+  Answer as honestly as you can. There is no record of what you choose
+  only of who you become."
+
+Reveal screen (after Q24, traits filled dynamically):
+  "The assessment is complete.
+  You are [Trait], [Trait], [Trait], and [Trait].
+  Your life begins now."
+
+Traits shown as names only, not editable. No running stats visible during questionnaire. No progress indicator yet (future: progress bar).
+**Alternatives rejected:** Clinical/instructional tone (Options A and B considered and rejected — too cold or too gamey).
+
 ### DEC-028: Stress and Memory use signed range (-50 to +50), not 0-100
 **Date:** 2026-04-05
 **Context:** Stress and Memory were added as standard 0-100 stats (DEC-021). But Stress as 0-100 implies a character starts at "50 stress" which is already under moderate pressure at creation. Memory at 0-100 similarly implies a character starts with "50 memory" as an absolute score. Both are better modelled as deviation from baseline: 0 = neutral/average, positive = above baseline, negative = below.

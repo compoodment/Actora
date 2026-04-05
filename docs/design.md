@@ -33,6 +33,41 @@ Each system uses this format:
 - Later: parent backstory depth, grandparent lineage, family history context.
 **Open questions:** Trait pool redesign is in progress (see Traits section). Wizard currently shows wrong trait pool and wrong count (3 instead of 4) — fix is a Now backlog item.
 
+
+---
+
+### Questionnaire
+**Status:** Redesign in progress (design complete 2026-04-05, implementation pending)
+**Current truth:** 16-question questionnaire exists in code but uses old trait names (Cheerful, Calm, Bold, etc.) that don't match the new 12-trait pool, and outputs 3 traits instead of 4. Broken until redesign is implemented.
+
+**Design (interview 2026-04-05):**
+- 24 questions (up from 16)
+- Variable answer count: 3 or 4 per question depending on what fits naturally — uniformity forced is worse than the right number of options
+- No negative stat changes — questionnaire should not penalise personality types. Gameplay handles downsides.
+- Stat baseline: all stats start at 50, Stress starts at 0 (it's a signed stat per DEC-028, not a neutral-at-50 stat)
+- Memory: not seeded by questionnaire. Starts at 0, drifts through gameplay only.
+- Stat changes per answer: +4 to +7 per stat, typically 1-2 stats per answer. Over 24 questions, focused play on one stat produces 74-96 range. Neutral spread produces 55-65.
+- Trait blocking: active tally competition (DEC-030). Introverted↔Extraverted and Disciplined↔Impulsive compete throughout — answer for one subtracts from the other.
+- Each trait must be suggestable at least 3 times across 24 questions. No trait should be unreachable.
+- Neutral answers allowed — not every option needs a trait_suggest. Some options are genuine personality neutrals that still seed stats.
+- Question style: mix of second-person situational ("In a room full of people...") and first-person ("When I want something..."). Forced consistency either way is wrong.
+- Childhood/formative questions use observable behaviour framing — what did you DO, not what did you THINK about it. Kids don't reflect analytically.
+- Tone: psychological depth without being clinical. Real personality signals, not "which Hogwarts house are you" material.
+- Framing screen and reveal screen text: locked in DEC-029.
+- Ethnicity: not on questionnaire — belongs on identity screen (DEC-031).
+
+**Trait coverage (24 questions, minimum 3 each):**
+Energy/pace cluster (Driven, Chill, Restless) — ~6 questions, most mechanically active (time budget).
+Social style cluster (Social, Introverted, Extraverted, Empathetic) — ~7 questions, core social systems.
+Structure cluster (Disciplined, Impulsive) — ~5 questions, hard-block pair.
+Depth/growth cluster (Curious, Ambitious) — ~4 questions.
+Toughness cluster (Resilient) — ~3 questions.
+
+**Open questions:**
+- Future: progress bar during questionnaire (logged in backlog Later)
+- Should the questionnaire be re-takeable after character creation, ever? (deferred)
+- How does questionnaire output interact with future ethnicity/background systems?
+
 ---
 
 ### Social Relationships
