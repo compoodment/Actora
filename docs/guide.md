@@ -138,15 +138,17 @@ If any box is unchecked, go back and do it. Do not proceed.
 
 ### Worker context loading
 When dispatching a coding worker, include:
-- **UI work** → `controls.md` + `screens.md` + `codebase.md` (relevant sections)
+- **UI/shell work** → `controls.md` + `screens.md` + `codebase.md` (relevant sections) + `ui.py` if touching layout primitives
 - **System implementation** → `design.md` (relevant system) + `codebase.md` + `rules.md`
+- **Mechanics/action work** → `codebase.md` + `mechanics.py` + `rules.md`
+- **Wizard/creation work** → `codebase.md` + `wizard.py` relevant sections + `rules.md`
 - **Bug fix** → `bugs.md` + `codebase.md` (relevant section)
 
 ### Coding worker rules
 - **Tiny fix** (1-5 lines): direct edit, no worker needed
 - **Medium+ changes**: minimal grounding → dispatch worker → review → verify → commit
-- **Claude Code CLI**: `claude --print` for read-only; `claude --permission-mode bypassPermissions --print` for edits
-- Always verify `python3 -c "import main"` after Python changes
+- **Current worker:** Codex CLI (`codex exec --full-auto`). Claude Code CLI auth is broken as of 2026-04-05 — see `TOOLS.md` (workspace) for current status and fix instructions.
+- Always verify `python3 -c "import main"` after Python changes; also verify `python3 -c "import ui; import mechanics; import wizard"` after touching extracted modules
 - Always review worker output — compilation is one gate, not the throne of truth
 - **Model selection:** See `TOOLS.md` (workspace) for the full routing table. Do not duplicate model decisions here.
 

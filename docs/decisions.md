@@ -235,3 +235,16 @@ Traits shown as names only, not editable. No running stats visible during questi
 **Why both number and label:** Number = precise feedback. Label = human meaning + gameplay consequence signal. Neither alone sufficient.
 **Alternatives rejected:** Label only (loses precision), number only (loses human meaning), merging Mood into Happiness (they operate on different timescales).
 
+
+### DEC-033: Codebase module structure and import boundary
+**Date:** 2026-04-05
+**Context:** main.py reached 4600+ lines with CreationWizard, ActoraTUI, layout primitives, game mechanics constants, and entrypoints all cohabiting. Needed decomposition before further growth.
+**Decision:** Split into focused modules with a strict acyclic import graph: `ui.py` (layout primitives, no local deps), `mechanics.py` (game rule constants/calculations, no local deps), `wizard.py` (CreationWizard + all creation constants, imports ui/mechanics/world/identity), `main.py` (ActoraTUI, snapshot helpers, startup, imports everything). Geography constants moved from main.py to world.py to satisfy wizard's import boundary. `shell.py` is the next planned extraction (ActoraTUI) — not yet done.
+**Import rule:** wizard.py must never import from main.py. ui.py and mechanics.py must never import local modules. New files must declare their import graph position before being written.
+**Alternatives rejected:** Keeping everything in main.py (unsustainable), splitting ActoraTUI now (premature — shell structure still settling).
+
+### DEC-034: Snapshot shape — statistics dict contains all 13 stats, no secondary split
+**Date:** 2026-04-05
+**Context:** `Human.get_snapshot_data()` previously returned `statistics` (4 primary stats + money) and `secondary_statistics` (9 remaining stats) separately. This baked a rendering decision into the data model — the split existed because Life View shows fewer stats than Profile.
+**Decision:** `statistics` contains all 13 stats + money. The renderer decides what to display — the snapshot does not. Life View renders only health/happiness/intelligence/money; Profile renders all 13. Neither decision belongs in the data layer.
+**Alternatives rejected:** Keeping the split (wrong layer of concern), moving the split to the renderer as a filter constant (acceptable but the flat dict is cleaner).

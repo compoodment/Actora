@@ -21,6 +21,7 @@ All project constraints in one place. If it says "don't" or "must", it lives her
 4. Preserve validated behavior unless the patch explicitly replaces it
 5. Don't silently weaken input validation, output ordering, error handling, or structured result contracts
 6. Don't bypass the link layer with random actor-owned relationship fields
+7. **Import boundary (DEC-033):** `ui.py` and `mechanics.py` import standard lib only. `wizard.py` must never import from `main.py`. New files must declare their position in the import graph (see `codebase.md` §2) before any code is written. No circular imports.
 
 ## Design rules
 

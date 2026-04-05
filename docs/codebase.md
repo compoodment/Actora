@@ -36,8 +36,21 @@ It is intended to support safe patching, review, and manual verification, alongs
     ├── events.py         (388 lines - human monthly events, meeting events)
     ├── lint_player_text.py (scans all *.py for internal/dev language in player-facing text)
     └── docs/
-        ├── architecture
-        └── [[changelog]]
+
+### Import boundary (v0.53.0)
+
+No circular imports. Allowed import graph:
+
+    ui.py        → (standard lib only)
+    mechanics.py → (standard lib only)
+    identity.py  → (standard lib only)
+    events.py    → (standard lib only)
+    human.py     → (standard lib only)
+    world.py     → human, identity, events (standard lib)
+    wizard.py    → ui, mechanics, world, identity (standard lib)
+    main.py      → ui, mechanics, wizard, world, human, events, identity (standard lib)
+
+Rule: `wizard.py` must never import from `main.py`. `ui.py` and `mechanics.py` must never import local modules. Adding a new file: declare its place in this graph before writing code.
 
 ## 3. Core Objects
 
@@ -168,7 +181,7 @@ Current stat-mutation boundary details:
 
 Current startup creation flow details:
 - `start_game()` now prints the title banner in plain text, then enters curses for a dedicated `CreationWizard`, then builds the world from the returned character payload, and only then hands control to the ordinary-play TUI.
-- `CreationWizard` lives in `main.py` and currently owns six startup steps: identity, location, appearance, traits, stats, and confirmation.
+- `CreationWizard` lives in `wizard.py` (extracted v0.53.0) and currently owns six startup steps: identity, location, appearance, traits, stats, and confirmation.
 - startup character payloads now include `first_name`, `last_name`, `sex`, `gender`, `country_id`, `city_id`, `appearance`, `traits`, and `stats`
 - player startup world creation now routes through `setup_initial_world_from_character(...)`, which hydrates the full real-world place registry from module-level `WORLD_GEOGRAPHY`, while the older `setup_initial_world(...)` still exists as a compatibility wrapper for callers that pass only the older four identity values
 
@@ -376,11 +389,11 @@ Current snapshot access is formalized through `Human.get_snapshot_data(current_y
 - `time` (`year`, `month`)
 - `location` (`world_body_name`, `current_place_name`, `current_place_kind`, `jurisdiction_place_name`, `jurisdiction_place_kind`)
 - `statistics` (`health`, `happiness`, `intelligence`, `money`)
-- `secondary_statistics` (`strength`, `charisma`, `imagination`, `memory`, `wisdom`, `discipline`, `willpower`, `stress`, `looks`, `fertility`)
+- `statistics` now contains ALL 13 stats + money: `health`, `happiness`, `intelligence`, `money`, `strength`, `charisma`, `imagination`, `memory`, `stress`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility` (v0.52.0 — `secondary_statistics` removed)
 - `relationships` (list of living-family entries with `label` and `name`)
 - `structural` (`structural_status`, `is_alive`, `death_year`, `death_month`, `death_reason`)
 
-This helper is read-only, resolves living family relationships through current world links, resolves `world_body_name` through place ancestry rather than assuming the current place is itself a world body, and preserves the current `"Unknown"` fallback for unresolved place names. The shell keeps Life View narrow by rendering only the primary `statistics` block there, while the dedicated profile screen consumes both `statistics` and `secondary_statistics`.
+This helper is read-only, resolves living family relationships through current world links, resolves `world_body_name` through place ancestry rather than assuming the current place is itself a world body, and preserves the current `"Unknown"` fallback for unresolved place names. The shell keeps Life View narrow by rendering only health/happiness/intelligence/money from `statistics` there, while the dedicated profile screen renders all 13 stats. The renderer decides what to show — the snapshot does not encode rendering decisions.
 
 ## 6. Module Responsibilities
 
@@ -416,7 +429,6 @@ Current shell-level functions:
 - `TRAIT_DEFINITIONS` — module-level dict mapping trait name → `{"sleep_modifier": float}` for all 12 traits
 - `HANG_OUT_TIME_COST = 4` — module-level constant for Hang Out action time cost in hours
 - `get_monthly_free_hours(actor)` — module-level helper; computes monthly free hours from actor traits: `720 - (8 + sleep_modifier_sum) * 30 - 120`
-- `safe_input(prompt)` - narrow shared CLI input boundary helper that exits cleanly on `EOFError` and `KeyboardInterrupt`
 - `CreationWizard` - curses-based character creation wizard with identity, location, appearance, and creation-mode steps, followed by either a questionnaire branch (questionnaire, confirmation) or a manual branch (stats, traits, confirmation)
 - `setup_initial_world_from_character(character_data)` - primary world creation flow from one fully prepared startup character payload
 - `setup_initial_world(...)` - compatibility wrapper that delegates into `setup_initial_world_from_character(...)`
@@ -424,7 +436,7 @@ Current shell-level functions:
 - `run_game_tui(...)` - curses wrapper entry point for ordinary play
 - `start_game()` - top-level orchestration (delegates to creation wizard and TUI)
 
-Current startup flow is human-only. `start_game()` runs the curses-based `CreationWizard`, builds the world through `setup_initial_world_from_character(...)`, and only then hands control to the ordinary-play shell. Interactive CLI input still exits cleanly through the shared `safe_input(...)` helper when input is interrupted or closed (`KeyboardInterrupt` / `EOFError`) instead of surfacing a traceback. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Startup parent ages now vary within a narrow adult range, some worlds now generate older siblings before the player is born through `World.bootstrap_older_siblings_for_newborn(...)`, and only-child worlds still remain possible. Once startup completes, ordinary play now lives inside a curses shell: the split `Life View` keeps identity/location/primary stats/relationships (including social links as `name · tier`) on the left, keeps an accumulating live event feed on the right, opens a dedicated full-detail `Profile` screen via Menu, allows simple left-side/profile/history vertical scrolling under terminal-height pressure, opens the tabbed Browser via `[1]` Menu (Relationships tab or History tab), opens the dedicated Actions screen via `[1]` Menu, still preserves the dead-focus interrupt before any continuation choices are shown, and now allows shell-owned popup choices to interrupt long skips for major identity-emergence moments during adolescence and meeting events for social link creation.
+Current startup flow is human-only. `start_game()` runs the curses-based `CreationWizard`, builds the world through `setup_initial_world_from_character(...)`, and only then hands control to the ordinary-play shell. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Startup parent ages now vary within a narrow adult range, some worlds now generate older siblings before the player is born through `World.bootstrap_older_siblings_for_newborn(...)`, and only-child worlds still remain possible. Once startup completes, ordinary play now lives inside a curses shell: the split `Life View` keeps identity/location/primary stats/relationships (including social links as `name · tier`) on the left, keeps an accumulating live event feed on the right, opens a dedicated full-detail `Profile` screen via Menu, allows simple left-side/profile/history vertical scrolling under terminal-height pressure, opens the tabbed Browser via `[1]` Menu (Relationships tab or History tab), opens the dedicated Actions screen via `[1]` Menu, still preserves the dead-focus interrupt before any continuation choices are shown, and now allows shell-owned popup choices to interrupt long skips for major identity-emergence moments during adolescence and meeting events for social link creation.
 
 ### `identity.py`
 Responsible for:
