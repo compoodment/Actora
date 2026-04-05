@@ -98,7 +98,7 @@ The compaction summary is NOT a substitute for reading these docs. The docs are 
 2. **Design gate:** Does this task touch a system with mechanical depth? If yes, check `design.md` — is there a completed interview/anchor for this system? If not, STOP. Flag as design-pending, do not implement.
 3. Read relevant docs from the doc map above
 4. **Scope scan:** If renaming/replacing anything, `grep -rn` across all source files first. List every affected file. This is mandatory before dispatching a worker.
-5. Choose execution path: direct edit (tiny) / Codex / Claude Code (medium+)
+5. Choose execution path: direct edit (tiny, 1-5 lines) / coding worker (medium+). See `TOOLS.md` (workspace) for which worker to use and when — do not make model decisions here.
 6. Spec before apply for anything non-trivial
 7. Verify: `python3 -c "import main"` + tmux playtest if TUI
 8. **Review worker output:** read the actual diff line-by-line. Run the worker review checklist in rules.md. Compile is one gate, not the only gate.
@@ -137,7 +137,7 @@ If any box is unchecked, go back and do it. Do not proceed.
 7. Every ~3 version tags: run cross-doc health check (see `rules.md`)
 
 ### Worker context loading
-When dispatching Codex or Claude Code, include:
+When dispatching a coding worker, include:
 - **UI work** → `controls.md` + `screens.md` + `codebase.md` (relevant sections)
 - **System implementation** → `design.md` (relevant system) + `codebase.md` + `rules.md`
 - **Bug fix** → `bugs.md` + `codebase.md` (relevant section)
