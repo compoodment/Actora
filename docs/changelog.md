@@ -6,6 +6,10 @@ updated: 2026-04-05
 
 # Actora Changelog
 
+## Version 0.51.5 (Patch) - 2026-04-05
+- **Fix: NPC memory/stress seeded out of signed range** — `generate_meeting_npc` was setting `memory=randint(40,70)` and `stress=randint(5,20)` as if they were 0–100 stats; corrected to signed-range values (`memory=-15..25`, `stress=0..20`)
+- **Cleanup: duplicate `questionnaire_reveal_shown` init removed** — redundant second assignment in `CreationWizard.__init__` removed
+
 ## Version 0.51.4 (Patch) - 2026-04-05
 - **Fix: W/S typing blocked in appearance custom text field** — W and S keys were intercepted as navigation even when focused on the custom text input; now only arrow keys navigate from text fields, W/S type normally
 - **Fix: skip_time / death_ack / continuation body row offset** — these screens were drawing body content starting at row 5, overlapping the header; now start at `HEADER_ROWS` (7) consistent with all other screens
