@@ -13,7 +13,6 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Now
 
-- **Questionnaire full redesign** — the entire questionnaire (questions + answer stat_changes + trait suggestions) was auto-generated and never reviewed. After stat/trait implementation lands: (1) update trait output to use new 12-trait pool + pick 4, (2) review all questions for quality and player-facing language, (3) update stat_changes to use "imagination" instead of "creativity" + consider adding memory/stress outcomes where appropriate. Low priority until stats/traits are stable in code.
 - **Profile dashboard redesign** — implement summary row per category (Stats/Traits/Skills/Needs/Mood), Enter→drill detail pattern. Reusable component for future category screens. Build incrementally as systems land.
 
 
