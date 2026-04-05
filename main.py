@@ -3698,36 +3698,35 @@ class ActoraTUI:
             "",
         ]
 
-        panel_w = max(1, (width - 1 - logo_w) // 2)
+        # Logo is centered. Left/right info panels flank it.
+        # All 7 rows use the same logo_x so ║ aligns vertically on all lines.
+        logo_x = (width - 1 - logo_w) // 2
+        panel_left_w = logo_x           # columns 0 to logo_x-1
+        panel_right_w = width - 1 - logo_x - logo_w  # columns after logo to end
 
-        # Row 0: logo top (═══▄▄▄...═══ blends with full-width separator)
-        logo_top = LOGO[0]
-        top_fill = "═" * max(0, (width - 1 - len(logo_top)) // 2 + 1)
-        top_row = top_fill + logo_top + "═" * max(0, width - 1 - len(top_fill) - len(logo_top))
+        # Row 0: top separator with logo top line
+        top_row = "═" * logo_x + LOGO[0] + "═" * panel_right_w
         try:
             stdscr.addnstr(0, 0, top_row[:width - 1], width - 1, curses.A_BOLD)
         except curses.error:
             pass
 
-        # Rows 1-5: logo body lines + left/right panels
-        # Logo already has ║ borders built in — no extra dividers needed
+        # Rows 1-5: logo body + left/right info panels
         for i in range(5):
             logo_line = LOGO[i + 1] if i + 1 < len(LOGO) - 1 else ""
-            left_text = f"{left_lines[i]:>{panel_w - 1}} " if i < len(left_lines) else " " * panel_w
-            right_text = f" {right_lines[i]:<{panel_w - 1}}" if i < len(right_lines) else " " * panel_w
-            # Draw left and right panels first, then overdraw the logo in bold
-            row_text = f"{left_text}{' ' * len(logo_line)}{right_text}"
+            left_val = left_lines[i] if i < len(left_lines) else ""
+            right_val = right_lines[i] if i < len(right_lines) else ""
+            left_text = f"{left_val:>{panel_left_w - 1}} "  # right-aligned, 1 space before ║
+            right_text = f" {right_val}"                    # 1 space after ║
             try:
-                stdscr.addnstr(i + 1, 0, row_text[:width - 1], width - 1)
-                logo_x = panel_w + 1
-                stdscr.addnstr(i + 1, logo_x, logo_line, len(logo_line), curses.A_BOLD)
+                stdscr.addnstr(i + 1, 0, left_text[:panel_left_w], panel_left_w)
+                stdscr.addnstr(i + 1, logo_x, logo_line, logo_w, curses.A_BOLD)
+                stdscr.addnstr(i + 1, logo_x + logo_w, right_text[:panel_right_w], panel_right_w)
             except curses.error:
                 pass
 
-        # Row 6: logo bottom (═══▀▀▀...═══ blends with full-width separator)
-        logo_bot = LOGO[-1]
-        bot_fill = "═" * max(0, (width - 1 - len(logo_bot)) // 2 + 1)
-        bot_row = bot_fill + logo_bot + "═" * max(0, width - 1 - len(bot_fill) - len(logo_bot))
+        # Row 6: bottom separator with logo bottom line
+        bot_row = "═" * logo_x + LOGO[-1] + "═" * panel_right_w
         try:
             stdscr.addnstr(6, 0, bot_row[:width - 1], width - 1, curses.A_BOLD)
         except curses.error:
