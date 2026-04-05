@@ -3713,13 +3713,13 @@ class ActoraTUI:
         # Logo already has ║ borders built in — no extra dividers needed
         for i in range(5):
             logo_line = LOGO[i + 1] if i + 1 < len(LOGO) - 1 else ""
-            left_text = f"{left_lines[i]:>{panel_w}} " if i < len(left_lines) else " " * (panel_w + 1)
-            right_text = f" {right_lines[i]:<{panel_w}}" if i < len(right_lines) else " " * (panel_w + 1)
+            left_text = f"{left_lines[i]:>{panel_w - 1}} " if i < len(left_lines) else " " * panel_w
+            right_text = f" {right_lines[i]:<{panel_w - 1}}" if i < len(right_lines) else " " * panel_w
             # Draw left and right panels first, then overdraw the logo in bold
             row_text = f"{left_text}{' ' * len(logo_line)}{right_text}"
             try:
                 stdscr.addnstr(i + 1, 0, row_text[:width - 1], width - 1)
-                logo_x = panel_w + 1
+                logo_x = panel_w
                 stdscr.addnstr(i + 1, logo_x, logo_line, len(logo_line), curses.A_BOLD)
             except curses.error:
                 pass
