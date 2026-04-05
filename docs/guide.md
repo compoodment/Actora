@@ -12,13 +12,17 @@ The one doc. Navigation, workflows, reading order, routing.
 
 ## After context loss (compaction / reset / new session)
 
+**This is not optional. Read ALL of these before doing ANY work:**
+
 1. `memory/YYYY-MM-DD.md` (today + yesterday)
 2. `MEMORY.md` (workspace, durable rules)
 3. This file — doc map, workflows, routing
 4. `rules.md` — constraints to not break things
 5. `backlog.md` → Now section — what we're actively doing
+6. `design.md` — current system designs, mechanical depth, interconnections
+7. `identity.md` — project identity, architecture principles
 
-That gets you oriented. Only read other docs when the task requires them.
+The compaction summary is NOT a substitute for reading these docs. The docs are the truth. Skip this and you will forget the scale, the design decisions, and the constraints — it has happened every time.
 
 ---
 
