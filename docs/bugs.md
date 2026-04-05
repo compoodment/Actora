@@ -19,8 +19,6 @@ Done = delete from here + mention in changelog.
 
 - **Questionnaire framing screen ignores Backspace** — pressing Backspace on the framing screen does nothing. Should navigate back to mode selection (step 3) so the player can choose manual mode instead. *(found 2026-04-05)*
 
-- **Reveal screen Backspace routing** — pressing Backspace on the reveal screen lands on Confirm with reveal content still showing, then requires another Enter to dismiss. Should go back to Q24 cleanly. *(found 2026-04-05)*
-
 - **Skip Time: custom `0` advances 1 month** — entering `0` as custom months and pressing Enter silently advances 1 month instead of rejecting the input or falling back to the preset. Expected: reject 0 or do nothing.
 
 
