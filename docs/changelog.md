@@ -6,6 +6,19 @@ updated: 2026-04-05
 
 # Actora Changelog
 
+## Version 0.53.0 (Minor) - 2026-04-05
+- **Codebase extraction — main.py split into focused modules:**
+    - `ui.py` (168 lines) — layout/drawing primitives: `wrap_text_line`, `center_text`, `get_content_bounds`, `split_centered_columns`, `draw_text_block`, `draw_box`, `get_scroll_window`, `truncate_for_width`, and related helpers. Zero game knowledge. Both `wizard.py` and `main.py` import from here.
+    - `mechanics.py` (48 lines) — game rule constants and calculations: `TRAIT_DEFINITIONS`, `get_monthly_free_hours`, `HANG_OUT_TIME_COST`, `SKIP_MONTH_PRESETS`, action subtypes, `format_stat_change_summary`
+    - `wizard.py` (1267 lines) — `CreationWizard` class + all wizard-only constants: `CREATION_*` pools, `QUESTIONNAIRE_QUESTIONS`, `normalize_creation_stats`, `build_randomized_starting_stats`
+    - `world.py` — geography constants moved here from `main.py` to satisfy clean import boundaries
+    - `main.py` shrunk from 4616 → 3029 lines. Keeps: `ActoraTUI`, snapshot/event helpers, setup/startup, entrypoints
+- **`lint_player_text.py`** — updated to scan all `*.py` files in cwd
+
+## Version 0.52.0 (Minor) - 2026-04-05
+- **Snapshot shape flattened** — `Human.get_snapshot_data()` now returns all 13 stats + money in a single `statistics` dict. `secondary_statistics` key removed entirely. Renderer decides what to display — snapshot no longer encodes rendering decisions.
+- **Deleted dead `safe_input` function** — defined but never called anywhere
+
 ## Version 0.51.5 (Patch) - 2026-04-05
 - **Fix: NPC memory/stress seeded out of signed range** — `generate_meeting_npc` was setting `memory=randint(40,70)` and `stress=randint(5,20)` as if they were 0–100 stats; corrected to signed-range values (`memory=-15..25`, `stress=0..20`)
 - **Cleanup: duplicate `questionnaire_reveal_shown` init removed** — redundant second assignment in `CreationWizard.__init__` removed
