@@ -341,13 +341,13 @@ CREATION_STAT_ORDER = [
     "strength",
     "charisma",
     "imagination",
-    "memory",
     "wisdom",
-    "stress",
     "discipline",
     "willpower",
     "looks",
     "fertility",
+    "memory",
+    "stress",
 ]
 CREATION_STAT_LABELS = {
     "health": "Health",
@@ -1450,6 +1450,8 @@ class CreationWizard:
         for index, stat_name in enumerate(CREATION_STAT_ORDER):
             if index == 3:
                 left_lines.extend(["", "Secondary Stats", ""])
+            if stat_name in ("memory", "stress") and (index == 0 or CREATION_STAT_ORDER[index - 1] not in ("memory", "stress")):
+                left_lines.append("")
             if index == self.stat_index:
                 highlight_index = len(left_lines)
                 left_lines.append(f"{CREATION_STAT_LABELS[stat_name]}: \u2190 {self.data['stats'][stat_name]} \u2192")
@@ -1459,10 +1461,8 @@ class CreationWizard:
         right_lines = [
             "Controls",
             "",
-            "Adjust any stat from 0 to 100.\nMemory and Stress: -50 to +50.",
-            "",
-            "[R] Randomize all stats",
-            
+            "Adjust any stat from 0 to 100.",
+            "Memory and Stress: -50 to +50.",
         ]
 
         draw_text_block(self.stdscr, 5, content_left, left_width, body_height, left_lines, highlight_index=highlight_index)
