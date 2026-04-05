@@ -3667,7 +3667,7 @@ class ActoraTUI:
             "║█░░▒▒▓█▓▄▓█▓▒▒░░█║",
             "╝▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀╚",
         ]
-        logo_w = max(len(l) for l in LOGO) + 4  # padding each side
+        logo_w = max(len(l) for l in LOGO)  # actual character width, no padding
 
         # Left panel content
         try:
