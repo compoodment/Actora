@@ -42,6 +42,25 @@ CREATION_HAIR_COLOR_OPTIONS = ["Black", "Brown", "Blonde", "Red", "Auburn", "Oth
 CREATION_SKIN_TONE_OPTIONS = ["Light", "Fair", "Medium", "Olive", "Tan", "Brown", "Dark", "Other"]
 CREATION_TRAIT_POOL = ["Driven", "Chill", "Curious", "Social", "Disciplined", "Impulsive", "Empathetic", "Resilient", "Introverted", "Extraverted", "Restless", "Ambitious"]
 HANG_OUT_TIME_COST = 4  # hours
+EXERCISE_TIME_COST = 6  # hours (estimated ~1.5hr session, 4 sessions/month)
+READ_TIME_COST = 8  # hours (estimated ~2hr/session, 4 sessions/month)
+REST_TIME_COST = 4  # hours (a proper rest day equivalent)
+EXERCISE_SUBTYPES = [
+    {"id": "home_workout", "label": "Home Workout", "time_cost": 4, "stat_changes": {"strength": 2, "health": 1}},
+    {"id": "gym_session", "label": "Gym Session", "time_cost": 6, "stat_changes": {"strength": 3, "health": 2}},
+    {"id": "run", "label": "Go for a Run", "time_cost": 3, "stat_changes": {"health": 3, "strength": 1}},
+]
+READ_SUBTYPES = [
+    {"id": "read_fiction", "label": "Read Fiction", "time_cost": 6, "stat_changes": {"happiness": 2, "imagination": 2}},
+    {"id": "read_nonfic", "label": "Read Non-Fiction", "time_cost": 6, "stat_changes": {"intelligence": 2, "wisdom": 1}},
+    {"id": "read_history", "label": "Read History", "time_cost": 6, "stat_changes": {"wisdom": 3}},
+    {"id": "read_science", "label": "Read Science", "time_cost": 6, "stat_changes": {"intelligence": 3}},
+]
+REST_SUBTYPES = [
+    {"id": "nap", "label": "Take a Nap", "time_cost": 2, "stat_changes": {"happiness": 2, "stress": -3}},
+    {"id": "music", "label": "Listen to Music", "time_cost": 2, "stat_changes": {"happiness": 3, "stress": -2}},
+    {"id": "walk", "label": "Take a Walk", "time_cost": 2, "stat_changes": {"happiness": 2, "health": 1}},
+]
 TRAIT_DEFINITIONS = {
     "Driven": {"sleep_modifier": -0.5},
     "Chill": {"sleep_modifier": +0.5},
@@ -67,6 +86,15 @@ def get_monthly_free_hours(actor):
     sleep_hours = (8.0 + sleep_modifier) * 30
     maintenance_hours = 120
     return 720 - sleep_hours - maintenance_hours
+
+
+def format_stat_change_summary(stat_changes):
+    parts = []
+    for stat_name, amount in stat_changes.items():
+        label = CREATION_STAT_LABELS.get(stat_name, stat_name.replace("_", " ").title())
+        sign = "+" if amount > 0 else "-"
+        parts.append(f"{sign}{label}")
+    return " ".join(parts)
 
 QUESTIONNAIRE_QUESTIONS = [
     {
@@ -1764,6 +1792,7 @@ class ActoraTUI:
         self.browser_tab = "relationships"
         self.active_actions = []
         self.hang_out_actor_ids = []
+        self.personal_subtype_options = []
         self.actions_focus = "categories"
         self.actions_category_index = 0
         self.actions_action_index = 0
@@ -2213,6 +2242,37 @@ class ActoraTUI:
                 self.last_message = "Cancelled."
             self.pending_choice = None
             return
+        elif choice_id in ("select_exercise_subtype", "select_read_subtype", "select_rest_subtype"):
+            if selected_value is not None:
+                options_list = (self.pending_choice or {}).get("options", [])
+                try:
+                    selected_idx = options_list.index(selected_value)
+                    subtype = self.personal_subtype_options[selected_idx]
+                except (ValueError, IndexError):
+                    self.pending_choice = None
+                    self.personal_subtype_options = []
+                    return
+                focused_actor = self.world.get_focused_actor()
+                free_hours = get_monthly_free_hours(focused_actor)
+                used_hours = sum(a.get("time_cost", 0) for a in self.active_actions)
+                if used_hours + subtype["time_cost"] > free_hours:
+                    self.last_message = "Not enough free time. (" + str(int(free_hours - used_hours)) + "h left)"
+                    self.pending_choice = None
+                    self.personal_subtype_options = []
+                    return
+                self.active_actions.append({
+                    "action_type": "personal",
+                    "subtype_id": subtype["id"],
+                    "label": subtype["label"],
+                    "time_cost": subtype["time_cost"],
+                    "stat_changes": subtype["stat_changes"],
+                })
+                self.last_message = f"Queued: {subtype['label']}."
+            else:
+                self.last_message = "Cancelled."
+            self.pending_choice = None
+            self.personal_subtype_options = []
+            return
 
         self.pending_choice = None
         remaining = self.remaining_skip_months
@@ -2299,6 +2359,7 @@ class ActoraTUI:
         focused_actor_id = self.get_focused_actor_id()
 
         spend_time_actions = [a for a in self.active_actions if a["action_type"] == "spend_time"]
+        personal_actions_queued = [a for a in self.active_actions if a["action_type"] == "personal"]
         shared_actor_ids = {a["target_actor_id"] for a in spend_time_actions}
 
         first_month = True
@@ -2319,7 +2380,7 @@ class ActoraTUI:
                         lnk_meta = lnk.get("metadata", {})
                         if lnk_meta.get("status") == "active":
                             old_cl = lnk_meta.get("closeness", 0)
-                            new_cl = min(100, old_cl + 8)
+                            new_cl = min(100, old_cl + 5)
                             lnk_meta["closeness"] = new_cl
                             new_role = self.world._get_social_link_category(new_cl)
                             lnk["role"] = new_role
@@ -2336,7 +2397,20 @@ class ActoraTUI:
                         year=self.world.current_year,
                         month=self.world.current_month,
                     )
-                self.active_actions = [a for a in self.active_actions if a["action_type"] != "spend_time"]
+                if spend_time_actions:
+                    self.world.apply_outcome(focused_actor_id, {"stat_changes": {"happiness": 3}})
+                    self.world.apply_outcome(focused_actor_id, {"stat_changes": {"stress": -2}})
+                for action in personal_actions_queued:
+                    self.world.apply_outcome(focused_actor_id, {"stat_changes": action["stat_changes"]})
+                    self.append_event_log_entry(
+                        "event",
+                        action.get("event_text", f"You did: {action['label']}."),
+                        year=self.world.current_year,
+                        month=self.world.current_month,
+                    )
+                self.active_actions = [
+                    a for a in self.active_actions if a["action_type"] not in ("spend_time", "personal")
+                ]
 
             for record in new_records_this_month:
                 if record.get("record_type") != "death":
@@ -3043,8 +3117,14 @@ class ActoraTUI:
         social_actions = []
         if active_social:
             social_actions.append({"id": "hang_out", "label": "Hang Out", "links": active_social, "time_cost": HANG_OUT_TIME_COST})
+        personal_actions = [
+            {"id": "exercise", "label": "Exercise", "subtypes": EXERCISE_SUBTYPES, "time_cost": EXERCISE_TIME_COST},
+            {"id": "read", "label": "Read", "subtypes": READ_SUBTYPES, "time_cost": READ_TIME_COST},
+            {"id": "rest", "label": "Rest", "subtypes": REST_SUBTYPES, "time_cost": REST_TIME_COST},
+        ]
         return [
             {"id": "social", "label": "Social", "actions": social_actions},
+            {"id": "personal", "label": "Personal", "actions": personal_actions},
         ]
 
     def handle_actions_key(self, key):
@@ -3108,6 +3188,20 @@ class ActoraTUI:
                     action = actions[self.actions_action_index]
                     if action["id"] == "hang_out":
                         self.open_hang_out_select()
+                    elif action["id"] in ("exercise", "read", "rest"):
+                        subtypes = action["subtypes"]
+                        self.personal_subtype_options = subtypes
+                        self.pending_choice = {
+                            "title": "Choose type",
+                            "text": "",
+                            "question": "",
+                            "options": [f"{s['label']}  {s['time_cost']}h" for s in subtypes],
+                            "selected_index": 0,
+                            "skippable": True,
+                            "choice_id": f"select_{action['id']}_subtype",
+                            "default_value": None,
+                        }
+                        self.last_message = f"Choose how you want to {action['label'].lower()}."
 
 
     def handle_death_ack_key(self, key):
@@ -3829,6 +3923,12 @@ class ActoraTUI:
                         det_lines.append(f"  {target_actor.get_full_name()} · {tier}")
                 else:
                     det_lines.append(" No active social connections yet.")
+            elif current_action["id"] in ("exercise", "read", "rest"):
+                det_lines.append(" Ways to spend your time:")
+                det_lines.append("")
+                for subtype in current_action.get("subtypes", []):
+                    effects_text = format_stat_change_summary(subtype.get("stat_changes", {}))
+                    det_lines.append(f"  {subtype['label']} - {subtype['time_cost']}h - {effects_text}")
             next_y = draw_text_block(stdscr, top, det_left, det_width, body_height, det_lines)
             if next_y < top + body_height:
                 next_y = draw_text_block(stdscr, next_y, det_left, det_width, body_height - (next_y - top), [""])
