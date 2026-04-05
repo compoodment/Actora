@@ -13,6 +13,10 @@ Done = delete from here + mention in changelog.
 
 ## 🟡 Annoying
 
+- **Intersex sex option not preserved through wizard** — selecting "Intersex" on the identity step results in the character being saved as Male. The intersex value appears not to carry through to the final character payload. *(found 2026-04-05, RT playtest)*
+
+- **"Other" appearance option may skip custom text input** — in some navigation paths, selecting "Other" for eye/hair color appears to default to the first real option (Brown) instead of opening the custom text input. Needs isolated test to confirm. *(found 2026-04-05, RT playtest)*
+
 - **Questionnaire framing screen ignores Backspace** — pressing Backspace on the framing screen does nothing. Should navigate back to mode selection (step 3) so the player can choose manual mode instead. *(found 2026-04-05)*
 
 - **Reveal screen Backspace routing** — pressing Backspace on the reveal screen lands on Confirm with reveal content still showing, then requires another Enter to dismiss. Should go back to Q24 cleanly. *(found 2026-04-05)*
