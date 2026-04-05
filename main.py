@@ -1736,6 +1736,12 @@ class CreationWizard:
                 self.data["appearance"][current_field["key"]] = options[min(len(options) - 1, current_index + 1)]
                 return
             if key in (curses.KEY_ENTER, 10, 13):
+                # If "Other" selected and custom text field follows, move focus to it
+                if self.data["appearance"][current_field["key"]] == "Other":
+                    next_index = self.appearance_field_index + 1
+                    if next_index < len(fields) and fields[next_index]["kind"] == "text":
+                        self.appearance_field_index = next_index
+                        return
                 if self.can_advance_appearance():
                     self.step_index = 3
                 return
@@ -1893,7 +1899,9 @@ class CreationWizard:
             elif self.step_index == 4:
                 if self.selected_mode == "questionnaire":
                     if not self.questionnaire_framing_shown:
-                        if key in (curses.KEY_ENTER, 10, 13, ord(' ')):
+                        if key in BACK_KEYS:
+                            self.step_index = 3
+                        elif key in (curses.KEY_ENTER, 10, 13, ord(' ')):
                             self.questionnaire_framing_shown = True
                     else:
                         self.handle_questionnaire_key(key)
@@ -2143,13 +2151,13 @@ class ActoraTUI:
             )
         )
 
-    def append_event_log_turn(self, turn_result, months_to_advance, new_records):
+    def append_event_log_turn(self, turn_result, months_to_advance, new_records, *, suppress_skip_marker=False):
         """Extends the event log from one completed advance."""
         actual_months_advanced = turn_result["months_advanced"]
         if actual_months_advanced <= 0:
             return
 
-        if months_to_advance > 1:
+        if months_to_advance > 1 and not suppress_skip_marker:
             label = "Month" if months_to_advance == 1 else "Months"
             self.append_event_log_entry(
                 "skip_marker",
@@ -2452,7 +2460,7 @@ class ActoraTUI:
         remaining = self.remaining_skip_months
         self.remaining_skip_months = 0
         if remaining > 0:
-            self.advance_time(remaining)
+            self.advance_time(remaining, is_resume=True)
 
     def open_history(self):
         self.screen_name = "history"
@@ -2521,7 +2529,7 @@ class ActoraTUI:
     def history_body_height(self):
         return getattr(self, "_history_body_height", 0)
 
-    def advance_time(self, months_to_advance):
+    def advance_time(self, months_to_advance, *, is_resume=False):
         """Advances time using the existing world-owned simulation seam."""
         aggregated_turn_result = {
             "months_advanced": 0,
@@ -2645,7 +2653,7 @@ class ActoraTUI:
                     self.remaining_skip_months = remaining
                 break
 
-        self.append_event_log_turn(aggregated_turn_result, months_to_advance, new_records)
+        self.append_event_log_turn(aggregated_turn_result, months_to_advance, new_records, suppress_skip_marker=is_resume)
         actual_months_advanced = aggregated_turn_result["months_advanced"]
         if actual_months_advanced == 1:
             self.last_message = "Advanced 1 month."
@@ -2680,7 +2688,12 @@ class ActoraTUI:
         return custom_months
 
     def confirm_skip_selection(self):
-        months_to_advance = self.get_custom_skip_months() or self.get_selected_skip_months()
+        custom = self.get_custom_skip_months()
+        if self.skip_custom_value and custom is None:
+            # Custom value present but invalid (e.g. "0") — reject, don't silently fall back
+            self.last_message = "Enter a number greater than 0."
+            return
+        months_to_advance = custom or self.get_selected_skip_months()
         self.screen_name = "main"
         self.advance_time(months_to_advance)
 
@@ -4162,6 +4175,14 @@ class ActoraTUI:
                         break
                     stdscr.addnstr(y, det_left, wrapped_line, det_width, attr)
                     y += 1
+
+        # Show last_message feedback at bottom of details column if present
+        if self.last_message:
+            msg_row = top + body_height - 1
+            if msg_row >= top:
+                stdscr.addnstr(msg_row, det_left,
+                               truncate_for_width(self.last_message, det_width),
+                               det_width, curses.A_DIM)
 
     def build_actor_inspect_detail(self, actor_id, *, relationship_label=None, recent_record_limit=INSPECT_RECORD_LIMIT):
         """Builds one shell-owned inspectability payload for an actor."""
