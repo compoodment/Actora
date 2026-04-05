@@ -46,20 +46,20 @@ EXERCISE_TIME_COST = 6  # hours (estimated ~1.5hr session, 4 sessions/month)
 READ_TIME_COST = 8  # hours (estimated ~2hr/session, 4 sessions/month)
 REST_TIME_COST = 4  # hours (a proper rest day equivalent)
 EXERCISE_SUBTYPES = [
-    {"id": "home_workout", "label": "Home Workout", "time_cost": 4, "stat_changes": {"strength": 2, "health": 1}},
-    {"id": "gym_session", "label": "Gym Session", "time_cost": 6, "stat_changes": {"strength": 3, "health": 2}},
-    {"id": "run", "label": "Go for a Run", "time_cost": 3, "stat_changes": {"health": 3, "strength": 1}},
+    {"id": "home_workout", "label": "Home Workout", "time_cost": 4, "stat_changes": {"strength": 2, "health": 1}, "event_text": "You worked out at home."},
+    {"id": "gym_session", "label": "Gym Session", "time_cost": 6, "stat_changes": {"strength": 3, "health": 2}, "event_text": "You hit the gym."},
+    {"id": "run", "label": "Go for a Run", "time_cost": 3, "stat_changes": {"health": 3, "strength": 1}, "event_text": "You went for a run."},
 ]
 READ_SUBTYPES = [
-    {"id": "read_fiction", "label": "Read Fiction", "time_cost": 6, "stat_changes": {"happiness": 2, "imagination": 2}},
-    {"id": "read_nonfic", "label": "Read Non-Fiction", "time_cost": 6, "stat_changes": {"intelligence": 2, "wisdom": 1}},
-    {"id": "read_history", "label": "Read History", "time_cost": 6, "stat_changes": {"wisdom": 3}},
-    {"id": "read_science", "label": "Read Science", "time_cost": 6, "stat_changes": {"intelligence": 3}},
+    {"id": "read_fiction", "label": "Read Fiction", "time_cost": 6, "stat_changes": {"happiness": 2, "imagination": 2}, "event_text": "You got lost in a good novel."},
+    {"id": "read_nonfic", "label": "Read Non-Fiction", "time_cost": 6, "stat_changes": {"intelligence": 2, "wisdom": 1}, "event_text": "You read something that made you think."},
+    {"id": "read_history", "label": "Read History", "time_cost": 6, "stat_changes": {"wisdom": 3}, "event_text": "You read about the past."},
+    {"id": "read_science", "label": "Read Science", "time_cost": 6, "stat_changes": {"intelligence": 3}, "event_text": "You read something scientific."},
 ]
 REST_SUBTYPES = [
-    {"id": "nap", "label": "Take a Nap", "time_cost": 2, "stat_changes": {"happiness": 2, "stress": -3}},
-    {"id": "music", "label": "Listen to Music", "time_cost": 2, "stat_changes": {"happiness": 3, "stress": -2}},
-    {"id": "walk", "label": "Take a Walk", "time_cost": 2, "stat_changes": {"happiness": 2, "health": 1}},
+    {"id": "nap", "label": "Take a Nap", "time_cost": 2, "stat_changes": {"happiness": 2, "stress": -3}, "event_text": "You took a proper nap."},
+    {"id": "music", "label": "Listen to Music", "time_cost": 2, "stat_changes": {"happiness": 3, "stress": -2}, "event_text": "You put on some music and let yourself unwind."},
+    {"id": "walk", "label": "Take a Walk", "time_cost": 2, "stat_changes": {"happiness": 2, "health": 1}, "event_text": "You went for a walk and cleared your head."},
 ]
 TRAIT_DEFINITIONS = {
     "Driven": {"sleep_modifier": -0.5},
