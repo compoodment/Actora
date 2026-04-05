@@ -6,6 +6,14 @@ updated: 2026-04-04
 
 # Actora Changelog
 
+## Version 0.48.3 (Patch) - 2026-04-05
+- **Stat redesign implemented (DEC-021):**
+    - Creativity renamed Imagination in Human.stats, human.py, world.py, events.py, main.py
+    - Memory (40-70 starting range) and Stress (5-20 starting range) added to Human stats
+    - Profile screen now displays Imagination, Memory, Stress
+    - human.py missed by Codex — fixed manually
+    - codebase.md synced, bugs.md updated with trait-gated event stale note
+
 ## Version 0.48.2 (Patch) - 2026-04-05
 - **Trait pool redesigned (DEC-022):**
     - New 12-trait pool: Driven, Chill, Curious, Social, Disciplined, Impulsive, Empathetic, Resilient, Introverted, Extraverted, Restless, Ambitious

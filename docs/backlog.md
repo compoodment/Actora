@@ -14,7 +14,6 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 ## Now
 
 - **Questionnaire full redesign** — the entire questionnaire (questions + answer stat_changes + trait suggestions) was auto-generated and never reviewed. After stat/trait implementation lands: (1) update trait output to use new 12-trait pool + pick 4, (2) review all questions for quality and player-facing language, (3) update stat_changes to use "imagination" instead of "creativity" + consider adding memory/stress outcomes where appropriate. Low priority until stats/traits are stable in code.
-- **Stat redesign implementation** — rename Creativity→Imagination in Human.stats, add Memory and Stress stats, update all references in events.py, world.py, main.py. Update questionnaire stat outputs. Connected to trait implementation.
 - **Profile dashboard redesign** — implement summary row per category (Stats/Traits/Skills/Needs/Mood), Enter→drill detail pattern. Reusable component for future category screens. Build incrementally as systems land.
 - **Action system first wave** — time-budget model (monthly free hours), sub-type selections per action (exercise type, book subject, rest type), individual time costs per sub-action. Social: Hang Out resolves with +5 closeness. Personal: Exercise, Read, Rest with sub-types. Do before Education.
 - **Action time budget** — derive monthly free hours from sleep baseline (240hr/month) minus maintenance. Wire trait sleep modifiers (each trait has a `sleep_modifier` field in TRAIT_DEFINITIONS). Wire to action queue so you can't queue more than fits.

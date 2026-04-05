@@ -2,7 +2,7 @@
 title: Codebase
 tags: [implementation, reference, stable]
 updated: 2026-04-04
-through: v0.48.2
+through: v0.48.3
 verified: 2026-04-04
 ---
 
@@ -122,7 +122,7 @@ Current stored fields:
 - `sexuality` (`None` until emergence during play for the focused player; randomized for generated NPC humans)
 - `birth_year`
 - `birth_month`
-- `stats` (dictionary containing: `health`, `happiness`, `intelligence`, `memory`, `stress`, `strength`, `charisma`, `imagination`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`) — **Note:** Memory, Stress added and Creativity renamed Imagination per DEC-021; not yet implemented in code as of v0.48.x
+- `stats` (dictionary containing: `health`, `happiness`, `intelligence`, `memory`, `stress`, `strength`, `charisma`, `imagination`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`) — implemented in code as of v0.48.2/v0.48.3
 - `money`
 - `appearance` (dictionary containing `eye_color`, `hair_color`, `skin_tone`)
 - `traits` (list of up to three simple personality descriptors)
@@ -158,7 +158,7 @@ Current structural-state details:
 - this still does not implement archive state, inheritance, or broader lifecycle/death gameplay beyond the current baseline old-age mortality rule
 
 Current stat-mutation boundary details:
-- `modify_stat(...)` supports any key present in `self.stats` (currently `health`, `happiness`, `intelligence`, `strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`) and applies clamped mutation in the inclusive range 0-100.
+- `modify_stat(...)` supports any key present in `self.stats` (currently `health`, `happiness`, `intelligence`, `memory`, `stress`, `strength`, `charisma`, `imagination`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`) and applies clamped mutation in the inclusive range 0-100.
 - `modify_stat(...)` supports `"money"` through the separate unbounded money path (`self.money += change`).
 - Any unsupported stat name now fails explicitly with `ValueError` (including the bad stat name) instead of being silently ignored.
 
@@ -372,7 +372,7 @@ Current snapshot access is formalized through `Human.get_snapshot_data(current_y
 - `time` (`year`, `month`)
 - `location` (`world_body_name`, `current_place_name`, `current_place_kind`, `jurisdiction_place_name`, `jurisdiction_place_kind`)
 - `statistics` (`health`, `happiness`, `intelligence`, `money`)
-- `secondary_statistics` (`strength`, `charisma`, `creativity`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`)
+- `secondary_statistics` (`strength`, `charisma`, `imagination`, `memory`, `wisdom`, `discipline`, `willpower`, `stress`, `looks`, `fertility`)
 - `relationships` (list of living-family entries with `label` and `name`)
 - `structural` (`structural_status`, `is_alive`, `death_year`, `death_month`, `death_reason`)
 

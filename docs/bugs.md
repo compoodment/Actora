@@ -21,4 +21,4 @@ Done = delete from here + mention in changelog.
 
 ## ⚪ Minor
 
-- **Traits only affect event eligibility** — 20 trait-gated events exist (2 per trait) but traits don't affect simulation outcomes beyond event eligibility yet. More trait events should follow as content expands.
+- **Trait-gated events use old trait names** — events.py still has events gated on old trait names (Curious, Calm, Restless, Alert, Bold, Stubborn, Cheerful, Gentle, Shy). New 12-trait pool is in code but event eligibility still references old labels. Needs update as part of questionnaire/event redesign pass. *(noted 2026-04-05)*
