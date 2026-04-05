@@ -1916,6 +1916,12 @@ class CreationWizard:
 class ActoraTUI:
     """Small actor-first curses shell layered on top of the existing world seams."""
 
+    # Canonical shell geometry — change these when header/footer layout changes.
+    HEADER_ROWS = 7   # rows 0–(HEADER_ROWS-1) are occupied by the header
+    FOOTER_ROWS = 2   # rows (height-FOOTER_ROWS)..(height-1) are occupied by the footer
+    # Browser adds 2 chrome rows (tab bar + separator) above its sub-screen body.
+    BROWSER_CHROME_ROWS = 2
+
     def __init__(self, world, player_id):
         self.world = world
         self.player_id = player_id
@@ -3735,15 +3741,15 @@ class ActoraTUI:
         # Row 6: bottom separator with logo bottom line
         bot_row = "═" * logo_x + LOGO[-1] + "═" * panel_right_w
         try:
-            stdscr.addnstr(6, 0, bot_row[:width - 1], width - 1, curses.A_BOLD)
+            stdscr.addnstr(self.HEADER_ROWS - 1, 0, bot_row[:width - 1], width - 1, curses.A_BOLD)
         except curses.error:
             pass
 
     def render_main(self, stdscr, height, width):
         snapshot_data = self.get_snapshot_data()
         snapshot_sections = build_snapshot_sections(snapshot_data)
-        top = 7
-        body_height = height - 8
+        top = self.HEADER_ROWS
+        body_height = height - self.HEADER_ROWS - self.FOOTER_ROWS
         self._main_body_height = body_height
         content_left, content_width = get_content_bounds(width, max_width=112)
         _, _logo_w, logo_center = self._get_logo_layout(width)
@@ -3787,8 +3793,8 @@ class ActoraTUI:
             )
 
     def render_profile(self, stdscr, height, width):
-        top = 7
-        body_height = height - 8
+        top = self.HEADER_ROWS
+        body_height = height - self.HEADER_ROWS - self.FOOTER_ROWS
         self._profile_body_height = body_height
         content_left, content_width = get_content_bounds(width, max_width=88)
         profile_lines = expand_render_lines(self.build_profile_lines(self.get_snapshot_data()), content_width)
@@ -3820,8 +3826,8 @@ class ActoraTUI:
         lineage_entries = browser_state["entries"]
         selected_detail = browser_state["selected_detail"]
 
-        top = 9
-        body_height = height - 11
+        top = self.HEADER_ROWS + self.BROWSER_CHROME_ROWS
+        body_height = height - self.HEADER_ROWS - self.BROWSER_CHROME_ROWS - self.FOOTER_ROWS
         content_left, content_width = get_content_bounds(width, max_width=112)
         left_width, right_left, right_width = split_centered_columns(content_left, content_width)
         filter_label = LINEAGE_FILTER_LABELS[browser_state["filter_mode"]]
@@ -3889,8 +3895,8 @@ class ActoraTUI:
         entries = browser_state["entries"]
         selected_detail = browser_state["selected_detail"]
 
-        top = 9
-        body_height = height - 11
+        top = self.HEADER_ROWS + self.BROWSER_CHROME_ROWS
+        body_height = height - self.HEADER_ROWS - self.BROWSER_CHROME_ROWS - self.FOOTER_ROWS
         content_left, content_width = get_content_bounds(width, max_width=120)
 
         filter_col_width = 12
@@ -3976,8 +3982,8 @@ class ActoraTUI:
         draw_text_block(stdscr, top, detail_left, detail_width, body_height, right_lines)
 
     def render_history(self, stdscr, height, width):
-        top = 8
-        body_height = height - 10
+        top = self.HEADER_ROWS + self.BROWSER_CHROME_ROWS
+        body_height = height - self.HEADER_ROWS - self.BROWSER_CHROME_ROWS - self.FOOTER_ROWS
         self._history_body_height = body_height
         content_left, content_width = get_content_bounds(width, max_width=104)
         self._history_content_width = content_width
@@ -4017,9 +4023,9 @@ class ActoraTUI:
         hist_label = "[ History ]" if self.browser_tab == "history" else "  History  "
         tab_bar = f"{rel_label}     │     {hist_label}"
         try:
-            stdscr.addnstr(6, content_left, center_text(tab_bar, content_width), content_width)
+            stdscr.addnstr(self.HEADER_ROWS, content_left, center_text(tab_bar, content_width), content_width)
             hline_char = getattr(curses, "ACS_HLINE", ord("-"))
-            stdscr.hline(7, content_left, hline_char, content_width)
+            stdscr.hline(self.HEADER_ROWS + 1, content_left, hline_char, content_width)
         except curses.error:
             pass
 
@@ -4030,8 +4036,8 @@ class ActoraTUI:
 
     def render_actions(self, stdscr, height, width):
         """Renders the Actions screen: Categories | Actions | Details."""
-        top = 7
-        body_height = height - 8
+        top = self.HEADER_ROWS
+        body_height = height - self.HEADER_ROWS - self.FOOTER_ROWS
         content_left, content_width = get_content_bounds(width, max_width=120)
         col_w = content_width // 3
         cat_left = content_left
