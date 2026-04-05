@@ -2,7 +2,7 @@
 title: Codebase
 tags: [implementation, reference, stable]
 updated: 2026-04-04
-through: v0.48.4
+through: v0.49.0
 verified: 2026-04-04
 ---
 
@@ -406,6 +406,9 @@ Current shell-level functions:
 - `build_screen_chrome(...)` - shell-owned title/subtitle/date chrome assembly for the current TUI screen, including the history browser
 - `draw_text_block(...)` - small curses text rendering helper with wrapping support
 - `ActoraTUI` — curses shell object managing the split Life View, dedicated profile screen, accumulating live event feed, tabbed Browser (Relationships + History), dedicated Actions screen with social action support, styled header/footer chrome, lineage list/detail, skip-time selection, death acknowledgment, two-step continuation inspection/selection, meeting event popups, simple left-pane/profile/history scrolling, a shell-owned pending-choice popup overlay for major player-facing decisions, and safe footer rendering that avoids writing into the terminal's last column
+- `EXERCISE_SUBTYPES`, `READ_SUBTYPES`, `REST_SUBTYPES` — module-level sub-type definition lists with `id`, `label`, `time_cost`, `stat_changes`, `event_text`
+- `EXERCISE_TIME_COST`, `READ_TIME_COST`, `REST_TIME_COST` — module-level time cost constants
+- `format_stat_change_summary(stat_changes)` — formats stat changes as plain "+Stat" labels for display
 - `TRAIT_DEFINITIONS` — module-level dict mapping trait name → `{"sleep_modifier": float}` for all 12 traits
 - `HANG_OUT_TIME_COST = 4` — module-level constant for Hang Out action time cost in hours
 - `get_monthly_free_hours(actor)` — module-level helper; computes monthly free hours from actor traits: `720 - (8 + sleep_modifier_sum) * 30 - 120`

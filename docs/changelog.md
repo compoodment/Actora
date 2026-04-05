@@ -6,6 +6,19 @@ updated: 2026-04-04
 
 # Actora Changelog
 
+## Version 0.49.0 (Minor) - 2026-04-05
+- **Action system first wave (DEC-018/019):**
+    - Personal category added: Exercise, Read, Rest — each with sub-type picker popup
+    - Exercise sub-types: Home Workout (4h, +Strength+Health), Gym Session (6h, +Strength+Health), Go for a Run (3h, +Health+Strength)
+    - Read sub-types: Fiction (6h, +Happiness+Imagination), Non-Fiction (6h, +Intelligence+Wisdom), History (6h, +Wisdom), Science (6h, +Intelligence)
+    - Rest sub-types: Take a Nap (2h, +Happiness-Stress), Listen to Music (2h, +Happiness-Stress), Take a Walk (2h, +Happiness+Health)
+    - Sub-type picker shows label + time cost; budget enforced per sub-type
+    - All stat changes route through `world.apply_outcome` (code rule 2 compliance)
+    - Natural event log text per sub-type (e.g. "You hit the gym.")
+    - `format_stat_change_summary()` helper for details column display
+- **Fix: Hang Out closeness** — changed +8 to +5 (matches design spec)
+- **Fix: Hang Out stat effects** — now gives +3 Happiness and -2 Stress once per advance (not per target)
+
 ## Version 0.48.4 (Patch) - 2026-04-05
 - **Action time budget (DEC-018):**
     - `TRAIT_DEFINITIONS` dict added with all 12 traits and their `sleep_modifier` values
