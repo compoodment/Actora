@@ -13,6 +13,8 @@ Done = delete from here + mention in changelog.
 
 ## 🟡 Annoying
 
+- **Multiple "X Months Skipped" entries in event log** — when a skip is interrupted by a popup (identity choice, meeting event), each resumed segment generates a new skip marker. e.g. "9835 Months Skipped", then "9832 Months Skipped", then "9831 Months Skipped". Cosmetically messy. Not a crash. *(found 2026-04-05)*
+
 - **Intersex sex option not preserved through wizard** — selecting "Intersex" on the identity step results in the character being saved as Male. The intersex value appears not to carry through to the final character payload. *(found 2026-04-05, RT playtest)*
 
 - **"Other" appearance option may skip custom text input** — in some navigation paths, selecting "Other" for eye/hair color appears to default to the first real option (Brown) instead of opening the custom text input. Needs isolated test to confirm. *(found 2026-04-05, RT playtest)*
