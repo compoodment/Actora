@@ -6,6 +6,10 @@ updated: 2026-04-05
 
 # Actora Changelog
 
+## Version 0.51.4 (Patch) - 2026-04-05
+- **Fix: W/S typing blocked in appearance custom text field** — W and S keys were intercepted as navigation even when focused on the custom text input; now only arrow keys navigate from text fields, W/S type normally
+- **Fix: skip_time / death_ack / continuation body row offset** — these screens were drawing body content starting at row 5, overlapping the header; now start at `HEADER_ROWS` (7) consistent with all other screens
+
 ## Version 0.51.3 (Patch) - 2026-04-05
 - **Fix: appearance Enter→custom text field** — pressing Enter on a select field set to "Other" now moves focus to the custom text input row instead of trying to advance the step
 - **Fix: questionnaire framing Backspace** — Backspace on the framing screen now navigates back to mode selection (step 3)

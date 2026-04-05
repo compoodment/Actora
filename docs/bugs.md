@@ -17,4 +17,3 @@ Done = delete from here + mention in changelog.
 
 - **Left panel scroll untested under real overflow** — scroll logic rewritten in v0.43.0 but needs real content overflow (relationships, jobs, etc.) to verify scrolling works correctly as panel grows.
 
-- **skip_time / death_ack / continuation screens start body at row 5** — these full-page screens (`render_skip_time`, `render_death_ack`, `render_continuation_detail`) draw body content starting at row 5, overlapping the header bottom rows 5–6. Not a crash, cosmetically inconsistent. Fix: move to `HEADER_ROWS` consistent with other screens, or intentionally exempt as header-free overlays. *(found 2026-04-05)*
