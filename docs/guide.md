@@ -145,10 +145,10 @@ When dispatching Codex or Claude Code, include:
 ### Coding worker rules
 - **Tiny fix** (1-5 lines): direct edit, no worker needed
 - **Medium+ changes**: minimal grounding → dispatch worker → review → verify → commit
-- **Codex CLI**: primary worker until ~2026-04-22, then Claude Code takes over
-- **Claude Code**: `claude --print` for read-only; `claude --permission-mode bypassPermissions --print` for edits
+- **Codex CLI**: `claude --print` for read-only; `claude --permission-mode bypassPermissions --print` for edits
 - Always verify `python3 -c "import main"` after Python changes
 - Always review worker output — compilation is one gate, not the throne of truth
+- **Model selection:** See `TOOLS.md` (workspace) for the full routing table. Do not duplicate model decisions here.
 
 ---
 

@@ -125,7 +125,7 @@ Toughness cluster (Resilient) — ~3 questions.
 ---
 
 ### Stats — Contract & Intent
-**Status:** Implemented (v0.48.3)
+**Status:** Implemented (v0.48.3, range update v0.50.1)
 **Current truth:** 13 stats in code (Health, Happiness, Intelligence, Memory, Stress, Strength, Charisma, Imagination, Wisdom, Discipline, Willpower, Looks, Fertility). Happiness wired to friend death and Hang Out action (+3). Stress reduced by Hang Out (-2) and Rest actions. Exercise affects Strength/Health. Read affects Intelligence/Wisdom/Imagination/Happiness. Most stats still display-only beyond these action effects.
 
 **Redesigned stat list (13 stats, interview 2026-04-04):**
@@ -135,8 +135,8 @@ Toughness cluster (Resilient) — ~3 questions.
 | Health | Mortality baseline | Mortality risk, energy for actions, illness chance | Declines from ~40, sharper after 70 |
 | Happiness | Friend death (-8/-18) | Event eligibility, action effectiveness, depression risk | No natural age curve — driven entirely by events and circumstances |
 | Intelligence | Nothing | Education performance, questionnaire outcomes, job eligibility | Stable across life |
-| Memory | Nothing | Skill learning speed, job performance, event recall | Stable until ~50, declines after (accelerated by substance abuse, sleep deprivation) |
-| Stress | Nothing | Degrades other stats when high, action effectiveness, illness risk | No natural age curve — driven entirely by events and circumstances |
+| Memory | Nothing | Skill learning speed, job performance, event recall | Stable until ~50, declines after (accelerated by substance abuse, sleep deprivation). **Range: -50 to +50. 0 = average baseline.** |
+| Stress | Hang Out (-2), Rest actions | Degrades other stats when high, action effectiveness, illness risk | No natural age curve — driven entirely by events and circumstances. **Range: -50 to +50. 0 = baseline.** |
 | Strength | Nothing | Physical actions, job eligibility, certain events | Peaks 18-25, slow decline from 30, sharper after 60 |
 | Charisma | Nothing | Social action effectiveness, relationship formation speed | No natural age curve — modified by social experience and lifestyle |
 | Imagination | Nothing | Quality ceiling for creative output, creative skill growth rate | Peaks young/young adult, maintainable with practice |
