@@ -14,7 +14,6 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 ## Now
 
 - **Stress + Memory range migration (DEC-028)** — change both stats from 0-100 to -50 to +50. Affects: `modify_stat` clamping in human.py, Profile display in main.py, questionnaire baseline in `build_questionnaire_starting_stats`, any future mechanical checks. Implement after questionnaire is written.
-- **Questionnaire redesign** — requires a full design interview before any implementation. The new traits (12, with mechanical depth: sleep modifiers, stat effects, skill growth, action effectiveness) and 13 stats need questions written around them from scratch — not patched onto the old auto-generated questions. Old questions and trait_suggest values are still the original broken state in code. Do not implement until the interview happens.
 
 - **Profile dashboard redesign** — implement summary row per category (Stats/Traits/Skills/Needs/Mood), Enter→drill detail pattern. Reusable component for future category screens. Build incrementally as systems land.
 

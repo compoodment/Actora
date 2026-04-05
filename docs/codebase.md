@@ -559,7 +559,7 @@ Current player creation includes:
 - gender defaults to match sex and is deferred to puberty emergence during play
 - Appearance step with eye color, hair color, and skin tone; each appearance field supports `Other`, which requires a custom free-text value before continuing
 - Creation Mode step with a choice between questionnaire-based generation and manual setup
-- Questionnaire branch with 16 one-at-a-time prompts that derive startup stats and traits automatically (NOTE: currently broken — outputs 3 traits from old pool instead of 4 from new pool; needs design interview)
+- Questionnaire branch with 24 questions (framing screen → Q1-24 → reveal screen → confirm). Outputs 4 traits from new 12-trait pool. Active trait blocking (Introverted↔Extraverted, Disciplined↔Impulsive). Stress baseline 0. All stats start at 50.
 - Manual branch with a Stats step for 0-100 adjustment across all 13 stats (`health`, `happiness`, `intelligence`, `memory`, `stress`, `strength`, `charisma`, `imagination`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`) plus `[R]` to randomize all startup stats
 - Manual Traits step requiring exactly 4 traits from the new pool: `Driven`, `Chill`, `Curious`, `Social`, `Disciplined`, `Impulsive`, `Empathetic`, `Resilient`, `Introverted`, `Extraverted`, `Restless`, `Ambitious`
 - Confirm step showing the full character summary, with `Enter` to start the game and `Backspace` to go back

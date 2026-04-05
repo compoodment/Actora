@@ -37,8 +37,8 @@ Each system uses this format:
 ---
 
 ### Questionnaire
-**Status:** Redesign in progress (design complete 2026-04-05, implementation pending)
-**Current truth:** 16-question questionnaire exists in code but uses old trait names (Cheerful, Calm, Bold, etc.) that don't match the new 12-trait pool, and outputs 3 traits instead of 4. Broken until redesign is implemented.
+**Status:** Implemented (v0.50.0)
+**Current truth:** 24-question questionnaire. Framing screen → Q1-24 → reveal screen. Outputs 4 traits from new pool. Active trait blocking for hard-block pairs. Stress baseline 0. Pick-4.
 
 **Design (interview 2026-04-05):**
 - 24 questions (up from 16)
