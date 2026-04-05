@@ -3702,7 +3702,7 @@ class ActoraTUI:
 
         # Row 0: logo top (═══▄▄▄...═══ blends with full-width separator)
         logo_top = LOGO[0]
-        top_fill = "═" * max(0, (width - 1 - len(logo_top)) // 2)
+        top_fill = "═" * max(0, (width - 1 - len(logo_top)) // 2 + 1)
         top_row = top_fill + logo_top + "═" * max(0, width - 1 - len(top_fill) - len(logo_top))
         try:
             stdscr.addnstr(0, 0, top_row[:width - 1], width - 1, curses.A_BOLD)
@@ -3719,14 +3719,14 @@ class ActoraTUI:
             row_text = f"{left_text}{' ' * len(logo_line)}{right_text}"
             try:
                 stdscr.addnstr(i + 1, 0, row_text[:width - 1], width - 1)
-                logo_x = panel_w
+                logo_x = panel_w + 1
                 stdscr.addnstr(i + 1, logo_x, logo_line, len(logo_line), curses.A_BOLD)
             except curses.error:
                 pass
 
         # Row 6: logo bottom (═══▀▀▀...═══ blends with full-width separator)
         logo_bot = LOGO[-1]
-        bot_fill = "═" * max(0, (width - 1 - len(logo_bot)) // 2)
+        bot_fill = "═" * max(0, (width - 1 - len(logo_bot)) // 2 + 1)
         bot_row = bot_fill + logo_bot + "═" * max(0, width - 1 - len(bot_fill) - len(logo_bot))
         try:
             stdscr.addnstr(6, 0, bot_row[:width - 1], width - 1, curses.A_BOLD)
