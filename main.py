@@ -101,7 +101,7 @@ QUESTIONNAIRE_QUESTIONS = [
         "style": "situational",
         "text": "You find something on the ground that isn't yours.",
         "options": [
-            {"text": "Try to find who it belongs to", "stat_changes": {"charisma": 6, "wisdom": 4}, "trait_suggest": "Empathetic"},
+            {"text": "Try to find who it belongs to", "stat_changes": {"charisma": 6, "wisdom": 4}, "trait_suggest": "Gentle"},
             {"text": "Keep it - finders keepers", "stat_changes": {"willpower": 5, "looks": 3}},
             {"text": "Look at it, put it back", "stat_changes": {"intelligence": 5, "imagination": 4}, "trait_suggest": "Curious"},
             {"text": "Walk past it", "stat_changes": {"discipline": 4, "willpower": 3}},
@@ -111,9 +111,9 @@ QUESTIONNAIRE_QUESTIONS = [
         "style": "spectrum",
         "text": "When plans suddenly change...",
         "options": [
-            {"text": "I get excited about what might happen instead", "stat_changes": {"imagination": 6, "happiness": 4}, "trait_suggest": "Social"},
-            {"text": "I feel annoyed but go with it", "stat_changes": {"willpower": 5, "discipline": 4}, "trait_suggest": "Resilient"},
-            {"text": "I need a minute before I can deal with it", "stat_changes": {"wisdom": 5, "intelligence": 3}, "trait_suggest": "Chill"},
+            {"text": "I get excited about what might happen instead", "stat_changes": {"imagination": 6, "happiness": 4}, "trait_suggest": "Cheerful"},
+            {"text": "I feel annoyed but go with it", "stat_changes": {"willpower": 5, "discipline": 4}, "trait_suggest": "Stubborn"},
+            {"text": "I need a minute before I can deal with it", "stat_changes": {"wisdom": 5, "intelligence": 3}, "trait_suggest": "Calm"},
             {"text": "I just wish things stayed how they were", "stat_changes": {"discipline": 6, "health": 3}},
         ],
     },
@@ -121,8 +121,8 @@ QUESTIONNAIRE_QUESTIONS = [
         "style": "gut_pick",
         "text": "Which one is more you?",
         "options": [
-            {"text": "I jump in first and think later", "stat_changes": {"strength": 5, "willpower": 5}, "trait_suggest": "Driven"},
-            {"text": "I watch first, then decide", "stat_changes": {"intelligence": 5, "wisdom": 4}, "trait_suggest": "Curious"},
+            {"text": "I jump in first and think later", "stat_changes": {"strength": 5, "willpower": 5}, "trait_suggest": "Bold"},
+            {"text": "I watch first, then decide", "stat_changes": {"intelligence": 5, "wisdom": 4}, "trait_suggest": "Alert"},
             {"text": "I ask someone else what they think", "stat_changes": {"charisma": 6, "happiness": 3}},
             {"text": "I overthink it until the moment passes", "stat_changes": {"intelligence": 6, "imagination": 3}, "trait_suggest": "Restless"},
         ],
@@ -131,9 +131,9 @@ QUESTIONNAIRE_QUESTIONS = [
         "style": "situational",
         "text": "A stranger starts talking to you out of nowhere.",
         "options": [
-            {"text": "I talk back like we have been friends for years", "stat_changes": {"charisma": 8, "happiness": 3}, "trait_suggest": "Social"},
+            {"text": "I talk back like we have been friends for years", "stat_changes": {"charisma": 8, "happiness": 3}, "trait_suggest": "Cheerful"},
             {"text": "I smile and keep it short", "stat_changes": {"charisma": 4, "discipline": 4}},
-            {"text": "I freeze up a little", "stat_changes": {"intelligence": 4, "wisdom": 3}, "trait_suggest": "Introverted"},
+            {"text": "I freeze up a little", "stat_changes": {"intelligence": 4, "wisdom": 3}, "trait_suggest": "Shy"},
             {"text": "I pretend I did not hear them", "stat_changes": {"willpower": 5, "imagination": 3}},
         ],
     },
@@ -141,9 +141,9 @@ QUESTIONNAIRE_QUESTIONS = [
         "style": "spectrum",
         "text": "When someone near you is upset...",
         "options": [
-            {"text": "I feel it like it is happening to me", "stat_changes": {"happiness": 3, "charisma": 4, "wisdom": 4}, "trait_suggest": "Empathetic"},
-            {"text": "I want to help but I keep my distance", "stat_changes": {"wisdom": 5, "discipline": 4}, "trait_suggest": "Chill"},
-            {"text": "I try to fix the problem", "stat_changes": {"intelligence": 5, "strength": 3}, "trait_suggest": "Driven"},
+            {"text": "I feel it like it is happening to me", "stat_changes": {"happiness": 3, "charisma": 4, "wisdom": 4}, "trait_suggest": "Gentle"},
+            {"text": "I want to help but I keep my distance", "stat_changes": {"wisdom": 5, "discipline": 4}, "trait_suggest": "Calm"},
+            {"text": "I try to fix the problem", "stat_changes": {"intelligence": 5, "strength": 3}, "trait_suggest": "Bold"},
             {"text": "I do not really notice unless they tell me", "stat_changes": {"willpower": 5, "discipline": 4}},
         ],
     },
@@ -152,7 +152,7 @@ QUESTIONNAIRE_QUESTIONS = [
         "text": "Pick the one that fits:",
         "options": [
             {"text": "I have taken something apart just to see how it works", "stat_changes": {"intelligence": 7, "imagination": 4}, "trait_suggest": "Curious"},
-            {"text": "I have never understood why people break things on purpose", "stat_changes": {"discipline": 5, "health": 4}, "trait_suggest": "Chill"},
+            {"text": "I have never understood why people break things on purpose", "stat_changes": {"discipline": 5, "health": 4}, "trait_suggest": "Calm"},
             {"text": "I would rather build something new than fix something old", "stat_changes": {"imagination": 7, "intelligence": 3}, "trait_suggest": "Restless"},
             {"text": "I do not really care how things work as long as they do", "stat_changes": {"willpower": 5, "happiness": 3}},
         ],
@@ -162,9 +162,9 @@ QUESTIONNAIRE_QUESTIONS = [
         "text": "You are given a set of rules you think are stupid.",
         "options": [
             {"text": "I follow them anyway", "stat_changes": {"discipline": 7, "willpower": 3}},
-            {"text": "I ignore the ones I disagree with", "stat_changes": {"willpower": 6, "imagination": 3}, "trait_suggest": "Resilient"},
-            {"text": "I try to change them", "stat_changes": {"charisma": 5, "intelligence": 4}, "trait_suggest": "Driven"},
-            {"text": "I follow them while complaining the entire time", "stat_changes": {"happiness": -3, "willpower": 4}, "trait_suggest": "Disciplined"},
+            {"text": "I ignore the ones I disagree with", "stat_changes": {"willpower": 6, "imagination": 3}, "trait_suggest": "Stubborn"},
+            {"text": "I try to change them", "stat_changes": {"charisma": 5, "intelligence": 4}, "trait_suggest": "Bold"},
+            {"text": "I follow them while complaining the entire time", "stat_changes": {"happiness": -3, "willpower": 4}, "trait_suggest": "Fussy"},
         ],
     },
     {
@@ -173,7 +173,7 @@ QUESTIONNAIRE_QUESTIONS = [
         "options": [
             {"text": "Right now, no waiting", "stat_changes": {"willpower": 5, "strength": 4}, "trait_suggest": "Restless"},
             {"text": "Soon, but I can be patient", "stat_changes": {"discipline": 5, "happiness": 4}},
-            {"text": "I will plan for it and get it eventually", "stat_changes": {"wisdom": 6, "discipline": 5}, "trait_suggest": "Chill"},
+            {"text": "I will plan for it and get it eventually", "stat_changes": {"wisdom": 6, "discipline": 5}, "trait_suggest": "Calm"},
             {"text": "I think about it so long I sometimes forget I wanted it", "stat_changes": {"imagination": 5, "intelligence": 4}},
         ],
     },
@@ -181,8 +181,8 @@ QUESTIONNAIRE_QUESTIONS = [
         "style": "gut_pick",
         "text": "Honestly?",
         "options": [
-            {"text": "I say what I think, even if people do not want to hear it", "stat_changes": {"willpower": 7, "charisma": -2}, "trait_suggest": "Resilient"},
-            {"text": "I keep most of my real opinions to myself", "stat_changes": {"wisdom": 5, "discipline": 4}, "trait_suggest": "Introverted"},
+            {"text": "I say what I think, even if people do not want to hear it", "stat_changes": {"willpower": 7, "charisma": -2}, "trait_suggest": "Stubborn"},
+            {"text": "I keep most of my real opinions to myself", "stat_changes": {"wisdom": 5, "discipline": 4}, "trait_suggest": "Shy"},
             {"text": "I adjust what I say depending on who I am talking to", "stat_changes": {"charisma": 6, "imagination": 3}},
             {"text": "I do not really have strong opinions about most things", "stat_changes": {"happiness": 4, "health": 3}},
         ],
@@ -191,17 +191,17 @@ QUESTIONNAIRE_QUESTIONS = [
         "style": "situational",
         "text": "Someone dares you to do something risky.",
         "options": [
-            {"text": "Already doing it", "stat_changes": {"strength": 5, "willpower": 5, "health": -3}, "trait_suggest": "Driven"},
+            {"text": "Already doing it", "stat_changes": {"strength": 5, "willpower": 5, "health": -3}, "trait_suggest": "Bold"},
             {"text": "I think about it, then probably do it", "stat_changes": {"intelligence": 4, "willpower": 4}},
-            {"text": "I laugh it off and say no", "stat_changes": {"wisdom": 5, "discipline": 4}, "trait_suggest": "Chill"},
-            {"text": "I dare them to do it first", "stat_changes": {"charisma": 5, "imagination": 4}, "trait_suggest": "Social"},
+            {"text": "I laugh it off and say no", "stat_changes": {"wisdom": 5, "discipline": 4}, "trait_suggest": "Calm"},
+            {"text": "I dare them to do it first", "stat_changes": {"charisma": 5, "imagination": 4}, "trait_suggest": "Cheerful"},
         ],
     },
     {
         "style": "spectrum",
         "text": "Losing at something makes me...",
         "options": [
-            {"text": "Want to try again immediately", "stat_changes": {"willpower": 7, "strength": 4}, "trait_suggest": "Resilient"},
+            {"text": "Want to try again immediately", "stat_changes": {"willpower": 7, "strength": 4}, "trait_suggest": "Stubborn"},
             {"text": "Frustrated, but I get over it", "stat_changes": {"discipline": 5, "wisdom": 3}},
             {"text": "Question whether it was worth trying", "stat_changes": {"intelligence": 5, "imagination": 3}},
             {"text": "Not care that much honestly", "stat_changes": {"happiness": 5, "looks": 3}},
@@ -211,9 +211,9 @@ QUESTIONNAIRE_QUESTIONS = [
         "style": "gut_pick",
         "text": "I notice...",
         "options": [
-            {"text": "Details that other people miss completely", "stat_changes": {"intelligence": 6, "wisdom": 4}, "trait_suggest": "Curious"},
-            {"text": "How people are feeling before they say anything", "stat_changes": {"charisma": 5, "wisdom": 5}, "trait_suggest": "Empathetic"},
-            {"text": "When something is about to go wrong", "stat_changes": {"wisdom": 6, "intelligence": 4}, "trait_suggest": "Curious"},
+            {"text": "Details that other people miss completely", "stat_changes": {"intelligence": 6, "wisdom": 4}, "trait_suggest": "Alert"},
+            {"text": "How people are feeling before they say anything", "stat_changes": {"charisma": 5, "wisdom": 5}, "trait_suggest": "Gentle"},
+            {"text": "When something is about to go wrong", "stat_changes": {"wisdom": 6, "intelligence": 4}, "trait_suggest": "Alert"},
             {"text": "Mostly whatever is right in front of me", "stat_changes": {"strength": 4, "happiness": 4}},
         ],
     },
@@ -223,15 +223,15 @@ QUESTIONNAIRE_QUESTIONS = [
         "options": [
             {"text": "I am already outside doing something", "stat_changes": {"health": 5, "strength": 4}, "trait_suggest": "Restless"},
             {"text": "I make something - draw, write, build, whatever", "stat_changes": {"imagination": 7, "intelligence": 3}, "trait_suggest": "Curious"},
-            {"text": "I find someone to hang out with", "stat_changes": {"charisma": 6, "happiness": 4}, "trait_suggest": "Social"},
-            {"text": "I sit somewhere quiet and do absolutely nothing", "stat_changes": {"wisdom": 5, "happiness": 4}, "trait_suggest": "Chill"},
+            {"text": "I find someone to hang out with", "stat_changes": {"charisma": 6, "happiness": 4}, "trait_suggest": "Cheerful"},
+            {"text": "I sit somewhere quiet and do absolutely nothing", "stat_changes": {"wisdom": 5, "happiness": 4}, "trait_suggest": "Calm"},
         ],
     },
     {
         "style": "spectrum",
         "text": "How much do I care about how I look?",
         "options": [
-            {"text": "More than I would ever admit", "stat_changes": {"looks": 8, "discipline": 3}, "trait_suggest": "Disciplined"},
+            {"text": "More than I would ever admit", "stat_changes": {"looks": 8, "discipline": 3}, "trait_suggest": "Fussy"},
             {"text": "Enough to make an effort most days", "stat_changes": {"looks": 5, "charisma": 3}},
             {"text": "Only when it matters", "stat_changes": {"wisdom": 4, "willpower": 3}},
             {"text": "Genuinely not that much", "stat_changes": {"happiness": 4, "imagination": 3}},
@@ -241,8 +241,8 @@ QUESTIONNAIRE_QUESTIONS = [
         "style": "gut_pick",
         "text": "My gut feeling is usually...",
         "options": [
-            {"text": "Right, and I trust it completely", "stat_changes": {"willpower": 7, "wisdom": 4}, "trait_suggest": "Driven"},
-            {"text": "Right, but I double check anyway", "stat_changes": {"intelligence": 6, "wisdom": 4}, "trait_suggest": "Curious"},
+            {"text": "Right, and I trust it completely", "stat_changes": {"willpower": 7, "wisdom": 4}, "trait_suggest": "Bold"},
+            {"text": "Right, but I double check anyway", "stat_changes": {"intelligence": 6, "wisdom": 4}, "trait_suggest": "Alert"},
             {"text": "Hit or miss honestly", "stat_changes": {"imagination": 4, "happiness": 3}},
             {"text": "Something I mostly ignore", "stat_changes": {"discipline": 6, "intelligence": 3}},
         ],
@@ -252,9 +252,9 @@ QUESTIONNAIRE_QUESTIONS = [
         "text": "A friend gives you something you hate.",
         "options": [
             {"text": "I smile and say thank you", "stat_changes": {"charisma": 6, "discipline": 3}},
-            {"text": "I tell them honestly", "stat_changes": {"willpower": 5, "charisma": -2}, "trait_suggest": "Resilient"},
-            {"text": "I keep it but never use it", "stat_changes": {"wisdom": 4, "discipline": 4}, "trait_suggest": "Introverted"},
-            {"text": "I feel bad about not liking it for way too long", "stat_changes": {"happiness": -3, "wisdom": 4}, "trait_suggest": "Empathetic"},
+            {"text": "I tell them honestly", "stat_changes": {"willpower": 5, "charisma": -2}, "trait_suggest": "Stubborn"},
+            {"text": "I keep it but never use it", "stat_changes": {"wisdom": 4, "discipline": 4}, "trait_suggest": "Shy"},
+            {"text": "I feel bad about not liking it for way too long", "stat_changes": {"happiness": -3, "wisdom": 4}, "trait_suggest": "Gentle"},
         ],
     },
 ]
@@ -1022,11 +1022,11 @@ class CreationWizard:
             random.shuffle(tied_traits)
             ranked_traits.extend(tied_traits)
 
-        selected_traits = ranked_traits[:4]
-        if len(selected_traits) < 4:
+        selected_traits = ranked_traits[:3]
+        if len(selected_traits) < 3:
             remaining_pool = [trait for trait in CREATION_TRAIT_POOL if trait not in selected_traits]
             random.shuffle(remaining_pool)
-            selected_traits.extend(remaining_pool[: 4 - len(selected_traits)])
+            selected_traits.extend(remaining_pool[: 3 - len(selected_traits)])
 
         self.data["stats"] = stats
         self.data["traits"] = selected_traits
