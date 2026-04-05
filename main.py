@@ -1719,12 +1719,18 @@ class CreationWizard:
             else:
                 self.step_index = 1
             return
-        if key in (curses.KEY_UP, ord("w"), ord("W")):
-            self.appearance_field_index = max(0, self.appearance_field_index - 1)
-            return
-        if key in (curses.KEY_DOWN, ord("s"), ord("S")):
-            self.appearance_field_index = min(len(fields) - 1, self.appearance_field_index + 1)
-            return
+        if current_field["kind"] != "text":
+            if key in (curses.KEY_UP, ord("w"), ord("W")):
+                self.appearance_field_index = max(0, self.appearance_field_index - 1)
+                return
+            if key in (curses.KEY_DOWN, ord("s"), ord("S")):
+                self.appearance_field_index = min(len(fields) - 1, self.appearance_field_index + 1)
+                return
+        else:
+            if key in (curses.KEY_UP, curses.KEY_DOWN):
+                # Arrow keys still navigate even in text mode
+                self.appearance_field_index = max(0, self.appearance_field_index - 1) if key == curses.KEY_UP else min(len(fields) - 1, self.appearance_field_index + 1)
+                return
         if current_field["kind"] == "select":
             options = current_field["options"]
             current_value = self.data["appearance"][current_field["key"]]
@@ -4243,7 +4249,7 @@ class ActoraTUI:
                 ),
             ]
         )
-        draw_text_block(stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
+        draw_text_block(stdscr, self.HEADER_ROWS, content_left, content_width, height - self.HEADER_ROWS - self.FOOTER_ROWS, lines, highlight_index=highlight_index)
 
     def render_death_ack(self, stdscr, height, width):
         continuity_state = self.get_continuity_state()
@@ -4315,7 +4321,7 @@ class ActoraTUI:
                     highlight_index = len(lines)
                 lines.append(line)
 
-        draw_text_block(stdscr, 5, content_left, content_width, height - 7, lines, highlight_index=highlight_index)
+        draw_text_block(stdscr, self.HEADER_ROWS, content_left, content_width, height - self.HEADER_ROWS - self.FOOTER_ROWS, lines, highlight_index=highlight_index)
 
     def render_continuation_detail(self, stdscr, height, width):
         continuity_state = self.get_continuity_state()
@@ -4359,7 +4365,7 @@ class ActoraTUI:
             "Recent Records",
         ]
         lines.extend(build_record_summary_lines(detail["records"]))
-        draw_text_block(stdscr, 5, content_left, content_width, height - 7, lines)
+        draw_text_block(stdscr, self.HEADER_ROWS, content_left, content_width, height - self.HEADER_ROWS - self.FOOTER_ROWS, lines)
 
     def render(self, stdscr):
         stdscr.erase()
