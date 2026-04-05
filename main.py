@@ -1459,7 +1459,7 @@ class CreationWizard:
         right_lines = [
             "Controls",
             "",
-            "Adjust any stat from 0 to 100.",
+            "Adjust any stat from 0 to 100.\nMemory and Stress: -50 to +50.",
             "",
             "[R] Randomize all stats",
             
@@ -1806,11 +1806,13 @@ class CreationWizard:
             return
         if key in (curses.KEY_LEFT, ord("a"), ord("A"), ord("-")):
             stat_name = CREATION_STAT_ORDER[self.stat_index]
-            self.data["stats"][stat_name] = max(0, self.data["stats"][stat_name] - 1)
+            _min = -50 if stat_name in ("stress", "memory") else 0
+            self.data["stats"][stat_name] = max(_min, self.data["stats"][stat_name] - 1)
             return
         if key in (curses.KEY_RIGHT, ord("d"), ord("D"), ord("+"), ord("=")):
             stat_name = CREATION_STAT_ORDER[self.stat_index]
-            self.data["stats"][stat_name] = min(100, self.data["stats"][stat_name] + 1)
+            _max = 50 if stat_name in ("stress", "memory") else 100
+            self.data["stats"][stat_name] = min(_max, self.data["stats"][stat_name] + 1)
 
     def handle_questionnaire_key(self, key):
         question = QUESTIONNAIRE_QUESTIONS[self.question_index]
