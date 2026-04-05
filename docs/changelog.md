@@ -6,6 +6,17 @@ updated: 2026-04-05
 
 # Actora Changelog
 
+## Version 0.51.2 (Patch) - 2026-04-05
+- **Shell geometry centralized** — `HEADER_ROWS`, `FOOTER_ROWS`, `BROWSER_CHROME_ROWS` class constants replace all hardcoded row numbers throughout `ActoraTUI`
+    - Any future header/footer change requires updating exactly three constants; no body renderer needs editing
+    - `_get_logo_layout()` helper added — canonical horizontal anchor for logo and body alignment
+- **Fix: Browser tab bar row collision** — tab bar and separator were drawn at rows 6–7 (overwriting header bottom); now correctly drawn at rows 7–8 using `HEADER_ROWS` and `HEADER_ROWS + 1`
+
+## Version 0.51.1 (Patch) - 2026-04-05
+- **Shell centering unification** — body `│` divider now pinned to logo center column via `_get_logo_layout()` helper
+    - Previously: three independent centering systems (logo, body, footer) with 1-column drift
+    - Now: `divider_x = logo_center`; left/right panel widths derive from that single anchor
+
 ## Version 0.51.0 (Minor) - 2026-04-05
 - **New logo** — custom crest design with ╗╔╝╚ box-drawing corners, ░▒▓ shading gradient, integrated ║ borders
     - Replaces placeholder "actora" script ASCII font

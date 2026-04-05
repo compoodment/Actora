@@ -19,8 +19,6 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Next
 
-- **Shell centering unification** — the logo, body content, and footer use three independent centering systems that don't reference each other. Logo centers at screen center; body content centers at max_width=112; footer centers separately. Results in visible misalignment between the logo ║ borders and the body │ divider. Fix: choose one canonical horizontal reference for all shell layers. Required before Life View dashboard redesign, otherwise dashboard builds on the same broken foundation. *(2026-04-05)*
-
 - **main.py extraction** — identify first sane decomposition seam after shell settles (shell/browser/actions rendering is the likely first candidate). During this pass: flatten `secondary_statistics` into one `statistics` dict with all 13 stats — snapshot should not encode rendering decisions; let the renderer decide what to show where.
 
 ## Later
