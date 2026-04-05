@@ -6,6 +6,39 @@ updated: 2026-04-05
 
 # Actora Changelog
 
+## Version 0.50.1 (Patch) - 2026-04-05
+- **Stress + Memory signed range (DEC-028):**
+    - Both stats now use -50 to +50 range (0 = baseline) instead of 0-100
+    - `modify_stat` in human.py respects signed clamp for stress and memory, 0-100 for all others
+    - Default values: stress=0, memory=0
+    - Randomized starting stats: stress 0-15, memory -10 to 20
+    - NPC normalize defaults updated to match
+    - Questionnaire baseline already correct (was already 0 for both)
+- **Fix: Action event_text missing** — all action subtype defs were missing `event_text`; event log was showing "You did: X." fallback instead of natural text
+- **Fix: Questionnaire reveal → game directly** — after reveal screen, questionnaire path now goes straight to Life View (not confirm screen)
+- **Fix: Reveal screen Backspace** — now correctly goes back to Q24
+- **Polish: Questionnaire spacing** — extra blank line between question and answers
+
+## Version 0.50.0 (Minor) - 2026-04-05
+- **Questionnaire redesign (DEC-029/030/031):**
+    - 24 questions (up from 16), written from scratch with real psychological depth
+    - Framing screen before Q1: simulation-tone intro text (DEC-029)
+    - Reveal screen after Q24: "The assessment is complete. You are X, Y, Z, and W. Your life begins now." (DEC-029)
+    - Variable answer count (2-4 per question depending on fit)
+    - No negative stat changes — gameplay handles personality downsides
+    - Stat baseline: all stats at 50, Stress starts at 0 (signed stat per DEC-028)
+    - Stat changes per answer: +3 to +6 per stat, 1-2 stats per answer
+    - Trait blocking via active tally competition (DEC-030): Introverted↔Extraverted, Disciplined↔Impulsive
+    - Traits with negative tally score excluded from selection
+    - Pick-4 output (up from pick-3)
+    - Question styles: childhood/formative, situational, spectrum, gut_pick
+    - All 12 traits covered with minimum 3 appearances each
+    - Trait distribution checked: Social/Extraverted distinction verified throughout
+
+## Version 0.49.1 (Patch) - 2026-04-05
+- **Events.py trait names remapped** — trait-gated events now use new 12-trait pool names (Driven, Chill, Curious, etc.) instead of old names (Bold, Calm, Cheerful, etc.). Events were silently never firing for new-pool traits.
+- **Truth pass** — design.md, codebase.md, screens.md, controls.md, bugs.md all synced to v0.49.x reality; frontmatter dates updated across all 10 docs
+
 ## Version 0.49.0 (Minor) - 2026-04-05
 - **Action system first wave (DEC-018/019):**
     - Personal category added: Exercise, Read, Rest — each with sub-type picker popup
