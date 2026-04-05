@@ -24,7 +24,7 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 - **Logo redesign** — replace placeholder "actora" script ASCII with a proper custom logo design. Layout already built and waiting for it.
 
-- **main.py extraction** — identify first sane decomposition seam after shell settles (shell/browser/actions rendering is the likely first candidate)
+- **main.py extraction** — identify first sane decomposition seam after shell settles (shell/browser/actions rendering is the likely first candidate). During this pass: flatten `secondary_statistics` into one `statistics` dict with all 13 stats — snapshot should not encode rendering decisions; let the renderer decide what to show where.
 - **Action system implementation** — narrow first-wave: social + self-improvement categories (foundation screen now exists)
 
 ## Later
