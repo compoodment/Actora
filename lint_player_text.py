@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Scans player-facing text in main.py for internal/dev language that shouldn't be shown to players."""
+"""Scans player-facing text in local Python files for internal/dev language that shouldn't be shown to players."""
 
 import re
 import sys
+from pathlib import Path
 
 BANNED_PATTERNS = [
     ("continuation target", "use 'who to continue as' or similar"),
@@ -48,35 +49,40 @@ def scan_file(filepath):
             if not any(marker in line for marker in ['center_text', 'last_message', 'lines.append', 'f"', "f'"]):
                 continue
 
+            display_line = re.sub(r"\{[^}]*\}", "", line)
+            literal_fragments = re.findall(r'"([^"]*)"|\'([^\']*)\'', display_line)
+            literal_text = " ".join(fragment for pair in literal_fragments for fragment in pair if fragment)
             for pattern, suggestion in BANNED_PATTERNS:
-                if pattern.lower() in line.lower():
-                    # Skip if it's in a variable name or internal logic, not a string
-                    if f'"{pattern}' in line or f"'{pattern}" in line or f"{{{pattern}" in line:
-                        # Could be in a format string shown to player
-                        issues.append((line_num, pattern, suggestion, stripped[:80]))
+                if pattern.lower() in literal_text.lower():
+                    issues.append((line_num, pattern, suggestion, stripped[:80]))
 
     return issues
 
 
 def main():
-    filepath = "main.py"
-    if len(sys.argv) > 1:
-        filepath = sys.argv[1]
+    filepaths = [Path(arg) for arg in sys.argv[1:]] if len(sys.argv) > 1 else sorted(Path(".").glob("*.py"))
+    all_issues = []
 
-    issues = scan_file(filepath)
-
-    if issues:
-        print(f"FOUND {len(issues)} potential player-facing text issues in {filepath}:")
+    for filepath in filepaths:
+        issues = scan_file(filepath)
         for line_num, pattern, suggestion, context in issues:
-            print(f"  L{line_num}: '{pattern}' — {suggestion}")
+            all_issues.append((filepath, line_num, pattern, suggestion, context))
+
+    if all_issues:
+        print(f"FOUND {len(all_issues)} potential player-facing text issues in {len(filepaths)} file(s):")
+        for filepath, line_num, pattern, suggestion, context in all_issues:
+            print(f"  {filepath}:L{line_num}: '{pattern}' — {suggestion}")
             print(f"    {context}")
         print()
         print("Note: some matches may be false positives (internal logic, not display text).")
         print("Review each match to confirm it's actually player-visible.")
         sys.exit(1)
+
+    if len(sys.argv) > 1:
+        print(f"No player-facing text issues found in {len(filepaths)} file(s).")
     else:
-        print(f"No player-facing text issues found in {filepath}.")
-        sys.exit(0)
+        print(f"No player-facing text issues found in {len(filepaths)} local Python files.")
+    sys.exit(0)
 
 
 if __name__ == "__main__":
