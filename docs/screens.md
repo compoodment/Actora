@@ -1,7 +1,7 @@
 ---
 title: Screens
 tags: [implementation, tui, reference]
-updated: 2026-04-04
+updated: 2026-04-05
 ---
 
 # Actora Screens

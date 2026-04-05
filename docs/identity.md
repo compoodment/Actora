@@ -1,7 +1,7 @@
 ---
 title: Identity
 tags: [core, identity, stable]
-updated: 2026-04-04
+updated: 2026-04-05
 ---
 
 # Actora Identity

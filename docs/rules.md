@@ -1,7 +1,7 @@
 ---
 title: Rules
 tags: [core, reference, stable]
-updated: 2026-04-04
+updated: 2026-04-05
 ---
 
 # Actora Rules

@@ -1,7 +1,7 @@
 ---
 title: Controls
 tags: [implementation, controls, tui, stable]
-updated: 2026-04-04
+updated: 2026-04-05
 ---
 
 # Actora Controls
