@@ -3659,10 +3659,13 @@ class ActoraTUI:
         divider = "║"
 
         LOGO = [
-            r"           __               ",
-            r" ___ _____/ /____  _______ _",
-            r"/ _ `/ __/ __/ _ \/ __/ _ `/",
-            r"\_,_/\__/\__/\___/_/  \_,_/ ",
+            "═══▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄═══",
+            "║░█▓▒░▒▓█▄ ▄█▓▒░▒▓█░║",
+            "║█▓▒░▒▓█▀ ▄ ▀█▓▒░▒▓█║",
+            "║█▓▒░▒▓█  █  █▓▒░▒▓█║",
+            "║█▓▒░▒▓█▄▀ ▀▄█▓▒░▒▓█║",
+            "║░█▓▒░▒▓█ ▄ █▓▒░▒▓█░║",
+            "═══▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀═══",
         ]
         logo_w = max(len(l) for l in LOGO) + 4  # padding each side
 
@@ -3685,40 +3688,52 @@ class ActoraTUI:
             chrome["subtitle"],
             chrome["title"],
             "",
+            "",
         ]
         right_lines = [
             loc_str,
             f"Health: {health}",
             money_str,
             "",
+            "",
         ]
 
-        panel_w = max(1, (width - logo_w - 4) // 2)
+        panel_w = max(1, (width - 1 - logo_w) // 2)
 
-        # Row 0: top separator
-        stdscr.addnstr(0, 0, full_hline, width - 1, curses.A_BOLD)
+        # Row 0: logo top (═══▄▄▄...═══ blends with full-width separator)
+        logo_top = LOGO[0]
+        top_fill = "═" * max(0, (width - 1 - len(logo_top)) // 2)
+        top_row = top_fill + logo_top + "═" * max(0, width - 1 - len(top_fill) - len(logo_top))
+        try:
+            stdscr.addnstr(0, 0, top_row[:width - 1], width - 1, curses.A_BOLD)
+        except curses.error:
+            pass
 
-        # Rows 1-4: logo + left/right panels
-        for i in range(4):
-            logo_line = LOGO[i] if i < len(LOGO) else ""
-            logo_padded = f"  {logo_line:<{logo_w - 2}}"
-            left_text = f"{left_lines[i]:>{panel_w - 1}} " if i < len(left_lines) else " " * panel_w
-            right_text = f" {right_lines[i]:<{panel_w - 1}}" if i < len(right_lines) else " " * panel_w
-            row_text = f"{left_text}{divider}{logo_padded}{divider}{right_text}"
+        # Rows 1-5: logo body lines + left/right panels
+        # Logo already has ║ borders built in — no extra dividers needed
+        for i in range(5):
+            logo_line = LOGO[i + 1] if i + 1 < len(LOGO) - 1 else ""
+            left_text = f"{left_lines[i]:>{panel_w}} " if i < len(left_lines) else " " * (panel_w + 1)
+            right_text = f" {right_lines[i]:<{panel_w}}" if i < len(right_lines) else " " * (panel_w + 1)
+            row_text = f"{left_text}{logo_line}{right_text}"
             try:
                 stdscr.addnstr(i + 1, 0, row_text[:width - 1], width - 1)
             except curses.error:
                 pass
 
-        # Row 5: bottom separator (becomes body boundary)
-        stdscr.addnstr(5, 0, full_hline, width - 1, curses.A_BOLD)
-        # State line handled inside render_header logo layout
-        pass  # state line folded into logo header
+        # Row 6: logo bottom (═══▀▀▀...═══ blends with full-width separator)
+        logo_bot = LOGO[-1]
+        bot_fill = "═" * max(0, (width - 1 - len(logo_bot)) // 2)
+        bot_row = bot_fill + logo_bot + "═" * max(0, width - 1 - len(bot_fill) - len(logo_bot))
+        try:
+            stdscr.addnstr(6, 0, bot_row[:width - 1], width - 1, curses.A_BOLD)
+        except curses.error:
+            pass
 
     def render_main(self, stdscr, height, width):
         snapshot_data = self.get_snapshot_data()
         snapshot_sections = build_snapshot_sections(snapshot_data)
-        top = 6
+        top = 7
         body_height = height - 8
         self._main_body_height = body_height
         content_left, content_width = get_content_bounds(width, max_width=112)
@@ -3759,7 +3774,7 @@ class ActoraTUI:
             )
 
     def render_profile(self, stdscr, height, width):
-        top = 6
+        top = 7
         body_height = height - 8
         self._profile_body_height = body_height
         content_left, content_width = get_content_bounds(width, max_width=88)
@@ -4002,7 +4017,7 @@ class ActoraTUI:
 
     def render_actions(self, stdscr, height, width):
         """Renders the Actions screen: Categories | Actions | Details."""
-        top = 6
+        top = 7
         body_height = height - 8
         content_left, content_width = get_content_bounds(width, max_width=120)
         col_w = content_width // 3
