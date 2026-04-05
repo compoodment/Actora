@@ -58,22 +58,26 @@ All project constraints in one place. If it says "don't" or "must", it lives her
 9. **When verifying a control/hotkey change: check that old keys are GONE, not just that new keys work. Both directions must be verified. Partial re-wiring is how broken state accumulates.**
 10. **Playtest workflow: present findings first, apply only after explicit approval.** Do not apply fixes mid-playtest without reporting findings and getting a go-ahead first.
 11. **TUI overlay verification: when checking if a popup is visible in tmux, grep for the popup box content — never the background screen header.** The Life View header is always visible under any overlay. Checking "Life View • ..." as evidence a popup closed is wrong.
+12. **Full-codebase grep before renaming/removing anything:** Before dispatching a worker to rename, remove, or replace any symbol (stat, trait, function, key), run `grep -rn "term" *.py` across ALL source files first. List every file that contains it. Include ALL of them in the worker spec. Never assume a subset is complete.
 
 ## Worker output review checklist
 
 Before accepting any worker-produced code change, confirm:
 1. Does a patch spec exist?
 2. Files touched listed?
-3. Behavior changed listed?
-4. Behavior preserved listed?
-5. Output/diff actually reviewed?
-6. Regression risks identified?
-7. Build/show-first respected if intended?
-8. Result approved before final apply?
-9. VPS verification plan clear?
-10. Any architecture-fit or efficiency issues flagged?
-11. Did the worker miss something important?
-12. Is there a tighter/better version still within scope?
+3. **Did you grep the full codebase to find ALL files containing the changed symbol?**
+4. Behavior changed listed?
+5. Behavior preserved listed?
+6. **Output/diff actually read line-by-line?** (not just "compile passed")
+7. Regression risks identified?
+8. Build/show-first respected if intended?
+9. Result approved before final apply?
+10. VPS verification plan clear?
+11. Any architecture-fit or efficiency issues flagged?
+12. Did the worker miss something important?
+13. Is there a tighter/better version still within scope?
+14. **Are hardcoded values extracted to constants?**
+15. **Does the code follow code rule 2 (state mutation through world-owned methods)?**
 
 If any answer is no, stop and resolve before accepting.
 
