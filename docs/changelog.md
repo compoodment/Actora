@@ -6,12 +6,6 @@ updated: 2026-04-04
 
 # Actora Changelog
 
-## Version 0.49.1 (Patch) - 2026-04-05
-- **Questionnaire trait output fixed:**
-    - `trait_suggest` values remapped from old pool to new 12-trait pool (Cheerful→Social, Calm→Chill, Stubborn→Resilient, Bold→Driven, Shy→Introverted, Fussy→Disciplined, Alert→Curious, Gentle→Empathetic; Restless unchanged)
-    - Pick count fixed: questionnaire now outputs 4 traits instead of 3 (matches pick-4 creation rule)
-    - Question text unchanged — reads naturally, no dev language
-
 ## Version 0.49.0 (Minor) - 2026-04-05
 - **Action system first wave (DEC-018/019):**
     - Personal category added: Exercise, Read, Rest — each with sub-type picker popup
