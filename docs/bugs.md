@@ -31,4 +31,3 @@ Done = delete from here + mention in changelog.
 
 - **Action feedback messages not visible on Actions screen** — `last_message` (e.g. "Already queued", "Not enough free time") only renders in the Life View left panel header, not on the Actions screen where the action happened. Player has to return to Life View to see the message. Fix: render last_message somewhere on the Actions screen (footer area or details column). *(noted 2026-04-05)*
 
-- **Trait-gated events use old trait names** — events.py still has events gated on old trait names (Curious, Calm, Restless, Alert, Bold, Stubborn, Cheerful, Gentle, Shy). New 12-trait pool is in code but event eligibility still references old labels. Needs update as part of questionnaire/event redesign pass. *(noted 2026-04-05)*
