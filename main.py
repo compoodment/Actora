@@ -1495,6 +1495,7 @@ class CreationWizard:
             "",
             question["text"].upper(),
             "",
+            "",
         ]
         highlight_index = None
         for index, option in enumerate(question["options"]):
