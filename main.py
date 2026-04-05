@@ -544,15 +544,6 @@ def generate_startup_actor_id(role):
     return f"startup_{role}_{uuid4().hex[:8]}"
 
 
-def safe_input(prompt):
-    """Reads one input value and exits cleanly on interruption/EOF."""
-    try:
-        return input(prompt)
-    except (EOFError, KeyboardInterrupt):
-        print(f"\n{INPUT_INTERRUPTED_MESSAGE}")
-        raise SystemExit(0)
-
-
 def build_snapshot_sections(snapshot_data):
     """Builds shell-owned snapshot sections from structured actor snapshot data."""
     identity = snapshot_data["identity"]
@@ -1993,27 +1984,14 @@ class ActoraTUI:
     def get_snapshot_data(self):
         focused_actor_id = self.get_focused_actor_id()
         focused_actor = self.world.get_actor(focused_actor_id)
-        snapshot_data = focused_actor.get_snapshot_data(
+        if focused_actor is None:
+            return {}
+        return focused_actor.get_snapshot_data(
             self.world.current_year,
             self.world.current_month,
             self.world,
             focused_actor_id,
         )
-        normalized_actor_stats = normalize_creation_stats(focused_actor.stats)
-        secondary_statistics = {
-            "strength": normalized_actor_stats["strength"],
-            "charisma": normalized_actor_stats["charisma"],
-            "imagination": normalized_actor_stats["imagination"],
-            "memory": normalized_actor_stats["memory"],
-            "wisdom": normalized_actor_stats["wisdom"],
-            "stress": normalized_actor_stats["stress"],
-            "discipline": normalized_actor_stats["discipline"],
-            "willpower": normalized_actor_stats["willpower"],
-            "looks": normalized_actor_stats["looks"],
-            "fertility": normalized_actor_stats["fertility"],
-        }
-        snapshot_data["secondary_statistics"] = secondary_statistics
-        return snapshot_data
 
     def sync_focus_state(self):
         """Applies shell-level dead-focus flow selection before rendering."""
@@ -2873,7 +2851,6 @@ class ActoraTUI:
         location = snapshot_data["location"]
         appearance = snapshot_data["appearance"]
         statistics = snapshot_data["statistics"]
-        secondary_statistics = snapshot_data["secondary_statistics"]
         traits = snapshot_data["traits"]
         relationships = snapshot_data["relationships"]
 
@@ -2908,11 +2885,11 @@ class ActoraTUI:
             format_stat_pair("Intelligence", statistics["intelligence"], "Money", f"${statistics['money']}"),
             "",
             "Secondary Stats",
-            format_stat_pair("Strength", secondary_statistics["strength"], "Charisma", secondary_statistics["charisma"]),
-            format_stat_pair("Imagination", secondary_statistics["imagination"], "Memory", secondary_statistics["memory"]),
-            format_stat_pair("Wisdom", secondary_statistics["wisdom"], "Discipline", secondary_statistics["discipline"]),
-            format_stat_pair("Willpower", secondary_statistics["willpower"], "Stress", secondary_statistics["stress"]),
-            format_stat_pair("Looks", secondary_statistics["looks"], "Fertility", secondary_statistics["fertility"]),
+            format_stat_pair("Strength", statistics["strength"], "Charisma", statistics["charisma"]),
+            format_stat_pair("Imagination", statistics["imagination"], "Memory", statistics["memory"]),
+            format_stat_pair("Wisdom", statistics["wisdom"], "Discipline", statistics["discipline"]),
+            format_stat_pair("Willpower", statistics["willpower"], "Stress", statistics["stress"]),
+            format_stat_pair("Looks", statistics["looks"], "Fertility", statistics["fertility"]),
             "",
             "Location",
             f"  Planet: {location['world_body_name']}",

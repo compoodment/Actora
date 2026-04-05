@@ -262,10 +262,6 @@ class Human:
                 "happiness": self.stats["happiness"],
                 "intelligence": self.stats["intelligence"],
                 "money": self.money,
-            },
-            "appearance": dict(self.appearance),
-            "traits": list(self.traits),
-            "secondary_statistics": {
                 "strength": self.stats["strength"],
                 "charisma": self.stats["charisma"],
                 "imagination": self.stats.get("imagination", 50),
@@ -277,6 +273,8 @@ class Human:
                 "looks": self.stats["looks"],
                 "fertility": self.stats["fertility"],
             },
+            "appearance": dict(self.appearance),
+            "traits": list(self.traits),
             "relationships": relationship_entries,
             "structural": structural_state,
         }
