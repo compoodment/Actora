@@ -2,7 +2,7 @@
 title: Backlog
 tags: [planning, tracking, wip]
 updated: 2026-04-05
-through: v0.50.2
+through: v0.51.0
 ---
 
 # Actora Backlog

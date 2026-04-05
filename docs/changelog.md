@@ -6,6 +6,16 @@ updated: 2026-04-05
 
 # Actora Changelog
 
+## Version 0.51.0 (Minor) - 2026-04-05
+- **New logo** — custom crest design with ╗╔╝╚ box-drawing corners, ░▒▓ shading gradient, integrated ║ borders
+    - Replaces placeholder "actora" script ASCII font
+    - Header expanded to 7 rows (was 6): top separator, 5 body rows, bottom separator
+    - Logo ║ borders serve as panel dividers — no duplicate dividers
+    - Logo rendered with `A_BOLD` for crisper shading
+    - Single `logo_x` for all rows — guaranteed vertical alignment
+    - `+4` padding removed from `logo_w` (leftover from old placeholder)
+    - Body content starts at row 7 (was row 6)
+
 ## Version 0.50.2 (Patch) - 2026-04-05
 - **Polish: Stats screen layout** — Memory and Stress moved to bottom of secondary stats with blank line separator; removes visual ambiguity with 0-100 stats
 - **Fix: Manual stat creator signed range** — Memory and Stress were incorrectly clamped to 0-100 in manual creation wizard; now correctly clamped to -50/+50

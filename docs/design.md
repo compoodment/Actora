@@ -431,7 +431,7 @@ Current TUI shell structure (v2 implemented v0.48.0, logo panel layout in progre
 - Body rows (screen content)
 - Row N-2: `═══` separator (full width)
 - Row N-1: primary commands footer (centered, screen-specific)
-- Logo header pending final logo design — currently using word "actora" in ASCII script font as placeholder
+- Logo header implemented (v0.51.0) — custom crest with box-drawing corners and shading gradient — currently using word "actora" in ASCII script font as placeholder
 - Prefer visible mockups/drafts before implementing meaningful shell/layout changes
 
 ---
