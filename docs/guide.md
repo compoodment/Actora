@@ -1,7 +1,7 @@
 ---
 title: Guide
 tags: [core, workflow, reference]
-updated: 2026-04-05
+updated: 2026-04-06
 ---
 
 # Actora Guide
@@ -151,6 +151,13 @@ When dispatching a coding worker, include:
 - Always verify `python3 -c "import main"` after Python changes; also verify `python3 -c "import ui; import mechanics; import wizard"` after touching extracted modules
 - Always review worker output — compilation is one gate, not the throne of truth
 - **Model selection:** See `TOOLS.md` (workspace) for the full routing table. Do not duplicate model decisions here.
+
+### Kestrel review protocol
+- **Kestrel** is a separate reviewer agent running on computment's laptop. He communicates with OpenComp via AgentMail (`kestrel-ai@agentmail.to` ↔ `opencomp@agentmail.to`).
+- **When to use Kestrel:** For architecture proposals, design direction changes, module extractions, or any decision that benefits from a second opinion. Not needed for tiny fixes or routine bug patches.
+- **How to request a review:** OpenComp emails Kestrel with a summary of the proposal and specific review questions. Kestrel replies by email with critique. OpenComp reads the review and incorporates feedback before implementing.
+- **Kestrel does NOT:** implement code, push commits, or edit Actora files. He reviews only.
+- **Trust model:** Kestrel's reviews are advisory. computment has final say on all decisions.
 
 ---
 
