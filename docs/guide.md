@@ -152,12 +152,13 @@ When dispatching a coding worker, include:
 - Always review worker output — compilation is one gate, not the throne of truth
 - **Model selection:** See `TOOLS.md` (workspace) for the full routing table. Do not duplicate model decisions here.
 
-### Kestrel review protocol
-- **Kestrel** is a separate reviewer agent running on computment's laptop. He communicates with OpenComp via AgentMail (`kestrel-ai@agentmail.to` ↔ `opencomp@agentmail.to`).
-- **When to use Kestrel:** For architecture proposals, design direction changes, module extractions, or any decision that benefits from a second opinion. Not needed for tiny fixes or routine bug patches.
-- **How to request a review:** OpenComp emails Kestrel with a summary of the proposal and specific review questions. Kestrel replies by email with critique. OpenComp reads the review and incorporates feedback before implementing.
-- **Kestrel does NOT:** implement code, push commits, or edit Actora files. He reviews only.
-- **Trust model:** Kestrel's reviews are advisory. computment has final say on all decisions.
+### Second-opinion review step
+- **Purpose:** Use an external reviewer when extra judgment improves the repo outcome.
+- **When to use it:** Architecture proposals, design direction changes, module extractions, post-compaction resumption of non-trivial work, or any change where a second pass may catch contradictions or weak reasoning. Not needed for tiny fixes or routine bug patches.
+- **Where it fits:** If used, this review happens after grounding/spec and before implementation or commit. It is an optional judgment step, not part of the mandatory compaction recovery read sequence.
+- **How to use it:** Send a scoped review request with concrete questions. Read the reply, incorporate what helps, and surface unresolved disagreements to computment.
+- **Boundary:** The external reviewer reviews only. They do not implement, commit, or change Actora files.
+- **Authority:** The review is advisory. computment has final say.
 
 ---
 
