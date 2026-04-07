@@ -1,12 +1,23 @@
 ---
 title: Changelog
 tags: [implementation, reference, stable]
-updated: 2026-04-05
+updated: 2026-04-07
 ---
 
 # Actora Changelog
 
-## Version 0.53.0 (Minor) - 2026-04-05
+## Version 0.54.0 (Minor) - 2026-04-07
+- **Profile dashboard redesign:** Profile screen replaced from flat read-only scroll to interactive dashboard with category rows and popup drill-downs.
+    - 10 category rows: Identity, Appearance, Stats, Attributes, Traits, Mood, Needs, Skills, Location, Relationships
+    - Each row shows a summary inline; Enter opens a centered popup overlay with full detail
+    - Popup is scrollable; Backspace closes popup, second Backspace returns to main
+    - Placeholder rows (Mood, Needs, Skills) show "Coming soon." in popup
+    - Stats/Attributes split preserved: primary vs secondary distinction maintained
+    - All 10 Attributes shown in summary row with abbreviated labels (`Str Cha Img Mem Wis Dsc Wil Srs Lks Fer`)
+    - Relationships summary shows family/friend counts sorted by closeness
+    - Footer updates contextually: `[↑↓] Move  [Enter] View  [Bsp] Back` / `[↑↓] Scroll  [Bsp] Close`
+    - `scroll_profile()` and `build_profile_lines()` removed; replaced with `build_profile_summary_rows()`, `build_profile_popup_lines()`, `get_profile_popup_render_data()`
+
 - **Codebase extraction — main.py split into focused modules:**
     - `ui.py` (168 lines) — layout/drawing primitives: `wrap_text_line`, `center_text`, `get_content_bounds`, `split_centered_columns`, `draw_text_block`, `draw_box`, `get_scroll_window`, `truncate_for_width`, and related helpers. Zero game knowledge. Both `wizard.py` and `main.py` import from here.
     - `mechanics.py` (48 lines) — game rule constants and calculations: `TRAIT_DEFINITIONS`, `get_monthly_free_hours`, `HANG_OUT_TIME_COST`, `SKIP_MONTH_PRESETS`, action subtypes, `format_stat_change_summary`

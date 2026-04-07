@@ -13,8 +13,6 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Now
 
-- **Profile dashboard redesign** — implement summary row per category (Stats/Traits/Skills/Needs/Mood), Enter→drill detail pattern. Reusable component for future category screens. Build incrementally as systems land.
-
 
 
 ## Next
