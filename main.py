@@ -63,6 +63,10 @@ REL_FILTER_LABELS = {
     "living": "Living",
     "dead": "Dead",
 }
+PROFILE_CATEGORIES = [
+    "identity", "appearance", "stats", "attributes", "traits",
+    "mood", "needs", "skills", "location", "relationships",
+]
 MAIN_LEFT_SECTION_KEYS = ("identity", "location", "statistics", "relationships")
 HIDDEN_PLAYER_RECORD_TYPES = {"family_bootstrap", "actor_entry"}
 BACK_KEYS = {
@@ -377,6 +381,10 @@ class ActoraTUI:
         self.lineage_search_active = False
         self.main_left_scroll = 0
         self.profile_scroll = 0
+        self.profile_selected_row = 0
+        self.profile_popup_open = False
+        self.profile_popup_category = None
+        self.profile_popup_scroll = 0
         self.history_scroll = 0
         self.history_search_active = False
         self.history_search_value = ""
@@ -890,7 +898,10 @@ class ActoraTUI:
 
     def open_profile(self):
         self.screen_name = "profile"
-        self.profile_scroll = 0
+        self.profile_selected_row = 0
+        self.profile_popup_open = False
+        self.profile_popup_category = None
+        self.profile_popup_scroll = 0
         self.last_message = "Viewing full profile."
 
     def get_history_lines(self, width):
@@ -1221,16 +1232,6 @@ class ActoraTUI:
         }
         self.last_message = "Select someone to hang out with."
 
-    def scroll_profile(self, delta):
-        profile_lines = self.build_profile_lines(self.get_snapshot_data())
-        visible_height = self.profile_body_height
-        if visible_height <= 0:
-            visible_height = 1
-        _, next_offset, _, _ = get_scroll_window(profile_lines, visible_height, self.profile_scroll + delta)
-        if next_offset != self.profile_scroll:
-            self.profile_scroll = next_offset
-            pass  # no message on scroll
-
     def scroll_main_left(self, delta):
         snapshot_sections = build_snapshot_sections(self.get_snapshot_data())
         left_sections = [
@@ -1282,66 +1283,109 @@ class ActoraTUI:
             lines.pop()
         return lines
 
-    def build_profile_lines(self, snapshot_data):
+    def build_profile_summary_rows(self, snapshot_data):
         identity = snapshot_data["identity"]
         location = snapshot_data["location"]
         appearance = snapshot_data["appearance"]
         statistics = snapshot_data["statistics"]
         traits = snapshot_data["traits"]
         relationships = snapshot_data["relationships"]
-
-        lines = [
-            "Identity",
-            f"  Name: {identity['full_name']}",
-            f"  Species: {identity['species']}",
-            f"  Sex: {identity['sex']}",
-            f"  Gender: {identity['gender']}",
-            f"  Sexuality: {identity.get('sexuality') or 'Not yet known'}",
-            f"  Age: {identity['age']}",
-            f"  Life Stage: {identity['life_stage']}",
-            "",
-            "Appearance",
-            f"  Eye Color: {appearance['eye_color']}",
-            f"  Hair Color: {appearance['hair_color']}",
-            f"  Skin Tone: {appearance['skin_tone']}",
-            "",
-            "Traits",
+        family_labels = {"Mother", "Father", "Son", "Daughter", "Brother", "Sister", "Grandparent", "Grandchild", "Sibling"}
+        family_count = sum(1 for entry in relationships if entry.get("label") in family_labels)
+        friend_count = max(0, len(relationships) - family_count)
+        trait_summary = ", ".join(traits) if traits else "None"
+        return [
+            ("identity", f"Identity  ·  {identity['full_name']}  ·  Age {identity['age']}  ·  {identity['gender']}"),
+            ("appearance", f"Appearance  ·  {appearance['eye_color']} eyes  ·  {appearance['hair_color']} hair"),
+            ("stats", f"Stats  ·  Health {statistics['health']}  ·  Happiness {statistics['happiness']}  ·  Intel {statistics['intelligence']}  ·  ${statistics['money']}"),
+            ("attributes", f"Attributes  ·  Str {statistics['strength']}  Cha {statistics['charisma']}  Img {statistics['imagination']}  Mem {statistics['memory']}  Wis {statistics['wisdom']}  Dsc {statistics['discipline']}  Wil {statistics['willpower']}  Srs {statistics['stress']}  Lks {statistics['looks']}  Fer {statistics['fertility']}"),
+            ("traits", f"Traits  ·  {trait_summary}"),
+            ("mood", "Mood  ·  —"),
+            ("needs", "Needs  ·  —"),
+            ("skills", "Skills  ·  —"),
+            ("location", f"Location  ·  {location['current_place_name']}, {location['jurisdiction_place_name']}"),
+            ("relationships", f"Relationships  ·  {family_count} family  ·  {friend_count} friends"),
         ]
 
-        if traits:
-            lines.append("  " + ", ".join(traits))
-        else:
-            lines.append("  None")
+    def build_profile_popup_lines(self, category, snapshot_data):
+        identity = snapshot_data["identity"]
+        location = snapshot_data["location"]
+        appearance = snapshot_data["appearance"]
+        statistics = snapshot_data["statistics"]
+        traits = snapshot_data["traits"]
 
-        lines.extend(
-            [
-                "",
-            "Primary Stats",
-            format_stat_pair("Health", statistics["health"], "Happiness", statistics["happiness"]),
-            format_stat_pair("Intelligence", statistics["intelligence"], "Money", f"${statistics['money']}"),
-            "",
-            "Secondary Stats",
-            format_stat_pair("Strength", statistics["strength"], "Charisma", statistics["charisma"]),
-            format_stat_pair("Imagination", statistics["imagination"], "Memory", statistics["memory"]),
-            format_stat_pair("Wisdom", statistics["wisdom"], "Discipline", statistics["discipline"]),
-            format_stat_pair("Willpower", statistics["willpower"], "Stress", statistics["stress"]),
-            format_stat_pair("Looks", statistics["looks"], "Fertility", statistics["fertility"]),
-            "",
-            "Location",
-            f"  Planet: {location['world_body_name']}",
-            f"  City: {location['current_place_name']}",
-            f"  Country: {location['jurisdiction_place_name']}",
-            "",
-            "Relationships",
+        if category == "identity":
+            return [
+                f"Name: {identity['full_name']}",
+                f"Species: {identity['species']}",
+                f"Sex: {identity['sex']}",
+                f"Gender: {identity['gender']}",
+                f"Sexuality: {identity.get('sexuality') or 'Not yet known'}",
+                f"Age: {identity['age']}",
+                f"Life Stage: {identity['life_stage']}",
             ]
-        )
+        if category == "appearance":
+            return [
+                f"Eye Color: {appearance['eye_color']}",
+                f"Hair Color: {appearance['hair_color']}",
+                f"Skin Tone: {appearance['skin_tone']}",
+            ]
+        if category == "stats":
+            return [
+                "Primary Stats",
+                f"Health: {statistics['health']}",
+                f"Happiness: {statistics['happiness']}",
+                f"Intelligence: {statistics['intelligence']}",
+                f"Money: ${statistics['money']}",
+            ]
+        if category == "attributes":
+            return [
+                "Secondary Stats",
+                f"Strength: {statistics['strength']}",
+                f"Charisma: {statistics['charisma']}",
+                f"Imagination: {statistics['imagination']}",
+                f"Memory: {statistics['memory']} (-50 to +50)",
+                f"Wisdom: {statistics['wisdom']}",
+                f"Discipline: {statistics['discipline']}",
+                f"Willpower: {statistics['willpower']}",
+                f"Stress: {statistics['stress']} (-50 to +50)",
+                f"Looks: {statistics['looks']}",
+                f"Fertility: {statistics['fertility']}",
+            ]
+        if category == "traits":
+            return traits or ["None"]
+        if category in {"mood", "needs", "skills"}:
+            return ["Coming soon."]
+        if category == "location":
+            return [
+                f"Planet: {location['world_body_name']}",
+                f"City: {location['current_place_name']}",
+                f"Country: {location['jurisdiction_place_name']}",
+            ]
+        if category == "relationships":
+            return ["Open the Relationships Browser to see your full list."]
+        return []
 
-        if relationships:
-            lines.extend([f"  {entry['label']}: {entry['name']}" for entry in relationships])
-        else:
-            lines.append("  No living family.")
-
-        return lines
+    def get_profile_popup_render_data(self, snapshot_data):
+        category = self.profile_popup_category or PROFILE_CATEGORIES[self.profile_selected_row]
+        content_lines = self.build_profile_popup_lines(category, snapshot_data)
+        content_width = getattr(self, "_profile_content_width", 88)
+        body_height = self.profile_body_height
+        popup_width = max(24, min(70, content_width - 4))
+        inner_width = max(1, popup_width - 2)
+        rendered_lines = expand_render_lines(content_lines, inner_width)
+        popup_height = max(5, min(len(rendered_lines) + 4, max(5, body_height - 4)))
+        visible_content_height = max(1, popup_height - 4)
+        max_scroll = max(0, len(rendered_lines) - visible_content_height)
+        return {
+            "category": category,
+            "content_lines": content_lines,
+            "rendered_lines": rendered_lines,
+            "popup_width": popup_width,
+            "popup_height": popup_height,
+            "visible_content_height": visible_content_height,
+            "max_scroll": max_scroll,
+        }
 
     def acknowledge_death(self):
         continuity_state = self.get_continuity_state()
@@ -1517,6 +1561,33 @@ class ActoraTUI:
             self.history_scroll += 1
 
     def handle_profile_key(self, key):
+        if self.profile_popup_open:
+            if key in BACK_KEYS:
+                self.profile_popup_open = False
+                self.profile_popup_category = None
+                self.profile_popup_scroll = 0
+                return
+            if key == 27:
+                self.options_popup_active = True
+                self.options_selection = 0
+                return
+            if key in (ord("q"), ord("Q")):
+                now = time.monotonic()
+                if now - self.last_advance_time < ADVANCE_THROTTLE_SECONDS:
+                    return
+                self.last_advance_time = now
+                self.advance_one_month()
+                return
+            if key in (ord("e"), ord("E")):
+                self.open_skip_time()
+                return
+            popup_data = self.get_profile_popup_render_data(self.get_snapshot_data())
+            if key in (curses.KEY_UP, ord("w"), ord("W")):
+                self.profile_popup_scroll = max(0, self.profile_popup_scroll - 1)
+            elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
+                self.profile_popup_scroll = min(popup_data["max_scroll"], self.profile_popup_scroll + 1)
+            return
+
         if key == 27:
             self.options_popup_active = True
             self.options_selection = 0
@@ -1533,9 +1604,13 @@ class ActoraTUI:
             self.screen_name = "main"
             self.last_message = MAIN_IDLE_MESSAGE
         elif key in (curses.KEY_UP, ord("w"), ord("W")):
-            self.scroll_profile(-1)
+            self.profile_selected_row = max(0, self.profile_selected_row - 1)
         elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
-            self.scroll_profile(1)
+            self.profile_selected_row = min(len(PROFILE_CATEGORIES) - 1, self.profile_selected_row + 1)
+        elif key in (curses.KEY_ENTER, 10, 13):
+            self.profile_popup_open = True
+            self.profile_popup_category = PROFILE_CATEGORIES[self.profile_selected_row]
+            self.profile_popup_scroll = 0
 
     def handle_lineage_key(self, key):
         if self.lineage_search_active:
@@ -1954,7 +2029,7 @@ class ActoraTUI:
     def render_footer(self, stdscr, height, width):
         footer_hints = {
             "main": "[Q] Advance Month   [E] Skip Time  |  [1] Menu  |  [Esc] Options",
-            "profile": "[↑↓] Scroll   [Bsp] Back   [Q] Advance   [Esc] Options",
+            "profile": "[↑↓] Move  [Enter] View  [Bsp] Back",
             "lineage": "[↑↓] Move   [A] All   [L] Living   [D] Dead   [/] Search   [Bsp] Back   [Q] Advance",
             "relationship_browser": "[↑↓] Filter/Move   [/] Search   [Tab/→] Switch   [Bsp/←] Back   [Q] Advance",
             "history": "[↑↓] Scroll   [/] Jump to Year   [Bsp] Back   [Q] Advance",
@@ -1971,6 +2046,8 @@ class ActoraTUI:
             footer_text = footer_hints["lineage_search"]
         elif self.screen_name == "history" and self.history_search_active:
             footer_text = footer_hints["history_search"]
+        elif self.screen_name == "profile" and self.profile_popup_open:
+            footer_text = "[↑↓] Scroll  [Bsp] Close"
         elif self.screen_name == "browser" and self.browser_tab == "relationships" and self.rel_browser_search_active:
             footer_text = footer_hints["browser_rel_search"]
         elif self.screen_name == "browser" and self.browser_tab == "history" and self.history_search_active:
@@ -2228,29 +2305,44 @@ class ActoraTUI:
         body_height = height - self.HEADER_ROWS - self.FOOTER_ROWS
         self._profile_body_height = body_height
         content_left, content_width = get_content_bounds(width, max_width=88)
-        profile_lines = expand_render_lines(self.build_profile_lines(self.get_snapshot_data()), content_width)
-        content_body_height = body_height
-        if len(profile_lines) > body_height:
-            content_body_height = max(1, body_height - 1)
-        visible_lines, self.profile_scroll, _, total_lines = get_scroll_window(
-            profile_lines,
-            content_body_height,
-            self.profile_scroll,
-        )
-        draw_text_block(stdscr, top, content_left, content_width, content_body_height, visible_lines)
+        self._profile_content_width = content_width
+        snapshot_data = self.get_snapshot_data()
+        summary_rows = self.build_profile_summary_rows(snapshot_data)
+        for index, (_category, label) in enumerate(summary_rows[:body_height]):
+            attr = curses.A_REVERSE if index == self.profile_selected_row else curses.A_NORMAL
+            stdscr.addnstr(top + index, content_left, truncate_for_width(label, content_width).ljust(content_width), content_width, attr)
 
-        if total_lines > content_body_height:
-            scroll_label = (
-                f"Profile: {self.profile_scroll + 1}-"
-                f"{self.profile_scroll + len(visible_lines)} / {total_lines}"
-            )
-            stdscr.addnstr(
-                min(height - 3, top + content_body_height),
-                content_left,
-                truncate_for_width(scroll_label, content_width),
-                content_width,
-                curses.A_DIM,
-            )
+        if not self.profile_popup_open:
+            return
+
+        popup_data = self.get_profile_popup_render_data(snapshot_data)
+        self.profile_popup_scroll = min(self.profile_popup_scroll, popup_data["max_scroll"])
+        popup_width = popup_data["popup_width"]
+        popup_height = popup_data["popup_height"]
+        popup_left = max(content_left, content_left + (content_width - popup_width) // 2)
+        popup_top = max(top + 1, top + (body_height - popup_height) // 2)
+        title = popup_data["category"].replace("_", " ").title()
+
+        top_border = "+" + ("-" * max(0, popup_width - 2)) + "+"
+        separator = "|" + ("-" * max(0, popup_width - 2)) + "|"
+        bottom_border = top_border
+        stdscr.addnstr(popup_top, popup_left, top_border, popup_width)
+        title_row = "|" + center_text(title, max(0, popup_width - 2)) + "|"
+        stdscr.addnstr(popup_top + 1, popup_left, title_row, popup_width, curses.A_BOLD)
+        stdscr.addnstr(popup_top + 2, popup_left, separator, popup_width)
+
+        visible_lines, _, _, _ = get_scroll_window(
+            popup_data["rendered_lines"],
+            popup_data["visible_content_height"],
+            self.profile_popup_scroll,
+        )
+        for row_offset in range(popup_data["visible_content_height"]):
+            row = popup_top + 3 + row_offset
+            line = visible_lines[row_offset] if row_offset < len(visible_lines) else ""
+            stdscr.addnstr(row, popup_left, "|", 1)
+            stdscr.addnstr(row, popup_left + 1, line.ljust(popup_width - 2), popup_width - 2)
+            stdscr.addnstr(row, popup_left + popup_width - 1, "|", 1)
+        stdscr.addnstr(popup_top + popup_height - 1, popup_left, bottom_border, popup_width)
 
     def render_lineage(self, stdscr, height, width):
         browser_state = self.get_lineage_browser_state()
