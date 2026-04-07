@@ -12,7 +12,7 @@ All project constraints in one place. If it says "don't" or "must", it lives her
 
 ## Code rules
 
-> **Note:** Menu and Options popups share ~90% identical rendering logic. When adding a third popup type, extract a shared `render_popup(items, title, hint, selection)` helper rather than copy-pasting again.
+> **Note:** All popup types (Menu, Options, Profile) use `draw_box` from `ui.py` as the shared rendering primitive. Do not add new popup types with manual border construction — call `draw_box` instead.
 
 
 1. Simulation core stays UI-agnostic — only `main.py` knows about curses
