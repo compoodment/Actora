@@ -385,6 +385,7 @@ class ActoraTUI:
         self.profile_popup_open = False
         self.profile_popup_category = None
         self.profile_popup_scroll = 0
+        self._profile_content_width = 88
         self.history_scroll = 0
         self.history_search_active = False
         self.history_search_value = ""
@@ -1290,7 +1291,7 @@ class ActoraTUI:
         statistics = snapshot_data["statistics"]
         traits = snapshot_data["traits"]
         relationships = snapshot_data["relationships"]
-        family_labels = {"Mother", "Father", "Son", "Daughter", "Brother", "Sister", "Grandparent", "Grandchild", "Sibling"}
+        family_labels = {"Mother", "Father", "Son", "Daughter", "Brother", "Sister", "Grandparent", "Grandchild", "Sibling", "Uncle", "Aunt", "Nephew", "Niece", "Spouse", "Partner"}
         family_count = sum(1 for entry in relationships if entry.get("label") in family_labels)
         friend_count = max(0, len(relationships) - family_count)
         trait_summary = ", ".join(traits) if traits else "None"
@@ -1374,8 +1375,8 @@ class ActoraTUI:
         popup_width = max(24, min(70, content_width - 4))
         inner_width = max(1, popup_width - 2)
         rendered_lines = expand_render_lines(content_lines, inner_width)
-        popup_height = max(5, min(len(rendered_lines) + 4, max(5, body_height - 4)))
-        visible_content_height = max(1, popup_height - 4)
+        popup_height = max(4, min(len(rendered_lines) + 2, max(4, body_height - 4)))
+        visible_content_height = max(1, popup_height - 2)
         max_scroll = max(0, len(rendered_lines) - visible_content_height)
         return {
             "category": category,
@@ -2323,13 +2324,7 @@ class ActoraTUI:
         popup_top = max(top + 1, top + (body_height - popup_height) // 2)
         title = popup_data["category"].replace("_", " ").title()
 
-        top_border = "+" + ("-" * max(0, popup_width - 2)) + "+"
-        separator = "|" + ("-" * max(0, popup_width - 2)) + "|"
-        bottom_border = top_border
-        stdscr.addnstr(popup_top, popup_left, top_border, popup_width)
-        title_row = "|" + center_text(title, max(0, popup_width - 2)) + "|"
-        stdscr.addnstr(popup_top + 1, popup_left, title_row, popup_width, curses.A_BOLD)
-        stdscr.addnstr(popup_top + 2, popup_left, separator, popup_width)
+        draw_box(stdscr, popup_top, popup_left, popup_height, popup_width, title=title)
 
         visible_lines, _, _, _ = get_scroll_window(
             popup_data["rendered_lines"],
@@ -2337,12 +2332,10 @@ class ActoraTUI:
             self.profile_popup_scroll,
         )
         for row_offset in range(popup_data["visible_content_height"]):
-            row = popup_top + 3 + row_offset
+            row = popup_top + 1 + row_offset
             line = visible_lines[row_offset] if row_offset < len(visible_lines) else ""
-            stdscr.addnstr(row, popup_left, "|", 1)
-            stdscr.addnstr(row, popup_left + 1, line.ljust(popup_width - 2), popup_width - 2)
-            stdscr.addnstr(row, popup_left + popup_width - 1, "|", 1)
-        stdscr.addnstr(popup_top + popup_height - 1, popup_left, bottom_border, popup_width)
+            if row < top + body_height and popup_left + 1 < content_left + content_width:
+                stdscr.addnstr(row, popup_left + 1, line.ljust(popup_width - 2), popup_width - 2)
 
     def render_lineage(self, stdscr, height, width):
         browser_state = self.get_lineage_browser_state()
