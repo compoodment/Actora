@@ -117,15 +117,17 @@ Budget enforcement: rejects queue if time cost exceeds remaining free hours.
 
 ### Profile
 
-Currently read-only display. Being redesigned as a dashboard (summary rows + Enter to drill into categories).
+Dashboard of summary category rows. Enter→Backspace drill pattern.
 
 | Key | Action |
 |-----|--------|
-| W/S or ↑↓ | Scroll / navigate summary rows |
-| Enter | Open selected category detail |
-| Backspace | Back (from detail → summary, or close Profile) |
+| W/S or ↑↓ | Navigate between category rows |
+| Enter | Open drill popup for selected category |
+| Backspace | Close popup (→ summary), or from summary → origin screen (not Menu) |
 
-Note: contract will expand as dashboard sections are implemented. Enter→Bsp drill pattern is the design standard.
+Navigation stack note: Backspace from Profile summary must return to origin (Life View or wherever), not back into the Menu popup. Requires navigation origin tracking — sub-task.
+
+Relationships row: Enter opens Browser Relationships tab directly, not a popup.
 
 ---
 

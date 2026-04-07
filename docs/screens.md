@@ -62,27 +62,39 @@ All screens are reachable from Life View. Nested screens return to their parent 
 ---
 
 ### Profile (via Menu → Profile)
-**Purpose:** Full actor detail. Who you are, what you've committed to. Being redesigned as a dashboard.
-**What lives here (current):**
-- Full stats (primary + secondary). Memory and Stress displayed at bottom of secondary stats, separated by a blank line (signed range -50 to +50)
-- Appearance
-- Traits
-- Sexuality, gender
+**Purpose:** Full-picture character sheet. Who you are right now. Dashboard of summary rows, each drillable.
 
-**Dashboard design (in progress — DEC-2026-04-04):**
-- Summary row per category: Stats, Traits, Skills/Talents, Needs, Mood
-- Enter on any row → drill into category detail view
-- Reusable pattern for any future category-based screen
-- Implement incrementally as systems land
+**Current truth (pre-redesign):** Flat read-only list — Identity, Appearance, Traits, Primary Stats, Secondary Stats, Location, Relationships.
 
-**Future:**
-- Commitments section (education, jobs — long-term active states)
-- Domain sections as systems mature (health conditions, property, etc.)
+**Dashboard design (interview 2026-04-07):**
+
+Category rows in order:
+1. Identity — name, age, gender (replaces sex once chosen), sexuality, life stage
+2. Appearance — eye/hair/skin
+3. Stats — Health, Happiness, Intelligence, Money (primary)
+4. Attributes — Strength, Charisma, Imagination, Memory, Wisdom, Discipline, Willpower, Stress, Looks, Fertility (secondary)
+5. Traits — the player's 4 traits
+6. Mood — placeholder (grayed, `—`) until system ships
+7. Needs — placeholder until system ships
+8. Skills / Talents — placeholder until system ships
+9. Location — planet, city, country
+10. Relationships — summary counts only (e.g. `2 family · 3 friends`, sorted by closeness)
+
+Each row: summary value inline. Enter → popup overlay with full detail. Backspace closes popup. Relationships Enter → opens Relationships tab in Browser.
+
+Backspace from Profile summary: returns to origin screen (Life View / wherever player came from), not back into Menu. Navigation stack required — sub-task.
+
+Placeholder rows visible by default; settings toggle to hide them (in Options popup).
 
 **What does NOT live here:**
 - Event history (→ Browser / History tab)
-- Relationship browser (→ Browser / Relationships tab)
+- Full relationship list (→ Browser / Relationships tab, opened via Relationships row drill)
 - Pending actions (→ Actions screen)
+
+**Future:**
+- Commitments section (education, jobs)
+- Physical Conditions row when that system ships
+- Domain sections as systems mature
 
 ---
 

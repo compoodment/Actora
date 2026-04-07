@@ -254,17 +254,71 @@ Toughness cluster (Resilient) — ~3 questions.
 ---
 
 ### Profile — Dashboard Design
-**Status:** Not started (current Profile is read-only display only)
-**Current truth:** Profile shows full stats and actor details but is a flat list, not interactive.
+**Status:** Design complete (2026-04-07). Not started implementation.
+**Current truth:** Profile is a flat scrolling list — Identity, Appearance, Traits, Primary Stats, Secondary Stats (now called Attributes), Location, Relationships. Read-only, no interaction.
 
-**Design (interview 2026-04-04):**
-- Profile becomes a dashboard: summary row per category, Enter on any row → drill into category detail.
-- Categories: Stats, Traits, Skills/Talents, Needs, Mood, (future: Commitments, History).
-- Summary rows show key values at a glance. Detail views show full data + context + future: explanations of why values are what they are.
-- This is a reusable pattern: any future category-based screen should follow the same summary→detail structure.
-- Implement incrementally: add sections as systems land, don't rebuild the whole Profile at once.
+**Design (interview 2026-04-07):**
 
-**Open questions:** Does Profile need its own navigation (Tab between sections), or is it always Enter→Bsp drill pattern?
+#### Purpose
+Full-picture screen for who your character is right now. Should feel like a genuine character sheet, not a debug dump. Everything is visible at a glance via summary rows; any row can be drilled into for detail.
+
+#### Category rows (in order)
+1. **Identity** — name, age, gender (replaces sex once gender is chosen), sexuality, life stage
+2. **Appearance** — eye colour, hair colour, skin tone
+3. **Stats** — primary stats (Health, Happiness, Intelligence, Money)
+4. **Attributes** — secondary stats (Strength, Charisma, Imagination, Memory, Wisdom, Discipline, Willpower, Stress, Looks, Fertility)
+5. **Traits** — the player's 4 traits
+6. **Mood** — placeholder until Mood system ships
+7. **Needs** — placeholder until Needs system ships
+8. **Skills / Talents** — placeholder until Skills system ships
+9. **Location** — planet, city, country
+10. **Relationships** — counts at summary level; Enter opens the Relationships tab in Browser
+
+Stats and Attributes are intentionally split: Stats are the player-facing moment-to-moment concerns; Attributes are deeper character makeup. They serve different mental models.
+
+#### Summary row format (one line per category)
+- `Identity  ·  Test User  ·  Age 0  ·  Male`
+- `Stats  ·  Health 99  ·  Happiness 83  ·  Intel 53  ·  $0`
+- `Attributes  ·  Str 61  Cha 58  Img 43  ...` (abbreviated, most important first)
+- `Traits  ·  Driven, Chill, Curious, Social`
+- `Mood  ·  —` (placeholder)
+- `Needs  ·  —` (placeholder)
+- `Relationships  ·  2 family  ·  3 friends` (sorted by closeness descending)
+
+#### Placeholder rows
+Rows for unimplemented systems (Mood, Needs, Skills) appear grayed with `—` value. This makes the dashboard feel like a real destination that will grow rather than a stub. A settings option controls whether placeholder rows are shown or hidden.
+
+#### Drill-down (Enter on any row → popup overlay)
+- **Identity** — full identity fields
+- **Appearance** — full appearance fields
+- **Stats** — all primary stats with values and future: bar/trend context
+- **Attributes** — all secondary stats with values
+- **Traits** — each trait name + mechanical description (what it actually does)
+- **Mood / Needs / Skills** — "Coming soon" placeholder screen
+- **Location** — full location fields
+- **Relationships** — opens Relationships tab in Browser directly (not a popup)
+
+Drill popups: overlay popup sized to fit content, expandable as systems deepen. Same popup system as the rest of the game.
+
+#### Navigation
+- Enter: open drill popup for highlighted row
+- Backspace: close popup → back to Profile summary. From Profile summary, Backspace goes back to wherever the player navigated from (Life View, not back into the Menu). This requires the navigation stack to track origin — not trivial, flag as a sub-task.
+- ↑↓: move between category rows on summary view
+
+#### Design rules
+- This is a reusable pattern. Any future category-based screen follows summary→detail with Enter→Bsp drill.
+- Implement incrementally: ship Identity/Appearance/Stats/Attributes/Traits/Location/Relationships first. Mood/Needs/Skills rows are placeholders that fill in when those systems land.
+- Do not rebuild Profile all at once. Build the scaffold, then populate.
+- Placeholder rows with settings toggle keeps the screen honest about future direction without lying about current state.
+
+#### NPC type question (flagged 2026-04-07)
+During the Profile interview, it became clear that family NPCs (parents, siblings) and social NPCs (met during play) likely have different capabilities — family NPCs probably don't have closeness decay or hangout mechanics. This is an unresolved architectural question: should all NPCs eventually be the same class with the same capabilities, or are there genuinely different NPC tiers? This needs its own design decision before the relationship system deepens. Flagged as design-pending, not blocking Profile implementation.
+
+**Open questions:**
+- Navigation stack / origin tracking for Backspace — is this a shared navigation primitive or Profile-specific?
+- Settings toggle placement (in Options popup)
+- Relationship drill: does it deep-link into the Browser Relationships tab, or open a mini-list popup that then offers to open the full Browser?
+- Attributes row: all 10 shown in summary or abbreviated to most important?
 
 ---
 
