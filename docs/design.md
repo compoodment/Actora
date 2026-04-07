@@ -279,7 +279,7 @@ Stats and Attributes are intentionally split: Stats are the player-facing moment
 #### Summary row format (one line per category)
 - `Identity  ·  Test User  ·  Age 0  ·  Male`
 - `Stats  ·  Health 99  ·  Happiness 83  ·  Intel 53  ·  $0`
-- `Attributes  ·  Str 61  Cha 58  Img 43  ...` (abbreviated, most important first)
+- `Attributes  ·  Str 61  Cha 58  Img 43  Mem 5  Wis 21  Dsc 46  Wil 54  Str 8  Lks 50  Fer 86` (all 10, abbreviated labels — do not show only "most important", that creates invisible tiers within secondary stats)
 - `Traits  ·  Driven, Chill, Curious, Social`
 - `Mood  ·  —` (placeholder)
 - `Needs  ·  —` (placeholder)
@@ -315,10 +315,11 @@ Drill popups: overlay popup sized to fit content, expandable as systems deepen. 
 During the Profile interview, it became clear that family NPCs (parents, siblings) and social NPCs (met during play) likely have different capabilities — family NPCs probably don't have closeness decay or hangout mechanics. This is an unresolved architectural question: should all NPCs eventually be the same class with the same capabilities, or are there genuinely different NPC tiers? This needs its own design decision before the relationship system deepens. Flagged as design-pending, not blocking Profile implementation.
 
 **Open questions:**
-- Navigation stack / origin tracking for Backspace — is this a shared navigation primitive or Profile-specific?
+- Navigation stack / origin tracking for Backspace — confirmed: this should be a shared primitive for all Menu-reached screens (Browser, Actions, Profile), not a Profile-specific hack. NavStack sub-task required before implementation.
+- NPC tier architecture — confirmed: tiered design is correct. Family NPCs have structural permanence social NPCs lack. Should look for `RelationshipClass` or `Tier` field on actor link with `KinshipLink` vs `SocialLink` as distinct types. Different decay/action logic per type. Design decision required before deepening relationship system.
 - Settings toggle placement (in Options popup)
 - Relationship drill: does it deep-link into the Browser Relationships tab, or open a mini-list popup that then offers to open the full Browser?
-- Attributes row: all 10 shown in summary or abbreviated to most important?
+- Attributes row: show all 10 with abbreviated labels if width allows. Do not abbreviate to "most important" — that creates an invisible tier within secondary stats.
 
 ---
 
