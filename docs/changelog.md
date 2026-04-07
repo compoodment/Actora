@@ -6,6 +6,12 @@ updated: 2026-04-07
 
 # Actora Changelog
 
+## Version 0.54.1 (Patch) - 2026-04-07
+- **Profile popup refactor:** Replaced manual border/title construction with `draw_box` helper — consistent with Menu and Options popups, satisfies rules.md Code Note
+- **Family labels expanded:** Added Uncle, Aunt, Nephew, Niece, Spouse, Partner to family_labels set in summary row count
+- **`_profile_content_width` init fix:** Initialized to 88 in `__init__` and `open_profile` to remove `getattr` fallback
+
+/
 ## Version 0.54.0 (Minor) - 2026-04-07
 - **Profile dashboard redesign:** Profile screen replaced from flat read-only scroll to interactive dashboard with category rows and popup drill-downs.
     - 10 category rows: Identity, Appearance, Stats, Attributes, Traits, Mood, Needs, Skills, Location, Relationships

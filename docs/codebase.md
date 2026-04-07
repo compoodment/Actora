@@ -2,7 +2,7 @@
 title: Codebase
 tags: [implementation, reference, stable]
 updated: 2026-04-05
-through: v0.54.0
+through: v0.54.1
 verified: 2026-04-04
 ---
 
