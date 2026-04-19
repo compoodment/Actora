@@ -14,5 +14,5 @@ Done = delete from here + mention in changelog.
 ## 🟡 Annoying
 
 - **Profile doc drift:** `docs/design.md` still says Profile is "Not started implementation" and "Read-only, no interaction," but `main.py` already implements interactive category rows and drill-down popups.
-- **Profile Relationships behavior mismatch:** `docs/design.md` says pressing Enter on Relationships should open the Relationships Browser directly, but current `main.py` behavior opens a popup placeholder instead.
+- **Profile Relationships behavior mismatch:** `docs/design.md` says pressing Enter on Relationships should open the Relationships Browser directly, but current `main.py` behavior opens a popup placeholder instead. **Superseded by card dashboard redesign (2026-04-19) — will be resolved when new Profile is implemented.**
 

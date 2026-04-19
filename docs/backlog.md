@@ -13,6 +13,7 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Now
 
+- **Profile card dashboard redesign** — replace v0.54.0 row-based Profile with card-based dashboard per design.md interview (2026-04-19). Merged categories: Identity+Appearance, Stats+Attributes, Mood+Needs. 2D card navigation with highlighted borders. Drill behavior: popup for most, Browser for Relationships. Layout flexible, shuffles during implementation. *(2026-04-19)*
 
 
 ## Next

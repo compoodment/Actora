@@ -253,9 +253,56 @@ Toughness cluster (Resilient) — ~3 questions.
 
 ---
 
-### Profile — Dashboard Design
-**Status:** Implementation shipped (v0.54.0, 2026-04-07).
-**Current truth:** Profile is an interactive dashboard with 10 category rows. Each row shows a summary; Enter drills into a centered popup overlay. Backspace closes popup, second Backspace returns to origin screen. Mood, Needs, Skills rows are placeholders showing "Coming soon." in popup.
+### Profile — Card Dashboard Design
+**Status:** Design complete (interview 2026-04-19). Replaces v0.54.0 row-based implementation.
+**Current truth:** Profile is an interactive dashboard with 10 category rows. Each row shows a summary; Enter drills into a centered popup overlay. Backspace closes popup, second Backspace returns to origin screen. Mood, Needs, Skills rows are placeholders showing "Coming soon." in popup. **This is being replaced by the card dashboard design below.**
+
+**Design (interview 2026-04-19):**
+
+#### Purpose
+Full-picture screen for who your character is right now. A card-based dashboard where everything is visible at once. Each card is a selectable block showing a compact summary; drilling in reveals full detail.
+
+#### Cards (merged categories)
+
+| Card | Summary content | Drill behavior |
+|------|----------------|---------------|
+| **Identity + Appearance** | Name, age, gender, life stage, eye/hair/skin | Popup with full identity + appearance fields |
+| **Stats + Attributes** | Primary stats + all 10 attributes in abbreviated form | Popup with full stat + attribute detail |
+| **Traits** | Player's 4 traits | Popup with trait name + mechanical description |
+| **Mood + Needs** | Placeholder (both unimplemented) | "Coming soon" placeholder |
+| **Skills / Talents** | Placeholder (unimplemented) | "Coming soon" placeholder |
+| **Location** | Planet, city, country | Popup with full location fields |
+| **Relationships** | Family/friend counts by closeness | Opens Relationships Browser directly (not popup) |
+
+#### Card dashboard layout
+Cards arranged in a loose multi-column grid. All cards visible simultaneously (dashboard feel). When content overflows the viewport, scrolling activates automatically as the user navigates down.
+
+Layout is intentionally flexible — card positions will be shuffled during implementation and as new cards are added. No fixed grid position is canonical yet.
+
+#### Card interaction
+- **Selected card:** whole card border highlights
+- **Navigation:** WASD / arrows move between cards in 2D (left/right/up/down)
+- **Enter:** drill into the selected card's detail
+  - If a full screen exists for that category (e.g. Relationships → Browser), navigate there
+  - If not, open a detail popup or expanded view within Profile
+- **Backspace:** from detail, return to dashboard. From dashboard, return to origin screen
+
+#### Card sizing
+Cards can be different sizes — some categories need more space for their summary (e.g. Stats+Attributes is bigger than Traits). Size is intentional per card, not uniform.
+
+#### Placeholder cards
+Cards for unimplemented systems (Mood+Needs, Skills) appear with placeholder content. Keeps the dashboard honest about future direction without hiding that those systems don't exist yet.
+
+#### Design rules
+- New screens must be intentional — don't create a full screen for every category. Reuse existing screens (Browser) where they already exist.
+- This is a reusable dashboard pattern. Any future card-based screen follows the same interaction model.
+- Implement incrementally: ship the card scaffold with the merged categories, then refine layout and sizes.
+
+---
+
+### Profile — Row Dashboard Design (v0.54.0, superseded)
+**Status:** Superseded by card dashboard design above (2026-04-19).
+**Archived for reference only.**
 
 **Design (interview 2026-04-07):**
 
@@ -279,47 +326,21 @@ Stats and Attributes are intentionally split: Stats are the player-facing moment
 #### Summary row format (one line per category)
 - `Identity  ·  Test User  ·  Age 0  ·  Male`
 - `Stats  ·  Health 99  ·  Happiness 83  ·  Intel 53  ·  $0`
-- `Attributes  ·  Str 61  Cha 58  Img 43  Mem 5  Wis 21  Dsc 46  Wil 54  Str 8  Lks 50  Fer 86` (all 10, abbreviated labels — do not show only "most important", that creates invisible tiers within secondary stats)
+- `Attributes  ·  Str 61  Cha 58  Img 43  Mem 5  Wis 21  Dsc 46  Wil 54  Str 8  Lks 50  Fer 86` (all 10, abbreviated labels)
 - `Traits  ·  Driven, Chill, Curious, Social`
 - `Mood  ·  —` (placeholder)
 - `Needs  ·  —` (placeholder)
 - `Relationships  ·  2 family  ·  3 friends` (sorted by closeness descending)
 
-#### Placeholder rows
-Rows for unimplemented systems (Mood, Needs, Skills) appear grayed with `—` value. This makes the dashboard feel like a real destination that will grow rather than a stub. A settings option controls whether placeholder rows are shown or hidden.
-
-#### Drill-down (Enter on any row → popup overlay)
-- **Identity** — full identity fields
-- **Appearance** — full appearance fields
-- **Stats** — all primary stats with values and future: bar/trend context
-- **Attributes** — all secondary stats with values
-- **Traits** — each trait name + mechanical description (what it actually does)
-- **Mood / Needs / Skills** — "Coming soon" placeholder screen
-- **Location** — full location fields
-- **Relationships** — opens Relationships tab in Browser directly (not a popup)
-
-Drill popups: overlay popup sized to fit content, expandable as systems deepen. Same popup system as the rest of the game.
-
 #### Navigation
 - Enter: open drill popup for highlighted row
-- Backspace: close popup → back to Profile summary. From Profile summary, Backspace goes back to wherever the player navigated from (Life View, not back into the Menu). This requires the navigation stack to track origin — not trivial, flag as a sub-task.
+- Backspace: close popup → back to Profile summary. From Profile summary, Backspace goes back to origin.
 - ↑↓: move between category rows on summary view
 
 #### Design rules
 - This is a reusable pattern. Any future category-based screen follows summary→detail with Enter→Bsp drill.
-- Implement incrementally: ship Identity/Appearance/Stats/Attributes/Traits/Location/Relationships first. Mood/Needs/Skills rows are placeholders that fill in when those systems land.
-- Do not rebuild Profile all at once. Build the scaffold, then populate.
+- Implement incrementally: ship Identity/Appearance/Stats/Attributes/Traits/Location/Relationships first. Mood/Needs/Skills rows are placeholders.
 - Placeholder rows with settings toggle keeps the screen honest about future direction without lying about current state.
-
-#### NPC type question (flagged 2026-04-07)
-During the Profile interview, it became clear that family NPCs (parents, siblings) and social NPCs (met during play) likely have different capabilities — family NPCs probably don't have closeness decay or hangout mechanics. This is an unresolved architectural question: should all NPCs eventually be the same class with the same capabilities, or are there genuinely different NPC tiers? This needs its own design decision before the relationship system deepens. Flagged as design-pending, not blocking Profile implementation.
-
-**Open questions:**
-- Navigation stack / origin tracking for Backspace — confirmed: this should be a shared primitive for all Menu-reached screens (Browser, Actions, Profile), not a Profile-specific hack. NavStack sub-task required before implementation.
-- NPC tier architecture — confirmed: tiered design is correct. Family NPCs have structural permanence social NPCs lack. Should look for `RelationshipClass` or `Tier` field on actor link with `KinshipLink` vs `SocialLink` as distinct types. Different decay/action logic per type. Design decision required before deepening relationship system.
-- Settings toggle placement (in Options popup)
-- Relationship drill: does it deep-link into the Browser Relationships tab, or open a mini-list popup that then offers to open the full Browser?
-- Attributes row: show all 10 with abbreviated labels if width allows. Do not abbreviate to "most important" — that creates an invisible tier within secondary stats.
 
 ---
 
