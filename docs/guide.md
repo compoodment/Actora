@@ -150,7 +150,6 @@ When dispatching a coding worker, include:
 - **Current worker:** Codex CLI (`codex exec --full-auto`).
 - Always verify `python3 -c "import main"` after Python changes; also verify `python3 -c "import ui; import mechanics; import wizard"` after touching extracted modules
 - Always review worker output — compilation is one gate, not the throne of truth
-- **Model selection:** computment picks models directly. No routing table needed.
 
 ### Second-opinion review step
 - **Purpose:** Use an external reviewer when extra judgment improves the repo outcome.
