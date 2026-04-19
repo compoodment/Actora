@@ -254,8 +254,8 @@ Toughness cluster (Resilient) — ~3 questions.
 ---
 
 ### Profile — Dashboard Design
-**Status:** Design complete (2026-04-07). Not started implementation.
-**Current truth:** Profile is a flat scrolling list — Identity, Appearance, Traits, Primary Stats, Secondary Stats (now called Attributes), Location, Relationships. Read-only, no interaction.
+**Status:** Implementation shipped (v0.54.0, 2026-04-07).
+**Current truth:** Profile is an interactive dashboard with 10 category rows. Each row shows a summary; Enter drills into a centered popup overlay. Backspace closes popup, second Backspace returns to origin screen. Mood, Needs, Skills rows are placeholders showing "Coming soon." in popup.
 
 **Design (interview 2026-04-07):**
 
