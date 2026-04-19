@@ -98,7 +98,7 @@ The compaction summary is NOT a substitute for reading these docs. The docs are 
 2. **Design gate:** Does this task touch a system with mechanical depth? If yes, check `design.md` — is there a completed interview/anchor for this system? If not, STOP. Flag as design-pending, do not implement.
 3. Read relevant docs from the doc map above
 4. **Scope scan:** If renaming/replacing anything, `grep -rn` across all source files first. List every affected file. This is mandatory before dispatching a worker.
-5. Choose execution path: direct edit (tiny, 1-5 lines) / coding worker (medium+). See `TOOLS.md` (workspace) for which worker to use and when — do not make model decisions here.
+5. Choose execution path: direct edit (tiny, 1-5 lines) / coding worker (medium+).
 6. Spec before apply for anything non-trivial
 7. Verify: `python3 -c "import main"` + tmux playtest if TUI
 8. **Review worker output:** read the actual diff line-by-line. Run the worker review checklist in rules.md. Compile is one gate, not the only gate.
@@ -147,10 +147,10 @@ When dispatching a coding worker, include:
 ### Coding worker rules
 - **Tiny fix** (1-5 lines): direct edit, no worker needed
 - **Medium+ changes**: minimal grounding → dispatch worker → review → verify → commit
-- **Current worker:** Codex CLI (`codex exec --full-auto`). Claude Code CLI auth is broken as of 2026-04-05 — see `TOOLS.md` (workspace) for current status and fix instructions.
+- **Current worker:** Codex CLI (`codex exec --full-auto`).
 - Always verify `python3 -c "import main"` after Python changes; also verify `python3 -c "import ui; import mechanics; import wizard"` after touching extracted modules
 - Always review worker output — compilation is one gate, not the throne of truth
-- **Model selection:** See `TOOLS.md` (workspace) for the full routing table. Do not duplicate model decisions here.
+- **Model selection:** computment picks models directly. No routing table needed.
 
 ### Second-opinion review step
 - **Purpose:** Use an external reviewer when extra judgment improves the repo outcome.
