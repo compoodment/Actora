@@ -1,7 +1,7 @@
 ---
 title: Guide
 tags: [core, workflow, reference]
-updated: 2026-04-06
+updated: 2026-04-21
 ---
 
 # Actora Guide
@@ -51,7 +51,7 @@ The compaction summary is NOT a substitute for reading these docs. The docs are 
 
 | What happened | Put it in |
 |---------------|-----------|
-| Bug found | `bugs.md` |
+| Bug found | `bugs.md` (root-cause first; fold downstream manifestations into sub-bullets unless they have a distinct fix path) |
 | Bug fixed | Delete from `bugs.md`, mention in `changelog.md` |
 | New idea / future feature | `backlog.md` → Later |
 | Idea becomes active work | `backlog.md` → Now |
@@ -73,6 +73,7 @@ The compaction summary is NOT a substitute for reading these docs. The docs are 
 
 - Don't leave finished work in `backlog.md`
 - Don't put bugs in `backlog.md`
+- Don't let `bugs.md` turn into a flat pile of surface manifestations when several entries are really one root cause plus sub-bugs
 - Don't put design decisions in `bugs.md`
 - Don't put workflow rules in `rules.md` (rules = constraints, guide = process)
 - Don't put process in `rules.md` (guide = process, rules = constraints)

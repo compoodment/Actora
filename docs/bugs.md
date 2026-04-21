@@ -13,6 +13,12 @@ Clarification marker:
 - `❓ Needs product answer` = the bug is confirmed, but the intended target behavior or fix shape is not fully anchored by the current docs/UI contract/codebase notes. Confirm with computment before implementing.
 - Unmarked bugs are sufficiently anchored for a future fix pass without extra product clarification first.
 
+Ledger structure:
+- Prefer root-cause bugs as top-level bullets.
+- If multiple confirmed issues are really downstream manifestations of the same underlying bug, keep the root cause as the top-level bullet and record the surface-specific failures as indented sub-bullets under it.
+- Do not create a new top-level bullet for a surface manifestation that is already explained by an existing root-cause bug unless the new finding has a distinct fix path or distinct product decision surface.
+- If a sub-bug later proves to have its own distinct root cause, promote it back to a top-level bug.
+
 ---
 
 ## ⚪ Docs / spec drift

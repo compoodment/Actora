@@ -1,7 +1,7 @@
 ---
 title: Rules
 tags: [core, reference, stable]
-updated: 2026-04-05
+updated: 2026-04-21
 ---
 
 # Actora Rules
@@ -36,15 +36,16 @@ All project constraints in one place. If it says "don't" or "must", it lives her
 ## Doc rules
 
 1. Every piece of information has exactly ONE canonical home — no copies across docs
-2. Done stuff leaves active docs immediately → changelog or delete
-3. No new docs without adding them to `guide.md`
-4. Every doc has a `updated:` date in frontmatter — if it's wrong, the doc is suspect
-5. `guide.md` hard cap: 150 lines of content (excluding frontmatter)
-6. Decisions in `decisions.md` are immutable-append — never edit, only supersede
-7. Backlog staleness: Now items untouched for 7 days get flagged; Later items older than 30 days without reference get reviewed for deletion
-8. `codebase.md` sync required on every version tag — if version doesn't match latest tag, it's stale
-9. Cross-doc health check every ~3 version tags: currency, contradictions, duplication, backlog cleanliness
-10. Tags follow the fixed taxonomy in `guide.md` — no inventing new tags without updating the taxonomy
+2. `bugs.md` must prefer root-cause-first structure: top-level bullets for distinct bugs, indented sub-bullets for confirmed downstream manifestations of the same bug
+3. Done stuff leaves active docs immediately → changelog or delete
+4. No new docs without adding them to `guide.md`
+5. Every doc has a `updated:` date in frontmatter — if it's wrong, the doc is suspect
+6. `guide.md` hard cap: 150 lines of content (excluding frontmatter)
+7. Decisions in `decisions.md` are immutable-append — never edit, only supersede
+8. Backlog staleness: Now items untouched for 7 days get flagged; Later items older than 30 days without reference get reviewed for deletion
+9. `codebase.md` sync required on every version tag — if version doesn't match latest tag, it's stale
+10. Cross-doc health check every ~3 version tags: currency, contradictions, duplication, backlog cleanliness
+11. Tags follow the fixed taxonomy in `guide.md` — no inventing new tags without updating the taxonomy
 
 ## Patch rules
 
