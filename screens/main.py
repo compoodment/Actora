@@ -58,9 +58,10 @@ class MainScreen:
         ]
         left_lines = [app.last_message, ""]
         left_lines.extend(app.build_main_left_lines(left_sections, include_time=False))
+        left_body_height = body_height - 1 if len(left_lines) > body_height else body_height
         visible_left_lines, app.main_left_scroll, main_left_max_offset, total_left_lines = get_scroll_window(
             left_lines,
-            body_height,
+            left_body_height,
             app.main_left_scroll,
         )
         right_lines = expand_render_lines(build_live_feed_lines(app.event_log), right_width)
@@ -70,14 +71,14 @@ class MainScreen:
             max(0, len(right_lines) - body_height),
         )
 
-        draw_text_block(stdscr, top, content_left, left_width, body_height, visible_left_lines)
+        draw_text_block(stdscr, top, content_left, left_width, left_body_height, visible_left_lines)
         draw_vertical_divider(stdscr, top, divider_x, body_height)
         draw_text_block(stdscr, top, right_left, right_width, body_height, visible_right_lines)
 
         if main_left_max_offset > 0:
             scroll_label = f"More details: {app.main_left_scroll + 1}-{app.main_left_scroll + len(visible_left_lines)} / {total_left_lines}"
             stdscr.addnstr(
-                min(height - 3, top + body_height - 1),
+                min(height - 3, top + left_body_height),
                 content_left,
                 truncate_for_width(scroll_label, left_width),
                 left_width,

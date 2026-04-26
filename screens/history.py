@@ -52,6 +52,7 @@ class HistoryScreen:
         elif key == ord("/"):
             app.history_search_active = True
             app.history_search_value = ""
+            app.history_scroll = 0
             app.last_message = "Type a year number. Enter jumps. Esc cancels."
         elif key in (curses.KEY_UP, ord("w"), ord("W")):
             app.history_scroll = max(0, app.history_scroll - 1)

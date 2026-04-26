@@ -70,6 +70,9 @@ class LineageScreen:
         if key in (ord("a"), ord("A")):
             app.set_lineage_filter_mode("all")
             return
+        if key in (ord("l"), ord("L")):
+            app.set_lineage_filter_mode("living")
+            return
         if key in (ord("d"), ord("D")):
             app.set_lineage_filter_mode("dead")
             return

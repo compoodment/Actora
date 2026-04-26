@@ -20,6 +20,13 @@ class SkipTimeScreen:
             return
         if key in (ord("q"), ord("Q")):
             return
+        if key == curses.KEY_BACKSPACE or key in (127, 8):
+            if app.skip_custom_value:
+                app.skip_custom_value = app.skip_custom_value[:-1]
+            else:
+                app.screen_name = "main"
+                app.last_message = self.main_idle_message
+            return
         if key in self.back_keys:
             app.screen_name = "main"
             app.last_message = self.main_idle_message
@@ -30,8 +37,6 @@ class SkipTimeScreen:
             app.skip_selection = min(len(self.presets) - 1, app.skip_selection + 1)
         elif key in (curses.KEY_ENTER, 10, 13):
             app.confirm_skip_selection()
-        elif key == curses.KEY_BACKSPACE or key in (127, 8):
-            app.skip_custom_value = app.skip_custom_value[:-1]
         elif ord("0") <= key <= ord("9"):
             if len(app.skip_custom_value) < 4:
                 app.skip_custom_value += chr(key)
