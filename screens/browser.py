@@ -26,9 +26,9 @@ class BrowserScreen:
                 app.last_message = "Browsing relationships."
             return
         if app.browser_tab == "relationships":
-            app.handle_relationship_browser_key(key, back_to="main")
+            app.relationship_browser_screen.handle_key(app, key, back_to="main")
         elif app.browser_tab == "history":
-            app.handle_history_key(key)
+            app.history_screen.handle_key(app, key)
 
     def render(self, app, stdscr, height, width):
         content_left, content_width = get_content_bounds(width, max_width=120, min_margin=1)
@@ -44,6 +44,6 @@ class BrowserScreen:
             pass
 
         if app.browser_tab == "relationships":
-            app.render_relationship_browser(stdscr, height, width)
+            app.relationship_browser_screen.render(app, stdscr, height, width)
         else:
-            app.render_history(stdscr, height, width)
+            app.history_screen.render(app, stdscr, height, width)

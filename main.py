@@ -32,6 +32,7 @@ from screens.main import MainScreen, build_snapshot_sections
 from screens.profile import ProfileScreen
 from screens.relationships import RelationshipBrowserScreen
 from screens.skip_time import SkipTimeScreen
+from app_router import AppRouter
 from browser_state_controller import BrowserStateController
 from choice_controller import ChoiceController
 from continuation_controller import ContinuationController
@@ -120,6 +121,7 @@ class ActoraTUI:
         self.player_id = player_id
         self.screen_name = "main"
         self.running = True
+        self.app_router = AppRouter()
         self.browser_state_controller = BrowserStateController(
             LINEAGE_RECORD_LIMIT,
             LINEAGE_FILTER_LABELS,
@@ -573,27 +575,6 @@ class ActoraTUI:
     def choose_continuation(self):
         self.continuation_controller.choose_continuation(self)
 
-    def handle_pending_choice_key(self, key):
-        self.choice_controller.handle_key(self, key)
-
-    def handle_main_key(self, key):
-        self.main_screen.handle_key(self, key)
-
-    def handle_history_key(self, key):
-        self.history_screen.handle_key(self, key)
-
-    def handle_profile_key(self, key):
-        self.profile_screen.handle_key(self, key)
-
-    def handle_lineage_key(self, key):
-        self.lineage_screen.handle_key(self, key)
-
-    def handle_relationship_browser_key(self, key, *, back_to="main"):
-        self.relationship_browser_screen.handle_key(self, key, back_to=back_to)
-
-    def handle_browser_key(self, key):
-        self.browser_screen.handle_key(self, key)
-
     def get_actions_categories(self):
         """Returns the categories and their available actions for the current actor."""
         focused_actor_id = self.get_focused_actor_id()
@@ -612,56 +593,11 @@ class ActoraTUI:
             {"id": "personal", "label": "Personal", "actions": personal_actions},
         ]
 
-    def handle_actions_key(self, key):
-        self.actions_screen.handle_key(self, key)
-
-    def handle_death_ack_key(self, key):
-        self.death_screen.handle_death_ack_key(self, key)
-
-    def handle_skip_time_key(self, key):
-        self.skip_time_screen.handle_key(self, key)
-
-    def handle_continuation_key(self, key):
-        self.death_screen.handle_continuation_key(self, key)
-
-    def handle_continuation_detail_key(self, key):
-        self.death_screen.handle_continuation_detail_key(self, key)
-
     def handle_key(self, key):
-        self.sync_focus_state()
-        if self.shell_controller.handle_modal_key(self, key):
-            return
-        if self.pending_choice is not None:
-            self.handle_pending_choice_key(key)
-            return
-        if self.screen_name == "main":
-            self.handle_main_key(key)
-        elif self.screen_name == "profile":
-            self.handle_profile_key(key)
-        elif self.screen_name == "lineage":
-            self.handle_lineage_key(key)
-        elif self.screen_name == "relationship_browser":
-            self.handle_relationship_browser_key(key)
-        elif self.screen_name == "history":
-            self.handle_history_key(key)
-        elif self.screen_name == "browser":
-            self.handle_browser_key(key)
-        elif self.screen_name == "actions":
-            self.handle_actions_key(key)
-        elif self.screen_name == "skip_time":
-            self.handle_skip_time_key(key)
-        elif self.screen_name == "death_ack":
-            self.handle_death_ack_key(key)
-        elif self.screen_name == "continuation":
-            self.handle_continuation_key(key)
-        elif self.screen_name == "continuation_detail":
-            self.handle_continuation_detail_key(key)
+        self.app_router.handle_key(self, key)
 
     def render_footer(self, stdscr, height, width):
         self.shell_renderer.render_footer(self, stdscr, height, width)
-
-    def build_choice_popup_lines(self, choice):
-        return self.shell_renderer.build_choice_popup_lines(choice)
 
     def render_pending_choice(self, stdscr, height, width):
         self.shell_renderer.render_pending_choice(self, stdscr, height, width)
@@ -680,27 +616,6 @@ class ActoraTUI:
 
     def render_header(self, stdscr, width):
         self.shell_renderer.render_header(self, stdscr, width)
-
-    def render_main(self, stdscr, height, width):
-        self.main_screen.render(self, stdscr, height, width)
-
-    def render_profile(self, stdscr, height, width):
-        self.profile_screen.render(self, stdscr, height, width)
-
-    def render_lineage(self, stdscr, height, width):
-        self.lineage_screen.render(self, stdscr, height, width)
-
-    def render_relationship_browser(self, stdscr, height, width):
-        self.relationship_browser_screen.render(self, stdscr, height, width)
-
-    def render_history(self, stdscr, height, width):
-        self.history_screen.render(self, stdscr, height, width)
-
-    def render_browser(self, stdscr, height, width):
-        self.browser_screen.render(self, stdscr, height, width)
-
-    def render_actions(self, stdscr, height, width):
-        self.actions_screen.render(self, stdscr, height, width)
 
     def build_actor_inspect_detail(self, actor_id, *, relationship_label=None, recent_record_limit=INSPECT_RECORD_LIMIT):
         """Builds one shell-owned inspectability payload for an actor."""
@@ -730,56 +645,8 @@ class ActoraTUI:
             "records": recent_records,
         }
 
-    def render_skip_time(self, stdscr, height, width):
-        self.skip_time_screen.render(self, stdscr, height, width)
-
-    def render_death_ack(self, stdscr, height, width):
-        self.death_screen.render_death_ack(self, stdscr, height, width)
-
-    def render_continuation(self, stdscr, height, width):
-        self.death_screen.render_continuation(self, stdscr, height, width)
-
-    def render_continuation_detail(self, stdscr, height, width):
-        self.death_screen.render_continuation_detail(self, stdscr, height, width)
-
     def render(self, stdscr):
-        stdscr.erase()
-        height, width = stdscr.getmaxyx()
-        if height < 16 or width < 50:
-            stdscr.addnstr(0, 0, "Terminal too small for Actora TUI. Resize and try again.", width - 1)
-            return
-
-        self.render_header(stdscr, width)
-        if self.screen_name == "main":
-            self.render_main(stdscr, height, width)
-        elif self.screen_name == "profile":
-            self.render_profile(stdscr, height, width)
-        elif self.screen_name == "lineage":
-            self.render_lineage(stdscr, height, width)
-        elif self.screen_name == "relationship_browser":
-            self.render_relationship_browser(stdscr, height, width)
-        elif self.screen_name == "history":
-            self.render_history(stdscr, height, width)
-        elif self.screen_name == "browser":
-            self.render_browser(stdscr, height, width)
-        elif self.screen_name == "actions":
-            self.render_actions(stdscr, height, width)
-        elif self.screen_name == "skip_time":
-            self.render_skip_time(stdscr, height, width)
-        elif self.screen_name == "death_ack":
-            self.render_death_ack(stdscr, height, width)
-        elif self.screen_name == "continuation":
-            self.render_continuation(stdscr, height, width)
-        elif self.screen_name == "continuation_detail":
-            self.render_continuation_detail(stdscr, height, width)
-
-        self.render_footer(stdscr, height, width)
-        self.render_pending_choice(stdscr, height, width)
-        if self.menu_popup_active:
-            self.render_menu_popup(stdscr, height, width)
-        if self.options_popup_active:
-            self.render_options_popup(stdscr, height, width)
-        stdscr.refresh()
+        self.app_router.render(self, stdscr)
 
     def run(self, stdscr):
         """Runs the narrow curses shell until the user quits or the run ends."""
