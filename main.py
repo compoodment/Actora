@@ -27,7 +27,6 @@ from views.history import (
     expand_render_lines,
     format_history_entry,
 )
-from views.shell import build_screen_chrome
 from screens.actions import ActionsScreen
 from screens.browser import BrowserScreen
 from screens.death import DeathContinuationScreen
@@ -37,17 +36,14 @@ from screens.main import MainScreen, build_snapshot_sections
 from screens.profile import ProfileScreen
 from screens.relationships import RelationshipBrowserScreen
 from screens.skip_time import SkipTimeScreen
+from shell_renderer import ShellRenderer
 from views.profile import build_person_card_lines
 from ui import (
-    center_text,
-    draw_box,
-    draw_panel_text,
     draw_text_block,
     draw_truncated_block,
     get_content_bounds,
     get_scroll_window,
     split_centered_columns,
-    wrap_text_line,
 )
 from wizard import (
     CREATION_STAT_LABELS,
@@ -121,6 +117,7 @@ class ActoraTUI:
         self.player_id = player_id
         self.screen_name = "main"
         self.running = True
+        self.shell_renderer = ShellRenderer()
         self.lineage_selection = 0
         self.continuation_selection = 0
         self.death_screen = DeathContinuationScreen(BACK_KEYS)
@@ -1256,231 +1253,28 @@ class ActoraTUI:
             self.handle_continuation_detail_key(key)
 
     def render_footer(self, stdscr, height, width):
-        footer_hints = {
-            "main": "[Q] Advance Month   [E] Skip Time  |  [1] Menu  |  [Esc] Options",
-            "profile": "[↑↓] Move  [Enter] View  [Bsp] Back",
-            "lineage": "[↑↓] Move   [A] All   [L] Living   [D] Dead   [/] Search   [Bsp] Back   [Q] Advance",
-            "relationship_browser": "[↑↓] Filter/Move   [/] Search   [Tab/→] Switch   [Bsp/←] Back   [Q] Advance",
-            "history": "[↑↓] Scroll   [/] Jump to Year   [Bsp] Back   [Q] Advance",
-            "browser": "[Tab] Switch Tab   [↑↓] Move   [/] Search   [Bsp] Back   [Q] Advance   [Esc] Options",
-            "browser_rel_search": "Type search   [Enter] Confirm   [Esc] Cancel   [Q] Advance",
-            "actions": "[↑↓] Move   [←→] Focus   [Enter] Select   [Bsp] Back   [Q] Advance   [Esc] Options",
-            "history_search": "Type year [0-9]   [Enter] Continue   [Esc] Cancel   [Q] Advance",
-            "lineage_search": "Type search   [Enter] Continue   [Esc] Cancel   [Q] Advance",
-            "skip_time": "[↑↓] Move   [0-9] Custom   [Bksp] Erase   [Enter] Continue   [Bsp] Back   [Esc] Options",
-            "death_ack": "[Enter] Continue   [Esc] Options",
-            "continuation_detail": "[Enter] Continue   [Bsp] Back   [Esc] Options",
-        }
-        if self.screen_name == "lineage" and self.lineage_search_active:
-            footer_text = footer_hints["lineage_search"]
-        elif self.screen_name == "history" and self.history_search_active:
-            footer_text = footer_hints["history_search"]
-        elif self.screen_name == "profile" and self.profile_popup_open:
-            footer_text = "[↑↓] Scroll  [Bsp] Close"
-        elif self.screen_name == "browser" and self.browser_tab == "relationships" and self.rel_browser_search_active:
-            footer_text = footer_hints["browser_rel_search"]
-        elif self.screen_name == "browser" and self.browser_tab == "history" and self.history_search_active:
-            footer_text = footer_hints["history_search"]
-        elif self.screen_name == "continuation":
-            continuity_state = self.get_continuity_state()
-            if continuity_state["continuity_candidates"]:
-                footer_text = "[↑↓] Move   [Enter] Continue   [Bsp] Back   [Esc] Options"
-            else:
-                footer_text = "[Bsp] Back   [Esc] Options"
-        else:
-            footer_text = footer_hints.get(self.screen_name, "")
-        content_left, content_width = get_content_bounds(width, max_width=108, min_margin=1)
-        full_hline = "═" * max(0, width - 1)
-        stdscr.addnstr(height - 2, 0, full_hline, width - 1, curses.A_BOLD)
-        stdscr.addnstr(
-            height - 1,
-            content_left,
-            center_text(footer_text, content_width),
-            content_width,
-            curses.A_NORMAL,
-        )
+        self.shell_renderer.render_footer(self, stdscr, height, width)
 
     def build_choice_popup_lines(self, choice):
-        lines = [choice["text"], "", choice["question"], ""]
-        option_line_indexes = []
-        for index, option in enumerate(choice["options"]):
-            option_line_indexes.append(len(lines))
-            lines.append(f"{option}")
-        lines.extend(
-            [
-                "",
-                (
-                    "[↑↓] Move   [Enter] Select   [Bsp] Skip"
-                    if choice.get("skippable")
-                    else "[↑↓] Move   [Enter] Select"
-                ),
-            ]
-        )
-        return lines, option_line_indexes
+        return self.shell_renderer.build_choice_popup_lines(choice)
 
     def render_pending_choice(self, stdscr, height, width):
-        if self.pending_choice is None:
-            return
-
-        box_width = min(max(40, width // 2), 50)
-        inner_width = max(1, box_width - 2)
-        popup_lines, option_line_indexes = self.build_choice_popup_lines(self.pending_choice)
-        rendered_line_count = sum(len(wrap_text_line(line, inner_width)) for line in popup_lines)
-        box_height = min(height - 4, max(9, rendered_line_count + 2))
-        top = max(2, (height - box_height) // 2)
-        left = max(0, (width - box_width) // 2)
-
-        draw_box(stdscr, top, left, box_height, box_width, title=self.pending_choice["title"])
-        highlighted_line = option_line_indexes[self.pending_choice["selected_index"]]
-        draw_panel_text(
-            stdscr,
-            top,
-            left,
-            box_height,
-            box_width,
-            popup_lines,
-            highlight_index=highlighted_line,
-        )
+        self.shell_renderer.render_pending_choice(self, stdscr, height, width)
 
     def render_menu_popup(self, stdscr, height, width):
-        MENU_ITEMS = ["Browser", "Actions", "Profile"]
-        box_width = 32
-        box_height = len(MENU_ITEMS) + 6
-        top = max(2, (height - box_height) // 2)
-        left = max(0, (width - box_width) // 2)
-        draw_box(stdscr, top, left, box_height, box_width, title="Menu")
-        for i, item in enumerate(MENU_ITEMS):
-            label = f"  {i+1}. {item}"
-            attr = curses.A_REVERSE if i == self.menu_selection else curses.A_NORMAL
-            row = top + 2 + i
-            if row < height and left + 1 < width:
-                stdscr.addnstr(row, left + 1, label.ljust(box_width - 2), box_width - 2, attr)
-        hint_row = top + 2 + len(MENU_ITEMS) + 1
-        hint = " [↑↓]  [Enter] Select  [Bsp] Back"
-        if hint_row < height and left + 1 < width:
-            stdscr.addnstr(hint_row, left + 1, hint.ljust(box_width - 2), box_width - 2)
+        self.shell_renderer.render_menu_popup(self, stdscr, height, width)
 
     def render_options_popup(self, stdscr, height, width):
-        OPTION_ITEMS = ["Quit Game", "Help / Controls", "Settings"]
-        box_width = 36
-        box_height = len(OPTION_ITEMS) + 6
-        top = max(2, (height - box_height) // 2)
-        left = max(0, (width - box_width) // 2)
-        draw_box(stdscr, top, left, box_height, box_width, title="Options")
-        for i, item in enumerate(OPTION_ITEMS):
-            prefix = "  "
-            attr = curses.A_REVERSE if i == self.options_selection else curses.A_NORMAL
-            if i > 0:
-                attr |= curses.A_DIM
-            label = f"{prefix}{item}"
-            row = top + 2 + i
-            if row < height and left + 1 < width:
-                stdscr.addnstr(row, left + 1, label.ljust(box_width - 2), box_width - 2, attr)
-        hint_row = top + 2 + len(OPTION_ITEMS) + 1
-        hint = " [↑↓]  [Enter] Select  [Esc] Close"
-        if hint_row < height and left + 1 < width:
-            stdscr.addnstr(hint_row, left + 1, hint.ljust(box_width - 2), box_width - 2)
+        self.shell_renderer.render_options_popup(self, stdscr, height, width)
 
     def render_quit_confirmation(self, stdscr, height, width):
-        box_width = min(max(36, width // 2), 44)
-        box_height = 7
-        top = max(2, (height - box_height) // 2)
-        left = max(0, (width - box_width) // 2)
-        lines = [
-            "Are you sure you want to quit?",
-            "",
-            "[Enter] Quit   [Bsp] Back",
-        ]
-        draw_box(stdscr, top, left, box_height, box_width, title="Quit")
-        draw_panel_text(stdscr, top, left, box_height, box_width, lines)
-
-    _LOGO_LINES = [
-        "╗▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄╔",
-        "║█░░▒▒▓█▄░▄█▓▒▒░░█║",
-        "║█░▒▒▓█▀░▄░▀█▓▒▒░█║",
-        "║█░▒▒▓█▒▒█▒▒█▓▒▒░█║",
-        "║█░▒▒▓█▄▀▓▀▄█▓▒▒░█║",
-        "║█░░▒▒▓█▓▄▓█▓▒▒░░█║",
-        "╝▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀╚",
-    ]
+        self.shell_renderer.render_quit_confirmation(self, stdscr, height, width)
 
     def _get_logo_layout(self, width):
-        """Returns (logo_x, logo_w, logo_center) — the canonical horizontal anchor for all shell layers."""
-        logo_w = max(len(l) for l in self._LOGO_LINES)
-        logo_x = (max(1, width - 1) - logo_w) // 2
-        logo_center = logo_x + logo_w // 2
-        return logo_x, logo_w, logo_center
+        return self.shell_renderer.get_logo_layout(width)
 
     def render_header(self, stdscr, width):
-        focused_actor = self.get_focused_actor()
-        focused_actor_name = focused_actor.get_full_name() if focused_actor is not None else "Unknown"
-        chrome = build_screen_chrome(self.screen_name, self.world, focused_actor_name)
-        full_hline = "═" * max(0, width - 1)
-        divider = "║"
-
-        LOGO = self._LOGO_LINES
-        logo_x, logo_w, _logo_center = self._get_logo_layout(width)
-
-        # Left panel content
-        try:
-            snapshot = self.get_snapshot_data()
-            loc = snapshot.get("location", {})
-            stats = snapshot.get("statistics", {})
-            city = loc.get("current_place_name", "")
-            country = loc.get("jurisdiction_place_name", "")
-            loc_str = f"{city}, {country}" if city and country else city or country or ""
-            health = stats.get("health", 0)
-            money = stats.get("money", 0)
-            money_str = f"${money:,.0f}" if isinstance(money, (int, float)) else str(money)
-        except Exception:
-            loc_str = health = money_str = ""
-
-        left_lines = [
-            chrome["date_text"],
-            chrome["subtitle"],
-            chrome["title"],
-            "",
-            "",
-        ]
-        right_lines = [
-            loc_str,
-            f"Health: {health}",
-            money_str,
-            "",
-            "",
-        ]
-
-        # Logo is centered via _get_logo_layout — canonical anchor for all shell layers.
-        panel_left_w = logo_x           # columns 0 to logo_x-1
-        panel_right_w = width - 1 - logo_x - logo_w  # columns after logo to end
-
-        # Row 0: top separator with logo top line
-        top_row = "═" * logo_x + LOGO[0] + "═" * panel_right_w
-        try:
-            stdscr.addnstr(0, 0, top_row[:width - 1], width - 1, curses.A_BOLD)
-        except curses.error:
-            pass
-
-        # Rows 1-5: logo body + left/right info panels
-        for i in range(5):
-            logo_line = LOGO[i + 1] if i + 1 < len(LOGO) - 1 else ""
-            left_val = left_lines[i] if i < len(left_lines) else ""
-            right_val = right_lines[i] if i < len(right_lines) else ""
-            left_text = f"{left_val:>{panel_left_w - 1}} "  # right-aligned, 1 space before ║
-            right_text = f" {right_val}"                    # 1 space after ║
-            try:
-                stdscr.addnstr(i + 1, 0, left_text[:panel_left_w], panel_left_w)
-                stdscr.addnstr(i + 1, logo_x, logo_line, logo_w, curses.A_BOLD)
-                stdscr.addnstr(i + 1, logo_x + logo_w, right_text[:panel_right_w], panel_right_w)
-            except curses.error:
-                pass
-
-        # Row 6: bottom separator with logo bottom line
-        bot_row = "═" * logo_x + LOGO[-1] + "═" * panel_right_w
-        try:
-            stdscr.addnstr(self.HEADER_ROWS - 1, 0, bot_row[:width - 1], width - 1, curses.A_BOLD)
-        except curses.error:
-            pass
+        self.shell_renderer.render_header(self, stdscr, width)
 
     def render_main(self, stdscr, height, width):
         self.main_screen.render(self, stdscr, height, width)
