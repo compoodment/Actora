@@ -31,6 +31,7 @@ from views.history import (
     format_history_entry,
 )
 from views.shell import build_death_lines, build_screen_chrome
+from screens.browser import BrowserScreen
 from screens.history import HistoryScreen
 from screens.lineage import LineageScreen
 from screens.profile import ProfileScreen
@@ -247,6 +248,7 @@ class ActoraTUI:
             MAIN_IDLE_MESSAGE,
         )
         self.browser_tab = "relationships"
+        self.browser_screen = BrowserScreen()
         self.active_actions = []
         self.hang_out_actor_ids = []
         self.personal_subtype_options = []
@@ -1218,27 +1220,7 @@ class ActoraTUI:
         self.relationship_browser_screen.handle_key(self, key, back_to=back_to)
 
     def handle_browser_key(self, key):
-        """Handles keys for the unified Browser screen (Relationships + History tabs)."""
-        search_active = (
-            (self.browser_tab == "relationships" and self.rel_browser_search_active)
-            or (self.browser_tab == "history" and self.history_search_active)
-        )
-        if not search_active and key == 27:  # Esc → Options
-            self.options_popup_active = True
-            self.options_selection = 0
-            return
-        if not search_active and key == 9:  # Tab key — switch tabs
-            if self.browser_tab == "relationships":
-                self.browser_tab = "history"
-                self.last_message = "Browsing event history."
-            else:
-                self.browser_tab = "relationships"
-                self.last_message = "Browsing relationships."
-            return
-        if self.browser_tab == "relationships":
-            self.handle_relationship_browser_key(key, back_to="main")
-        elif self.browser_tab == "history":
-            self.handle_history_key(key)
+        self.browser_screen.handle_key(self, key)
 
     def get_actions_categories(self):
         """Returns the categories and their available actions for the current actor."""
@@ -1764,24 +1746,7 @@ class ActoraTUI:
         self.history_screen.render(self, stdscr, height, width)
 
     def render_browser(self, stdscr, height, width):
-        """Renders the unified Browser screen with Relationships and History tabs."""
-        content_left, content_width = get_content_bounds(width, max_width=120, min_margin=1)
-
-        # Tab bar on row 5 with a separating bottom rule (header now occupies rows 0-4)
-        rel_label = "[ Relationships ]" if self.browser_tab == "relationships" else "  Relationships  "
-        hist_label = "[ History ]" if self.browser_tab == "history" else "  History  "
-        tab_bar = f"{rel_label}     │     {hist_label}"
-        try:
-            stdscr.addnstr(self.HEADER_ROWS, content_left, center_text(tab_bar, content_width), content_width)
-            hline_char = getattr(curses, "ACS_HLINE", ord("-"))
-            stdscr.hline(self.HEADER_ROWS + 1, content_left, hline_char, content_width)
-        except curses.error:
-            pass
-
-        if self.browser_tab == "relationships":
-            self.render_relationship_browser(stdscr, height, width)
-        else:
-            self.render_history(stdscr, height, width)
+        self.browser_screen.render(self, stdscr, height, width)
 
     def render_actions(self, stdscr, height, width):
         """Renders the Actions screen: Categories | Actions | Details."""
