@@ -26,11 +26,11 @@ class EventLogController:
             return
 
         if months_to_advance > 1 and not suppress_skip_marker:
-            label = "Month" if months_to_advance == 1 else "Months"
+            label = "Month" if actual_months_advanced == 1 else "Months"
             self.append_entry(
                 app,
                 "skip_marker",
-                f"{months_to_advance} {label} Skipped",
+                f"{actual_months_advanced} {label} Skipped",
             )
 
         visible_record_types = {"birth", "death"}

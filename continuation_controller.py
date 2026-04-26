@@ -51,7 +51,7 @@ class ContinuationController:
             successor_actor_id,
         )
         app.player_id = successor_actor_id
-        app.last_logged_year = 0
+        app.last_logged_year = app.world.current_year
         app.event_log.append(
             {
                 "kind": "life_separator",

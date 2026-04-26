@@ -143,11 +143,10 @@ class ChoiceController:
             return
         elif choice_id in ("select_exercise_subtype", "select_read_subtype", "select_rest_subtype"):
             if selected_value is not None:
-                options_list = (app.pending_choice or {}).get("options", [])
                 try:
-                    selected_idx = options_list.index(selected_value)
+                    selected_idx = (app.pending_choice or {}).get("selected_index", 0)
                     subtype = app.personal_subtype_options[selected_idx]
-                except (ValueError, IndexError):
+                except (TypeError, IndexError):
                     app.pending_choice = None
                     app.personal_subtype_options = []
                     return
@@ -165,6 +164,7 @@ class ChoiceController:
                     "label": subtype["label"],
                     "time_cost": subtype["time_cost"],
                     "stat_changes": subtype["stat_changes"],
+                    "event_text": subtype.get("event_text"),
                 })
                 app.last_message = f"Queued: {subtype['label']}."
             else:
