@@ -34,6 +34,7 @@ from views.shell import build_death_lines, build_screen_chrome
 from screens.history import HistoryScreen
 from screens.lineage import LineageScreen
 from screens.profile import ProfileScreen
+from screens.relationships import RelationshipBrowserScreen
 from views.profile import build_person_card_lines
 from ui import (
     center_text,
@@ -238,6 +239,13 @@ class ActoraTUI:
         self.rel_filter_index = 0
         self.rel_browser_search_active = False
         self.rel_browser_search_text = ""
+        self.relationship_browser_screen = RelationshipBrowserScreen(
+            REL_FILTER_OPTIONS,
+            REL_FILTER_LABELS,
+            BACK_KEYS,
+            ADVANCE_THROTTLE_SECONDS,
+            MAIN_IDLE_MESSAGE,
+        )
         self.browser_tab = "relationships"
         self.active_actions = []
         self.hang_out_actor_ids = []
@@ -1207,94 +1215,7 @@ class ActoraTUI:
         self.lineage_screen.handle_key(self, key)
 
     def handle_relationship_browser_key(self, key, *, back_to="main"):
-        """Handles keys for the relationship browser tab/screen.
-
-        back_to: screen name to return to when [B] is pressed from filters focus.
-        """
-        if self.rel_browser_search_active:
-            if key == 27:
-                self.rel_browser_search_active = False
-                self.last_message = "Search canceled."
-                return
-            if key in (curses.KEY_ENTER, 10, 13):
-                self.rel_browser_search_active = False
-                self.lineage_selection = 0
-                self.selected_lineage_actor_id = None
-                if self.rel_browser_search_text:
-                    self.last_message = f"Search: {self.rel_browser_search_text}."
-                else:
-                    self.last_message = "Search cleared."
-                return
-            if key == curses.KEY_BACKSPACE or key in (127, 8):
-                if self.rel_browser_search_text:
-                    self.rel_browser_search_text = self.rel_browser_search_text[:-1]
-                    self.lineage_selection = 0
-                    self.selected_lineage_actor_id = None
-                return
-            if 32 <= key <= 126 and len(self.rel_browser_search_text) < 24:
-                self.rel_browser_search_text += chr(key)
-                self.lineage_selection = 0
-                self.selected_lineage_actor_id = None
-                return
-
-        browser_state = self.get_relationship_browser_state()
-        entries = browser_state["entries"]
-
-        if key in (ord("q"), ord("Q")):
-            now = time.monotonic()
-            if now - self.last_advance_time < ADVANCE_THROTTLE_SECONDS:
-                return
-            self.last_advance_time = now
-            self.advance_one_month()
-            return
-        if key in (ord("e"), ord("E")):
-            self.open_skip_time()
-            return
-
-        if key == ord("/"):
-            self.rel_browser_search_active = True
-            self.last_message = "Type to search names. Enter confirms. Esc cancels."
-            return
-        if key == curses.KEY_BACKSPACE or key in (127, 8):
-            if self.rel_browser_search_text:
-                self.rel_browser_search_text = ""
-                self.lineage_selection = 0
-                self.selected_lineage_actor_id = None
-                self.last_message = "Search cleared."
-                return
-
-        if self.rel_browser_focus == "filters":
-            if key in BACK_KEYS:
-                self.screen_name = back_to
-                self.last_message = MAIN_IDLE_MESSAGE
-                return
-            if key in (curses.KEY_UP, ord("w"), ord("W")):
-                self.rel_filter_index = max(0, self.rel_filter_index - 1)
-                self.lineage_selection = 0
-                self.selected_lineage_actor_id = None
-            elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
-                self.rel_filter_index = min(len(REL_FILTER_OPTIONS) - 1, self.rel_filter_index + 1)
-                self.lineage_selection = 0
-                self.selected_lineage_actor_id = None
-            elif key in (9, curses.KEY_RIGHT, ord("d"), ord("D")):  # Tab or Right
-                self.rel_browser_focus = "actors"
-                self.last_message = "Browsing people."
-        else:  # actors focus
-            if key in (curses.KEY_LEFT, ord("a"), ord("A")) or key in BACK_KEYS:
-                self.rel_browser_focus = "filters"
-                self.last_message = "Browsing relationships."
-                return
-            if not entries:
-                return
-            if key in (curses.KEY_UP, ord("w"), ord("W")):
-                self.lineage_selection = max(0, self.lineage_selection - 1)
-                self.selected_lineage_actor_id = entries[self.lineage_selection]["actor_id"]
-            elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
-                self.lineage_selection = min(len(entries) - 1, self.lineage_selection + 1)
-                self.selected_lineage_actor_id = entries[self.lineage_selection]["actor_id"]
-            elif key in (curses.KEY_ENTER, 10, 13):
-                if entries:
-                    self.last_message = f"Inspecting {entries[self.lineage_selection]['full_name']}."
+        self.relationship_browser_screen.handle_key(self, key, back_to=back_to)
 
     def handle_browser_key(self, key):
         """Handles keys for the unified Browser screen (Relationships + History tabs)."""
@@ -1837,95 +1758,7 @@ class ActoraTUI:
         self.lineage_screen.render(self, stdscr, height, width)
 
     def render_relationship_browser(self, stdscr, height, width):
-        browser_state = self.get_relationship_browser_state()
-        entries = browser_state["entries"]
-        selected_detail = browser_state["selected_detail"]
-
-        top = self.HEADER_ROWS + self.BROWSER_CHROME_ROWS
-        body_height = height - self.HEADER_ROWS - self.BROWSER_CHROME_ROWS - self.FOOTER_ROWS
-        content_left, content_width = get_content_bounds(width, max_width=120)
-
-        filter_col_width = 12
-        gap = 2
-        remaining_width = content_width - filter_col_width - gap
-        actor_col_width = remaining_width * 5 // 10
-        detail_left = content_left + filter_col_width + gap + actor_col_width + gap
-        detail_width = max(20, content_width - filter_col_width - gap - actor_col_width - gap)
-        actor_left = content_left + filter_col_width + gap
-
-        filter_lines = []
-        filter_highlight = None
-        for idx, fkey in enumerate(REL_FILTER_OPTIONS):
-            if idx == self.rel_filter_index:
-                filter_highlight = len(filter_lines)
-            marker = ">" if self.rel_browser_focus == "filters" and idx == self.rel_filter_index else " "
-            filter_lines.append(f"{marker} {REL_FILTER_LABELS[fkey]}")
-
-        draw_truncated_block(
-            stdscr, top, content_left, filter_col_width, body_height, filter_lines,
-            highlight_index=filter_highlight,
-        )
-
-        divider1_x = content_left + filter_col_width + 1
-        draw_vertical_divider(stdscr, top, divider1_x, body_height)
-
-        actor_lines = []
-        actor_highlight = None
-        search_status = self.get_rel_browser_search_status()
-        if search_status:
-            actor_lines.append(search_status)
-            actor_lines.append("")
-        if not entries:
-            actor_lines.append("No entries.")
-        else:
-            search_offset = len(actor_lines)
-            for index, entry in enumerate(entries):
-                if index == self.lineage_selection and self.rel_browser_focus == "actors":
-                    actor_highlight = search_offset + index
-                actor_lines.append(build_lineage_row(entry))
-
-        draw_truncated_block(
-            stdscr, top, actor_left, actor_col_width, body_height, actor_lines,
-            highlight_index=actor_highlight,
-        )
-
-        divider2_x = detail_left - 1
-        draw_vertical_divider(stdscr, top, divider2_x, body_height)
-
-        if selected_detail is None:
-            right_lines = [
-                center_text("SELECTED PERSON", detail_width),
-                "",
-                "No detail available.",
-            ]
-        else:
-            summary = selected_detail["summary"]
-            records = selected_detail["records"]
-            right_lines = []
-            right_lines.append(center_text("SELECTED PERSON", detail_width))
-            right_lines.append("")
-            right_lines.extend(build_person_card_lines(summary))
-            link_type = summary.get("link_type", "family")
-            if link_type == "social":
-                closeness = summary.get("closeness", 0)
-                social_status = summary.get("social_status", "active")
-                right_lines.extend([
-                    "",
-                    f"Social: {summary['relationship_label']}",
-                    f"Closeness: {closeness}   Status: {'past' if social_status == 'former' else social_status}",
-                ])
-            else:
-                right_lines.extend([
-                    "",
-                    "Identity",
-                    f"Species: {summary['species']}",
-                    f"Sex: {summary['sex']}",
-                    f"Condition: Health {summary['health']}   Happiness {summary['happiness']}",
-                ])
-            right_lines.extend(["", "Recent Records"])
-            right_lines.extend(build_record_summary_lines(records))
-
-        draw_text_block(stdscr, top, detail_left, detail_width, body_height, right_lines)
+        self.relationship_browser_screen.render(self, stdscr, height, width)
 
     def render_history(self, stdscr, height, width):
         self.history_screen.render(self, stdscr, height, width)
