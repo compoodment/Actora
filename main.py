@@ -987,40 +987,20 @@ class ActoraTUI:
             aggregated_turn_result["continuity_state"] = month_turn_result["continuity_state"]
 
             if first_month:
-                for action in spend_time_actions:
-                    target_id = action["target_actor_id"]
-                    for lnk in self.world.get_links(source_id=focused_actor_id, target_id=target_id, link_type="social"):
-                        lnk_meta = lnk.get("metadata", {})
-                        if lnk_meta.get("status") == "active":
-                            old_cl = lnk_meta.get("closeness", 0)
-                            new_cl = min(100, old_cl + 5)
-                            lnk_meta["closeness"] = new_cl
-                            new_role = self.world._get_social_link_category(new_cl)
-                            lnk["role"] = new_role
-                            for rev_lnk in self.world.get_links(source_id=target_id, target_id=focused_actor_id, link_type="social"):
-                                rev_meta = rev_lnk.get("metadata", {})
-                                if rev_meta.get("status") == "active":
-                                    rev_meta["closeness"] = new_cl
-                                    rev_lnk["role"] = new_role
-                    target_actor = self.world.get_actor(target_id)
-                    target_name = target_actor.get_full_name() if target_actor else "Someone"
-                    self.append_event_log_entry(
-                        "event",
-                        f"You spent some time with {target_name}.",
-                        year=self.world.current_year,
-                        month=self.world.current_month,
-                    )
-                if spend_time_actions:
-                    self.world.apply_outcome(focused_actor_id, {"stat_changes": {"happiness": 3}})
-                    self.world.apply_outcome(focused_actor_id, {"stat_changes": {"stress": -2}})
-                for action in personal_actions_queued:
-                    self.world.apply_outcome(focused_actor_id, {"stat_changes": action["stat_changes"]})
-                    self.append_event_log_entry(
-                        "event",
-                        action.get("event_text", f"You did: {action['label']}."),
-                        year=self.world.current_year,
-                        month=self.world.current_month,
-                    )
+                if month_turn_result.get("focused_actor_alive", True):
+                    for action in spend_time_actions:
+                        event = self.world.spend_time_with_actor(
+                            focused_actor_id,
+                            action["target_actor_id"],
+                        )
+                        if event is not None:
+                            aggregated_turn_result["events"].append(event)
+
+                    for action in personal_actions_queued:
+                        event = self.world.resolve_personal_action(focused_actor_id, action)
+                        if event is not None:
+                            aggregated_turn_result["events"].append(event)
+
                 self.active_actions = [
                     a for a in self.active_actions if a["action_type"] not in ("spend_time", "personal")
                 ]
@@ -1031,32 +1011,9 @@ class ActoraTUI:
                 for dead_actor_id in record.get("actor_ids", []):
                     if dead_actor_id == focused_actor_id:
                         continue
-                    for lnk in self.world.get_links(source_id=focused_actor_id, target_id=dead_actor_id, link_type="social"):
-                        lnk_meta = lnk.get("metadata", {})
-                        if lnk_meta.get("status") != "active":
-                            continue
-                        closeness = lnk_meta.get("closeness", 0)
-                        dead_actor = self.world.get_actor(dead_actor_id)
-                        dead_name = dead_actor.get_full_name() if dead_actor else "Someone"
-                        focused_actor_obj = self.world.get_actor(focused_actor_id)
-                        if closeness >= 70:
-                            if focused_actor_obj:
-                                focused_actor_obj.modify_stat("happiness", -18)
-                            self.append_event_log_entry(
-                                "event",
-                                f"You were devastated to hear that {dead_name}, your close friend, has passed away.",
-                                year=self.world.current_year,
-                                month=self.world.current_month,
-                            )
-                        elif closeness >= 30:
-                            if focused_actor_obj:
-                                focused_actor_obj.modify_stat("happiness", -8)
-                            self.append_event_log_entry(
-                                "event",
-                                f"You learned that {dead_name}, your friend, has passed away.",
-                                year=self.world.current_year,
-                                month=self.world.current_month,
-                            )
+                    event = self.world.resolve_social_death_impact(focused_actor_id, dead_actor_id)
+                    if event is not None:
+                        aggregated_turn_result["events"].append(event)
 
             if month_turn_result.get("focused_actor_alive", True):
                 month_shared = shared_actor_ids if first_month else set()

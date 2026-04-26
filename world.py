@@ -1097,6 +1097,104 @@ class World:
         )
         return category
 
+    def _get_active_social_link_pair(self, actor_id, target_actor_id):
+        """Returns the active forward/reverse social links for a pair, if both sides are valid."""
+        actor = self.get_actor(actor_id)
+        target_actor = self.get_actor(target_actor_id)
+        if actor is None or target_actor is None:
+            return None, None
+        if not actor.is_alive() or not target_actor.is_alive():
+            return None, None
+
+        forward_link = None
+        for link in self.get_links(source_id=actor_id, target_id=target_actor_id, link_type="social"):
+            if link.get("metadata", {}).get("status") == "active":
+                forward_link = link
+                break
+        if forward_link is None:
+            return None, None
+
+        reverse_link = None
+        for link in self.get_links(source_id=target_actor_id, target_id=actor_id, link_type="social"):
+            if link.get("metadata", {}).get("status") == "active":
+                reverse_link = link
+                break
+        return forward_link, reverse_link
+
+    def spend_time_with_actor(self, actor_id, target_actor_id, *, closeness_gain=5):
+        """Applies a successful spend-time action and returns the surfaced event, or None.
+
+        This is the authoritative simulation boundary for Hang Out. The UI may queue the
+        intent, but validation, relationship mutation, and stat effects belong here.
+        """
+        forward_link, reverse_link = self._get_active_social_link_pair(actor_id, target_actor_id)
+        if forward_link is None:
+            return None
+
+        meta = forward_link.get("metadata", {})
+        old_closeness = meta.get("closeness", 0)
+        new_closeness = min(100, old_closeness + closeness_gain)
+        new_role = self._get_social_link_category(new_closeness)
+
+        meta["closeness"] = new_closeness
+        meta["closeness_history_months"] = 0
+        forward_link["role"] = new_role
+
+        if reverse_link is not None:
+            reverse_meta = reverse_link.get("metadata", {})
+            reverse_meta["closeness"] = new_closeness
+            reverse_meta["closeness_history_months"] = 0
+            reverse_link["role"] = new_role
+
+        self.apply_outcome(actor_id, {"stat_changes": {"happiness": 3, "stress": -2}})
+
+        target_actor = self.get_actor(target_actor_id)
+        target_name = target_actor.get_full_name() if target_actor else "Someone"
+        event = {
+            "text": f"You spent some time with {target_name}.",
+            "year": self.current_year,
+            "month": self.current_month,
+            "event_id": "spend_time",
+            "tags": ["social", "queued_action"],
+        }
+        self.add_record(
+            record_type="event",
+            scope="actor",
+            text=event["text"],
+            year=event["year"],
+            month=event["month"],
+            actor_ids=[actor_id, target_actor_id],
+            tags=event["tags"],
+            metadata={"event_id": event["event_id"], "entry_method": "World.spend_time_with_actor"},
+        )
+        return event
+
+    def resolve_personal_action(self, actor_id, action):
+        """Applies a queued personal action and returns the surfaced event, or None."""
+        actor = self.get_actor(actor_id)
+        if actor is None or not actor.is_alive():
+            return None
+
+        self.apply_outcome(actor_id, {"stat_changes": action.get("stat_changes", {})})
+        event = {
+            "text": action.get("event_text", f"You did: {action.get('label', 'something')}."),
+            "year": self.current_year,
+            "month": self.current_month,
+            "event_id": action.get("subtype_id", "personal_action"),
+            "tags": ["personal", "queued_action"],
+        }
+        self.add_record(
+            record_type="event",
+            scope="actor",
+            text=event["text"],
+            year=event["year"],
+            month=event["month"],
+            actor_ids=[actor_id],
+            tags=event["tags"],
+            metadata={"event_id": event["event_id"], "entry_method": "World.resolve_personal_action"},
+        )
+        return event
+
     def generate_meeting_npc(self, player_id, *, culture_group=None):
         """Generates and registers a plausible NPC for a meeting event.
 
@@ -1748,6 +1846,40 @@ class World:
             "result_count": len(entries),
             "selected_detail": selected_detail,
         }
+
+    def resolve_social_death_impact(self, focused_actor_id, dead_actor_id):
+        """Applies grief effects when an active social connection dies, returning an event if surfaced."""
+        focused_actor = self.get_actor(focused_actor_id)
+        if focused_actor is None or not focused_actor.is_alive():
+            return None
+
+        dead_actor = self.get_actor(dead_actor_id)
+        dead_name = dead_actor.get_full_name() if dead_actor else "Someone"
+        for link in self.get_links(source_id=focused_actor_id, target_id=dead_actor_id, link_type="social"):
+            meta = link.get("metadata", {})
+            if meta.get("status") != "active":
+                continue
+
+            closeness = meta.get("closeness", 0)
+            if closeness >= 70:
+                focused_actor.modify_stat("happiness", -18)
+                return {
+                    "text": f"You were devastated to hear that {dead_name}, your close friend, has passed away.",
+                    "year": self.current_year,
+                    "month": self.current_month,
+                    "event_id": "close_friend_death_grief",
+                    "tags": ["social", "death", "grief"],
+                }
+            if closeness >= 30:
+                focused_actor.modify_stat("happiness", -8)
+                return {
+                    "text": f"You learned that {dead_name}, your friend, has passed away.",
+                    "year": self.current_year,
+                    "month": self.current_month,
+                    "event_id": "friend_death_grief",
+                    "tags": ["social", "death", "grief"],
+                }
+        return None
 
     def apply_social_link_decay(self, focused_actor_id, shared_actor_ids=None):
         """Applies one month of closeness decay to active social links for the focused actor.
