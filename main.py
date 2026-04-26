@@ -18,12 +18,10 @@ from mechanics import (
     get_monthly_free_hours,
 )
 from views.browser import (
-    HIDDEN_PLAYER_RECORD_TYPES,
     filter_player_facing_records,
     get_social_tier_label,
 )
 from views.history import (
-    build_event_log_entry,
     expand_render_lines,
     format_history_entry,
 )
@@ -38,6 +36,7 @@ from screens.relationships import RelationshipBrowserScreen
 from screens.skip_time import SkipTimeScreen
 from choice_controller import ChoiceController
 from continuation_controller import ContinuationController
+from event_log_controller import EventLogController
 from shell_controller import ShellController
 from shell_renderer import ShellRenderer
 from views.profile import build_person_card_lines
@@ -127,6 +126,7 @@ class ActoraTUI:
             SEXUALITY_OPTION_LABELS,
         )
         self.continuation_controller = ContinuationController()
+        self.event_log_controller = EventLogController()
         self.lineage_selection = 0
         self.continuation_selection = 0
         self.death_screen = DeathContinuationScreen(BACK_KEYS)
@@ -365,109 +365,23 @@ class ActoraTUI:
         return self.continuation_controller.get_continuity_state(self)
 
     def append_event_log_entry(self, kind, text, *, year=None, month=None, record_type=None):
-        """Appends one event-log entry with normalized structure."""
-        self.event_log.append(
-            build_event_log_entry(
-                kind,
-                text,
-                year=year,
-                month=month,
-                record_type=record_type,
-            )
+        self.event_log_controller.append_entry(
+            self,
+            kind,
+            text,
+            year=year,
+            month=month,
+            record_type=record_type,
         )
 
     def append_event_log_turn(self, turn_result, months_to_advance, new_records, *, suppress_skip_marker=False):
-        """Extends the event log from one completed advance."""
-        actual_months_advanced = turn_result["months_advanced"]
-        if actual_months_advanced <= 0:
-            return
-
-        if months_to_advance > 1 and not suppress_skip_marker:
-            label = "Month" if months_to_advance == 1 else "Months"
-            self.append_event_log_entry(
-                "skip_marker",
-                f"{months_to_advance} {label} Skipped",
-            )
-
-        visible_record_types = {"birth", "death"}
-        merged_entries = []
-        event_identity_keys = set()
-
-        for sequence, structured_event in enumerate(turn_result["events"]):
-            event_year = structured_event.get("year")
-            event_month = structured_event.get("month")
-            event_text = structured_event.get("text", "")
-            event_key = (event_year, event_month, event_text)
-            event_identity_keys.add(event_key)
-            merged_entries.append(
-                {
-                    "sort_key": (
-                        event_year if event_year is not None else -1,
-                        event_month if event_month is not None else -1,
-                        sequence,
-                        0,
-                    ),
-                    "kind": "event",
-                    "text": event_text,
-                    "year": event_year,
-                    "month": event_month,
-                    "record_type": None,
-                }
-            )
-
-        structural_sequence = len(merged_entries)
-        for record in new_records:
-            if record.get("record_type") in HIDDEN_PLAYER_RECORD_TYPES:
-                continue
-            if record.get("record_type") not in visible_record_types:
-                continue
-            if self.get_focused_actor_id() not in (record.get("actor_ids") or []):
-                continue
-
-            record_key = (
-                record.get("year"),
-                record.get("month"),
-                record.get("text"),
-            )
-            if record_key in event_identity_keys:
-                continue
-
-            merged_entries.append(
-                {
-                    "sort_key": (
-                        record.get("year") if record.get("year") is not None else -1,
-                        record.get("month") if record.get("month") is not None else -1,
-                        structural_sequence,
-                        1,
-                    ),
-                    "kind": "event",
-                    "text": record.get("text", ""),
-                    "year": record.get("year"),
-                    "month": record.get("month"),
-                    "record_type": record.get("record_type"),
-                }
-            )
-            structural_sequence += 1
-
-        merged_entries.sort(key=lambda entry: entry["sort_key"])
-        for entry in merged_entries:
-            entry_year = entry.get("year")
-            if entry_year is not None and entry_year > self.last_logged_year:
-                for year in range(self.last_logged_year + 1, entry_year + 1):
-                    self.append_event_log_entry(
-                        "year_header",
-                        f"Year {year}",
-                        year=year,
-                    )
-                self.last_logged_year = entry_year
-
-            self.append_event_log_entry(
-                entry["kind"],
-                entry["text"],
-                year=entry.get("year"),
-                month=entry.get("month"),
-                record_type=entry.get("record_type"),
-            )
+        self.event_log_controller.append_turn(
+            self,
+            turn_result,
+            months_to_advance,
+            new_records,
+            suppress_skip_marker=suppress_skip_marker,
+        )
 
     def maybe_offer_identity_choice(self):
         actor = self.get_focused_actor()
