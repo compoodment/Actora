@@ -17,6 +17,13 @@ from mechanics import (
     SKIP_MONTH_PRESETS,
     get_monthly_free_hours,
 )
+from views.browser import (
+    HIDDEN_PLAYER_RECORD_TYPES,
+    build_lineage_row,
+    build_record_summary_lines,
+    filter_player_facing_records,
+    get_social_tier_label,
+)
 from views.history import (
     build_event_log_entry,
     build_live_feed_lines,
@@ -79,7 +86,6 @@ PROFILE_CATEGORIES = [
     "mood", "needs", "skills", "location", "relationships",
 ]
 MAIN_LEFT_SECTION_KEYS = ("identity", "location", "statistics", "relationships")
-HIDDEN_PLAYER_RECORD_TYPES = {"family_bootstrap", "actor_entry"}
 BACK_KEYS = {
     curses.KEY_BACKSPACE, 127, 8,
 }
@@ -159,40 +165,6 @@ def build_snapshot_sections(snapshot_data):
         {"key": key, "title": title, "lines": lines}
         for key, title, lines in section_pairs
     ]
-
-
-def build_lineage_row(entry):
-    """Builds one compact lineage browser row."""
-    return f"{entry['full_name']} · {entry['relationship_label']} · Age {entry['age']}"
-
-
-def filter_player_facing_records(records):
-    """Removes implementation-scaffolding records from player-facing surfaces."""
-    return [
-        record
-        for record in records
-        if record.get("record_type") not in HIDDEN_PLAYER_RECORD_TYPES
-    ]
-
-
-def build_record_summary_lines(records):
-    """Builds compact record lines for inspectability surfaces."""
-    filtered_records = filter_player_facing_records(records)
-    if not filtered_records:
-        return ["No records found."]
-    return [
-        f"[{record['year'] or 0:04d}-{record['month'] or 0:02d}] {record['text']}"
-        for record in filtered_records
-    ]
-
-
-def _get_social_tier_label(closeness):
-    """Returns the display tier label for a social link closeness value."""
-    if closeness >= 70:
-        return "Close Friend"
-    if closeness >= 30:
-        return "Friend"
-    return "Acquaintance"
 
 
 class ActoraTUI:
@@ -1001,7 +973,7 @@ class ActoraTUI:
                 continue
             meta = link.get("metadata", {})
             closeness = meta.get("closeness", 0)
-            tier = _get_social_tier_label(closeness)
+            tier = get_social_tier_label(closeness)
             already_queued = any(
                 a["action_type"] == "spend_time" and a["target_actor_id"] == target_id
                 for a in self.active_actions
@@ -1072,7 +1044,7 @@ class ActoraTUI:
                         continue
                     meta = lnk.get("metadata", {})
                     closeness = meta.get("closeness", 0)
-                    tier = _get_social_tier_label(closeness)
+                    tier = get_social_tier_label(closeness)
                     lines.append(f"  {target_actor.get_full_name()} · {tier}")
             lines.append("")
         if lines and lines[-1] == "":
@@ -2338,7 +2310,7 @@ class ActoraTUI:
                             continue
                         meta = lnk.get("metadata", {})
                         closeness = meta.get("closeness", 0)
-                        tier = _get_social_tier_label(closeness)
+                        tier = get_social_tier_label(closeness)
                         det_lines.append(f"  {target_actor.get_full_name()} · {tier}")
                 else:
                     det_lines.append(" No active social connections yet.")
