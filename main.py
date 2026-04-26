@@ -37,6 +37,7 @@ from screens.profile import ProfileScreen
 from screens.relationships import RelationshipBrowserScreen
 from screens.skip_time import SkipTimeScreen
 from choice_controller import ChoiceController
+from shell_controller import ShellController
 from shell_renderer import ShellRenderer
 from views.profile import build_person_card_lines
 from ui import (
@@ -119,6 +120,7 @@ class ActoraTUI:
         self.screen_name = "main"
         self.running = True
         self.shell_renderer = ShellRenderer()
+        self.shell_controller = ShellController(BACK_KEYS)
         self.choice_controller = ChoiceController(
             BACK_KEYS,
             SEXUALITY_OPTION_LABELS,
@@ -896,21 +898,10 @@ class ActoraTUI:
         self.last_message = "Browsing relationships."
 
     def _open_menu_selection(self):
-        """Opens the screen selected in the menu popup."""
-        self.menu_popup_active = False
-        if self.menu_selection == 0:
-            self.open_browser("relationships")
-        elif self.menu_selection == 1:
-            self.open_actions()
-        elif self.menu_selection == 2:
-            self.open_profile()
+        self.shell_controller.open_menu_selection(self)
 
     def _open_options_selection(self):
-        if self.options_selection == 0:
-            self.options_popup_active = False
-            self.quit_confirmation_active = True
-            self.quit_from_options = True
-        # Items 1 and 2 (Help, Settings) are not yet implemented — do nothing
+        self.shell_controller.open_options_selection(self)
 
     def open_browser(self, tab="relationships"):
         """Opens the unified Browser screen on the specified tab."""
@@ -1165,47 +1156,7 @@ class ActoraTUI:
 
     def handle_key(self, key):
         self.sync_focus_state()
-        if self.quit_confirmation_active:
-            if key in BACK_KEYS or key == 27:
-                self.quit_confirmation_active = False
-                if self.quit_from_options:
-                    self.quit_from_options = False
-                    self.options_popup_active = True
-                return
-            if key in (curses.KEY_ENTER, 10, 13):
-                self.running = False
-                return
-            return
-        if self.options_popup_active:
-            OPTIONS_ITEMS = ["Quit Game", "Help / Controls", "Settings"]
-            if key == 27:
-                self.options_popup_active = False
-            elif key in (curses.KEY_UP, ord("w"), ord("W")):
-                self.options_selection = max(0, self.options_selection - 1)
-            elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
-                self.options_selection = min(len(OPTIONS_ITEMS) - 1, self.options_selection + 1)
-            elif key in (curses.KEY_ENTER, 10, 13):
-                self._open_options_selection()
-            return
-        if self.menu_popup_active:
-            MENU_ITEMS = ["Browser", "Actions", "Profile"]
-            if key in BACK_KEYS:
-                self.menu_popup_active = False
-            elif key in (curses.KEY_UP, ord("w"), ord("W")):
-                self.menu_selection = max(0, self.menu_selection - 1)
-            elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
-                self.menu_selection = min(len(MENU_ITEMS) - 1, self.menu_selection + 1)
-            elif key == ord("1"):
-                self.menu_selection = 0
-                self._open_menu_selection()
-            elif key == ord("2"):
-                self.menu_selection = 1
-                self._open_menu_selection()
-            elif key == ord("3"):
-                self.menu_selection = 2
-                self._open_menu_selection()
-            elif key in (curses.KEY_ENTER, 10, 13):
-                self._open_menu_selection()
+        if self.shell_controller.handle_modal_key(self, key):
             return
         if self.pending_choice is not None:
             self.handle_pending_choice_key(key)
