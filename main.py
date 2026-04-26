@@ -19,8 +19,6 @@ from mechanics import (
 )
 from views.browser import (
     HIDDEN_PLAYER_RECORD_TYPES,
-    build_lineage_row,
-    build_record_summary_lines,
     filter_player_facing_records,
     get_social_tier_label,
 )
@@ -30,9 +28,10 @@ from views.history import (
     expand_render_lines,
     format_history_entry,
 )
-from views.shell import build_death_lines, build_screen_chrome
+from views.shell import build_screen_chrome
 from screens.actions import ActionsScreen
 from screens.browser import BrowserScreen
+from screens.death import DeathContinuationScreen
 from screens.history import HistoryScreen
 from screens.lineage import LineageScreen
 from screens.profile import ProfileScreen
@@ -185,6 +184,7 @@ class ActoraTUI:
         self.running = True
         self.lineage_selection = 0
         self.continuation_selection = 0
+        self.death_screen = DeathContinuationScreen(BACK_KEYS)
         self.skip_selection = 0
         self.skip_custom_value = ""
         self.skip_time_screen = SkipTimeScreen(
@@ -1255,55 +1255,16 @@ class ActoraTUI:
         self.actions_screen.handle_key(self, key)
 
     def handle_death_ack_key(self, key):
-        if key == 27:
-            self.options_popup_active = True
-            self.options_selection = 0
-            return
-        if key in (ord("q"), ord("Q")):
-            return  # Q blocked on death screen — use Esc for Options
-        elif key in (curses.KEY_ENTER, 10, 13):
-            self.acknowledge_death()
+        self.death_screen.handle_death_ack_key(self, key)
 
     def handle_skip_time_key(self, key):
         self.skip_time_screen.handle_key(self, key)
 
     def handle_continuation_key(self, key):
-        if key == 27:
-            self.options_popup_active = True
-            self.options_selection = 0
-            return
-        continuity_state = self.get_continuity_state()
-        candidates = continuity_state["continuity_candidates"]
-        if key in (ord("q"), ord("Q")):
-            return  # Q blocked on continuation screen — use Esc for Options
-        if key in BACK_KEYS:
-            self.screen_name = "death_ack"
-            self.last_message = "Returned to death summary."
-            return
-        if not candidates:
-            return
-        if key in (curses.KEY_UP, ord("w"), ord("W")):
-            self.continuation_selection = max(0, self.continuation_selection - 1)
-        elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
-            self.continuation_selection = min(
-                len(candidates) - 1,
-                self.continuation_selection + 1,
-            )
-        elif key in (curses.KEY_ENTER, 10, 13):
-            self.open_continuation_detail()
+        self.death_screen.handle_continuation_key(self, key)
 
     def handle_continuation_detail_key(self, key):
-        if key == 27:
-            self.options_popup_active = True
-            self.options_selection = 0
-            return
-        if key in (ord("q"), ord("Q")):
-            return  # Q blocked on continuation screen — use Esc for Options
-        elif key in BACK_KEYS:
-            self.screen_name = "continuation"
-            self.last_message = "Returned to available lives."
-        elif key in (curses.KEY_ENTER, 10, 13):
-            self.choose_continuation()
+        self.death_screen.handle_continuation_detail_key(self, key)
 
     def handle_key(self, key):
         self.sync_focus_state()
@@ -1699,120 +1660,13 @@ class ActoraTUI:
         self.skip_time_screen.render(self, stdscr, height, width)
 
     def render_death_ack(self, stdscr, height, width):
-        continuity_state = self.get_continuity_state()
-        content_left, content_width = get_content_bounds(width, max_width=74)
-        death_detail = self.build_actor_inspect_detail(
-            self.get_focused_actor_id(),
-            relationship_label="Self",
-        )
-        lines = [
-            "",
-            center_text("DEATH", content_width),
-            "",
-        ]
-        lines.extend(build_death_lines(continuity_state))
-        if death_detail is not None:
-            lines.extend(
-                [
-                    "",
-                    "Life Summary",
-                    f"Age at death: {death_detail['age']}",
-                    f"Place at death: {death_detail['current_place_name']}",
-                    (
-                        "At death: "
-                        f"Health {death_detail['health']}   Happiness {death_detail['happiness']}   "
-                        f"Intelligence {death_detail['intelligence']}   Money ${death_detail['money']}"
-                    ),
-                    "",
-                    "Recent Records",
-                ]
-            )
-            lines.extend(build_record_summary_lines(death_detail["records"]))
-        lines.extend(
-            [
-                "",
-                center_text("Press Enter to continue.", content_width),
-            ]
-        )
-        draw_text_block(
-            stdscr,
-            5,
-            content_left,
-            content_width,
-            height - 7,
-            lines,
-        )
+        self.death_screen.render_death_ack(self, stdscr, height, width)
 
     def render_continuation(self, stdscr, height, width):
-        continuity_state = self.get_continuity_state()
-        candidates = continuity_state["continuity_candidates"]
-        content_left, content_width = get_content_bounds(width, max_width=96)
-        lines = [
-            "",
-        ]
-        highlight_index = None
-
-        if not candidates:
-            lines.append("No living family members were found.")
-        else:
-            self.continuation_selection = max(
-                0,
-                min(self.continuation_selection, len(candidates) - 1),
-            )
-            for index, candidate in enumerate(candidates):
-                line = (
-                    f"{candidate['full_name']} · {candidate['relationship_label']} · "
-                    f"Age {candidate['age']} · {candidate.get('current_place_name') or 'Unknown'}"
-                )
-                if index == self.continuation_selection:
-                    highlight_index = len(lines)
-                lines.append(line)
-
-        draw_text_block(stdscr, self.HEADER_ROWS, content_left, content_width, height - self.HEADER_ROWS - self.FOOTER_ROWS, lines, highlight_index=highlight_index)
+        self.death_screen.render_continuation(self, stdscr, height, width)
 
     def render_continuation_detail(self, stdscr, height, width):
-        continuity_state = self.get_continuity_state()
-        candidates = continuity_state["continuity_candidates"]
-        selected_candidate = next(
-            (
-                candidate
-                for candidate in candidates
-                if candidate["actor_id"] == self.selected_continuation_actor_id
-            ),
-            None,
-        )
-        if selected_candidate is None:
-            self.screen_name = "continuation"
-            self.last_message = "This person is no longer available."
-            self.render_continuation(stdscr, height, width)
-            return
-
-        detail = self.build_actor_inspect_detail(
-            selected_candidate["actor_id"],
-            relationship_label=selected_candidate["relationship_label"],
-        )
-        if detail is None:
-            content_left, content_width = get_content_bounds(width, max_width=86)
-            render_lines(stdscr, ["Actor data unavailable."], 0, content_left, height, width)
-            return
-        content_left, content_width = get_content_bounds(width, max_width=86)
-        lines = [
-            center_text("CONTINUATION DETAIL", content_width),
-            "",
-            detail["full_name"],
-            (
-                f"{detail['relationship_label']}   Age {detail['age']}   "
-                f"Location: {detail['current_place_name']}"
-            ),
-            (
-                f"Health {detail['health']}   Happiness {detail['happiness']}   "
-                f"Intelligence {detail['intelligence']}   Money ${detail['money']}"
-            ),
-            "",
-            "Recent Records",
-        ]
-        lines.extend(build_record_summary_lines(detail["records"]))
-        draw_text_block(stdscr, self.HEADER_ROWS, content_left, content_width, height - self.HEADER_ROWS - self.FOOTER_ROWS, lines)
+        self.death_screen.render_continuation_detail(self, stdscr, height, width)
 
     def render(self, stdscr):
         stdscr.erase()
