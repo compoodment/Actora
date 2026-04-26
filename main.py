@@ -32,6 +32,7 @@ from views.history import (
 )
 from views.shell import build_death_lines, build_screen_chrome
 from screens.history import HistoryScreen
+from screens.lineage import LineageScreen
 from screens.profile import ProfileScreen
 from views.profile import build_person_card_lines
 from ui import (
@@ -187,6 +188,12 @@ class ActoraTUI:
         self.lineage_filter_mode = "all"
         self.lineage_search_text = ""
         self.lineage_search_active = False
+        self.lineage_screen = LineageScreen(
+            LINEAGE_FILTER_LABELS,
+            BACK_KEYS,
+            ADVANCE_THROTTLE_SECONDS,
+            MAIN_IDLE_MESSAGE,
+        )
         self.main_left_scroll = 0
         self.profile_scroll = 0
         self.profile_selected_row = 0
@@ -1197,68 +1204,7 @@ class ActoraTUI:
         self.profile_screen.handle_key(self, key)
 
     def handle_lineage_key(self, key):
-        if self.lineage_search_active:
-            if key == 27:
-                self.lineage_search_active = False
-                self.last_message = "Returned to lineage."
-                return
-            if key in (curses.KEY_ENTER, 10, 13):
-                self.lineage_search_active = False
-                self.lineage_selection = 0
-                self.selected_lineage_actor_id = None
-                if self.lineage_search_text:
-                    self.last_message = f"Lineage search: {self.lineage_search_text}."
-                else:
-                    self.last_message = "Lineage search cleared."
-                return
-            if key == curses.KEY_BACKSPACE or key in (127, 8):
-                if self.lineage_search_text:
-                    self.lineage_search_text = self.lineage_search_text[:-1]
-                    self.lineage_selection = 0
-                    self.selected_lineage_actor_id = None
-                return
-            if 32 <= key <= 126 and len(self.lineage_search_text) < 24:
-                self.lineage_search_text += chr(key)
-                self.lineage_selection = 0
-                self.selected_lineage_actor_id = None
-                return
-
-        lineage_entries = self.get_lineage_entries()
-        if key in (ord("q"), ord("Q")):
-            now = time.monotonic()
-            if now - self.last_advance_time < ADVANCE_THROTTLE_SECONDS:
-                return
-            self.last_advance_time = now
-            self.advance_one_month()
-            return
-        if key in (ord("e"), ord("E")):
-            self.open_skip_time()
-            return
-        if key in BACK_KEYS:
-            self.screen_name = "main"
-            self.lineage_search_active = False
-            self.last_message = MAIN_IDLE_MESSAGE
-            return
-        if key in (ord("a"), ord("A")):
-            self.set_lineage_filter_mode("all")
-            return
-        if key in (ord("d"), ord("D")):
-            self.set_lineage_filter_mode("dead")
-            return
-        if key == ord("/"):
-            self.lineage_search_active = True
-            self.last_message = "Type to search lineage names. Enter confirms. Esc cancels search."
-            return
-        if not lineage_entries:
-            return
-        if key in (curses.KEY_UP, ord("w"), ord("W")):
-            self.lineage_selection = max(0, self.lineage_selection - 1)
-            self.selected_lineage_actor_id = lineage_entries[self.lineage_selection]["actor_id"]
-        elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
-            self.lineage_selection = min(len(lineage_entries) - 1, self.lineage_selection + 1)
-            self.selected_lineage_actor_id = lineage_entries[self.lineage_selection]["actor_id"]
-        elif key in (curses.KEY_ENTER, 10, 13):
-            self.last_message = f"Inspecting {lineage_entries[self.lineage_selection]['full_name']}."
+        self.lineage_screen.handle_key(self, key)
 
     def handle_relationship_browser_key(self, key, *, back_to="main"):
         """Handles keys for the relationship browser tab/screen.
@@ -1888,73 +1834,7 @@ class ActoraTUI:
         self.profile_screen.render(self, stdscr, height, width)
 
     def render_lineage(self, stdscr, height, width):
-        browser_state = self.get_lineage_browser_state()
-        lineage_entries = browser_state["entries"]
-        selected_detail = browser_state["selected_detail"]
-
-        top = self.HEADER_ROWS + self.BROWSER_CHROME_ROWS
-        body_height = height - self.HEADER_ROWS - self.BROWSER_CHROME_ROWS - self.FOOTER_ROWS
-        content_left, content_width = get_content_bounds(width, max_width=112)
-        left_width, right_left, right_width = split_centered_columns(content_left, content_width)
-        filter_label = LINEAGE_FILTER_LABELS[browser_state["filter_mode"]]
-        left_lines = [
-            f"Archive • {filter_label} • {browser_state['result_count']} result(s)",
-            self.get_lineage_search_status(),
-            "",
-        ]
-        highlight_index = None
-        if not lineage_entries:
-            left_lines.append("No lineage entries match the current filter/search.")
-        else:
-            for index, entry in enumerate(lineage_entries):
-                if index == self.lineage_selection:
-                    highlight_index = len(left_lines)
-                left_lines.append(build_lineage_row(entry))
-
-        draw_truncated_block(
-            stdscr,
-            top,
-            content_left,
-            left_width,
-            body_height,
-            left_lines,
-            highlight_index=highlight_index,
-        )
-
-        divider_x = right_left - 2
-        draw_vertical_divider(stdscr, top, divider_x, body_height)
-
-        if selected_detail is None:
-            right_lines = [
-                center_text("SELECTED PERSON", right_width),
-                "",
-                "No lineage detail available.",
-                "",
-                "Try another filter or search.",
-            ]
-        else:
-            summary = selected_detail["summary"]
-            records = selected_detail["records"]
-            right_lines = []
-            right_lines.append(center_text("SELECTED PERSON", right_width))
-            right_lines.append("")
-            right_lines.extend(build_person_card_lines(summary))
-            right_lines.extend(
-                [
-                    "",
-                    "Identity",
-                    f"Species: {summary['species']}",
-                    f"Sex: {summary['sex']}",
-                    f"Gender: {summary['gender']}",
-                    f"Condition: Health {summary['health']}   Happiness {summary['happiness']}   Intelligence {summary['intelligence']}",
-                    f"Resources: ${summary['money']}",
-                    "",
-                    "Recent Records",
-                ]
-            )
-            right_lines.extend(build_record_summary_lines(records))
-
-        draw_text_block(stdscr, top, right_left, right_width, body_height, right_lines)
+        self.lineage_screen.render(self, stdscr, height, width)
 
     def render_relationship_browser(self, stdscr, height, width):
         browser_state = self.get_relationship_browser_state()
