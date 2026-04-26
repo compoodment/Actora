@@ -3,7 +3,6 @@ import random
 from uuid import uuid4
 
 
-from events import get_meeting_event_for_player
 from identity import prepare_parent_identity_context, generate_parent_identity_from_context
 from mechanics import (
     EXERCISE_SUBTYPES,
@@ -36,6 +35,7 @@ from screens.skip_time import SkipTimeScreen
 from choice_controller import ChoiceController
 from continuation_controller import ContinuationController
 from event_log_controller import EventLogController
+from life_event_controller import LifeEventController
 from shell_controller import ShellController
 from shell_renderer import ShellRenderer
 from time_controller import TimeController
@@ -127,6 +127,11 @@ class ActoraTUI:
         )
         self.continuation_controller = ContinuationController()
         self.event_log_controller = EventLogController()
+        self.life_event_controller = LifeEventController(
+            MEETING_EVENT_COOLDOWN_MONTHS,
+            GENDER_IDENTITY_OPTIONS,
+            SEXUALITY_OPTION_LABELS,
+        )
         self.time_controller = TimeController()
         self.lineage_selection = 0
         self.continuation_selection = 0
@@ -385,81 +390,10 @@ class ActoraTUI:
         )
 
     def maybe_offer_identity_choice(self):
-        actor = self.get_focused_actor()
-        if actor is None or not actor.is_alive():
-            return False
-
-        lifecycle = actor.get_lifecycle_state(self.world.current_year, self.world.current_month)
-        age_years = lifecycle["age_years"]
-        current_gender = actor.gender or "Other"
-
-        if self.identity_popup_suppressed_for_resumed_adult:
-            return False
-
-        if age_years >= self.gender_choice_age and not self.gender_choice_offered:
-            selected_index = (
-                GENDER_IDENTITY_OPTIONS.index(current_gender)
-                if current_gender in GENDER_IDENTITY_OPTIONS
-                else 0
-            )
-            self.pending_choice = {
-                "title": "A moment of self-reflection",
-                "text": "As you grow, you find yourself thinking more about who you are.",
-                "question": "Your gender identity feels like:",
-                "options": list(GENDER_IDENTITY_OPTIONS),
-                "selected_index": selected_index,
-                "skippable": True,
-                "choice_id": "gender_identity",
-                "default_value": current_gender,
-            }
-            self.gender_choice_offered = True
-            self.last_message = "A personal choice needs your attention."
-            return True
-
-        if age_years >= self.sexuality_choice_age and not self.sexuality_choice_offered:
-            self.pending_choice = {
-                "title": "A new kind of awareness",
-                "text": "You have started noticing things about yourself you had not thought about before.",
-                "question": "You feel attracted to:",
-                "options": [label for label, _ in SEXUALITY_OPTION_LABELS],
-                "selected_index": 0,
-                "skippable": True,
-                "choice_id": "sexuality",
-                "default_value": None,
-            }
-            self.sexuality_choice_offered = True
-            self.last_message = "A personal choice needs your attention."
-            return True
-
-        return False
+        return self.life_event_controller.maybe_offer_identity_choice(self)
 
     def maybe_offer_meeting_event(self):
-        """Fires a meeting-event popup choice when conditions and cooldown allow."""
-        actor = self.get_focused_actor()
-        if actor is None or not actor.is_alive():
-            return False
-
-        lifecycle = actor.get_lifecycle_state(self.world.current_year, self.world.current_month)
-        current_total_months = self.world.current_year * 12 + self.world.current_month
-        if current_total_months - self.meeting_event_last_total_months < MEETING_EVENT_COOLDOWN_MONTHS:
-            return False
-
-        meeting_event = get_meeting_event_for_player(lifecycle)
-        if meeting_event is None:
-            return False
-
-        self.meeting_event_last_total_months = current_total_months
-        self.pending_choice = {
-            "title": "Someone new",
-            "text": meeting_event["text"],
-            "question": "Do you want to introduce yourself?",
-            "options": ["Introduce yourself", "Keep to yourself"],
-            "selected_index": 0,
-            "skippable": False,
-            "choice_id": "meeting_npc",
-        }
-        self.last_message = "You notice someone nearby."
-        return True
+        return self.life_event_controller.maybe_offer_meeting_event(self)
 
     def resolve_choice(self, choice_id, selected_value):
         self.choice_controller.resolve_choice(self, choice_id, selected_value)
