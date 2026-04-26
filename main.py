@@ -31,6 +31,7 @@ from views.history import (
     format_history_entry,
 )
 from views.shell import build_death_lines, build_screen_chrome
+from screens.history import HistoryScreen
 from screens.profile import ProfileScreen
 from views.profile import build_person_card_lines
 from ui import (
@@ -202,6 +203,11 @@ class ActoraTUI:
         self.history_scroll = 0
         self.history_search_active = False
         self.history_search_value = ""
+        self.history_screen = HistoryScreen(
+            BACK_KEYS,
+            ADVANCE_THROTTLE_SECONDS,
+            MAIN_IDLE_MESSAGE,
+        )
         self.selected_continuation_actor_id = None
         self.last_message = MAIN_IDLE_MESSAGE
         self.event_log = []
@@ -1185,47 +1191,7 @@ class ActoraTUI:
             self.scroll_main_left(1)
 
     def handle_history_key(self, key):
-        if self.history_search_active:
-            if key == 27:
-                self.history_search_active = False
-                self.history_search_value = ""
-                self.last_message = "Year jump canceled."
-                return
-            if key in (curses.KEY_ENTER, 10, 13):
-                typed_year = int(self.history_search_value) if self.history_search_value else 1
-                self.jump_history_to_year(typed_year)
-                self.history_search_active = False
-                self.history_search_value = ""
-                return
-            if key == curses.KEY_BACKSPACE or key in (127, 8):
-                self.history_search_value = self.history_search_value[:-1]
-                return
-            if ord("0") <= key <= ord("9") and len(self.history_search_value) < 9:
-                self.history_search_value += chr(key)
-                return
-            return
-
-        if key in (ord("q"), ord("Q")):
-            now = time.monotonic()
-            if now - self.last_advance_time < ADVANCE_THROTTLE_SECONDS:
-                return
-            self.last_advance_time = now
-            self.advance_one_month()
-        elif key in (ord("e"), ord("E")):
-            self.open_skip_time()
-        elif key in BACK_KEYS:
-            self.screen_name = "main"
-            self.history_search_active = False
-            self.history_search_value = ""
-            self.last_message = MAIN_IDLE_MESSAGE
-        elif key == ord("/"):
-            self.history_search_active = True
-            self.history_search_value = ""
-            self.last_message = "Type a year number. Enter jumps. Esc cancels."
-        elif key in (curses.KEY_UP, ord("w"), ord("W")):
-            self.history_scroll = max(0, self.history_scroll - 1)
-        elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
-            self.history_scroll += 1
+        self.history_screen.handle_key(self, key)
 
     def handle_profile_key(self, key):
         self.profile_screen.handle_key(self, key)
@@ -2082,37 +2048,7 @@ class ActoraTUI:
         draw_text_block(stdscr, top, detail_left, detail_width, body_height, right_lines)
 
     def render_history(self, stdscr, height, width):
-        top = self.HEADER_ROWS + self.BROWSER_CHROME_ROWS
-        body_height = height - self.HEADER_ROWS - self.BROWSER_CHROME_ROWS - self.FOOTER_ROWS
-        self._history_body_height = body_height
-        content_left, content_width = get_content_bounds(width, max_width=104)
-        self._history_content_width = content_width
-        history_lines = expand_render_lines(self.get_history_lines(content_width), content_width)
-        search_status = self.get_history_search_status()
-        if search_status:
-            history_lines = [search_status, ""] + history_lines
-        content_body_height = body_height
-        if len(history_lines) > body_height:
-            content_body_height = max(1, body_height - 1)
-        visible_lines, self.history_scroll, _, total_lines = get_scroll_window(
-            history_lines,
-            content_body_height,
-            self.history_scroll,
-        )
-        draw_text_block(stdscr, top, content_left, content_width, content_body_height, visible_lines)
-
-        if total_lines > content_body_height:
-            scroll_label = (
-                f"History: {self.history_scroll + 1}-"
-                f"{self.history_scroll + len(visible_lines)} / {total_lines}"
-            )
-            stdscr.addnstr(
-                min(height - 3, top + content_body_height),
-                content_left,
-                truncate_for_width(scroll_label, content_width),
-                content_width,
-                curses.A_DIM,
-            )
+        self.history_screen.render(self, stdscr, height, width)
 
     def render_browser(self, stdscr, height, width):
         """Renders the unified Browser screen with Relationships and History tabs."""
