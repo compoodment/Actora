@@ -32,6 +32,7 @@ from screens.main import MainScreen, build_snapshot_sections
 from screens.profile import ProfileScreen
 from screens.relationships import RelationshipBrowserScreen
 from screens.skip_time import SkipTimeScreen
+from browser_state_controller import BrowserStateController
 from choice_controller import ChoiceController
 from continuation_controller import ContinuationController
 from event_log_controller import EventLogController
@@ -119,6 +120,11 @@ class ActoraTUI:
         self.player_id = player_id
         self.screen_name = "main"
         self.running = True
+        self.browser_state_controller = BrowserStateController(
+            LINEAGE_RECORD_LIMIT,
+            LINEAGE_FILTER_LABELS,
+            REL_FILTER_OPTIONS,
+        )
         self.shell_renderer = ShellRenderer()
         self.shell_controller = ShellController(BACK_KEYS)
         self.choice_controller = ChoiceController(
@@ -253,119 +259,28 @@ class ActoraTUI:
             self.screen_name = "death_ack"
 
     def get_lineage_browser_state(self):
-        browser_state = self.world.get_lineage_browser_data_for(
-            self.get_focused_actor_id(),
-            filter_mode=self.lineage_filter_mode,
-            search_text=self.lineage_search_text,
-            recent_record_limit=LINEAGE_RECORD_LIMIT,
-        )
-
-        entries = browser_state["entries"]
-        if not entries:
-            self.lineage_selection = 0
-            self.selected_lineage_actor_id = None
-            browser_state["selected_detail"] = None
-            return browser_state
-
-        if self.selected_lineage_actor_id is not None:
-            matching_index = next(
-                (
-                    index
-                    for index, entry in enumerate(entries)
-                    if entry["actor_id"] == self.selected_lineage_actor_id
-                ),
-                None,
-            )
-            if matching_index is not None:
-                self.lineage_selection = matching_index
-            else:
-                self.lineage_selection = 0
-                self.selected_lineage_actor_id = entries[0]["actor_id"]
-        else:
-            self.lineage_selection = max(0, min(self.lineage_selection, len(entries) - 1))
-            self.selected_lineage_actor_id = entries[self.lineage_selection]["actor_id"]
-
-        browser_state["selected_detail"] = self.world.get_lineage_detail_for(
-            self.get_focused_actor_id(),
-            self.selected_lineage_actor_id,
-            recent_record_limit=LINEAGE_RECORD_LIMIT,
-        )
-        return browser_state
+        return self.browser_state_controller.get_lineage_browser_state(self)
 
     def get_lineage_entries(self):
-        return self.get_lineage_browser_state()["entries"]
+        return self.browser_state_controller.get_lineage_entries(self)
 
     def get_lineage_detail(self):
-        return self.get_lineage_browser_state()["selected_detail"]
+        return self.browser_state_controller.get_lineage_detail(self)
 
     def set_lineage_filter_mode(self, filter_mode):
-        self.lineage_filter_mode = filter_mode
-        self.lineage_selection = 0
-        self.selected_lineage_actor_id = None
-        self.last_message = f"Lineage filter: {LINEAGE_FILTER_LABELS[filter_mode]}."
+        self.browser_state_controller.set_lineage_filter_mode(self, filter_mode)
 
     def clear_lineage_search(self):
-        if self.lineage_search_text:
-            self.lineage_search_text = ""
-            self.lineage_selection = 0
-            self.selected_lineage_actor_id = None
-            self.last_message = "Lineage search cleared."
+        self.browser_state_controller.clear_lineage_search(self)
 
     def get_lineage_search_status(self):
-        if self.lineage_search_active:
-            return f"Search: {self.lineage_search_text}_"
-        if self.lineage_search_text:
-            return f"Search: {self.lineage_search_text}"
-        return "Search: off"
+        return self.browser_state_controller.get_lineage_search_status(self)
 
     def get_rel_browser_search_status(self):
-        """Returns the search status line for the relationship browser, or None."""
-        if self.rel_browser_search_active:
-            return f"Search: {self.rel_browser_search_text}_"
-        if self.rel_browser_search_text:
-            return f"Search: {self.rel_browser_search_text}"
-        return None
+        return self.browser_state_controller.get_rel_browser_search_status(self)
 
     def get_relationship_browser_state(self):
-        focused_actor_id = self.get_focused_actor_id()
-        filter_mode = REL_FILTER_OPTIONS[self.rel_filter_index]
-        browser_state = self.world.get_relationship_browser_data_for(
-            focused_actor_id,
-            filter_mode=filter_mode,
-            search_text=self.rel_browser_search_text,
-            recent_record_limit=LINEAGE_RECORD_LIMIT,
-        )
-        entries = browser_state["entries"]
-        if not entries:
-            self.lineage_selection = 0
-            self.selected_lineage_actor_id = None
-            browser_state["selected_detail"] = None
-            return browser_state
-
-        if self.selected_lineage_actor_id is not None:
-            matching_index = next(
-                (
-                    index
-                    for index, entry in enumerate(entries)
-                    if entry["actor_id"] == self.selected_lineage_actor_id
-                ),
-                None,
-            )
-            if matching_index is not None:
-                self.lineage_selection = matching_index
-            else:
-                self.lineage_selection = 0
-                self.selected_lineage_actor_id = entries[0]["actor_id"]
-        else:
-            self.lineage_selection = max(0, min(self.lineage_selection, len(entries) - 1))
-            self.selected_lineage_actor_id = entries[self.lineage_selection]["actor_id"]
-
-        browser_state["selected_detail"] = self.world.get_relationship_detail_for(
-            focused_actor_id,
-            self.selected_lineage_actor_id,
-            recent_record_limit=LINEAGE_RECORD_LIMIT,
-        )
-        return browser_state
+        return self.browser_state_controller.get_relationship_browser_state(self)
 
     def get_continuity_state(self):
         return self.continuation_controller.get_continuity_state(self)
