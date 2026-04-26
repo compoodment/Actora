@@ -107,11 +107,10 @@ class ChoiceController:
 
         elif choice_id == "select_hang_out_target":
             if selected_value is not None:
-                options_list = (app.pending_choice or {}).get("options", [])
                 try:
-                    selected_idx = options_list.index(selected_value)
+                    selected_idx = (app.pending_choice or {}).get("selected_index", 0)
                     target_actor_id = app.hang_out_actor_ids[selected_idx]
-                except (ValueError, IndexError):
+                except (TypeError, IndexError):
                     app.pending_choice = None
                     return
                 already_queued = any(

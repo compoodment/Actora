@@ -56,6 +56,12 @@ class SkipTimeScreen:
         for preset_months in self.presets:
             label = "month" if preset_months == 1 else "months"
             lines.append(f"{preset_months:>2} {label}")
+        if custom_months is not None:
+            enter_preview = f"Enter will advance {custom_months} months from the custom value."
+        elif app.skip_custom_value:
+            enter_preview = "Enter will reject this custom value. Use a number greater than 0."
+        else:
+            enter_preview = f"Enter will advance {selected_months} months from the selected preset."
         lines.extend(
             [
                 "",
@@ -65,11 +71,7 @@ class SkipTimeScreen:
                     if app.skip_custom_value
                     else "Typed value: none"
                 ),
-                (
-                    f"Enter will advance {custom_months} months from the custom value."
-                    if custom_months is not None
-                    else f"Enter will advance {selected_months} months from the selected preset."
-                ),
+                enter_preview,
             ]
         )
         draw_text_block(

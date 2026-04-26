@@ -20,6 +20,7 @@ class BrowserScreen:
         if not search_active and key == 9:
             if app.browser_tab == "relationships":
                 app.browser_tab = "history"
+                app.history_scroll = 10**9
                 app.last_message = "Browsing event history."
             else:
                 app.browser_tab = "relationships"

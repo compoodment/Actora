@@ -28,7 +28,10 @@ class LineageScreen:
         if app.lineage_search_active:
             if key == 27:
                 app.lineage_search_active = False
-                app.last_message = "Returned to lineage."
+                app.lineage_search_text = ""
+                app.lineage_selection = 0
+                app.selected_lineage_actor_id = None
+                app.last_message = "Lineage search canceled."
                 return
             if key in (curses.KEY_ENTER, 10, 13):
                 app.lineage_search_active = False

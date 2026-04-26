@@ -22,6 +22,9 @@ class RelationshipBrowserScreen:
         if app.rel_browser_search_active:
             if key == 27:
                 app.rel_browser_search_active = False
+                app.rel_browser_search_text = ""
+                app.lineage_selection = 0
+                app.selected_lineage_actor_id = None
                 app.last_message = "Search canceled."
                 return
             if key in (curses.KEY_ENTER, 10, 13):
@@ -63,14 +66,6 @@ class RelationshipBrowserScreen:
             app.rel_browser_search_active = True
             app.last_message = "Type to search names. Enter confirms. Esc cancels."
             return
-        if key == curses.KEY_BACKSPACE or key in (127, 8):
-            if app.rel_browser_search_text:
-                app.rel_browser_search_text = ""
-                app.lineage_selection = 0
-                app.selected_lineage_actor_id = None
-                app.last_message = "Search cleared."
-                return
-
         if app.rel_browser_focus == "filters":
             if key in self.back_keys:
                 app.screen_name = back_to
