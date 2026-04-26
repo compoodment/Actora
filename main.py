@@ -37,6 +37,7 @@ from screens.profile import ProfileScreen
 from screens.relationships import RelationshipBrowserScreen
 from screens.skip_time import SkipTimeScreen
 from choice_controller import ChoiceController
+from continuation_controller import ContinuationController
 from shell_controller import ShellController
 from shell_renderer import ShellRenderer
 from views.profile import build_person_card_lines
@@ -125,6 +126,7 @@ class ActoraTUI:
             BACK_KEYS,
             SEXUALITY_OPTION_LABELS,
         )
+        self.continuation_controller = ContinuationController()
         self.lineage_selection = 0
         self.continuation_selection = 0
         self.death_screen = DeathContinuationScreen(BACK_KEYS)
@@ -360,7 +362,7 @@ class ActoraTUI:
         return browser_state
 
     def get_continuity_state(self):
-        return self.world.build_continuity_state_for(self.get_focused_actor_id())
+        return self.continuation_controller.get_continuity_state(self)
 
     def append_event_log_entry(self, kind, text, *, year=None, month=None, record_type=None):
         """Appends one event-log entry with normalized structure."""
@@ -1026,79 +1028,16 @@ class ActoraTUI:
         return lines
 
     def acknowledge_death(self):
-        continuity_state = self.get_continuity_state()
-        self.continuation_selection = 0
-        self.selected_continuation_actor_id = None
-        self.screen_name = "continuation"
-        if continuity_state["had_continuity_candidates"]:
-            self.last_message = "Choose who to continue as."
-        else:
-            self.last_message = "No one is available to continue."
+        self.continuation_controller.acknowledge_death(self)
 
     def get_selected_continuation_candidate(self):
-        continuity_state = self.get_continuity_state()
-        candidates = continuity_state["continuity_candidates"]
-        if not candidates:
-            return None
-
-        self.continuation_selection = max(
-            0,
-            min(self.continuation_selection, len(candidates) - 1),
-        )
-        return candidates[self.continuation_selection]
+        return self.continuation_controller.get_selected_continuation_candidate(self)
 
     def open_continuation_detail(self):
-        selected_candidate = self.get_selected_continuation_candidate()
-        if selected_candidate is None:
-            return
-        self.selected_continuation_actor_id = selected_candidate["actor_id"]
-        self.screen_name = "continuation_detail"
-        self.last_message = f"Inspecting {selected_candidate['full_name']}."
+        self.continuation_controller.open_continuation_detail(self)
 
     def choose_continuation(self):
-        selected_candidate = self.get_selected_continuation_candidate()
-        if selected_candidate is None:
-            self.running = False
-            return
-
-        successor_actor_id = selected_candidate["actor_id"]
-        handoff_result = self.world.handoff_focus_to_continuation(
-            self.get_focused_actor_id(),
-            successor_actor_id,
-        )
-        self.player_id = successor_actor_id
-        self.last_logged_year = 0
-        self.event_log.append(
-            {
-                "kind": "life_separator",
-                "text": f"New Life: {handoff_result['new_focused_actor_name']}",
-            }
-        )
-        self.pending_choice = None
-        self.remaining_skip_months = 0
-        continued_actor = self.get_focused_actor()
-        continued_lifecycle = (
-            continued_actor.get_lifecycle_state(self.world.current_year, self.world.current_month)
-            if continued_actor is not None
-            else None
-        )
-        self.identity_popup_suppressed_for_resumed_adult = False
-        if continued_actor is not None and continued_lifecycle is not None and continued_lifecycle["age_years"] >= 18:
-            continued_actor.auto_resolve_identity()
-            self.gender_choice_offered = True
-            self.sexuality_choice_offered = True
-            self.identity_popup_suppressed_for_resumed_adult = True
-        else:
-            self.gender_choice_offered = False
-            self.gender_choice_offered = False
-        self.sexuality_choice_offered = False
-        self.gender_choice_age = random.randint(12, 15)
-        self.sexuality_choice_age = random.randint(14, 17)
-        self.meeting_event_last_total_months = 0
-        self.selected_continuation_actor_id = None
-        self.screen_name = "main"
-        self.quit_confirmation_active = False
-        self.last_message = f"Your story continues as {handoff_result['new_focused_actor_name']}."
+        self.continuation_controller.choose_continuation(self)
 
     def handle_pending_choice_key(self, key):
         self.choice_controller.handle_key(self, key)
