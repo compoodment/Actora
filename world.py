@@ -1121,6 +1121,22 @@ class World:
                 break
         return forward_link, reverse_link
 
+    def end_active_social_links_for_actor(self, actor_id, *, reason="death", year=None, month=None):
+        """Marks active social links involving one actor as former and returns changed links."""
+        ended_year = self.current_year if year is None else year
+        ended_month = self.current_month if month is None else month
+        changed_links = []
+        for link in self.get_links(entity_id=actor_id, link_type="social"):
+            meta = link.get("metadata", {})
+            if meta.get("status") != "active":
+                continue
+            meta["status"] = "former"
+            meta["ended_reason"] = reason
+            meta["ended_year"] = ended_year
+            meta["ended_month"] = ended_month
+            changed_links.append(link)
+        return changed_links
+
     def spend_time_with_actor(self, actor_id, target_actor_id, *, closeness_gain=5):
         """Applies a successful spend-time action and returns the surfaced event, or None.
 
@@ -1857,7 +1873,7 @@ class World:
         dead_name = dead_actor.get_full_name() if dead_actor else "Someone"
         for link in self.get_links(source_id=focused_actor_id, target_id=dead_actor_id, link_type="social"):
             meta = link.get("metadata", {})
-            if meta.get("status") != "active":
+            if meta.get("status") != "active" and meta.get("ended_reason") != "death":
                 continue
 
             closeness = meta.get("closeness", 0)
@@ -1898,6 +1914,21 @@ class World:
                 continue
 
             target_id = link.get("target_id")
+            target_actor = self.get_actor(target_id)
+            if target_actor is None or not target_actor.is_alive():
+                meta["status"] = "former"
+                meta["ended_reason"] = "death"
+                meta["ended_year"] = self.current_year
+                meta["ended_month"] = self.current_month
+                for rev_link in self.get_links(source_id=target_id, target_id=focused_actor_id, link_type="social"):
+                    rev_meta = rev_link.get("metadata", {})
+                    if rev_meta.get("status") == "active":
+                        rev_meta["status"] = "former"
+                        rev_meta["ended_reason"] = "death"
+                        rev_meta["ended_year"] = self.current_year
+                        rev_meta["ended_month"] = self.current_month
+                continue
+
             closeness = meta.get("closeness", 0)
             history_months = meta.get("closeness_history_months", 0)
 
@@ -1990,8 +2021,9 @@ class World:
         for link in links:
             link_type = link.get("type")
             if link_type == "social":
-                social_status = link.get("metadata", {}).get("status", "active")
-                if social_status != "active":
+                social_meta = link.get("metadata", {})
+                social_status = social_meta.get("status", "active")
+                if social_status != "active" and social_meta.get("ended_reason") != "death":
                     continue
             valid_links.append(link)
 
@@ -2164,6 +2196,12 @@ class World:
         actor.death_year = transition_year
         actor.death_month = transition_month
         actor.death_reason = transition_reason
+        self.end_active_social_links_for_actor(
+            actor_id,
+            reason="death",
+            year=transition_year,
+            month=transition_month,
+        )
 
         continuity_state = self.build_continuity_state_for(actor_id)
         death_record_text = f"{actor.get_full_name()} died."

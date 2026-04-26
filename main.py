@@ -471,7 +471,13 @@ class ActoraTUI:
         """Opens the hang out overlay to select a friend to spend time with."""
         focused_actor_id = self.get_focused_actor_id()
         social_links = self.world.get_links(source_id=focused_actor_id, link_type="social")
-        active_links = [l for l in social_links if l.get("metadata", {}).get("status") == "active"]
+        active_links = [
+            l
+            for l in social_links
+            if l.get("metadata", {}).get("status") == "active"
+            and (self.world.get_actor(l.get("target_id")) is not None)
+            and self.world.get_actor(l.get("target_id")).is_alive()
+        ]
         if not active_links:
             self.last_message = "No active social connections are available for Hang Out yet."
             return
@@ -579,7 +585,13 @@ class ActoraTUI:
         """Returns the categories and their available actions for the current actor."""
         focused_actor_id = self.get_focused_actor_id()
         social_links = self.world.get_links(source_id=focused_actor_id, link_type="social")
-        active_social = [lnk for lnk in social_links if lnk.get("metadata", {}).get("status") == "active"]
+        active_social = [
+            lnk
+            for lnk in social_links
+            if lnk.get("metadata", {}).get("status") == "active"
+            and (self.world.get_actor(lnk.get("target_id")) is not None)
+            and self.world.get_actor(lnk.get("target_id")).is_alive()
+        ]
         social_actions = []
         if active_social:
             social_actions.append({"id": "hang_out", "label": "Hang Out", "links": active_social, "time_cost": HANG_OUT_TIME_COST})
