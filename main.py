@@ -37,6 +37,7 @@ from screens.history import HistoryScreen
 from screens.lineage import LineageScreen
 from screens.profile import ProfileScreen
 from screens.relationships import RelationshipBrowserScreen
+from screens.skip_time import SkipTimeScreen
 from views.profile import build_person_card_lines
 from ui import (
     center_text,
@@ -186,6 +187,11 @@ class ActoraTUI:
         self.continuation_selection = 0
         self.skip_selection = 0
         self.skip_custom_value = ""
+        self.skip_time_screen = SkipTimeScreen(
+            SKIP_MONTH_PRESETS,
+            BACK_KEYS,
+            MAIN_IDLE_MESSAGE,
+        )
         self.selected_lineage_actor_id = None
         self.lineage_filter_mode = "all"
         self.lineage_search_text = ""
@@ -1259,28 +1265,7 @@ class ActoraTUI:
             self.acknowledge_death()
 
     def handle_skip_time_key(self, key):
-        if key == 27:
-            self.options_popup_active = True
-            self.options_selection = 0
-            return
-        # Q blocked during skip time — user is actively doing a time action
-        if key in (ord("q"), ord("Q")):
-            return  # do nothing
-        if key in BACK_KEYS:
-            self.screen_name = "main"
-            self.last_message = MAIN_IDLE_MESSAGE
-            return
-        if key in (curses.KEY_UP, ord("w"), ord("W")):
-            self.skip_selection = max(0, self.skip_selection - 1)
-        elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
-            self.skip_selection = min(len(SKIP_MONTH_PRESETS) - 1, self.skip_selection + 1)
-        elif key in (curses.KEY_ENTER, 10, 13):
-            self.confirm_skip_selection()
-        elif key == curses.KEY_BACKSPACE or key in (127, 8):
-            self.skip_custom_value = self.skip_custom_value[:-1]
-        elif ord("0") <= key <= ord("9"):
-            if len(self.skip_custom_value) < 4:
-                self.skip_custom_value += chr(key)
+        self.skip_time_screen.handle_key(self, key)
 
     def handle_continuation_key(self, key):
         if key == 27:
@@ -1711,37 +1696,7 @@ class ActoraTUI:
         }
 
     def render_skip_time(self, stdscr, height, width):
-        custom_months = self.get_custom_skip_months()
-        selected_months = self.get_selected_skip_months()
-        content_left, content_width = get_content_bounds(width, max_width=76)
-        lines = [
-            center_text("TIME JUMP", content_width),
-            "",
-            self.last_message,
-            "",
-            "Presets",
-        ]
-        highlight_index = 5 + self.skip_selection
-        for preset_months in SKIP_MONTH_PRESETS:
-            label = "month" if preset_months == 1 else "months"
-            lines.append(f"{preset_months:>2} {label}")
-        lines.extend(
-            [
-                "",
-                "Custom Months",
-                (
-                    f"Typed value: {self.skip_custom_value} months"
-                    if self.skip_custom_value
-                    else "Typed value: none"
-                ),
-                (
-                    f"Enter will advance {custom_months} months from the custom value."
-                    if custom_months is not None
-                    else f"Enter will advance {selected_months} months from the selected preset."
-                ),
-            ]
-        )
-        draw_text_block(stdscr, self.HEADER_ROWS, content_left, content_width, height - self.HEADER_ROWS - self.FOOTER_ROWS, lines, highlight_index=highlight_index)
+        self.skip_time_screen.render(self, stdscr, height, width)
 
     def render_death_ack(self, stdscr, height, width):
         continuity_state = self.get_continuity_state()
