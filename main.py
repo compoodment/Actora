@@ -36,6 +36,7 @@ from screens.main import MainScreen, build_snapshot_sections
 from screens.profile import ProfileScreen
 from screens.relationships import RelationshipBrowserScreen
 from screens.skip_time import SkipTimeScreen
+from choice_controller import ChoiceController
 from shell_renderer import ShellRenderer
 from views.profile import build_person_card_lines
 from ui import (
@@ -118,6 +119,10 @@ class ActoraTUI:
         self.screen_name = "main"
         self.running = True
         self.shell_renderer = ShellRenderer()
+        self.choice_controller = ChoiceController(
+            BACK_KEYS,
+            SEXUALITY_OPTION_LABELS,
+        )
         self.lineage_selection = 0
         self.continuation_selection = 0
         self.death_screen = DeathContinuationScreen(BACK_KEYS)
@@ -1105,31 +1110,7 @@ class ActoraTUI:
         self.last_message = f"Your story continues as {handoff_result['new_focused_actor_name']}."
 
     def handle_pending_choice_key(self, key):
-        # Q and E are blocked while a popup is active — cannot advance or skip during a choice
-        if key in (ord("q"), ord("Q"), ord("e"), ord("E")):
-            return
-
-        if self.pending_choice is None:
-            return
-
-        options = self.pending_choice["options"]
-        selected_index = self.pending_choice["selected_index"]
-        if key in (curses.KEY_UP, ord("w"), ord("W")):
-            self.pending_choice["selected_index"] = max(0, selected_index - 1)
-        elif key in (curses.KEY_DOWN, ord("s"), ord("S")):
-            self.pending_choice["selected_index"] = min(len(options) - 1, selected_index + 1)
-        elif key in (curses.KEY_ENTER, 10, 13):
-            selected_option = options[self.pending_choice["selected_index"]]
-            if self.pending_choice["choice_id"] == "sexuality":
-                selected_value = dict(SEXUALITY_OPTION_LABELS)[selected_option]
-            else:
-                selected_value = selected_option
-            self.resolve_choice(self.pending_choice["choice_id"], selected_value)
-        elif self.pending_choice.get("skippable") and key in BACK_KEYS:
-            self.resolve_choice(
-                self.pending_choice["choice_id"],
-                self.pending_choice.get("default_value"),
-            )
+        self.choice_controller.handle_key(self, key)
 
     def handle_main_key(self, key):
         self.main_screen.handle_key(self, key)
