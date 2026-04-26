@@ -40,3 +40,14 @@ Start with [`docs/guide.md`](docs/guide.md) — it maps everything.
 | [`design.md`](docs/design.md) | How each system should feel |
 | [`codebase.md`](docs/codebase.md) | What's actually implemented |
 | [`changelog.md`](docs/changelog.md) | Version history |
+| [`controls.md`](docs/controls.md) | Keybinds and controls |
+| [`screens.md`](docs/screens.md) | UI screens and layouts |
+
+### Internal
+
+| | |
+|---|---|
+| [`rules.md`](docs/internal/rules.md) | Internal logic rules |
+| [`decisions.md`](docs/internal/decisions.md) | Architecture decisions |
+| [`bugs.md`](docs/internal/bugs.md) | Known bugs |
+| [`backlog.md`](docs/internal/backlog.md) | Internal backlog |
