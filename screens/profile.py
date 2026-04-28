@@ -32,15 +32,7 @@ class ProfileScreen:
                 app.options_popup_active = True
                 app.options_selection = 0
                 return
-            if key in (ord("q"), ord("Q")):
-                now = time.monotonic()
-                if now - app.last_advance_time < self.advance_throttle_seconds:
-                    return
-                app.last_advance_time = now
-                app.advance_one_month()
-                return
-            if key in (ord("e"), ord("E")):
-                app.open_skip_time()
+            if key in (ord("q"), ord("Q"), ord("e"), ord("E")):
                 return
             popup_data = build_profile_popup_render_data(
                 app.profile_popup_category or self.categories[app.profile_selected_row],

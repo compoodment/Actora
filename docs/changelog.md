@@ -1,10 +1,20 @@
 ---
 title: Changelog
 tags: [implementation, reference, stable]
-updated: 2026-04-07
+updated: 2026-04-28
 ---
 
 # Actora Changelog
+
+## Version 0.55.0 (Minor) - 2026-04-27
+- **Codebase Extraction Phase 2:** Massive refactor to pull UI, rendering, and specific interaction logic out of the `main.py` monolith into focused controllers, screens, and views.
+    - `main.py` reduced from 3029 lines to 871 lines. It now acts as a thin TUI orchestrator and shell initialization loop.
+    - **Controllers:** Extracted `app_router.py`, `browser_state_controller.py`, `choice_controller.py`, `continuation_controller.py`, `event_log_controller.py`, `life_event_controller.py`, `shell_controller.py`, `time_controller.py`.
+    - **Screens:** All discrete TUI surfaces extracted into `screens/`: `actions.py`, `browser.py`, `death.py`, `history.py`, `lineage.py`, `main.py`, `profile.py`, `relationships.py`, `skip_time.py`.
+    - **Views:** Pure-data formatting and string assembly extracted into `views/`: `browser.py`, `history.py`, `profile.py`, `shell.py`.
+    - **World mutation seam:** Moved queued action effects and social action execution (`resolve_personal_action`, `spend_time_with_actor`) fully into `world.py`.
+- **Docs Update:** `codebase.md` fully rewritten to reflect the new 26-file controller-based modular architecture and strict import boundaries.
+- **Profile popup modal fix:** Profile detail popups now ignore `Q` and `E` while open, matching the popup footer contract and preventing hidden month advancement or Skip Time opening underneath the overlay.
 
 ## Version 0.54.1 (Patch) - 2026-04-07
 - **Profile popup refactor:** Replaced manual border/title construction with `draw_box` helper — consistent with Menu and Options popups, satisfies rules.md Code Note

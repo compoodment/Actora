@@ -1,18 +1,18 @@
 ---
 title: Codebase
 tags: [implementation, reference, stable]
-updated: 2026-04-05
-through: v0.54.1
-verified: 2026-04-04
+updated: 2026-04-27
+through: v0.55.0
+verified: 2026-04-27
 ---
 
 # Actora Codebase
 
 Current repo implementation truth. What the code looks like right now.
-**Last verified against actual code:** 2026-04-04
+**Last verified against actual code:** 2026-04-27
 
-**Version:** 0.45.0+
-**Last Updated:** 2026-04-02
+**Version:** 0.55.0 (post-v0.54.1 refactor)
+**Last Updated:** 2026-04-27
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
 It is intended to support safe patching, review, and manual verification, alongside [[controls]] and [[screens]] for interface-specific rules.
@@ -21,36 +21,90 @@ It is intended to support safe patching, review, and manual verification, alongs
 
 - **Language:** Python
 - **Interface:** Terminal with a curses-based startup character creation wizard and a curses TUI shell for ordinary play. Shell v2 (v0.48.0+): 7-row header (custom logo crest + flanking info panels, rows 0-6), body, 2-row footer. Split Life View, dedicated profile screen, tabbed Browser (Relationships tab + History tab), dedicated Actions screen, death/continuation interrupts, skip-time flow, and meeting/social event popups. Shell geometry centralized in `ActoraTUI` class constants: `HEADER_ROWS=7`, `FOOTER_ROWS=2`, `BROWSER_CHROME_ROWS=2` — all body renderers derive `top` and `body_height` from these.
-- **Structure:** Small modular prototype with separated simulation and rendering responsibilities
+- **Structure:** Modular architecture with separated simulation, controllers, screens, and view layers. Shell (main.py) is thin orchestration; screen controllers own per-surface input/render; view helpers own pure-data formatting; controllers own interaction logic.
 
 ## 2. Current File Structure
 
     ./
-    ├── main.py          (3029 lines - ActoraTUI shell, snapshot/event helpers, startup/entrypoints)
-    ├── ui.py            (168 lines - layout/drawing primitives, used by wizard and shell)
-    ├── mechanics.py     (48 lines - game rule constants: traits, actions, time budget)
-    ├── wizard.py        (1267 lines - CreationWizard class, all creation constants and questionnaire)
-    ├── world.py          (2271 lines - simulation state, links, places, records, social links, mortality, advancement, geography)
-    ├── identity.py       (299 lines - name pools, culture-aware identity generation)
-    ├── human.py          (295 lines - Human model, lifecycle, spatial, snapshot)
-    ├── events.py         (388 lines - human monthly events, meeting events)
-    ├── lint_player_text.py (scans all *.py for internal/dev language in player-facing text)
+    ├── main.py                    (871 lines - ActoraTUI shell, startup/entrypoints, screen delegation)
+    ├── ui.py                      (168 lines - layout/drawing primitives)
+    ├── mechanics.py               (48 lines - game rule constants: traits, actions, time budget)
+    ├── wizard.py                  (1267 lines - CreationWizard class, all creation constants and questionnaire)
+    ├── world.py                   (2441 lines - simulation state, links, places, records, social links, mortality, advancement, geography, actions)
+    ├── identity.py                (299 lines - name pools, culture-aware identity generation)
+    ├── human.py                   (298 lines - Human model, lifecycle, spatial, snapshot)
+    ├── events.py                  (388 lines - human monthly events, meeting events)
+    ├── app_router.py               (74 lines - top-level TUI input/render routing)
+    ├── shell_controller.py         (75 lines - global menu/options/quit modal input handling)
+    ├── shell_renderer.py           (236 lines - global chrome, footer, and popup rendering)
+    ├── browser_state_controller.py (125 lines - lineage/relationship browser state adaptation)
+    ├── choice_controller.py        (180 lines - pending-choice modal input handling)
+    ├── continuation_controller.py  (85 lines - death acknowledgement and continuation handoff)
+    ├── event_log_controller.py     (116 lines - event-log accumulation and turn merge)
+    ├── life_event_controller.py    (89 lines - identity-choice and meeting-event offer logic)
+    ├── time_controller.py          (103 lines - time advancement orchestration)
+    ├── lint_player_text.py         (89 lines - scans all *.py for internal/dev language)
+    ├── views/
+    │   ├── __init__.py             (0 lines)
+    │   ├── browser.py              (37 lines - lineage/relationship view helpers)
+    │   ├── history.py              (77 lines - event-log and history view helpers)
+    │   ├── profile.py              (142 lines - profile dashboard view helpers)
+    │   └── shell.py                (65 lines - shell chrome and lifecycle interrupt view helpers)
+    ├── screens/
+    │   ├── __init__.py             (1 line)
+    │   ├── actions.py              (215 lines - actions screen controller/renderer)
+    │   ├── browser.py              (50 lines - unified browser tab-switch wrapper)
+    │   ├── death.py                (191 lines - death/continuation screen controller/renderer)
+    │   ├── history.py              (93 lines - history screen controller/renderer)
+    │   ├── lineage.py              (164 lines - lineage browser screen controller/renderer)
+    │   ├── main.py                 (145 lines - life-view screen controller/renderer)
+    │   ├── profile.py              (126 lines - profile screen controller/renderer)
+    │   ├── relationships.py        (191 lines - relationship browser screen controller/renderer)
+    │   └── skip_time.py            (85 lines - skip-time screen controller/renderer)
     └── docs/
 
-### Import boundary (v0.53.0)
+### Import boundary (v0.55.0)
 
 No circular imports. Allowed import graph:
 
-    ui.py        → (standard lib only)
-    mechanics.py → (standard lib only)
-    identity.py  → (standard lib only)
-    events.py    → (standard lib only)
-    human.py     → (standard lib only)
-    world.py     → human, identity, events (standard lib)
-    wizard.py    → ui, mechanics, world, identity (standard lib)
-    main.py      → ui, mechanics, wizard, world, human, events, identity (standard lib)
+    ui.py                      → (standard lib only)
+    mechanics.py               → (standard lib only)
+    identity.py                → (standard lib only)
+    events.py                  → (standard lib only)
+    human.py                   → (standard lib only)
+    views.shell.py             → (standard lib only)
+    views.browser.py           → (standard lib only)
+    views.history.py           → ui (standard lib)
+    views.profile.py           → views.history (standard lib)
+    world.py                   → human, identity, events (standard lib)
+    wizard.py                  → human, ui, world (standard lib)
+    shell_controller.py        → (standard lib only)
+    time_controller.py         → (standard lib only)
+    continuation_controller.py → (standard lib only)
+    app_router.py              → (standard lib only)
+    browser_state_controller.py → (standard lib only)
+    choice_controller.py       → mechanics (standard lib)
+    life_event_controller.py   → events (standard lib)
+    event_log_controller.py    → views.browser, views.history (standard lib)
+    shell_renderer.py          → ui, views.shell (standard lib)
+    screens.main.py            → ui, views.history (standard lib)
+    screens.profile.py         → ui, views.profile (standard lib)
+    screens.actions.py         → mechanics, ui, views.browser, wizard (standard lib)
+    screens.browser.py         → ui (standard lib)
+    screens.death.py           → ui, views.browser, views.shell (standard lib)
+    screens.history.py         → ui, views.history (standard lib)
+    screens.lineage.py         → ui, views.browser, views.profile (standard lib)
+    screens.relationships.py   → ui, views.browser, views.profile (standard lib)
+    screens.skip_time.py       → ui (standard lib only)
+    main.py                    → all local modules (standard lib)
 
-Rule: `wizard.py` must never import from `main.py`. `ui.py` and `mechanics.py` must never import local modules. Adding a new file: declare its place in this graph before writing code.
+Rules:
+- `wizard.py` must never import from `main.py`.
+- `ui.py` and `mechanics.py` must never import local modules.
+- `views/` must never import from `screens/`, `controllers`, `main.py`, or `world.py`.
+- `screens/` must never import from `main.py` or `world.py`.
+- Controllers must never import from `screens/` or `main.py`.
+- Adding a new file: declare its place in this graph before writing code.
 
 ## 3. Core Objects
 
@@ -399,44 +453,46 @@ This helper is read-only, resolves living family relationships through current w
 
 ### `main.py`
 Responsible for:
-- plain-text startup flow
 - plain-text to curses TUI orchestration
-- character creation flow
+- character creation wizard execution
 - initial world setup flow
 - curses-driven actor-first ordinary play flow
-- screen-level visual-system orchestration for the current TUI
-- post-turn rendering orchestration
-- shell-owned post-turn identity-choice emergence checks
-- rendering TUI snapshots from structured snapshot data
-- converting structured event results into display text
-- rendering the shell-owned dead-focus interrupt and continuation handoff flow when present
-- rendering lineage list/detail browsing without typed command words
-- rendering a tabbed Browser shell (Relationships tab + History tab) that replaced the older separate lineage and history screens
-- rendering a dedicated Actions screen with Social and Personal action categories, sub-type picker popups, time budget display, and pending action queue
-- rendering meeting event popups where the player can choose to introduce themselves or keep to themselves
-- social action queueing ("Spend time with friend") and resolution on month advance
+- shell initialization and top-level run loop
+- screen controller dispatch
 
-Current shell-level functions:
-- `build_snapshot_sections(...)` - shell-owned transformation from structured snapshot data into TUI-ready section lines
-- `build_event_log_entry(...)` / `format_history_entry(...)` - shell-owned live-feed and full-history entry shaping for the accumulating event log
-- `build_death_lines(...)` - shell-owned dead-focus interrupt copy assembly
-- `build_screen_chrome(...)` - shell-owned title/subtitle/date chrome assembly for the current TUI screen, including the history browser
-- `draw_text_block(...)` - small curses text rendering helper with wrapping support
-- `ActoraTUI` — curses shell object managing the split Life View, interactive Profile dashboard (v0.54.0+), accumulating live event feed, tabbed Browser (Relationships + History), dedicated Actions screen with social action support, styled header/footer chrome, lineage list/detail, skip-time selection, death acknowledgment, two-step continuation inspection/selection, meeting event popups, a shell-owned pending-choice popup overlay for major player-facing decisions, and safe footer rendering that avoids writing into the terminal's last column. Class constants `HEADER_ROWS`, `FOOTER_ROWS`, `BROWSER_CHROME_ROWS` are the canonical shell geometry anchors. `_get_logo_layout(width)` returns `(logo_x, logo_w, logo_center)` — used by both `render_header` and `render_main` to guarantee the body │ divider aligns with the logo center column. All popup types (Menu, Options, Profile drill-downs) use `draw_box` from `ui.py`.
-- `EXERCISE_SUBTYPES`, `READ_SUBTYPES`, `REST_SUBTYPES` — module-level sub-type definition lists with `id`, `label`, `time_cost`, `stat_changes`, `event_text`
-- `EXERCISE_TIME_COST`, `READ_TIME_COST`, `REST_TIME_COST` — module-level time cost constants
-- `format_stat_change_summary(stat_changes)` — formats stat changes as plain "+Stat" labels for display
-- `TRAIT_DEFINITIONS` — module-level dict mapping trait name → `{"sleep_modifier": float}` for all 12 traits
-- `HANG_OUT_TIME_COST = 4` — module-level constant for Hang Out action time cost in hours
-- `get_monthly_free_hours(actor)` — module-level helper; computes monthly free hours from actor traits: `720 - (8 + sleep_modifier_sum) * 30 - 120`
-- `CreationWizard` - curses-based character creation wizard with identity, location, appearance, and creation-mode steps, followed by either a questionnaire branch (questionnaire, confirmation) or a manual branch (stats, traits, confirmation)
-- `setup_initial_world_from_character(character_data)` - primary world creation flow from one fully prepared startup character payload
-- `setup_initial_world(...)` - compatibility wrapper that delegates into `setup_initial_world_from_character(...)`
-- `run_creation_wizard()` - curses wrapper that runs `CreationWizard` and returns character data or `None`
-- `run_game_tui(...)` - curses wrapper entry point for ordinary play
-- `start_game()` - top-level orchestration (delegates to creation wizard and TUI)
+### `app_router.py`
+- top-level TUI input and render routing
+- delegates keypresses and renders to the active screen controller
 
-Current startup flow is human-only. `start_game()` runs the curses-based `CreationWizard`, builds the world through `setup_initial_world_from_character(...)`, and only then hands control to the ordinary-play shell. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Startup parent ages now vary within a narrow adult range, some worlds now generate older siblings before the player is born through `World.bootstrap_older_siblings_for_newborn(...)`, and only-child worlds still remain possible. Once startup completes, ordinary play now lives inside a curses shell: the split `Life View` keeps identity/location/primary stats/relationships (including social links as `name · tier`) on the left, keeps an accumulating live event feed on the right, opens a dedicated interactive `Profile` dashboard via Menu (10 summary rows with Enter→popup drill-down pattern, v0.54.0+), allows simple left-side/history vertical scrolling under terminal-height pressure, opens the tabbed Browser via `[1]` Menu (Relationships tab or History tab), opens the dedicated Actions screen via `[1]` Menu, still preserves the dead-focus interrupt before any continuation choices are shown, and now allows shell-owned popup choices to interrupt long skips for major identity-emergence moments during adolescence and meeting events for social link creation.
+### `shell_controller.py` & `shell_renderer.py`
+- global menu/options popup input handling
+- global styling, header/footer chrome rendering, and logo drawing
+- shared shell navigation rules
+
+### `time_controller.py` & `event_log_controller.py`
+- orchestration of the world turn advancement boundary
+- extracting events and month counts into the shell event log
+- shaping events for live feed vs history feed
+
+### Controllers (e.g. `choice_controller.py`, `continuation_controller.py`, `life_event_controller.py`)
+- extracting complex interaction flows (pending choice modal, death handoff, identity emergence) out of the main loop
+
+### Screens (e.g. `screens/main.py`, `screens/profile.py`, `screens/actions.py`)
+- owning input handling and render coordination for one specific TUI surface
+- interacting with view helpers for pure-data formatting
+
+### Views (e.g. `views/profile.py`, `views/browser.py`, `views/shell.py`, `views/history.py`)
+- pure data-to-string formatting helpers
+- assembling text lines, spacing, and summary strings without curses dependencies
+
+### `wizard.py`
+Responsible for:
+- `CreationWizard` class and interaction loop
+- questionnaire logic and random trait/stat generation
+- identity, location, appearance inputs
+- producing the final startup character payload
+
+Current startup flow is human-only. `start_game()` runs the curses-based `CreationWizard`, builds the world through `setup_initial_world_from_character(...)`, and only then hands control to the ordinary-play shell. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Startup parent ages now vary within a narrow adult range, some worlds now generate older siblings before the player is born through `World.bootstrap_older_siblings_for_newborn(...)`, and only-child worlds still remain possible. Once startup completes, ordinary play now lives inside a curses shell with dedicated screen controllers managing the Life View, Profile dashboard, tabbed Browser (Relationships/History), and Actions.
 
 ### `identity.py`
 Responsible for:
@@ -537,7 +593,7 @@ Current return-contract notes:
 - `months_advanced` reports real completed advancement, which may be lower than the requested skip when death interrupts the focused actor
 - this patch now supports narrow playable continuation handoff with baseline automatic old-age mortality while still avoiding archive behavior or broader continuity systems
 
-This function does not perform terminal input, output, or presentation formatting. Terminal presentation remains in `main.py` and consumes the returned structured result.
+This function does not perform terminal input, output, or presentation formatting. Terminal presentation is managed by the shell controllers and consumes the returned structured result.
 
 ## 8. Current Turn Flow
 
@@ -631,7 +687,7 @@ Current event behavior:
 - later-life practical event coverage still extends across the currently implemented post-Child human stages (`Teenager`, `Young Adult`, `Adult`, `Elder`)
 - the clarified seam remains honest about current human-only content and does not claim species-general event support
 - `World.simulate_advance_turn(...)` applies each returned event outcome centrally via `World.apply_outcome(...)` while collecting structured results
-- `main.py` maintains a shell-owned event log that merges triggered monthly events with newly written relevant `birth` and `death` records
+- the `event_log_controller` maintains a shell-owned event log that merges triggered monthly events with newly written relevant `birth` and `death` records
 - the Life View live feed is compact and omits normal date prefixes, but still inserts year headers and skip markers as the run progresses
 - the full-screen `History` browser opened with `H` renders the same accumulated log in detailed form with date prefixes, year separators, and scrolling
 - `family_bootstrap` and `actor_entry` records are filtered from current player-facing event surfaces while remaining preserved in world storage
@@ -666,10 +722,10 @@ Current structural-transition behavior:
 - continuity state can be built from the current linked living actors through `World.build_continuity_state_for(...)`
 - current continuity candidates are returned in deterministic order with display-ready relationship metadata
 - ordinary month advancement does not proceed once the focused actor is dead
-- `main.py` now renders a dedicated dead-focus interrupt led by `You are dead.`, shows current death context when available, adds a brief life-summary retrospective (age/place/stats plus recent meaningful records), and still requires acknowledgment before showing any continuation choices
-- `main.py` now renders continuation candidates as compact name/relationship/age/place rows, opens a dedicated continuation-detail inspect view on `Enter`, and only hands off focus after explicit confirmation from that detail screen
-- player-facing record surfaces in `main.py` now filter out implementation scaffolding records such as `actor_entry` and `family_bootstrap` while preserving those records in world storage
-- `main.py` now exposes lineage browsing through the curses shell so family-linked alive/dead actors can be inspected through a highlighted list + detail flow backed by current actors/links/records
+- `screens.death` now renders a dedicated dead-focus interrupt led by `You are dead.`, shows current death context when available, adds a brief life-summary retrospective (age/place/stats plus recent meaningful records), and still requires acknowledgment before showing any continuation choices
+- `screens.death` now renders continuation candidates as compact name/relationship/age/place rows, opens a dedicated continuation-detail inspect view on `Enter`, and only hands off focus after explicit confirmation from that detail screen
+- player-facing record surfaces in the shell now filter out implementation scaffolding records such as `actor_entry` and `family_bootstrap` while preserving those records in world storage
+- the shell now exposes lineage browsing through `screens.lineage` so family-linked alive/dead actors can be inspected through a highlighted list + detail flow backed by current actors/links/records
 - if no valid continuation candidates exist, the shell reports that cleanly and leaves the run only through explicit quit
 
 Current limitations:
@@ -729,7 +785,7 @@ After patching, verify:
 - quit still works
 - snapshot output still renders correctly in the curses shell
 - origin/care/bootstrap family-link semantics remain explicit in `World.links` without implying broader relationship systems
-- events still trigger and display correctly (with correct date prefixes rendered by main.py)
+- events still trigger and display correctly (with correct date prefixes rendered by the history view helpers)
 - month-by-month advancement still behaves correctly
 - larger skip requests still behave correctly while advancing internally month-by-month
 - focused actor assignment works correctly at startup
