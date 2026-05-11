@@ -1,7 +1,7 @@
 ---
 title: Backlog
 tags: [planning, tracking, wip]
-updated: 2026-04-05
+updated: 2026-05-11
 through: v0.53.0
 ---
 
@@ -13,7 +13,8 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Now
 
-- **Profile card dashboard redesign** — replace v0.54.0 row-based Profile with card-based dashboard per design.md interview (2026-04-19). Merged categories: Identity+Appearance, Stats+Attributes, Mood+Needs. 2D card navigation with highlighted borders. Drill behavior: popup for most, Browser for Relationships. Layout flexible, shuffles during implementation. *(2026-04-19)*
+- **`/lab/actora` web shell foundation** — owner-directed active track per DEC-035. First scope: title/start/save-lite entry, web character creation, Life View, Actions, Profile, Relationships/History Browser, death/continuation flow, and simple schema-conscious local persistence if needed for testing. Must preserve current simulation truth and roadmap constraints; do not use the web shell to build later domain systems out of order. *(2026-05-11)*
+- **Profile card dashboard redesign** — remains the intended Profile direction, but implementation is now folded into the web shell track first. Replace v0.54.0 row-based Profile with card-based dashboard per design.md interview (2026-04-19): merged categories, 2D card navigation/highlighted borders, popup drill for most cards, Browser for Relationships. *(2026-04-19, updated 2026-05-11)*
 
 
 ## Next

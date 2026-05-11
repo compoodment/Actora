@@ -1,7 +1,7 @@
 ---
 title: Design
 tags: [core, reference, stable]
-updated: 2026-04-05
+updated: 2026-05-11
 ---
 
 # Actora Design
@@ -490,6 +490,39 @@ Stats and Attributes are intentionally split: Stats are the player-facing moment
 - Era affects: what actions exist, what species exist, what places exist, what news looks like.
 - Characters are era-restricted — a medieval peasant can't use a smartphone.
 - Compverse = one save = one continuous universe with one advancing timeline.
+
+---
+
+## Web Shell Direction (`/lab/actora`)
+
+**Status:** Active direction (DEC-035, 2026-05-11)
+**Current truth:** No web implementation exists yet in this repo. Current playable implementation is Python/curses TUI. actora.art currently has a public site/lab structure separately from this game repo.
+
+**Intent:**
+The web shell should make Actora easier to see, play, and iterate on without changing what Actora is. It is a game surface for Actora, not a generic site experiment and not a separate rewrite of the vision.
+
+Design anchors:
+- Public game surface at `/lab/actora`.
+- Feels like entering a separate game mode; Actora is its own game and the inspiration for the site name.
+- Start with a title/start/save-lite screen before character creation or play.
+- Primary interaction is buttons/cards, not command input.
+- Preserve month-by-month play rhythm.
+- Main play priorities: actor stats, actions, event feed, world/news/context, and time controls.
+- Use visual clarity over cleverness. Strange/Actora-specific atmosphere is welcome, but not at the cost of readability.
+- The world should be present around the focused actor, but not fake later systems that the roadmap says are not ready.
+- The first shell may use mocked/static state for layout review, but durable behavior must map back to simulation truth: records, links, events, places, current actor, and controlled mutation.
+
+**Design rules:**
+- Do not turn web migration into a substitute for core architecture.
+- Do not introduce Education, Work, Economy, Politics, Travel, Property, Space, or other later domain systems just to fill the screen.
+- Do not create web-only records, relationships, places, or action outcomes that cannot map back to world-owned simulation data.
+- Simple local persistence is acceptable for testing, but save/load complexity is not the feature direction yet.
+- Keep Projects page removal separate; current direction only establishes `/lab/actora` as the game surface.
+
+**Open questions:**
+- Exact visual language of the first title/start screen.
+- Whether local saves are pure browser-local first or share actora.art account save infrastructure later.
+- How much world/news context appears in the first shell before the News system exists.
 
 ---
 

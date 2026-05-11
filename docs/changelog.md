@@ -1,10 +1,16 @@
 ---
 title: Changelog
 tags: [implementation, reference, stable]
-updated: 2026-04-28
+updated: 2026-05-11
 ---
 
 # Actora Changelog
+
+## Version 0.55.1 (Patch) - 2026-05-11
+- **Web shell direction documented:** Added DEC-035 to start `/lab/actora` web shell implementation as an owner-directed parallel presentation track.
+- **Roadmap active track:** Added `/lab/actora` web shell scope and guardrails while preserving the backbone dependency ladder.
+- **Backlog updated:** Made `/lab/actora` web shell foundation the active Now item and folded Profile card dashboard work into that track.
+- **Screens/design sync:** Added web shell route, entry flow, screen responsibility mapping, interaction direction, and design rules for the first web implementation.
 
 ## Version 0.55.0 (Minor) - 2026-04-27
 - **Codebase Extraction Phase 2:** Massive refactor to pull UI, rendering, and specific interaction logic out of the `main.py` monolith into focused controllers, screens, and views.

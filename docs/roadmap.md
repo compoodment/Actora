@@ -1,7 +1,7 @@
 ---
 title: Roadmap
 tags: [core, reference, stable]
-updated: 2026-04-05
+updated: 2026-05-11
 ---
 
 # Actora Roadmap
@@ -11,6 +11,31 @@ Dependency order. What must come before what.
 This is a sequencing document, not a progress tracker. For what's actually implemented, see `codebase.md` and `changelog.md`. For project identity, see `identity.md`.
 
 Foundation before expansion. Dependency order over novelty. Don't build later systems before their prerequisites are stable.
+
+---
+
+## Current active parallel track — `/lab/actora` web shell
+
+Owner-directed priority shift (DEC-035): begin a web shell implementation now so Actora can become a public playable game surface on actora.art at `/lab/actora`.
+
+This is a presentation/runtime track, not permission to skip the backbone. The web shell must render and exercise current implemented foundations before adding later domain systems. It may improve visual clarity and coding speed, but it must not become a separate design that bypasses simulation-step ownership, structured outputs, records, links, places, spatial identity, or controlled mutation.
+
+Allowed first web scope:
+- title/start/save-lite entry surface
+- character creation matching current implemented creation truth
+- Life View as the anchor play surface
+- Actions with time budget, queued actions, and sub-type choices
+- Profile card dashboard direction
+- Relationships/History Browser surfaces
+- death interrupt and continuation handoff flow
+- simple local persistence if schema-conscious and not treated as a major save/load system
+
+Still not allowed through the web track:
+- building Education, Work, Economy, Politics, Travel, Property, Space, or other later layers before their prerequisites
+- adding large event-content packs instead of strengthening event structure
+- direct web-only mutation paths that bypass world-owned methods
+- UI-only relationships, records, places, or history that do not map back to simulation truth
+- save/load complexity as a major feature direction
 
 ---
 
@@ -117,8 +142,8 @@ Valid long-term possibilities that must remain deferred until prerequisites exis
 - Vessel/station gameplay before non-fixed place support
 - Multi-world / space-travel before lower spatial layers are proven
 - Macroeconomy as a substitute for stronger foundations
-- Save/load complexity as a major feature direction
-- Web/app migration as a substitute for core architecture
+- Save/load complexity as a major feature direction, beyond simple schema-conscious persistence needed for `/lab/actora` testing
+- Web/app migration as a substitute for core architecture; DEC-035 permits a web shell only as a presentation/runtime track over Actora truth
 - Large event content packs without stronger event structure
 - Daily/hourly simulation by default
 - Route/logistics/infrastructure simulation

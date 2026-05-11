@@ -1,7 +1,7 @@
 ---
 title: Screens
 tags: [implementation, tui, reference]
-updated: 2026-04-05
+updated: 2026-05-11
 ---
 
 # Actora Screens
@@ -10,6 +10,36 @@ Screen map, navigation hierarchy, and rules for adding new systems to the UI.
 Separate from controls (interaction rules) and design (creative intent).
 
 Note: Current implementation is TUI-first. This doc describes the intended TUI structure and should remain compatible with future non-TUI presentation.
+
+---
+
+## Web Shell Track (`/lab/actora`)
+
+DEC-035 starts a web shell implementation as a parallel presentation track. This section maps existing screen responsibilities to the first web surface so the web version does not drift into a separate game design.
+
+Route:
+- Public game surface: `/lab/actora`
+- `Projects` may continue linking the repo/showcase until explicitly removed; this decision does not delete it.
+
+Entry flow:
+- Title / Start / Save-lite screen first
+- New game enters web character creation
+- Continue/load resumes an existing local test save when present
+
+Screen responsibility mapping:
+- **Life View → Main play screen:** still the anchor/home surface. Shows current actor, current date/month, primary stats, location, relationships summary, and accumulating event feed.
+- **Actions → Action cards/queue:** button/card interaction, time budget visible, queued actions clear, sub-type choices explicit.
+- **Profile → Card dashboard:** follow the card dashboard direction from `design.md`; web should use this before continuing TUI row-dashboard polish.
+- **Browser → Relationships + History surfaces:** relationships remain structural link browsing; history remains record/event browsing with year separation and markers.
+- **Skip Time → Time controls:** month advance remains primary. Larger skips can be exposed as explicit controls, but still resolve month-by-month through simulation truth.
+- **Death / Continuation → Staged interrupt flow:** death appears first, then acknowledgment, then continuation candidate browsing/detail, then handoff.
+
+Web interaction direction:
+- Use buttons/cards as the primary interaction model.
+- Preserve keyboard accessibility where practical, but do not make command input the core web interaction.
+- Visual weirdness is allowed only when readability stays strong; Actora-specific strangeness should come from premise, continuity, records, and scope, not confusing controls.
+
+Do not add new top-level web systems that the roadmap says are not ready. If a future screen candidate appears visually useful, keep it as a placeholder or disabled affordance unless its underlying system exists.
 
 ---
 

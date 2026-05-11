@@ -1,7 +1,7 @@
 ---
 title: Decisions
 tags: [core, decisions, stable]
-updated: 2026-04-05
+updated: 2026-05-11
 ---
 
 # Actora Decisions
@@ -248,3 +248,9 @@ Traits shown as names only, not editable. No running stats visible during questi
 **Context:** `Human.get_snapshot_data()` previously returned `statistics` (4 primary stats + money) and `secondary_statistics` (9 remaining stats) separately. This baked a rendering decision into the data model — the split existed because Life View shows fewer stats than Profile.
 **Decision:** `statistics` contains all 13 stats + money. The renderer decides what to display — the snapshot does not. Life View renders only health/happiness/intelligence/money; Profile renders all 13. Neither decision belongs in the data layer.
 **Alternatives rejected:** Keeping the split (wrong layer of concern), moving the split to the renderer as a filter constant (acceptable but the flat dict is cleaner).
+
+### DEC-035: Start `/lab/actora` web shell implementation as a parallel presentation track
+**Date:** 2026-05-11
+**Context:** The terminal shell is slowing visual clarity and iteration speed. The owner wants Actora playable on actora.art now, as a public game surface reachable from `/lab/actora`, while preserving Actora as its own game and not turning the web move into a substitute for core architecture.
+**Decision:** Begin a web shell implementation as a current active track. The first web work is a presentation/runtime shell over current implemented foundations: title/start/save-lite entry, web character creation, Life View, Actions, Profile, Relationships/History Browser, and death/continuation flow. The web shell must preserve the month-by-month rhythm, actor-anchored play, structured records/events/links, controlled state mutation boundaries, and roadmap dependency discipline. It may use mocked/static state briefly for visual layout review, but durable implementation must reconnect to real simulation truth rather than becoming a forked game design.
+**Alternatives rejected:** Continuing TUI-only until the full backbone is finished (too slow for current owner priority), rewriting Actora as a different web game (breaks identity), using web migration to bypass architecture/backbone dependencies (explicitly forbidden), deleting the Projects page as part of this decision (deferred; Projects still has repo-link purpose).
