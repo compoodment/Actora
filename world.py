@@ -3,7 +3,19 @@ from collections import deque
 from uuid import uuid4
 
 from events import get_human_monthly_event_from_lifecycle
+from geography import (
+    DEFAULT_CITY_ID,
+    DEFAULT_COUNTRY_ID,
+    WORLD_GEOGRAPHY,
+    WORLD_GEOGRAPHY_BY_COUNTRY_ID,
+)
 from human import Human
+from identity import (
+    CULTURE_NAME_POOLS,
+    FALLBACK_LAST_NAME_POOL,
+    FATHER_FIRST_NAME_POOL,
+    MOTHER_FIRST_NAME_POOL,
+)
 from mechanics import HUMAN_TRAIT_COUNT, HUMAN_TRAIT_POOL
 
 
@@ -34,8 +46,9 @@ def _extract_imagination_value(stats):
     return 50
 
 
-def _normalize_human_stats(stats):
+def _normalize_human_stats(stats, *, random_source=None):
     """Aligns human stat keys with the shell-owned stat model."""
+    rng = random if random_source is None else random_source
     source_stats = dict(stats)
     normalized_stats = {
         stat_name: stat_value
@@ -43,154 +56,14 @@ def _normalize_human_stats(stats):
         if stat_name in _CANONICAL_HUMAN_STAT_KEYS
     }
     normalized_stats["imagination"] = _extract_imagination_value(source_stats)
-    normalized_stats.setdefault("memory", random.randint(-10, 20))  # Signed: -50 to +50
-    normalized_stats.setdefault("stress", random.randint(0, 15))      # Signed: -50 to +50
+    if "memory" not in normalized_stats:
+        normalized_stats["memory"] = rng.randint(-10, 20)  # Signed: -50 to +50
+    if "stress" not in normalized_stats:
+        normalized_stats["stress"] = rng.randint(0, 15)  # Signed: -50 to +50
     return normalized_stats
-from identity import (
-    CULTURE_NAME_POOLS,
-    FALLBACK_LAST_NAME_POOL,
-    FATHER_FIRST_NAME_POOL,
-    MOTHER_FIRST_NAME_POOL,
-)
 
 
 UNSET = object()
-
-WORLD_GEOGRAPHY = [
-    {
-        "country_id": "us",
-        "country_name": "United States",
-        "metadata": {"region": "North America", "culture_group": "American", "primary_language": "English"},
-        "cities": [
-            {"city_id": "us_new_york", "city_name": "New York"},
-            {"city_id": "us_los_angeles", "city_name": "Los Angeles"},
-            {"city_id": "us_chicago", "city_name": "Chicago"},
-            {"city_id": "us_houston", "city_name": "Houston"},
-            {"city_id": "us_phoenix", "city_name": "Phoenix"},
-        ],
-    },
-    {
-        "country_id": "brazil",
-        "country_name": "Brazil",
-        "metadata": {"region": "South America", "culture_group": "Brazilian", "primary_language": "Portuguese"},
-        "cities": [
-            {"city_id": "brazil_sao_paulo", "city_name": "São Paulo"},
-            {"city_id": "brazil_rio_de_janeiro", "city_name": "Rio de Janeiro"},
-            {"city_id": "brazil_brasilia", "city_name": "Brasília"},
-            {"city_id": "brazil_salvador", "city_name": "Salvador"},
-        ],
-    },
-    {
-        "country_id": "uk",
-        "country_name": "United Kingdom",
-        "metadata": {"region": "Europe", "culture_group": "British", "primary_language": "English"},
-        "cities": [
-            {"city_id": "uk_london", "city_name": "London"},
-            {"city_id": "uk_manchester", "city_name": "Manchester"},
-            {"city_id": "uk_birmingham", "city_name": "Birmingham"},
-        ],
-    },
-    {
-        "country_id": "netherlands",
-        "country_name": "Netherlands",
-        "metadata": {"region": "Europe", "culture_group": "Dutch", "primary_language": "Dutch"},
-        "cities": [
-            {"city_id": "netherlands_amsterdam", "city_name": "Amsterdam"},
-            {"city_id": "netherlands_rotterdam", "city_name": "Rotterdam"},
-            {"city_id": "netherlands_amersfoort", "city_name": "Amersfoort"},
-            {"city_id": "netherlands_utrecht", "city_name": "Utrecht"},
-            {"city_id": "netherlands_den_haag", "city_name": "Den Haag"},
-        ],
-    },
-    {
-        "country_id": "germany",
-        "country_name": "Germany",
-        "metadata": {"region": "Europe", "culture_group": "German", "primary_language": "German"},
-        "cities": [
-            {"city_id": "germany_berlin", "city_name": "Berlin"},
-            {"city_id": "germany_munich", "city_name": "Munich"},
-            {"city_id": "germany_hamburg", "city_name": "Hamburg"},
-            {"city_id": "germany_frankfurt", "city_name": "Frankfurt"},
-        ],
-    },
-    {
-        "country_id": "kenya",
-        "country_name": "Kenya",
-        "metadata": {"region": "East Africa", "culture_group": "Kenyan", "primary_language": "Swahili/English"},
-        "cities": [
-            {"city_id": "kenya_nairobi", "city_name": "Nairobi"},
-            {"city_id": "kenya_mombasa", "city_name": "Mombasa"},
-            {"city_id": "kenya_kisumu", "city_name": "Kisumu"},
-        ],
-    },
-    {
-        "country_id": "colombia",
-        "country_name": "Colombia",
-        "metadata": {"region": "South America", "culture_group": "Colombian", "primary_language": "Spanish"},
-        "cities": [
-            {"city_id": "colombia_bogota", "city_name": "Bogotá"},
-            {"city_id": "colombia_medellin", "city_name": "Medellín"},
-            {"city_id": "colombia_cali", "city_name": "Cali"},
-        ],
-    },
-    {
-        "country_id": "japan",
-        "country_name": "Japan",
-        "metadata": {"region": "East Asia", "culture_group": "Japanese", "primary_language": "Japanese"},
-        "cities": [
-            {"city_id": "japan_tokyo", "city_name": "Tokyo"},
-            {"city_id": "japan_osaka", "city_name": "Osaka"},
-            {"city_id": "japan_kyoto", "city_name": "Kyoto"},
-        ],
-    },
-    {
-        "country_id": "india",
-        "country_name": "India",
-        "metadata": {"region": "South Asia", "culture_group": "Indian", "primary_language": "Hindi/English"},
-        "cities": [
-            {"city_id": "india_mumbai", "city_name": "Mumbai"},
-            {"city_id": "india_delhi", "city_name": "Delhi"},
-            {"city_id": "india_bangalore", "city_name": "Bangalore"},
-            {"city_id": "india_kolkata", "city_name": "Kolkata"},
-        ],
-    },
-    {
-        "country_id": "indonesia",
-        "country_name": "Indonesia",
-        "metadata": {"region": "Southeast Asia", "culture_group": "Indonesian", "primary_language": "Indonesian"},
-        "cities": [
-            {"city_id": "indonesia_jakarta", "city_name": "Jakarta"},
-            {"city_id": "indonesia_surabaya", "city_name": "Surabaya"},
-            {"city_id": "indonesia_bandung", "city_name": "Bandung"},
-        ],
-    },
-    {
-        "country_id": "philippines",
-        "country_name": "Philippines",
-        "metadata": {"region": "Southeast Asia", "culture_group": "Filipino", "primary_language": "Filipino/English"},
-        "cities": [
-            {"city_id": "philippines_manila", "city_name": "Manila"},
-            {"city_id": "philippines_cebu_city", "city_name": "Cebu City"},
-            {"city_id": "philippines_davao_city", "city_name": "Davao City"},
-        ],
-    },
-    {
-        "country_id": "australia",
-        "country_name": "Australia",
-        "metadata": {"region": "Oceania", "culture_group": "Australian", "primary_language": "English"},
-        "cities": [
-            {"city_id": "australia_sydney", "city_name": "Sydney"},
-            {"city_id": "australia_melbourne", "city_name": "Melbourne"},
-            {"city_id": "australia_brisbane", "city_name": "Brisbane"},
-        ],
-    },
-]
-WORLD_GEOGRAPHY_BY_COUNTRY_ID = {
-    country["country_id"]: country
-    for country in WORLD_GEOGRAPHY
-}
-DEFAULT_COUNTRY_ID = WORLD_GEOGRAPHY[0]["country_id"]
-DEFAULT_CITY_ID = WORLD_GEOGRAPHY[0]["cities"][0]["city_id"]
 
 
 class World:
@@ -402,8 +275,10 @@ class World:
         """Returns records for one actor by delegating to the world record store helper."""
         return self.get_records(actor_id=actor_id, record_type=record_type)
 
-    def generate_actor_id(self, role):
+    def generate_actor_id(self, role, *, id_source=None):
         """Builds one narrow world-owned actor ID for generated family actors."""
+        if id_source is not None:
+            return id_source.next_id(role)
         return f"{role}_{uuid4().hex[:8]}"
 
     def get_latest_record(self, actor_id=None, record_type=None):
@@ -442,6 +317,7 @@ class World:
         jurisdiction_place_id=None,
         temporary_occupancy_place_id=None,
         randomize_stats=False,
+        random_source=None,
     ):
         """Creates and registers a Human actor in the world."""
         actor = Human(
@@ -454,8 +330,13 @@ class World:
             birth_month=birth_month,
         )
         if randomize_stats:
-            actor.randomize_starting_statistics()
-        actor.stats = _normalize_human_stats(actor.stats)
+            actor.randomize_starting_statistics(
+                random_source=random_source,
+            )
+        actor.stats = _normalize_human_stats(
+            actor.stats,
+            random_source=random_source,
+        )
         self.add_actor(actor_id, actor)
         self.update_actor_spatial_identity(
             actor_id,
@@ -479,6 +360,32 @@ class World:
         )
         return actor
 
+    def finalize_startup_human_actor(
+        self,
+        actor_id,
+        *,
+        stats,
+        appearance,
+        traits,
+        money=0,
+        random_source=None,
+    ):
+        """Applies character-creation state through the world mutation boundary."""
+        actor = self.get_actor(actor_id)
+        if actor is None:
+            raise ValueError(
+                "finalize_startup_human_actor: "
+                f"unknown actor_id '{actor_id}'"
+            )
+        actor.stats = _normalize_human_stats(
+            stats,
+            random_source=random_source,
+        )
+        actor.appearance = dict(appearance)
+        actor.traits = list(traits)
+        actor.money = money
+        return actor
+
     def create_human_child_with_parents(
         self,
         child_id,
@@ -499,6 +406,7 @@ class World:
         birth_record_text=None,
         birth_record_tags=None,
         birth_record_metadata=None,
+        random_source=None,
     ):
         """Creates a human child actor and optional mother/father family links."""
         child = self.create_human_actor(
@@ -515,6 +423,7 @@ class World:
             jurisdiction_place_id=jurisdiction_place_id,
             temporary_occupancy_place_id=temporary_occupancy_place_id,
             randomize_stats=randomize_stats,
+            random_source=random_source,
         )
 
         child_family_metadata = {
@@ -639,17 +548,23 @@ class World:
                 sibling_ids.append(other_actor_id)
         return sibling_ids
 
-    def _generate_human_child_identity(self, family_last_name):
+    def _generate_human_child_identity(
+        self,
+        family_last_name,
+        *,
+        random_source=None,
+    ):
         """Builds one narrow placeholder identity for a generated sibling or newborn."""
-        if random.random() < 0.5:
+        rng = random if random_source is None else random_source
+        if rng.random() < 0.5:
             return {
-                "first_name": random.choice(MOTHER_FIRST_NAME_POOL),
+                "first_name": rng.choice(MOTHER_FIRST_NAME_POOL),
                 "last_name": family_last_name,
                 "sex": "Female",
                 "gender": "Female",
             }
         return {
-            "first_name": random.choice(FATHER_FIRST_NAME_POOL),
+            "first_name": rng.choice(FATHER_FIRST_NAME_POOL),
             "last_name": family_last_name,
             "sex": "Male",
             "gender": "Male",
@@ -750,7 +665,17 @@ class World:
             "rule": "narrow_family_birth",
         }
 
-    def _create_family_child_birth(self, mother_id, father_id, *, birth_year, birth_month, birth_source):
+    def _create_family_child_birth(
+        self,
+        mother_id,
+        father_id,
+        *,
+        birth_year,
+        birth_month,
+        birth_source,
+        random_source=None,
+        id_source=None,
+    ):
         """Creates one real family child actor for a current coparent pair."""
         mother = self.get_actor(mother_id)
         father = self.get_actor(father_id)
@@ -758,8 +683,15 @@ class World:
             raise ValueError("_create_family_child_birth: unresolved parents")
 
         family_last_name = mother.last_name or father.last_name
-        identity = self._generate_human_child_identity(family_last_name)
-        child_id = self.generate_actor_id("family_child")
+        rng = random if random_source is None else random_source
+        identity = self._generate_human_child_identity(
+            family_last_name,
+            random_source=rng,
+        )
+        child_id = self.generate_actor_id(
+            "family_child",
+            id_source=id_source,
+        )
         child = self.create_human_child_with_parents(
             child_id=child_id,
             first_name=identity["first_name"],
@@ -781,6 +713,7 @@ class World:
             birth_record_text=f"{identity['first_name']} {identity['last_name']} was born into the family.",
             birth_record_tags=["family", "birth"],
             birth_record_metadata={"birth_source": birth_source},
+            random_source=rng,
         )
         return child_id, child
 
@@ -791,8 +724,11 @@ class World:
         father_id,
         player_birth_year,
         player_birth_month,
+        random_source=None,
+        id_source=None,
     ):
         """Creates a small plausible set of older siblings before the player is born."""
+        rng = random if random_source is None else random_source
         mother = self.get_actor(mother_id)
         father = self.get_actor(father_id)
         if mother is None or father is None:
@@ -802,25 +738,25 @@ class World:
         father_age_months = father.get_age_in_months(player_birth_year, player_birth_month)
         if mother_age_months < (20 * 12) or father_age_months < (20 * 12):
             return []
-        if random.random() < 0.58:
+        if rng.random() < 0.58:
             return []
 
         max_possible_count = 1
         if mother_age_months >= (29 * 12):
             max_possible_count = 2
-        if mother_age_months >= (35 * 12) and random.random() < 0.3:
+        if mother_age_months >= (35 * 12) and rng.random() < 0.3:
             max_possible_count = 3
-        sibling_count = random.randint(1, max_possible_count)
+        sibling_count = rng.randint(1, max_possible_count)
 
         birth_points = []
-        months_before_player = random.randint(14, 36)
+        months_before_player = rng.randint(14, 36)
         for _ in range(sibling_count):
             sibling_total_months = (player_birth_year * 12) + player_birth_month - months_before_player
             if sibling_total_months <= ((mother.birth_year * 12) + mother.birth_month + (18 * 12)):
                 break
             birth_year, birth_month = divmod(sibling_total_months - 1, 12)
             birth_points.append((birth_year, birth_month + 1))
-            months_before_player += random.randint(18, 36)
+            months_before_player += rng.randint(18, 36)
 
         created_sibling_ids = []
         for birth_year, birth_month in reversed(birth_points):
@@ -830,13 +766,22 @@ class World:
                 birth_year=birth_year,
                 birth_month=birth_month,
                 birth_source="startup_family",
+                random_source=rng,
+                id_source=id_source,
             )
             created_sibling_ids.append(sibling_id)
 
         return created_sibling_ids
 
-    def resolve_monthly_family_events(self, focused_actor_id=None):
+    def resolve_monthly_family_events(
+        self,
+        focused_actor_id=None,
+        *,
+        random_source=None,
+        id_source=None,
+    ):
         """Runs narrow family background simulation such as later sibling births."""
+        rng = random if random_source is None else random_source
         coparent_pairs = []
         seen_pairs = set()
         for link in self.get_links(link_type="association", roles=["coparent"]):
@@ -861,7 +806,7 @@ class World:
             )
             if birth_profile is None:
                 continue
-            if random.random() >= birth_profile["monthly_birth_probability"]:
+            if rng.random() >= birth_profile["monthly_birth_probability"]:
                 continue
 
             child_id, child = self._create_family_child_birth(
@@ -870,6 +815,8 @@ class World:
                 birth_year=self.current_year,
                 birth_month=self.current_month,
                 birth_source="family_birth",
+                random_source=rng,
+                id_source=id_source,
             )
             sibling_ids = self.get_sibling_ids_for(child_id)
             event_payload = {
@@ -1208,13 +1155,21 @@ class World:
         )
         return event
 
-    def generate_meeting_npc(self, player_id, *, culture_group=None):
+    def generate_meeting_npc(
+        self,
+        player_id,
+        *,
+        culture_group=None,
+        random_source=None,
+        id_source=None,
+    ):
         """Generates and registers a plausible NPC for a meeting event.
 
         Age is within ±5 years of the player (minimum 8).
         Stats are seeded in normal human ranges.
         Name is drawn from the player's culture group when resolvable.
         """
+        rng = random if random_source is None else random_source
         player = self.get_actor(player_id)
         if player is None:
             raise ValueError(f"generate_meeting_npc: unknown player_id '{player_id}'")
@@ -1227,11 +1182,11 @@ class World:
         player_age = player.get_age(self.current_year, self.current_month)
         age_min = max(8, player_age - 5)
         age_max = max(8, player_age + 5)
-        npc_age = random.randint(age_min, age_max)
+        npc_age = rng.randint(age_min, age_max)
         npc_birth_year = self.current_year - npc_age
-        npc_birth_month = random.randint(1, 12)
+        npc_birth_month = rng.randint(1, 12)
 
-        npc_sex = random.choice(["Male", "Female"])
+        npc_sex = rng.choice(["Male", "Female"])
         culture_pool = CULTURE_NAME_POOLS.get(culture_group or "", {})
         if npc_sex == "Female":
             first_name_pool = culture_pool.get("mother_first_names", MOTHER_FIRST_NAME_POOL)
@@ -1239,7 +1194,7 @@ class World:
             first_name_pool = culture_pool.get("father_first_names", FATHER_FIRST_NAME_POOL)
         last_name_pool = culture_pool.get("last_names", FALLBACK_LAST_NAME_POOL)
 
-        first_name = random.choice(first_name_pool)
+        first_name = rng.choice(first_name_pool)
         player_last_name = player.last_name if player else None
         available_last_names = [
             name for name in last_name_pool
@@ -1249,10 +1204,13 @@ class World:
             available_last_names = [name for name in last_name_pool if name != player_last_name]
         if not available_last_names:
             available_last_names = last_name_pool
-        last_name = random.choice(available_last_names)
+        last_name = rng.choice(available_last_names)
         self._used_npc_last_names.add(last_name)
 
-        npc_actor_id = self.generate_actor_id("npc")
+        npc_actor_id = self.generate_actor_id(
+            "npc",
+            id_source=id_source,
+        )
         npc = self.create_human_actor(
             actor_id=npc_actor_id,
             species="Human",
@@ -1265,25 +1223,29 @@ class World:
             current_place_id=player.current_place_id,
             residence_place_id=player.residence_place_id,
             jurisdiction_place_id=player.jurisdiction_place_id,
+            random_source=rng,
         )
 
         npc.stats.update({
-            "health": random.randint(70, 100),
-            "happiness": random.randint(50, 100),
-            "intelligence": random.randint(35, 75),
-            "strength": random.randint(30, 70),
-            "charisma": random.randint(30, 70),
-            "imagination": random.randint(30, 70),
-            "memory": random.randint(-15, 25),   # Signed stat: -50 to +50
-            "stress": random.randint(0, 20),      # Signed stat: -50 to +50
-            "wisdom": random.randint(20, 60),
-            "discipline": random.randint(20, 60),
-            "willpower": random.randint(30, 70),
-            "looks": random.randint(30, 80),
-            "fertility": random.randint(40, 90),
+            "health": rng.randint(70, 100),
+            "happiness": rng.randint(50, 100),
+            "intelligence": rng.randint(35, 75),
+            "strength": rng.randint(30, 70),
+            "charisma": rng.randint(30, 70),
+            "imagination": rng.randint(30, 70),
+            "memory": rng.randint(-15, 25),   # Signed stat: -50 to +50
+            "stress": rng.randint(0, 20),      # Signed stat: -50 to +50
+            "wisdom": rng.randint(20, 60),
+            "discipline": rng.randint(20, 60),
+            "willpower": rng.randint(30, 70),
+            "looks": rng.randint(30, 80),
+            "fertility": rng.randint(40, 90),
         })
-        npc.stats = _normalize_human_stats(npc.stats)
-        npc.traits = random.sample(HUMAN_TRAIT_POOL, HUMAN_TRAIT_COUNT)
+        npc.stats = _normalize_human_stats(
+            npc.stats,
+            random_source=rng,
+        )
+        npc.traits = rng.sample(HUMAN_TRAIT_POOL, HUMAN_TRAIT_COUNT)
 
         return npc_actor_id, npc
 
@@ -2357,8 +2319,9 @@ class World:
             "lifecycle_state": lifecycle_state,
         }
 
-    def resolve_monthly_mortality(self):
+    def resolve_monthly_mortality(self, *, random_source=None):
         """Applies one month of mortality checks across all living actors."""
+        rng = random if random_source is None else random_source
         structural_transitions = []
         for actor_id in sorted(self.actors):
             actor = self.get_actor(actor_id)
@@ -2370,7 +2333,7 @@ class World:
                 continue
 
             death_probability = mortality_profile["monthly_death_probability"]
-            if death_probability < 1.0 and random.random() >= death_probability:
+            if death_probability < 1.0 and rng.random() >= death_probability:
                 continue
 
             structural_transition = self.mark_actor_dead(
@@ -2386,11 +2349,19 @@ class World:
 
         return structural_transitions
 
-    def simulate_advance_turn(self, player_id: str, months_to_advance: int) -> dict:
+    def simulate_advance_turn(
+        self,
+        player_id: str,
+        months_to_advance: int,
+        *,
+        random_source=None,
+        id_source=None,
+    ) -> dict:
         """
         World-owned authoritative simulation-step boundary.
         Advances time month-by-month, collects events, applies outcomes, and writes event records.
         """
+        rng = random if random_source is None else random_source
         collected_structured_events = []
         focused_actor_id = self.get_focused_actor_id() or player_id
         if self.get_focused_actor_id() is None and focused_actor_id in self.actors:
@@ -2425,7 +2396,9 @@ class World:
             self.advance_months(1)
             months_advanced += 1
 
-            monthly_structural_transitions = self.resolve_monthly_mortality()
+            monthly_structural_transitions = self.resolve_monthly_mortality(
+                random_source=rng,
+            )
             focused_actor_transition = next(
                 (
                     transition
@@ -2442,7 +2415,11 @@ class World:
                 continuity_state = self.build_continuity_state_for(focused_actor_id)
                 break
 
-            family_event_result = self.resolve_monthly_family_events(focused_actor_id=focused_actor_id)
+            family_event_result = self.resolve_monthly_family_events(
+                focused_actor_id=focused_actor_id,
+                random_source=rng,
+                id_source=id_source,
+            )
             for surfaced_event in family_event_result["surfaced_events"]:
                 self.apply_outcome(focused_actor_id, surfaced_event.get("outcome"))
                 self.add_record(
@@ -2473,6 +2450,7 @@ class World:
                 family_context=family_context_for_event,
                 recent_event_ids=recent_event_ids,
                 actor_traits=actor_traits_for_event,
+                random_source=rng,
             )
             if structured_event_for_month:
                 self.apply_outcome(focused_actor_id, structured_event_for_month.get("outcome"))
@@ -2516,6 +2494,18 @@ class World:
             "advancement_block_reason": None,
         }
 
-def simulate_advance_turn(world, player_id: str, months_to_advance: int) -> dict:
+def simulate_advance_turn(
+    world,
+    player_id: str,
+    months_to_advance: int,
+    *,
+    random_source=None,
+    id_source=None,
+) -> dict:
     """Compatibility wrapper delegating to the world-owned simulation-step boundary."""
-    return world.simulate_advance_turn(player_id, months_to_advance)
+    return world.simulate_advance_turn(
+        player_id,
+        months_to_advance,
+        random_source=random_source,
+        id_source=id_source,
+    )

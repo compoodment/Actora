@@ -6,7 +6,7 @@ import math
 from copy import deepcopy
 from typing import Any, TypeAlias
 
-from .errors import ContractValidationError
+from .errors import ContractValidationError, NumericLimitError
 
 JSONScalar: TypeAlias = None | bool | int | float | str
 JSONValue: TypeAlias = JSONScalar | list["JSONValue"] | dict[str, "JSONValue"]
@@ -23,12 +23,12 @@ def parse_json_safe_int(value: str, *, path: str) -> int:
     """Parses a JSON integer without triggering unbounded Python conversion."""
     digits = value[1:] if value.startswith("-") else value
     if not digits or len(digits) > 16:
-        raise ContractValidationError(
+        raise NumericLimitError(
             f"{path} must be a JavaScript-safe integer"
         )
     parsed = int(value)
     if not MIN_SAFE_INTEGER <= parsed <= MAX_SAFE_INTEGER:
-        raise ContractValidationError(
+        raise NumericLimitError(
             f"{path} must be a JavaScript-safe integer"
         )
     return parsed
@@ -53,7 +53,7 @@ def _assert_json_value(value: Any, path: str) -> None:
         return
     if isinstance(value, int):
         if not MIN_SAFE_INTEGER <= value <= MAX_SAFE_INTEGER:
-            raise ContractValidationError(
+            raise NumericLimitError(
                 f"{path} must be a JavaScript-safe integer"
             )
         return
@@ -87,7 +87,7 @@ def require_int(
     if isinstance(value, bool) or not isinstance(value, int):
         raise ContractValidationError(f"{path} must be an integer")
     if not MIN_SAFE_INTEGER <= value <= MAX_SAFE_INTEGER:
-        raise ContractValidationError(
+        raise NumericLimitError(
             f"{path} must be a JavaScript-safe integer"
         )
     if minimum is not None and value < minimum:

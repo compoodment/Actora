@@ -75,43 +75,45 @@ class Human:
         """Derives and returns the full name of the human."""
         return f"{self.first_name} {self.last_name}".strip()
 
-    def randomize_starting_statistics(self):
+    def randomize_starting_statistics(self, *, random_source=None):
         """Randomizes health, happiness, and intelligence for a new human infant."""
-        self.stats["health"] = random.randint(85, 100) # Tighter range for human infant
-        self.stats["happiness"] = random.randint(80, 100) # Tighter range for human infant
-        self.stats["intelligence"] = random.randint(45, 60) # Tighter range for human infant
-        self.stats["strength"] = random.randint(30, 70)
-        self.stats["charisma"] = random.randint(30, 70)
-        self.stats["imagination"] = random.randint(30, 70)
-        self.stats["memory"] = random.randint(-10, 20)   # Signed: slight variation around 0
-        self.stats["stress"] = random.randint(0, 15)       # Signed: most start near baseline
-        self.stats["wisdom"] = random.randint(20, 50)
-        self.stats["discipline"] = random.randint(20, 50)
-        self.stats["willpower"] = random.randint(30, 70)
-        self.stats["looks"] = random.randint(30, 90)
-        self.stats["fertility"] = random.randint(50, 100)
+        rng = random if random_source is None else random_source
+        self.stats["health"] = rng.randint(85, 100) # Tighter range for human infant
+        self.stats["happiness"] = rng.randint(80, 100) # Tighter range for human infant
+        self.stats["intelligence"] = rng.randint(45, 60) # Tighter range for human infant
+        self.stats["strength"] = rng.randint(30, 70)
+        self.stats["charisma"] = rng.randint(30, 70)
+        self.stats["imagination"] = rng.randint(30, 70)
+        self.stats["memory"] = rng.randint(-10, 20)   # Signed: slight variation around 0
+        self.stats["stress"] = rng.randint(0, 15)       # Signed: most start near baseline
+        self.stats["wisdom"] = rng.randint(20, 50)
+        self.stats["discipline"] = rng.randint(20, 50)
+        self.stats["willpower"] = rng.randint(30, 70)
+        self.stats["looks"] = rng.randint(30, 90)
+        self.stats["fertility"] = rng.randint(50, 100)
         self.money = 0 # Money remains fixed at 0
 
         eye_colors = ["Brown", "Blue", "Green", "Hazel", "Gray", "Amber"]
         hair_colors = ["Black", "Brown", "Blonde", "Red", "Auburn"]
         skin_tones = ["Light", "Fair", "Medium", "Olive", "Tan", "Brown", "Dark"]
-        self.appearance["eye_color"] = random.choice(eye_colors)
-        self.appearance["hair_color"] = random.choice(hair_colors)
-        self.appearance["skin_tone"] = random.choice(skin_tones)
-        self.sexuality = random.choice(SEXUALITY_OPTIONS)
+        self.appearance["eye_color"] = rng.choice(eye_colors)
+        self.appearance["hair_color"] = rng.choice(hair_colors)
+        self.appearance["skin_tone"] = rng.choice(skin_tones)
+        self.sexuality = rng.choice(SEXUALITY_OPTIONS)
 
-        self.traits = random.sample(HUMAN_TRAIT_POOL, HUMAN_TRAIT_COUNT)
+        self.traits = rng.sample(HUMAN_TRAIT_POOL, HUMAN_TRAIT_COUNT)
 
-    def auto_resolve_identity(self):
+    def auto_resolve_identity(self, *, random_source=None):
         """Silently resolves unresolved gender/sexuality for non-played or resumed actors."""
+        rng = random if random_source is None else random_source
         if not self.gender or self.gender == self.sex:
-            if self.sex in {"Male", "Female"} and random.random() < 0.85:
+            if self.sex in {"Male", "Female"} and rng.random() < 0.85:
                 self.gender = self.sex
             else:
-                self.gender = random.choice(GENDER_IDENTITY_AUTO_OPTIONS)
+                self.gender = rng.choice(GENDER_IDENTITY_AUTO_OPTIONS)
 
         if self.sexuality is None:
-            self.sexuality = random.choice(SEXUALITY_OPTIONS)
+            self.sexuality = rng.choice(SEXUALITY_OPTIONS)
 
     def get_lifecycle_state(self, current_year, current_month):
         """

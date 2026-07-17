@@ -92,6 +92,15 @@ def _capture_pending_choice(runtime: Any) -> dict[str, JSONValue] | None:
         labels = getattr(choice_controller, "sexuality_option_labels", ())
         value_by_label = dict(labels) if isinstance(labels, (list, tuple)) else {}
         values = [value_by_label.get(label, label) for label in raw_options]
+    elif choice_id == "meeting_npc":
+        meeting_values = {
+            "Introduce yourself": "introduce",
+            "Keep to yourself": "keep_to_self",
+        }
+        values = [
+            meeting_values.get(label, label)
+            for label in raw_options
+        ]
     else:
         values = list(raw_options)
     if len(values) != len(raw_options):

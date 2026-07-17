@@ -189,15 +189,21 @@ CULTURE_NAME_POOLS = {
 }
 
 
-def resolve_family_last_name(player_last_name, culture_group=None):
+def resolve_family_last_name(
+    player_last_name,
+    culture_group=None,
+    *,
+    random_source=None,
+):
+    rng = random if random_source is None else random_source
     if player_last_name:
         return player_last_name
 
     culture_pool = CULTURE_NAME_POOLS.get(culture_group or "")
     if culture_pool:
-        return random.choice(culture_pool["last_names"])
+        return rng.choice(culture_pool["last_names"])
 
-    return random.choice(FALLBACK_LAST_NAME_POOL)
+    return rng.choice(FALLBACK_LAST_NAME_POOL)
 
 
 def prepare_parent_identity_context(
@@ -210,6 +216,7 @@ def prepare_parent_identity_context(
     culture_group=None,
     culture_key=None,
     era_key=None,
+    random_source=None,
 ):
     """Builds the current structured identity-generation seam for startup parent generation.
 
@@ -221,6 +228,7 @@ def prepare_parent_identity_context(
         resolved_family_last_name = resolve_family_last_name(
             player_last_name,
             culture_group=culture_group or culture_key,
+            random_source=random_source,
         )
 
     return {
@@ -241,7 +249,11 @@ def prepare_parent_identity_context(
     }
 
 
-def generate_parent_identity_from_context(identity_context):
+def generate_parent_identity_from_context(
+    identity_context,
+    *,
+    random_source=None,
+):
     """Generates a parent identity from a structured context seam.
 
     Current behavior remains intentionally narrow and human-only: role selection and
@@ -250,11 +262,13 @@ def generate_parent_identity_from_context(identity_context):
     role = identity_context.get("role")
     family_last_name = identity_context.get("family_last_name")
     culture_group = identity_context.get("culture_group") or identity_context.get("culture_key")
+    rng = random if random_source is None else random_source
 
     if family_last_name is None:
         family_last_name = resolve_family_last_name(
             identity_context.get("player_last_name"),
             culture_group=culture_group,
+            random_source=rng,
         )
 
     culture_pool = CULTURE_NAME_POOLS.get(culture_group, {})
@@ -263,7 +277,7 @@ def generate_parent_identity_from_context(identity_context):
 
     if role == "mother":
         return {
-            "first_name": random.choice(mother_first_names),
+            "first_name": rng.choice(mother_first_names),
             "last_name": family_last_name,
             "sex": "Female",
             "gender": "Female",
@@ -271,7 +285,7 @@ def generate_parent_identity_from_context(identity_context):
 
     if role == "father":
         return {
-            "first_name": random.choice(father_first_names),
+            "first_name": rng.choice(father_first_names),
             "last_name": family_last_name,
             "sex": "Male",
             "gender": "Male",
@@ -280,7 +294,13 @@ def generate_parent_identity_from_context(identity_context):
     raise ValueError("role must be 'mother' or 'father'")
 
 
-def generate_parent_identity(role, family_last_name, generation_context=None):
+def generate_parent_identity(
+    role,
+    family_last_name,
+    generation_context=None,
+    *,
+    random_source=None,
+):
     context = prepare_parent_identity_context(
         role=role,
         family_last_name=family_last_name,
@@ -295,5 +315,9 @@ def generate_parent_identity(role, family_last_name, generation_context=None):
         ),
         culture_key=(generation_context or {}).get("culture_key") if generation_context else None,
         era_key=(generation_context or {}).get("era_key") if generation_context else None,
+        random_source=random_source,
     )
-    return generate_parent_identity_from_context(context)
+    return generate_parent_identity_from_context(
+        context,
+        random_source=random_source,
+    )

@@ -2,7 +2,7 @@
 title: Codebase
 tags: [implementation, reference, stable]
 updated: 2026-07-18
-through: v0.56.0
+through: v0.57.0
 verified: 2026-07-18
 ---
 
@@ -11,7 +11,7 @@ verified: 2026-07-18
 Current repo implementation truth. What the code looks like right now.
 **Last verified against actual code:** 2026-07-18
 
-**Version:** 0.56.0
+**Version:** 0.57.0
 **Last Updated:** 2026-07-18
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
@@ -21,28 +21,30 @@ It is intended to support safe patching, review, and manual verification, alongs
 
 - **Language:** Python
 - **Interface:** Terminal with a curses-based startup character creation wizard and a curses TUI shell for ordinary play. Shell v2 (v0.48.0+): 7-row header (custom logo crest + flanking info panels, rows 0-6), body, 2-row footer. Split Life View, dedicated profile screen, tabbed Browser (Relationships tab + History tab), dedicated Actions screen, death/continuation interrupts, skip-time flow, and meeting/social event popups. Shell geometry centralized in `ActoraTUI` class constants: `HEADER_ROWS=7`, `FOOTER_ROWS=2`, `BROWSER_CHROME_ROWS=2` — all body renderers derive `top` and `body_height` from these.
-- **Headless checkpoint:** `actora_core/` is a curses-free native boundary for deterministic sources, strict JSON commands/results, schema-1 saves, validation, serialization, and the first action-queue dispatcher slice. It is not yet the complete gameplay engine and is not connected to a browser Worker.
+- **Headless checkpoint:** `actora_core/` is a curses-free native boundary for deterministic sources, strict JSON commands/results, schema-1 saves, validation, serialization, creation, action queues, and authoritative month advancement. Choice resolution and continuation remain before browser packaging; no browser Worker is connected yet.
 - **Structure:** Modular architecture with separated simulation, controllers, screens, view layers, and a provisional headless runtime boundary. Shell (`main.py`) is thin orchestration; screen controllers own per-surface input/render; view helpers own pure-data formatting; controllers own interaction logic.
 
 ## 2. Current File Structure
 
     ./
-    ├── main.py                    (871 lines - ActoraTUI shell, startup/entrypoints, screen delegation)
+    ├── main.py                    (750 lines - ActoraTUI shell, startup/entrypoints, screen delegation)
     ├── ui.py                      (168 lines - layout/drawing primitives)
-    ├── mechanics.py               (50 lines - game rule constants: traits, actions, time budget)
-    ├── wizard.py                  (1267 lines - CreationWizard class, all creation constants and questionnaire)
-    ├── world.py                   (2521 lines - simulation state, links, places, records, social links, mortality, advancement, geography, actions)
-    ├── identity.py                (299 lines - name pools, culture-aware identity generation)
-    ├── human.py                   (299 lines - Human model, lifecycle, spatial, snapshot)
-    ├── events.py                  (388 lines - human monthly events, meeting events)
+    ├── mechanics.py               (68 lines - game rule constants: traits, actions, time budget, identity choices)
+    ├── wizard.py                  (1227 lines - CreationWizard class, creation content and questionnaire)
+    ├── world.py                   (2511 lines - simulation state, links, places, records, social links, mortality, advancement, actions)
+    ├── geography.py               (138 lines - stdlib-only world geography data and lookup map)
+    ├── game_setup.py              (252 lines - curses-free startup world construction)
+    ├── identity.py                (323 lines - name pools, culture-aware identity generation)
+    ├── human.py                   (301 lines - Human model, lifecycle, spatial, snapshot)
+    ├── events.py                  (408 lines - human monthly events, meeting events)
     ├── app_router.py               (74 lines - top-level TUI input/render routing)
     ├── shell_controller.py         (75 lines - global menu/options/quit modal input handling)
     ├── shell_renderer.py           (236 lines - global chrome, footer, and popup rendering)
     ├── browser_state_controller.py (127 lines - lineage/relationship browser state adaptation)
     ├── choice_controller.py        (180 lines - pending-choice modal input handling)
     ├── continuation_controller.py  (85 lines - death acknowledgement and continuation handoff)
-    ├── event_log_controller.py     (116 lines - event-log accumulation and turn merge)
-    ├── life_event_controller.py    (89 lines - identity-choice and meeting-event offer logic)
+    ├── event_log_controller.py     (33 lines - terminal adapter over native history accumulation)
+    ├── life_event_controller.py    (88 lines - identity-choice and meeting-event offer logic)
     ├── time_controller.py          (103 lines - time advancement orchestration)
     ├── lint_player_text.py         (89 lines - scans all *.py for internal/dev language)
     ├── actora_core/                (curses-free command/save runtime boundary)
@@ -57,12 +59,14 @@ It is intended to support safe patching, review, and manual verification, alongs
     │   ├── serialization.py        (World/Human save and restore)
     │   ├── validation.py           (world/save invariants)
     │   ├── action_queue.py         (canonical queue/remove mutations)
+    │   ├── history.py              (174 lines - curses-free event-log accumulation)
+    │   ├── advancement.py          (390 lines - headless monthly orchestration)
     │   ├── dispatcher.py           (optimistic command dispatch)
     │   └── transport.py            (strict canonical JSON)
     ├── views/
     │   ├── __init__.py             (0 lines)
     │   ├── browser.py              (37 lines - lineage/relationship view helpers)
-    │   ├── history.py              (77 lines - event-log and history view helpers)
+    │   ├── history.py              (67 lines - event-log and history view helpers)
     │   ├── profile.py              (142 lines - profile dashboard view helpers)
     │   └── shell.py                (65 lines - shell chrome and lifecycle interrupt view helpers)
     ├── screens/
@@ -73,26 +77,28 @@ It is intended to support safe patching, review, and manual verification, alongs
     │   ├── history.py              (93 lines - history screen controller/renderer)
     │   ├── lineage.py              (164 lines - lineage browser screen controller/renderer)
     │   ├── main.py                 (145 lines - life-view screen controller/renderer)
-    │   ├── profile.py              (126 lines - profile screen controller/renderer)
-    │   ├── relationships.py        (191 lines - relationship browser screen controller/renderer)
+    │   ├── profile.py              (118 lines - profile screen controller/renderer)
+    │   ├── relationships.py        (194 lines - relationship browser screen controller/renderer)
     │   └── skip_time.py            (85 lines - skip-time screen controller/renderer)
     └── docs/
 
-### Import boundary (v0.56.0)
+### Import boundary (v0.57.0)
 
 No circular imports. Allowed import graph:
 
     ui.py                      → (standard lib only)
     mechanics.py               → (standard lib only)
+    geography.py               → (standard lib only)
     identity.py                → (standard lib only)
     events.py                  → (standard lib only)
     human.py                   → mechanics (standard lib)
     views.shell.py             → (standard lib only)
-    views.browser.py           → (standard lib only)
-    views.history.py           → ui (standard lib)
+    views.browser.py           → actora_core.history
+    views.history.py           → actora_core.history, ui
     views.profile.py           → views.history (standard lib)
-    world.py                   → human, identity, events, mechanics (standard lib)
-    wizard.py                  → human, ui, world (standard lib)
+    world.py                   → human, identity, events, geography, mechanics (standard lib)
+    game_setup.py              → geography, identity, world (standard lib)
+    wizard.py                  → game_setup, human, ui, world (standard lib)
     shell_controller.py        → (standard lib only)
     time_controller.py         → (standard lib only)
     continuation_controller.py → (standard lib only)
@@ -100,7 +106,7 @@ No circular imports. Allowed import graph:
     browser_state_controller.py → (standard lib only)
     choice_controller.py       → mechanics (standard lib)
     life_event_controller.py   → events (standard lib)
-    event_log_controller.py    → views.browser, views.history (standard lib)
+    event_log_controller.py    → actora_core.history
     shell_renderer.py          → ui, views.shell (standard lib)
     screens.main.py            → ui, views.history (standard lib)
     screens.profile.py         → ui, views.profile (standard lib)
@@ -117,13 +123,15 @@ No circular imports. Allowed import graph:
     actora_core.json_types     → errors (standard lib)
     actora_core.randomness     → errors (standard lib)
     actora_core.ids            → errors, json_types (standard lib)
-    actora_core.commands       → errors, json_types (standard lib)
+    actora_core.commands       → errors, json_types, geography, mechanics
     actora_core.session        → errors, json_types, randomness (mechanics only in the TUI adapter)
     actora_core.contracts      → commands, errors, ids, json_types, randomness, session
     actora_core.serialization  → contracts, errors, ids, json_types, randomness, session, validation
     actora_core.validation     → contracts, errors, json_types, mechanics
     actora_core.action_queue   → errors, ids, json_types, session, mechanics
-    actora_core.dispatcher     → action_queue, commands, contracts, errors, json_types, serialization
+    actora_core.history        → (standard lib only)
+    actora_core.advancement    → errors, history, ids, json_types, randomness, session, events, mechanics
+    actora_core.dispatcher     → action_queue, advancement, commands, contracts, errors, ids, json_types, randomness, serialization, session, game_setup (runtime)
     actora_core.transport      → commands, contracts, errors, json_types
 
 Rules:
@@ -259,13 +267,13 @@ Current structural-state details:
 - this still does not implement archive state, inheritance, or broader lifecycle/death gameplay beyond the current baseline old-age mortality rule
 
 Current stat-mutation boundary details:
-- `modify_stat(...)` supports any key present in `self.stats` (currently `health`, `happiness`, `intelligence`, `memory`, `stress`, `strength`, `charisma`, `imagination`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`) and applies clamped mutation in the inclusive range 0-100.
-- `modify_stat(...)` supports `"money"` through the separate unbounded money path (`self.money += change`).
+- `modify_stat(...)` supports any key present in `self.stats` (currently `health`, `happiness`, `intelligence`, `memory`, `stress`, `strength`, `charisma`, `imagination`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`). Memory and Stress clamp to -50..50; the other stats clamp to 0..100.
+- `modify_stat(...)` supports `"money"` through a separate additive path (`self.money += change`); the headless dispatcher rejects a result that would exceed the schema's JSON-safe numeric range.
 - Any unsupported stat name now fails explicitly with `ValueError` (including the bad stat name) instead of being silently ignored.
 
 Current startup creation flow details:
-- `start_game()` now prints the title banner in plain text, then enters curses for a dedicated `CreationWizard`, then builds the world from the returned character payload, and only then hands control to the ordinary-play TUI.
-- `CreationWizard` lives in `wizard.py` (extracted v0.53.0) and currently owns six startup steps: identity, location, appearance, traits, stats, and confirmation.
+- `start_game()` enters curses for a dedicated `CreationWizard`, builds the world from the returned character payload, and only then hands control to the ordinary-play TUI.
+- `CreationWizard` lives in `wizard.py` (extracted v0.53.0). Identity, Location, Appearance, and Creation Mode are shared; the questionnaire branch then reaches six total steps, while the manual Stats/Traits branch reaches seven.
 - startup character payloads now include `first_name`, `last_name`, `sex`, `gender`, `country_id`, `city_id`, `appearance`, `traits`, and `stats`
 - player startup world creation now routes through `setup_initial_world_from_character(...)`, which hydrates the full real-world place registry from module-level `WORLD_GEOGRAPHY`, while the older `setup_initial_world(...)` still exists as a compatibility wrapper for callers that pass only the older four identity values
 
@@ -504,7 +512,7 @@ Responsible for:
 ### `time_controller.py` & `event_log_controller.py`
 - orchestration of the world turn advancement boundary
 - extracting events and month counts into the shell event log
-- shaping events for live feed vs history feed
+- adapting the terminal to the same curses-free history accumulator used by headless advancement
 
 ### Controllers (e.g. `choice_controller.py`, `continuation_controller.py`, `life_event_controller.py`)
 - extracting complex interaction flows (pending choice modal, death handoff, identity emergence) out of the main loop
@@ -524,7 +532,13 @@ Responsible for:
 - identity, location, appearance inputs
 - producing the final startup character payload
 
-Current startup flow is human-only. `start_game()` runs the curses-based `CreationWizard`, builds the world through `setup_initial_world_from_character(...)`, and only then hands control to the ordinary-play shell. Startup actor IDs are now generated through the narrow `generate_startup_actor_id(...)` helper in `main.py` rather than reusing fixed singleton strings for mother, father, and player. Current startup IDs follow the `startup_<role>_<suffix>` pattern, such as `startup_mother_ab12cd34`, `startup_father_ef56gh78`, and `startup_player_ij90kl12`. Startup actor spatial identity is now applied through the world-owned `update_actor_spatial_identity(...)` seam instead of direct field pokes inside actor creation. Startup parent ages now vary within a narrow adult range, some worlds now generate older siblings before the player is born through `World.bootstrap_older_siblings_for_newborn(...)`, and only-child worlds still remain possible. Once startup completes, ordinary play now lives inside a curses shell with dedicated screen controllers managing the Life View, Profile dashboard, tabbed Browser (Relationships/History), and Actions.
+Current startup flow is human-only. `start_game()` runs the curses-based `CreationWizard`, builds the world through the shared `game_setup.setup_initial_world_from_character(...)` seam, and only then hands control to the ordinary-play shell. The terminal uses UUID-backed startup IDs through the compatibility default; headless creation injects sequential IDs such as `actora_startup_mother_00000001`. Startup actor spatial identity and final player creation fields are applied through world-owned seams instead of direct field pokes. Startup parent ages vary within a narrow adult range, some worlds generate older siblings through `World.bootstrap_older_siblings_for_newborn(...)`, and only-child worlds remain possible. Once startup completes, ordinary play lives inside the curses shell with dedicated screen controllers managing Life View, Profile, Browser, and Actions.
+
+### `geography.py` & `game_setup.py`
+- `geography.py` owns the canonical startup country/city data, defaults, and lookup map without importing simulation or terminal modules.
+- `game_setup.py` owns curses-free creation-stat normalization, startup actor ID generation, and initial world/family construction.
+- Omitted sources preserve terminal-compatible stdlib randomness and UUID IDs. The headless dispatcher injects the save-owned PCG and sequential ID sources.
+- Character-command validation checks the same geography table before setup; setup keeps a defensive country/city invariant check.
 
 ### `identity.py`
 Responsible for:
@@ -591,7 +605,7 @@ Current event boundary truth:
 
 ## 7. Simulation Boundary
 
-### Headless command/save checkpoint (v0.56.0)
+### Headless command/save runtime (v0.57.0)
 
 `actora_core` now defines the native boundary that a future terminal adapter and browser Worker can share:
 
@@ -600,11 +614,28 @@ Current event boundary truth:
 - caller-owned request IDs that never consume simulation IDs
 - strict JSON parsing with duplicate-key, non-finite, unsafe-integer, unknown-field, and malformed-state rejection
 - optimistic concurrency through `expected_revision`
-- structured results with events, effects, interruption, and error channels
+- structured results with events, effects, exact tagged interruptions, and error channels
 - complete pending-choice options with stable option IDs
-- byte-preserving failures and one-revision successful queue/remove mutations
+- byte-preserving failures and one-revision successful mutations
 
-Only `queue_action` and `remove_action` execute in v0.56.0. The other command shapes exist so their intent boundary can be reviewed, but return `command_not_implemented`. Existing terminal gameplay still uses its legacy global randomness and controller orchestration. A terminal queue created outside the dispatcher has no durable action ID and therefore cannot be captured as a schema-1 engine save yet.
+`create_game`, `queue_action`, `remove_action`, and `advance_time` execute in v0.57.0. `resolve_choice` and `continue_as` retain validated intent shapes but return `command_not_implemented`.
+
+Native creation:
+- accepts exactly the current nine-field human creation payload and a lowercase 16-digit hexadecimal seed
+- validates names, sex/current default gender, canonical country/city pairing, appearance, exactly four canonical traits, and all 13 finite in-range stats
+- constructs startup parents/siblings/player through `game_setup.py` using `SeededRandomSource(int(seed, 16))` and `DeterministicIdSource("actora")`
+- creates `GameSession` only after world construction, preserving source-consumption order
+
+Native advancement:
+- restores the save-owned PCG/ID sources and processes each requested month in terminal-compatible order
+- resolves queued social actions before personal actions in the first completed month, then clears the engine queue
+- applies grief and relationship decay, offers gender before sexuality before meetings, and stops on choice or focused-person death
+- stores remaining skip months only for a choice and emits an exact `choice_required` or `continuation_required` interruption tied back to the returned save
+- consumes sequential IDs for family births and returns an atomic `identifier_limit` failure if the source is depleted
+- rejects an unrepresentable total-month horizon before mutation, returns an atomic `state_limit` if a safe numeric field would overflow, and records only represented history years rather than expanding empty gaps
+- preserves deterministic output and save bytes across serialization/reload
+
+The action-queue and create/advance golden traces lock current native behavior. Existing terminal gameplay still uses its controller orchestration and legacy global sources outside the headless dispatcher, although startup construction and history accumulation now share curses-free seams. A terminal queue created outside the dispatcher has no durable action ID and therefore cannot be captured as a schema-1 engine save yet. No browser Worker is connected.
 
 The schema-1 engine executes only when `engine_kind` is exactly `python-headless`. Foreign kinds may be parsed solely so dispatch can return a structured, byte-preserving mismatch; they are never executed as this engine.
 
@@ -700,8 +731,8 @@ Current initialization behavior:
 - parent first names are randomized from approved internal mother/father pools
 - parent last names inherit the player last name when provided
 - if player last name is blank, parent last names use a random fallback from `FALLBACK_LAST_NAME_POOL`
-- startup mother, startup father, and startup player each receive `current_place_id = "earth_city_01"` and `residence_place_id = "earth_city_01"` during setup
-- those same startup actors also receive `jurisdiction_place_id = "earth_country_01"` during setup while `temporary_occupancy_place_id` remains unset (`None`)
+- startup mother, startup father, bootstrapped siblings, and startup player receive the selected city as current place and residence
+- those same startup actors receive the selected country as jurisdiction while `temporary_occupancy_place_id` remains unset (`None`)
 - those startup spatial assignments now flow through `World.update_actor_spatial_identity(...)`, which leaves unspecified fields unchanged and fails explicitly on unknown actor IDs or unknown non-`None` place IDs
 - startup actor IDs now follow the `startup_<role>_<suffix>` pattern instead of fixed singleton IDs, while preserving the current one-family startup shape and parent/player lookup behavior
 - parent birth months are randomized from 1-12

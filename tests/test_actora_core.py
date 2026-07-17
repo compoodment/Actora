@@ -420,7 +420,7 @@ class SaveRoundtripTests(unittest.TestCase):
         _, _, _, envelope = self.build_envelope(revision=8)
         result = CommandResult(
             command_id="save_command_00000003",
-            command_type=CommandType.ADVANCE_TIME,
+            command_type=CommandType.QUEUE_ACTION,
             ok=True,
             revision=8,
             save=envelope,

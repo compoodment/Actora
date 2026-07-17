@@ -38,6 +38,24 @@ TRAIT_DEFINITIONS = {
 HUMAN_TRAIT_POOL = tuple(TRAIT_DEFINITIONS)
 HUMAN_TRAIT_COUNT = 4
 
+MEETING_EVENT_COOLDOWN_MONTHS = 18
+GENDER_IDENTITY_OPTIONS = (
+    "Male",
+    "Female",
+    "Non-binary",
+    "Agender",
+    "Genderfluid",
+    "Other",
+)
+SEXUALITY_OPTION_LABELS = (
+    ("Opposite gender (Heterosexual)", "Heterosexual"),
+    ("Same gender (Homosexual)", "Homosexual"),
+    ("Both genders (Bisexual)", "Bisexual"),
+    ("No one in particular (Asexual)", "Asexual"),
+    ("People regardless of gender (Pansexual)", "Pansexual"),
+    ("It is hard to define (Queer)", "Queer"),
+)
+
 
 def get_monthly_free_hours(actor):
     """Returns the actor's monthly free hours based on sleep hours from traits."""

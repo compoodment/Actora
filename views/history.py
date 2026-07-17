@@ -1,17 +1,7 @@
 """History and event-log view helpers."""
 
+from actora_core.history import build_event_log_entry
 from ui import build_centered_rule, wrap_text_line
-
-
-def build_event_log_entry(kind, text, *, year=None, month=None, record_type=None):
-    """Builds one normalized event-log entry for shell-owned history rendering."""
-    return {
-        "kind": kind,
-        "text": text,
-        "year": year,
-        "month": month,
-        "record_type": record_type,
-    }
 
 
 def get_event_log_marker(record_type):

@@ -189,11 +189,11 @@ def build_save_envelope(
     format_version: int = 1,
     schema_version: int = 1,
 ) -> SaveEnvelope:
-    """Captures world/session data plus the future injected-source states.
+    """Captures world/session data plus the injected-source states.
 
-    Existing gameplay still uses module-global randomness.  This becomes a
-    deterministic resume boundary only after those call sites adopt the
-    supplied sources.
+    The headless dispatcher restores this exact state. Terminal compatibility
+    paths continue using module-global sources until they adopt the same
+    command boundary.
     """
     envelope = SaveEnvelope(
         engine_version=engine_version,

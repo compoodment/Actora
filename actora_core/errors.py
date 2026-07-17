@@ -10,6 +10,14 @@ class ContractValidationError(ValueError):
     """Raised when a command or serialized contract has an invalid shape."""
 
 
+class NumericLimitError(ContractValidationError):
+    """Raised when an otherwise numeric JSON value exceeds its safe range."""
+
+
+class IdentifierExhaustedError(ContractValidationError):
+    """Raised when a valid deterministic ID source cannot allocate again."""
+
+
 class CommandRejectedError(Exception):
     """Expected domain rejection converted into a structured command result."""
 

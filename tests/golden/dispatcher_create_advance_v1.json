@@ -1,0 +1,99 @@
+{
+  "contract": "dispatcher-create-advance-v1",
+  "steps": [
+    {
+      "actor_ids": [
+        "actora_startup_father_00000002",
+        "actora_startup_mother_00000001",
+        "actora_startup_player_00000003"
+      ],
+      "command_id": "trace-create-01",
+      "command_type": "create_game",
+      "cooldown": {},
+      "date": {
+        "month": 1,
+        "year": 1
+      },
+      "effects": [
+        {
+          "focused_actor_id": "actora_startup_player_00000003",
+          "kind": "game_created"
+        }
+      ],
+      "error_code": null,
+      "events": [],
+      "focused_actor_id": "actora_startup_player_00000003",
+      "ids": {
+        "algorithm": "sequential-v1",
+        "namespace": "actora",
+        "next_value": 4
+      },
+      "interruption": null,
+      "ok": true,
+      "revision": 1,
+      "rng": {
+        "algorithm": "pcg32-v1",
+        "increment": "000000000000006d",
+        "state": "b915db08e5162a12"
+      },
+      "save_sha256": "c2b2fa4e5f934706027a493e8daacaae27f241b13c3dcc059e71abb3d0138790"
+    },
+    {
+      "actor_ids": [
+        "actora_startup_father_00000002",
+        "actora_startup_mother_00000001",
+        "actora_startup_player_00000003"
+      ],
+      "command_id": "trace-advance-02",
+      "command_type": "advance_time",
+      "cooldown": {
+        "actora_startup_player_00000003": [
+          "fussy_refused_meal"
+        ]
+      },
+      "date": {
+        "month": 2,
+        "year": 1
+      },
+      "effects": [
+        {
+          "kind": "time_advanced",
+          "months_advanced": 1,
+          "months_requested": 1
+        }
+      ],
+      "error_code": null,
+      "events": [
+        {
+          "event_id": "fussy_refused_meal",
+          "month": 2,
+          "outcome": {
+            "stat_changes": {
+              "happiness": -1
+            }
+          },
+          "tags": [
+            "negative"
+          ],
+          "text": "You refused to eat something and made a whole thing about it.",
+          "year": 1
+        }
+      ],
+      "focused_actor_id": "actora_startup_player_00000003",
+      "ids": {
+        "algorithm": "sequential-v1",
+        "namespace": "actora",
+        "next_value": 4
+      },
+      "interruption": null,
+      "ok": true,
+      "revision": 2,
+      "rng": {
+        "algorithm": "pcg32-v1",
+        "increment": "000000000000006d",
+        "state": "ed46903f95124223"
+      },
+      "save_sha256": "3ab0be60eb70f13fc97eb28b41c5bc6fa32d744738f1191872f2a6c55cfda5b7"
+    }
+  ]
+}

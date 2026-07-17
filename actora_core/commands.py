@@ -1,11 +1,15 @@
-"""Versionable JSON command contract for a future headless dispatcher."""
+"""Versionable JSON command contract for the headless dispatcher."""
 
 from __future__ import annotations
 
+import math
 import re
 from dataclasses import dataclass
 from enum import Enum
 from typing import Callable
+
+from geography import WORLD_GEOGRAPHY_BY_COUNTRY_ID
+from mechanics import TRAIT_DEFINITIONS
 
 from .errors import ContractValidationError
 from .json_types import (
@@ -18,6 +22,39 @@ from .json_types import (
 
 MAX_ADVANCE_MONTHS = 120
 _CREATE_SEED_PATTERN = re.compile(r"^[0-9a-f]{16}$")
+_CREATE_CHARACTER_FIELDS = {
+    "first_name",
+    "last_name",
+    "sex",
+    "gender",
+    "country_id",
+    "city_id",
+    "appearance",
+    "traits",
+    "stats",
+}
+_CREATE_APPEARANCE_FIELDS = {"eye_color", "hair_color", "skin_tone"}
+_CREATE_STAT_FIELDS = {
+    "health",
+    "happiness",
+    "intelligence",
+    "strength",
+    "charisma",
+    "imagination",
+    "memory",
+    "wisdom",
+    "stress",
+    "discipline",
+    "willpower",
+    "looks",
+    "fertility",
+}
+_SIGNED_CREATE_STAT_FIELDS = {"memory", "stress"}
+_CREATE_SEX_TO_GENDER = {
+    "Male": "Male",
+    "Female": "Female",
+    "Intersex": "Non-binary",
+}
 
 
 class CommandType(str, Enum):
@@ -31,10 +68,15 @@ class CommandType(str, Enum):
     CONTINUE_AS = "continue_as"
 
 
-def _require_object_key(payload: JSONObject, key: str) -> JSONObject:
+def _require_object_key(
+    payload: JSONObject,
+    key: str,
+    *,
+    path: str = "command.payload",
+) -> JSONObject:
     if key not in payload or not isinstance(payload[key], dict):
-        raise ContractValidationError(f"command.payload.{key} must be an object")
-    return clone_json_object(payload[key], path=f"command.payload.{key}")
+        raise ContractValidationError(f"{path}.{key} must be an object")
+    return clone_json_object(payload[key], path=f"{path}.{key}")
 
 
 def _reject_unknown_fields(
@@ -54,13 +96,160 @@ def _reject_unknown_fields(
         )
 
 
+def _require_trimmed_string(value: object, *, path: str) -> str:
+    normalized = require_nonempty_string(value, path=path)
+    if normalized != normalized.strip():
+        raise ContractValidationError(
+            f"{path} must not start or end with whitespace"
+        )
+    return normalized
+
+
+def _validate_create_character(character: JSONObject) -> None:
+    _reject_unknown_fields(
+        character,
+        _CREATE_CHARACTER_FIELDS,
+        path="command.payload.character",
+    )
+    missing_fields = sorted(_CREATE_CHARACTER_FIELDS - set(character))
+    if missing_fields:
+        raise ContractValidationError(
+            "command.payload.character is missing fields: "
+            + ", ".join(missing_fields)
+        )
+
+    for field_name in (
+        "first_name",
+        "last_name",
+        "country_id",
+        "city_id",
+    ):
+        _require_trimmed_string(
+            character.get(field_name),
+            path=f"command.payload.character.{field_name}",
+        )
+
+    country_id = character["country_id"]
+    city_id = character["city_id"]
+    country = WORLD_GEOGRAPHY_BY_COUNTRY_ID.get(country_id)
+    if country is None:
+        raise ContractValidationError(
+            "command.payload.character.country_id is unknown"
+        )
+    if city_id not in {
+        city["city_id"] for city in country["cities"]
+    }:
+        raise ContractValidationError(
+            "command.payload.character.city_id must belong to "
+            "command.payload.character.country_id"
+        )
+
+    sex = _require_trimmed_string(
+        character.get("sex"),
+        path="command.payload.character.sex",
+    )
+    if sex not in _CREATE_SEX_TO_GENDER:
+        raise ContractValidationError(
+            "command.payload.character.sex must be Male, Female, or Intersex"
+        )
+    gender = _require_trimmed_string(
+        character.get("gender"),
+        path="command.payload.character.gender",
+    )
+    expected_gender = _CREATE_SEX_TO_GENDER[sex]
+    if gender != expected_gender:
+        raise ContractValidationError(
+            "command.payload.character.gender must match the current "
+            f"creation default for {sex}: {expected_gender}"
+        )
+
+    appearance = _require_object_key(
+        character,
+        "appearance",
+        path="command.payload.character",
+    )
+    _reject_unknown_fields(
+        appearance,
+        _CREATE_APPEARANCE_FIELDS,
+        path="command.payload.character.appearance",
+    )
+    missing_appearance = sorted(
+        _CREATE_APPEARANCE_FIELDS - set(appearance)
+    )
+    if missing_appearance:
+        raise ContractValidationError(
+            "command.payload.character.appearance is missing fields: "
+            + ", ".join(missing_appearance)
+        )
+    for field_name in sorted(_CREATE_APPEARANCE_FIELDS):
+        _require_trimmed_string(
+            appearance.get(field_name),
+            path=f"command.payload.character.appearance.{field_name}",
+        )
+
+    traits = character.get("traits")
+    if not isinstance(traits, list):
+        raise ContractValidationError(
+            "command.payload.character.traits must be an array"
+        )
+    if (
+        len(traits) != 4
+        or any(not isinstance(trait, str) for trait in traits)
+        or len(set(traits)) != 4
+        or any(trait not in TRAIT_DEFINITIONS for trait in traits)
+    ):
+        raise ContractValidationError(
+            "command.payload.character.traits must contain exactly 4 "
+            "unique canonical human traits"
+        )
+
+    stats = _require_object_key(
+        character,
+        "stats",
+        path="command.payload.character",
+    )
+    _reject_unknown_fields(
+        stats,
+        _CREATE_STAT_FIELDS,
+        path="command.payload.character.stats",
+    )
+    missing_stats = sorted(_CREATE_STAT_FIELDS - set(stats))
+    if missing_stats:
+        raise ContractValidationError(
+            "command.payload.character.stats is missing fields: "
+            + ", ".join(missing_stats)
+        )
+    for stat_name in sorted(_CREATE_STAT_FIELDS):
+        stat_value = stats.get(stat_name)
+        if (
+            isinstance(stat_value, bool)
+            or not isinstance(stat_value, (int, float))
+            or not math.isfinite(stat_value)
+        ):
+            raise ContractValidationError(
+                "command.payload.character.stats."
+                f"{stat_name} must be a finite number"
+            )
+        minimum, maximum = (
+            (-50, 50)
+            if stat_name in _SIGNED_CREATE_STAT_FIELDS
+            else (0, 100)
+        )
+        if not minimum <= stat_value <= maximum:
+            raise ContractValidationError(
+                "command.payload.character.stats."
+                f"{stat_name} must be between {minimum} and {maximum}"
+            )
+
+
 def _validate_create_game(payload: JSONObject) -> None:
     _reject_unknown_fields(
         payload,
         {"character", "seed"},
         path="command.payload",
     )
-    _require_object_key(payload, "character")
+    character = _require_object_key(payload, "character")
+    _validate_create_character(character)
     seed = require_nonempty_string(
         payload.get("seed"),
         path="command.payload.seed",

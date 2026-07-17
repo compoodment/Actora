@@ -24,16 +24,15 @@ class LifeEventController:
             return False
 
         if age_years >= app.gender_choice_age and not app.gender_choice_offered:
-            selected_index = (
-                self.gender_identity_options.index(current_gender)
-                if current_gender in self.gender_identity_options
-                else 0
-            )
+            options = list(self.gender_identity_options)
+            if current_gender not in options:
+                options.append(current_gender)
+            selected_index = options.index(current_gender)
             app.pending_choice = {
                 "title": "A moment of self-reflection",
                 "text": "As you grow, you find yourself thinking more about who you are.",
                 "question": "Your gender identity feels like:",
-                "options": list(self.gender_identity_options),
+                "options": options,
                 "selected_index": selected_index,
                 "skippable": True,
                 "choice_id": "gender_identity",

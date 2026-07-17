@@ -6,6 +6,16 @@ updated: 2026-07-18
 
 # Actora Changelog
 
+## Version 0.57.0 (Minor) - 2026-07-18
+- **Deterministic native creation:** `create_game` now validates the complete intent-only character payload, interprets its 16-digit seed as a hexadecimal integer, constructs the startup family through injected PCG/ID sources, and returns a schema-1 save at revision 1.
+- **Authoritative headless advancement:** `advance_time` now runs native month-by-month simulation, queued social/personal actions, grief, relationship decay, identity emergence, meeting choices, early death interruption, saved history, and remaining-skip state in terminal-compatible order.
+- **Portable native sources:** Injected randomness and sequential IDs now flow through startup names/ages/stats/siblings, ordinary events, family births, mortality, meeting selection, generated people, and identity resolution seams. Omitted sources retain the terminal's stdlib-random/UUID compatibility path.
+- **Strict interruption contract:** Choice and continuation results now use exact tagged payloads, are checked against the returned save, and are revalidated before serialization. Forged choices, resume counts, death identity, candidate sets, or post-construction mutations are rejected.
+- **Atomic source and state limits:** Family births consume the saved ID stream, while advancement rejects an unrepresentable timeline or post-simulation numeric overflow before committing it. Exhaustion returns a structured failure without changing the supplied save, RNG, IDs, or revision; history also avoids materializing empty intervening years.
+- **Shared curses-free seams:** Extracted canonical geography, startup construction, and event-log accumulation into `geography.py`, `game_setup.py`, and `actora_core/history.py`; the terminal delegates to them without changing its presentation flow.
+- **Golden and adversarial coverage:** Added deterministic create/advance golden output, reload parity, global-RNG isolation, action ordering, identity precedence, meeting semantics, family-birth IDs, bounded timeline/state handling, death/choice interruption, strict result loading, and terminal-adapter regressions. The full suite now covers 65 tests.
+- **Scope boundary:** `resolve_choice` and `continue_as` remain the two unimplemented dispatcher commands. No browser Worker or `/lab/actora` runtime cutover is claimed by this release.
+
 ## Version 0.56.0 (Minor) - 2026-07-18
 - **Curses-free native core boundary:** Added the `actora_core` package with versioned command, result, save, session, deterministic RNG, deterministic ID, serialization, validation, and strict JSON transport contracts.
 - **Deterministic action queue:** Added intent-only queueing and durable-ID removal. The engine derives action costs, labels, effects, and event text. Successful mutations increment the save revision once; rejected commands preserve save bytes, RNG state, and ID state.

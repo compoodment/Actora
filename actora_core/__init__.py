@@ -1,13 +1,12 @@
-"""Curses-free contracts for Actora's future headless runtime.
+"""Curses-free contracts for Actora's headless runtime.
 
-This package intentionally exposes state and transport seams without taking
-over gameplay orchestration yet.  Importing it must never import the terminal
-shell.
+Importing it must never import the terminal shell.
 """
 
 from .commands import CommandType, GameCommand
 from .contracts import CommandError, CommandResult, SaveEnvelope
 from .dispatcher import (
+    ENGINE_VERSION,
     SUPPORTED_ENGINE_KIND,
     dispatch_command,
     dispatch_serialized_command,
@@ -15,8 +14,10 @@ from .dispatcher import (
 from .errors import (
     CommandRejectedError,
     ContractValidationError,
+    IdentifierExhaustedError,
     InvariantError,
     InvariantViolation,
+    NumericLimitError,
 )
 from .ids import DeterministicIdSource, IdSource, IdState
 from .randomness import RandomSource, RandomState, SeededRandomSource
@@ -50,12 +51,15 @@ __all__ = [
     "CommandType",
     "ContractValidationError",
     "DeterministicIdSource",
+    "ENGINE_VERSION",
     "GameCommand",
     "GameSession",
     "IdSource",
     "IdState",
+    "IdentifierExhaustedError",
     "InvariantError",
     "InvariantViolation",
+    "NumericLimitError",
     "RandomSource",
     "RandomState",
     "RestoredSave",

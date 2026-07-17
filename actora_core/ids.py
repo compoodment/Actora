@@ -6,7 +6,7 @@ import re
 from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
 
-from .errors import ContractValidationError
+from .errors import ContractValidationError, IdentifierExhaustedError
 from .json_types import MAX_SAFE_INTEGER, require_int
 
 _ID_SEGMENT_PATTERN = re.compile(r"^[a-z0-9]+(?:_[a-z0-9]+)*$")
@@ -94,7 +94,7 @@ class DeterministicIdSource:
     def next_id(self, role: str) -> str:
         normalized_role = _validate_segment(role, path="role")
         if self._next_value >= MAX_SAFE_INTEGER:
-            raise ContractValidationError(
+            raise IdentifierExhaustedError(
                 "ids.next_value cannot advance beyond the JavaScript-safe range"
             )
         value = self._next_value

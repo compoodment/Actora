@@ -87,6 +87,43 @@ def command(
     )
 
 
+def build_creation_character() -> dict:
+    return {
+        "first_name": "Ada",
+        "last_name": "Trace",
+        "sex": "Female",
+        "gender": "Female",
+        "country_id": "us",
+        "city_id": "us_new_york",
+        "appearance": {
+            "eye_color": "Brown",
+            "hair_color": "Black",
+            "skin_tone": "Medium",
+        },
+        "traits": [
+            "Curious",
+            "Disciplined",
+            "Empathetic",
+            "Resilient",
+        ],
+        "stats": {
+            "health": 80,
+            "happiness": 70,
+            "intelligence": 75,
+            "strength": 50,
+            "charisma": 55,
+            "imagination": 65,
+            "memory": 0,
+            "wisdom": 45,
+            "stress": 0,
+            "discipline": 70,
+            "willpower": 60,
+            "looks": 50,
+            "fertility": 50,
+        },
+    }
+
+
 class DispatcherMutationTests(unittest.TestCase):
     def test_personal_intent_queues_only_canonical_engine_effects(self) -> None:
         save = build_dispatch_save(revision=4)
@@ -245,8 +282,11 @@ class DispatcherMutationTests(unittest.TestCase):
             ),
             command(
                 "request-unimplemented",
-                CommandType.ADVANCE_TIME,
-                {"months": 1},
+                CommandType.RESOLVE_CHOICE,
+                {
+                    "choice_id": "gender_identity",
+                    "option_id": "value:Female",
+                },
                 9,
             ),
         )
@@ -402,17 +442,41 @@ class ContractHardeningTests(unittest.TestCase):
         create = command(
             "request-create",
             CommandType.CREATE_GAME,
-            {"character": {}, "seed": "0123456789abcdef"},
+            {
+                "character": build_creation_character(),
+                "seed": "0123456789abcdef",
+            },
             0,
         )
         result = dispatch_command(None, create)
-        self.assertEqual(result.error.code, "command_not_implemented")
-        self.assertIsNone(result.save)
+        self.assertTrue(result.ok)
+        self.assertIsNone(result.error)
+        self.assertEqual(result.revision, 1)
+        self.assertEqual(result.save.engine_version, "0.57.0")
+        self.assertEqual(
+            result.save.session.focused_actor_id,
+            "actora_startup_player_00000003",
+        )
+        self.assertEqual(result.save.ids.next_value, 4)
+        self.assertEqual(
+            sorted(result.save.world["actors"]),
+            [
+                "actora_startup_father_00000002",
+                "actora_startup_mother_00000001",
+                "actora_startup_player_00000003",
+            ],
+        )
 
         invalid_create_payloads = (
-            {"character": {}},
-            {"character": {}, "seed": "ABCDEF0123456789"},
-            {"character": {}, "seed": "short"},
+            {"character": build_creation_character()},
+            {
+                "character": build_creation_character(),
+                "seed": "ABCDEF0123456789",
+            },
+            {
+                "character": build_creation_character(),
+                "seed": "short",
+            },
         )
         for payload in invalid_create_payloads:
             with self.assertRaises(ContractValidationError):
@@ -422,6 +486,54 @@ class ContractHardeningTests(unittest.TestCase):
                     payload,
                     0,
                 )
+
+        malformed_characters = []
+        for field_name in (
+            "first_name",
+            "appearance",
+            "traits",
+            "stats",
+        ):
+            malformed = build_creation_character()
+            del malformed[field_name]
+            malformed_characters.append(malformed)
+
+        wrong_gender = build_creation_character()
+        wrong_gender["gender"] = "Male"
+        malformed_characters.append(wrong_gender)
+
+        duplicate_traits = build_creation_character()
+        duplicate_traits["traits"] = ["Curious"] * 4
+        malformed_characters.append(duplicate_traits)
+
+        extra_stat = build_creation_character()
+        extra_stat["stats"]["client_power"] = 100
+        malformed_characters.append(extra_stat)
+
+        out_of_range_stat = build_creation_character()
+        out_of_range_stat["stats"]["health"] = 101
+        malformed_characters.append(out_of_range_stat)
+
+        unknown_country = build_creation_character()
+        unknown_country["country_id"] = "unknown"
+        malformed_characters.append(unknown_country)
+
+        mismatched_city = build_creation_character()
+        mismatched_city["city_id"] = "germany_berlin"
+        malformed_characters.append(mismatched_city)
+
+        for index, character in enumerate(malformed_characters):
+            with self.subTest(character_index=index):
+                with self.assertRaises(ContractValidationError):
+                    command(
+                        f"request-invalid-character-{index}",
+                        CommandType.CREATE_GAME,
+                        {
+                            "character": character,
+                            "seed": "0123456789abcdef",
+                        },
+                        0,
+                    )
 
         command(
             "request-max-revision",
@@ -838,8 +950,11 @@ class GoldenTraceTests(unittest.TestCase):
             ),
             command(
                 "trace-request-07",
-                CommandType.ADVANCE_TIME,
-                {"months": 1},
+                CommandType.RESOLVE_CHOICE,
+                {
+                    "choice_id": "gender_identity",
+                    "option_id": "value:Female",
+                },
                 3,
             ),
             command(

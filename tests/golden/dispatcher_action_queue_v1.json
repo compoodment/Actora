@@ -170,7 +170,7 @@
         }
       ],
       "command_id": "trace-request-07",
-      "command_type": "advance_time",
+      "command_type": "resolve_choice",
       "effects": [],
       "error_code": "command_not_implemented",
       "next_id": 3,

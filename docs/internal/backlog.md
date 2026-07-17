@@ -2,7 +2,7 @@
 title: Backlog
 tags: [planning, tracking, wip]
 updated: 2026-07-18
-through: v0.56.0
+through: v0.57.0
 ---
 
 # Actora Backlog
@@ -13,7 +13,7 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Now
 
-- **Authoritative headless runtime completion** — extend the v0.56.0 command/save checkpoint with deterministic `create_game`, one-month/multi-month `advance_time`, `resolve_choice`, and `continue_as`. Inject the saved PCG/ID sources through startup, identity, events, family generation, mortality, and continuation without monkeypatching or importing curses. Add native creation/advance golden traces before browser packaging. *(2026-07-18)*
+- **Authoritative headless runtime completion** — finish `resolve_choice` and `continue_as` on top of the deterministic v0.57.0 creation/advancement boundary. Choice resolution must apply engine-owned identity/meeting effects through stable option IDs, resume saved skip time correctly, and hand death continuation through the world-owned focus seam. Add native golden traces for both commands before browser packaging. *(2026-07-18)*
 
 
 ## Next

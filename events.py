@@ -235,8 +235,14 @@ def _get_human_eligible_events(lifecycle_state: dict, family_context=None, actor
     return eligible_events
 
 
-def _render_event_text(chosen_event, family_context):
+def _render_event_text(
+    chosen_event,
+    family_context,
+    *,
+    random_source=None,
+):
     """Renders one event text, resolving family placeholders when required."""
+    rng = random if random_source is None else random_source
     event_text = chosen_event["text"]
     if not chosen_event.get("family_context"):
         return event_text
@@ -248,7 +254,7 @@ def _render_event_text(chosen_event, family_context):
     if not matching_family:
         return event_text
 
-    family_member = random.choice(matching_family)
+    family_member = rng.choice(matching_family)
     family_role = str(family_member.get("role") or "").strip().lower()
     return event_text.format(
         family_name=family_member["name"],
@@ -263,6 +269,7 @@ def get_human_monthly_event_from_lifecycle(
     family_context=None,
     recent_event_ids=None,
     actor_traits=None,
+    random_source=None,
 ) -> dict | None:
     """
     Selects a monthly event from the current human-only content pool using derived lifecycle state.
@@ -272,8 +279,10 @@ def get_human_monthly_event_from_lifecycle(
     if lifecycle_state.get("life_stage_model") != "human_default":
         return None
 
+    rng = random if random_source is None else random_source
+
     # 50% chance to generate an event this month
-    if random.random() >= 0.5:
+    if rng.random() >= 0.5:
         return None
 
     eligible_events = _get_human_eligible_events(
@@ -292,11 +301,15 @@ def get_human_monthly_event_from_lifecycle(
     if cooled_eligible_events:
         eligible_events = cooled_eligible_events
 
-    chosen_event = random.choice(eligible_events)
+    chosen_event = rng.choice(eligible_events)
 
     return {
         "event_id": chosen_event["event_id"],
-        "text": _render_event_text(chosen_event, family_context),
+        "text": _render_event_text(
+            chosen_event,
+            family_context,
+            random_source=rng,
+        ),
         "outcome": {
             "stat_changes": dict(chosen_event.get("outcome", {}).get("stat_changes", {}))
         },
@@ -313,6 +326,7 @@ def get_monthly_event(
     family_context=None,
     recent_event_ids=None,
     actor_traits=None,
+    random_source=None,
 ) -> dict | None:
     """
     Compatibility wrapper for the current human monthly event contract.
@@ -327,6 +341,7 @@ def get_monthly_event(
         family_context=family_context,
         recent_event_ids=recent_event_ids,
         actor_traits=actor_traits,
+        random_source=random_source,
     )
 
 
@@ -361,13 +376,18 @@ MEETING_EVENT_POOL = [
 _MEETING_EVENT_MIN_AGE_MONTHS = 72  # age 6
 
 
-def get_meeting_event_for_player(lifecycle_state: dict) -> dict | None:
+def get_meeting_event_for_player(
+    lifecycle_state: dict,
+    *,
+    random_source=None,
+) -> dict | None:
     """Returns one random meeting event template or None.
 
     Conditions checked here: minimum age (6) and life stage (Child/Teenager).
     A ~20% monthly base chance applies. Cooldown enforcement is the caller's
     responsibility (ActoraTUI.maybe_offer_meeting_event).
     """
+    rng = random if random_source is None else random_source
     if lifecycle_state.get("life_stage_model") != "human_default":
         return None
 
@@ -378,10 +398,10 @@ def get_meeting_event_for_player(lifecycle_state: dict) -> dict | None:
         return None
     if life_stage not in ("Child", "Teenager"):
         return None
-    if random.random() >= 0.20:
+    if rng.random() >= 0.20:
         return None
 
-    template = random.choice(MEETING_EVENT_POOL)
+    template = rng.choice(MEETING_EVENT_POOL)
     return {
         "event_id": template["event_id"],
         "text": template["text"],

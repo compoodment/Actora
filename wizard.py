@@ -1,6 +1,7 @@
 import curses
 import random
 
+from game_setup import CREATION_STAT_ORDER, normalize_creation_stats
 from human import Human
 from ui import (
     build_centered_rule,
@@ -263,21 +264,6 @@ QUESTIONNAIRE_QUESTIONS = [
         ],
     },
 ]
-CREATION_STAT_ORDER = [
-    "health",
-    "happiness",
-    "intelligence",
-    "strength",
-    "charisma",
-    "imagination",
-    "wisdom",
-    "discipline",
-    "willpower",
-    "looks",
-    "fertility",
-    "memory",
-    "stress",
-]
 CREATION_STAT_LABELS = {
     "health": "Health",
     "happiness": "Happiness",
@@ -295,40 +281,14 @@ CREATION_STAT_LABELS = {
 }
 
 
-def normalize_creation_stats(stats):
-    """Aligns creation and loaded stat blocks with the current stat model."""
-    source_stats = dict(stats)
-    normalized_stats = {}
-    for stat_name in CREATION_STAT_ORDER:
-        if stat_name == "imagination":
-            if stat_name in source_stats:
-                normalized_stats[stat_name] = source_stats[stat_name]
-            else:
-                normalized_stats[stat_name] = next(
-                    (
-                        stat_value
-                        for legacy_name, stat_value in source_stats.items()
-                        if legacy_name not in CREATION_STAT_LABELS
-                    ),
-                    50,
-                )
-            continue
-
-        default_value = 10 if stat_name == "stress" else 50
-        normalized_stats[stat_name] = source_stats.get(stat_name, default_value)
-
-    if "memory" not in source_stats:
-        normalized_stats["memory"] = random.randint(40, 70)
-    if "stress" not in source_stats:
-        normalized_stats["stress"] = random.randint(5, 20)
-    return normalized_stats
-
-
-def build_randomized_starting_stats():
+def build_randomized_starting_stats(*, random_source=None):
     """Builds one startup stat block using the same Human randomization ranges."""
     actor = Human("Human", "Temp", "", "Female", "Female", 1, 1)
-    actor.randomize_starting_statistics()
-    return normalize_creation_stats(actor.stats)
+    actor.randomize_starting_statistics(random_source=random_source)
+    return normalize_creation_stats(
+        actor.stats,
+        random_source=random_source,
+    )
 
 
 def format_stat_change_summary(stat_changes):

@@ -1,18 +1,29 @@
-"""Optimistic-concurrency dispatcher for the first headless action slice."""
+"""Optimistic-concurrency dispatcher for the headless native engine."""
 
 from __future__ import annotations
 
 from .action_queue import queue_action, remove_action
+from .advancement import advance_time
 from .commands import CommandType, GameCommand
 from .contracts import CommandError, CommandResult, SaveEnvelope
-from .errors import CommandRejectedError, ContractValidationError
+from .errors import (
+    CommandRejectedError,
+    ContractValidationError,
+    IdentifierExhaustedError,
+    InvariantError,
+    NumericLimitError,
+)
+from .ids import DeterministicIdSource
 from .json_types import MAX_SAFE_INTEGER
+from .randomness import SeededRandomSource
 from .serialization import (
     build_save_envelope,
     restore_save_envelope,
 )
+from .session import GameSession
 
 SUPPORTED_ENGINE_KIND = "python-headless"
+ENGINE_VERSION = "0.57.0"
 
 
 def _copy_save(save: SaveEnvelope) -> SaveEnvelope:
@@ -42,6 +53,51 @@ def _failure(
     )
 
 
+def _create_game(command: GameCommand) -> CommandResult:
+    """Builds a new deterministic world without importing terminal modules."""
+    from game_setup import setup_initial_world_from_character
+
+    character = command.payload["character"]
+    seed = command.payload["seed"]
+    if not isinstance(character, dict) or not isinstance(seed, str):
+        raise ContractValidationError(
+            "validated create_game payload changed before dispatch"
+        )
+
+    random_source = SeededRandomSource(int(seed, 16))
+    id_source = DeterministicIdSource("actora")
+    world, focused_actor_id = setup_initial_world_from_character(
+        character,
+        random_source=random_source,
+        id_source=id_source,
+    )
+
+    session = GameSession.new(focused_actor_id, random_source)
+    next_save = build_save_envelope(
+        world,
+        session,
+        random_source,
+        id_source,
+        engine_version=ENGINE_VERSION,
+        engine_kind=SUPPORTED_ENGINE_KIND,
+        revision=1,
+        metadata={},
+    )
+    return CommandResult(
+        command_id=command.command_id,
+        command_type=command.command_type,
+        ok=True,
+        revision=next_save.revision,
+        save=next_save,
+        effects=(
+            {
+                "kind": "game_created",
+                "focused_actor_id": focused_actor_id,
+            },
+        ),
+    )
+
+
 def dispatch_command(
     save: SaveEnvelope | None,
     command: GameCommand,
@@ -54,8 +110,11 @@ def dispatch_command(
 
     if save is None:
         if command.command_type is not CommandType.CREATE_GAME:
-            raise ContractValidationError(
-                "an existing save is required for this command"
+            return _failure(
+                command,
+                code="save_required",
+                message="Start or load a game before using that command.",
+                save=None,
             )
         if command.expected_revision != 0:
             return _failure(
@@ -68,12 +127,7 @@ def dispatch_command(
                     "expected_revision": command.expected_revision,
                 },
             )
-        return _failure(
-            command,
-            code="command_not_implemented",
-            message="Game creation is not implemented in this engine slice.",
-            save=None,
-        )
+        return _create_game(command)
 
     if not isinstance(save, SaveEnvelope):
         raise ContractValidationError("save must be a SaveEnvelope or null")
@@ -102,9 +156,17 @@ def dispatch_command(
             },
         )
 
+    if command.command_type is CommandType.CREATE_GAME:
+        return _failure(
+            command,
+            code="game_already_exists",
+            message="A game already exists in this save.",
+            save=save,
+        )
     if command.command_type not in {
         CommandType.QUEUE_ACTION,
         CommandType.REMOVE_ACTION,
+        CommandType.ADVANCE_TIME,
     }:
         return _failure(
             command,
@@ -149,8 +211,12 @@ def dispatch_command(
                 restored.id_source,
                 action,
             )
-            effect = {"kind": "action_queued", "action_id": action_id}
-        else:
+            effects = (
+                {"kind": "action_queued", "action_id": action_id},
+            )
+            events = ()
+            interruption = None
+        elif command.command_type is CommandType.REMOVE_ACTION:
             remove_action_id = command.payload["action_id"]
             if not isinstance(remove_action_id, str):  # command-validated
                 raise ContractValidationError(
@@ -160,7 +226,36 @@ def dispatch_command(
                 restored.session,
                 action_id=remove_action_id,
             )
-            effect = {"kind": "action_removed", "action_id": action_id}
+            effects = (
+                {"kind": "action_removed", "action_id": action_id},
+            )
+            events = ()
+            interruption = None
+        else:
+            months = command.payload["months"]
+            if not isinstance(months, int) or isinstance(months, bool):
+                raise ContractValidationError(
+                    "command.payload.months must be an integer"
+                )
+            advancement = advance_time(
+                restored.world,
+                restored.session,
+                restored.random_source,
+                restored.id_source,
+                months,
+            )
+            raw_events = advancement["events"]
+            raw_effects = advancement["effects"]
+            if not isinstance(raw_events, list) or not isinstance(
+                raw_effects,
+                list,
+            ):
+                raise RuntimeError(
+                    "advance_time returned an invalid result shape"
+                )
+            events = tuple(raw_events)
+            effects = tuple(raw_effects)
+            interruption = advancement["interruption"]
     except CommandRejectedError as exc:
         return _failure(
             command,
@@ -169,26 +264,64 @@ def dispatch_command(
             save=save,
             details=exc.details,
         )
+    except IdentifierExhaustedError:
+        return _failure(
+            command,
+            code="identifier_limit",
+            message="This save has reached its creation limit.",
+            save=save,
+        )
 
-    next_save = build_save_envelope(
-        restored.world,
-        restored.session,
-        restored.random_source,
-        restored.id_source,
-        engine_version=restored.engine_version,
-        engine_kind=restored.engine_kind,
-        revision=restored.revision + 1,
-        metadata=restored.metadata,
-        format_version=restored.format_version,
-        schema_version=restored.schema_version,
-    )
+    try:
+        next_save = build_save_envelope(
+            restored.world,
+            restored.session,
+            restored.random_source,
+            restored.id_source,
+            engine_version=restored.engine_version,
+            engine_kind=restored.engine_kind,
+            revision=restored.revision + 1,
+            metadata=restored.metadata,
+            format_version=restored.format_version,
+            schema_version=restored.schema_version,
+        )
+    except NumericLimitError:
+        return _failure(
+            command,
+            code="state_limit",
+            message="This save cannot safely apply that change.",
+            save=save,
+            details={"reason": "numeric_limit"},
+        )
+    except InvariantError as exc:
+        numeric_limit_codes = {
+            "invalid_money",
+            "invalid_social_history",
+        }
+        if (
+            exc.violations
+            and all(
+                violation.code in numeric_limit_codes
+                for violation in exc.violations
+            )
+        ):
+            return _failure(
+                command,
+                code="state_limit",
+                message="This save cannot safely apply that change.",
+                save=save,
+                details={"reason": "numeric_limit"},
+            )
+        raise
     return CommandResult(
         command_id=command.command_id,
         command_type=command.command_type,
         ok=True,
         revision=next_save.revision,
         save=next_save,
-        effects=(effect,),
+        events=events,
+        effects=effects,
+        interruption=interruption,
     )
 
 
