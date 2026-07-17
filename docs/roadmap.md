@@ -1,7 +1,7 @@
 ---
 title: Roadmap
 tags: [core, reference, stable]
-updated: 2026-05-11
+updated: 2026-07-18
 ---
 
 # Actora Roadmap
@@ -19,6 +19,14 @@ Foundation before expansion. Dependency order over novelty. Don't build later sy
 Owner-directed priority shift (DEC-035): begin a web shell implementation now so Actora can become a public playable game surface on actora.art at `/lab/actora`.
 
 This is a presentation/runtime track, not permission to skip the backbone. The web shell must render and exercise current implemented foundations before adding later domain systems. It may improve visual clarity and coding speed, but it must not become a separate design that bypasses simulation-step ownership, structured outputs, records, links, places, spatial identity, or controlled mutation.
+
+The first web presentation pass now exists. The active dependency is replacing its copied browser simulation with the authoritative Python runtime through the curses-free command/save boundary. Required order:
+
+1. Complete deterministic native `create_game`, `advance_time`, `resolve_choice`, and `continue_as` commands with injected RNG/IDs and golden traces.
+2. Package that exact native state and command boundary without importing terminal modules.
+3. Prove parity in an isolated, opt-in browser Worker before changing the ordinary route.
+4. Introduce an explicitly separate new-engine save namespace and a deliberate legacy migration/recovery path.
+5. Switch `/lab/actora` only after native and Worker traces match and the current web UX remains intact.
 
 Allowed first web scope:
 - title/start/save-lite entry surface

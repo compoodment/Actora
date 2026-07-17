@@ -1,7 +1,7 @@
 ---
 title: Guide
 tags: [core, workflow, reference]
-updated: 2026-04-21
+updated: 2026-07-18
 ---
 
 # Actora Guide
@@ -177,7 +177,7 @@ Each doc gets 2-4 tags from this taxonomy.
 
 ## Repo info
 
-- Path: `/home/compadmin/openclaw_automated/actora`
+- Path: `/home/compadmin/actora`
 - GitHub: `git@github.com:compoodment/Actora.git`
 - Language: Python / curses TUI
 - Playtesting: always use tmux (`tmux new-session -d -s actora-test -x 220 -y 50`)

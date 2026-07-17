@@ -4,6 +4,7 @@ from uuid import uuid4
 
 from events import get_human_monthly_event_from_lifecycle
 from human import Human
+from mechanics import HUMAN_TRAIT_COUNT, HUMAN_TRAIT_POOL
 
 
 _CANONICAL_HUMAN_STAT_KEYS = {
@@ -202,6 +203,7 @@ class World:
         self.places = {}
         self.records = []
         self.focused_actor_id = None
+        self.recent_event_ids_by_actor = {}
         self._used_npc_last_names = set()
 
     def add_place(self, place_id, name, kind, parent_place_id=None, metadata=None):
@@ -1052,11 +1054,6 @@ class World:
 
     # --- Social link helpers ---
 
-    _NPC_TRAIT_POOL = [
-        "Curious", "Calm", "Fussy", "Bold", "Shy",
-        "Cheerful", "Stubborn", "Gentle", "Restless", "Alert",
-    ]
-
     def _get_social_link_category(self, closeness):
         """Returns the social link role for a given closeness value (0–100)."""
         if closeness >= 70:
@@ -1286,7 +1283,7 @@ class World:
             "fertility": random.randint(40, 90),
         })
         npc.stats = _normalize_human_stats(npc.stats)
-        npc.traits = random.sample(self._NPC_TRAIT_POOL, 3)
+        npc.traits = random.sample(HUMAN_TRAIT_POOL, HUMAN_TRAIT_COUNT)
 
         return npc_actor_id, npc
 
@@ -1713,11 +1710,16 @@ class World:
         meta = link.get("metadata", {})
         closeness = meta.get("closeness", 0)
         social_status = meta.get("status", "active")
+        relationship_label = (
+            "Past"
+            if social_status == "former"
+            else self._get_social_tier_label(closeness)
+        )
 
         return {
             "actor_id": linked_actor_id,
             "full_name": linked_actor.get_full_name(),
-            "relationship_label": self._get_social_tier_label(closeness),
+            "relationship_label": relationship_label,
             "family_branch_label": None,
             "is_alive": linked_actor.is_alive(),
             "structural_status": linked_actor.structural_status,
@@ -1764,6 +1766,8 @@ class World:
                 social_status = meta.get("status", "active")
                 if filter_mode == "friends" and social_status != "active":
                     continue
+                if filter_mode == "friends" and meta.get("closeness", 0) < 30:
+                    continue
                 if filter_mode == "former" and social_status != "former":
                     continue
                 entry = self._build_relationship_social_entry(actor_id, target_id, link)
@@ -1785,22 +1789,56 @@ class World:
             ),
         )
 
-    def get_relationship_detail_for(self, actor_id, linked_actor_id, recent_record_limit=5):
+    def get_relationship_detail_for(
+        self,
+        actor_id,
+        linked_actor_id,
+        recent_record_limit=5,
+        *,
+        selected_entry=None,
+    ):
         """Returns one relationship detail payload for a family or social link actor."""
         if actor_id not in self.actors:
             raise ValueError(f"get_relationship_detail_for: unknown actor_id '{actor_id}'")
 
-        entries = self.get_relationship_entries_for(actor_id)
-        selected_entry = next(
-            (e for e in entries if e["actor_id"] == linked_actor_id),
-            None,
-        )
+        if selected_entry is None:
+            entries = self.get_relationship_entries_for(actor_id)
+            selected_entry = next(
+                (e for e in entries if e["actor_id"] == linked_actor_id),
+                None,
+            )
+        elif selected_entry.get("actor_id") != linked_actor_id:
+            raise ValueError(
+                "get_relationship_detail_for: selected_entry actor_id does not match "
+                f"linked_actor_id '{linked_actor_id}'"
+            )
         if selected_entry is None:
             return None
 
         linked_actor = self.get_actor(linked_actor_id)
         if linked_actor is None:
             return None
+
+        family_entry = next(
+            (
+                entry
+                for entry in self.get_lineage_entries_for(
+                    actor_id,
+                    filter_mode="all",
+                    search_text="",
+                )
+                if entry["actor_id"] == linked_actor_id
+            ),
+            None,
+        )
+        family_relationship_label = (
+            family_entry.get("relationship_label")
+            if family_entry is not None
+            else None
+        )
+        family_branch_label = selected_entry.get("family_branch_label")
+        if family_branch_label is None and family_entry is not None:
+            family_branch_label = family_entry.get("family_branch_label")
 
         actor_records = self.get_actor_records(linked_actor_id)
         recent_records = actor_records[-recent_record_limit:]
@@ -1819,7 +1857,8 @@ class World:
                 "actor_id": linked_actor_id,
                 "full_name": linked_actor.get_full_name(),
                 "relationship_label": selected_entry["relationship_label"],
-                "family_branch_label": selected_entry.get("family_branch_label"),
+                "family_relationship_label": family_relationship_label,
+                "family_branch_label": family_branch_label,
                 "species": linked_actor.species,
                 "sex": linked_actor.sex,
                 "gender": linked_actor.gender,
@@ -1854,6 +1893,7 @@ class World:
                 actor_id,
                 entries[0]["actor_id"],
                 recent_record_limit=recent_record_limit,
+                selected_entry=entries[0],
             )
         return {
             "actor_id": actor_id,
@@ -2154,6 +2194,24 @@ class World:
             raise ValueError(
                 f"handoff_focus_to_continuation: actor_id '{from_actor_id}' is not dead"
             )
+        prior_handoff = next(
+            (
+                record
+                for record in self.get_records(record_type="continuation")
+                if record.get("metadata", {}).get("from_actor_id") == from_actor_id
+            ),
+            None,
+        )
+        if prior_handoff is not None:
+            raise ValueError(
+                "handoff_focus_to_continuation: from_actor_id "
+                f"'{from_actor_id}' already handed off"
+            )
+        if self.get_focused_actor_id() != from_actor_id:
+            raise ValueError(
+                "handoff_focus_to_continuation: from_actor_id "
+                f"'{from_actor_id}' does not match current world focus"
+            )
 
         successor_actor = self.get_actor(successor_actor_id)
         if successor_actor is None:
@@ -2173,6 +2231,23 @@ class World:
             )
 
         self.set_focused_actor(successor_actor_id)
+        self.add_record(
+            record_type="continuation",
+            scope="actor",
+            text=(
+                f"The story continued as {successor_actor.get_full_name()} "
+                f"after {actor.get_full_name()} died."
+            ),
+            year=self.current_year,
+            month=self.current_month,
+            actor_ids=[from_actor_id, successor_actor_id],
+            tags=["continuation", "structural_transition"],
+            metadata={
+                "from_actor_id": from_actor_id,
+                "successor_actor_id": successor_actor_id,
+                "entry_method": "World.handoff_focus_to_continuation",
+            },
+        )
         return {
             "previous_actor_id": from_actor_id,
             "previous_actor_name": actor.get_full_name(),
@@ -2327,7 +2402,10 @@ class World:
         continuity_state = None
         focused_actor = self.get_actor(focused_actor_id)
         months_advanced = 0
-        recent_event_ids = deque(maxlen=3)
+        recent_event_ids = deque(
+            self.recent_event_ids_by_actor.get(focused_actor_id, []),
+            maxlen=3,
+        )
 
         if focused_actor is not None and not focused_actor.is_alive():
             continuity_state = self.build_continuity_state_for(focused_actor_id)
@@ -2381,9 +2459,6 @@ class World:
                     },
                 )
                 collected_structured_events.append(surfaced_event)
-                surfaced_event_id = surfaced_event.get("event_id")
-                if surfaced_event_id:
-                    recent_event_ids.append(surfaced_event_id)
 
             lifecycle_state_for_event = focused_actor.get_lifecycle_state(
                 self.current_year,
@@ -2417,8 +2492,13 @@ class World:
                 collected_structured_events.append(structured_event_for_month)
                 structured_event_id = structured_event_for_month.get("event_id")
                 if structured_event_id:
+                    if structured_event_id in recent_event_ids:
+                        recent_event_ids.remove(structured_event_id)
                     recent_event_ids.append(structured_event_id)
 
+        self.recent_event_ids_by_actor[focused_actor_id] = list(
+            recent_event_ids
+        )
         focused_actor = self.get_actor(focused_actor_id)
         focused_actor_alive = focused_actor.is_alive() if focused_actor is not None else False
         if focused_actor is not None and not focused_actor_alive:

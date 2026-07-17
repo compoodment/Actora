@@ -1,7 +1,7 @@
 ---
 title: Decisions
 tags: [core, decisions, stable]
-updated: 2026-05-11
+updated: 2026-07-18
 ---
 
 # Actora Decisions
@@ -254,3 +254,9 @@ Traits shown as names only, not editable. No running stats visible during questi
 **Context:** The terminal shell is slowing visual clarity and iteration speed. The owner wants Actora playable on actora.art now, as a public game surface reachable from `/lab/actora`, while preserving Actora as its own game and not turning the web move into a substitute for core architecture.
 **Decision:** Begin a web shell implementation as a current active track. The first web work is a presentation/runtime shell over current implemented foundations: title/start/save-lite entry, web character creation, Life View, Actions, Profile, Relationships/History Browser, and death/continuation flow. The web shell must preserve the month-by-month rhythm, actor-anchored play, structured records/events/links, controlled state mutation boundaries, and roadmap dependency discipline. It may use mocked/static state briefly for visual layout review, but durable implementation must reconnect to real simulation truth rather than becoming a forked game design.
 **Alternatives rejected:** Continuing TUI-only until the full backbone is finished (too slow for current owner priority), rewriting Actora as a different web game (breaks identity), using web migration to bypass architecture/backbone dependencies (explicitly forbidden), deleting the Projects page as part of this decision (deferred; Projects still has repo-link purpose).
+
+### DEC-036: The Python headless JSON boundary is authoritative across terminal and web runtimes
+**Date:** 2026-07-18
+**Context:** The first `/lab/actora` implementation proved the web UX, but its copied TypeScript simulation cannot remain a second source of gameplay truth. Moving the existing Python model into a browser also introduces replay, save compatibility, concurrency, malformed-state, and cross-runtime randomness risks that cannot be solved by exposing Python objects directly to UI code.
+**Decision:** Actora's durable runtime boundary is a curses-free Python command/save engine with strict versioned JSON input and output. Commands carry player intent only; the engine derives costs, effects, labels, records, and mutations. Browser-owned request IDs never consume simulation IDs. The save owns exact portable RNG/ID state, optimistic revision state, complete structured choices with stable option IDs, and one recognized executable engine kind. Foreign kinds may be parsed only to return a structured mismatch. Native golden traces are required before packaging, and the same traces must match in an isolated browser Worker before route cutover. UI code may render results and send commands but must not mutate simulation state, execute arbitrary Python, retain `PyProxy` object graphs, or monkeypatch global randomness. Legacy web saves and new engine saves remain isolated until an explicit migration/recovery path exists.
+**Alternatives rejected:** Keeping TypeScript and Python simulations in long-term parallel (guaranteed design drift), calling Python methods directly from UI components (leaks mutation authority and runtime objects), monkeypatching `random`/UUID globals for tests (hidden coupling and unsafe concurrency), tying request IDs to the simulation stream (retries change the universe), and switching the live route before native/browser trace parity is proven.

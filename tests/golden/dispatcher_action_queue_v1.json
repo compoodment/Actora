@@ -1,0 +1,218 @@
+{
+  "contract": "dispatcher-action-queue-v1",
+  "steps": [
+    {
+      "actions": [
+        {
+          "action_id": "trace_action_00000001",
+          "action_type": "personal",
+          "event_text": "You took a proper nap.",
+          "label": "Take a Nap",
+          "stat_changes": {
+            "happiness": 2,
+            "stress": -3
+          },
+          "subtype_id": "nap",
+          "time_cost": 2
+        }
+      ],
+      "command_id": "trace-request-01",
+      "command_type": "queue_action",
+      "effects": [
+        {
+          "action_id": "trace_action_00000001",
+          "kind": "action_queued"
+        }
+      ],
+      "error_code": null,
+      "next_id": 2,
+      "ok": true,
+      "revision": 1,
+      "save_sha256": "0888eaadac1e554d918d07314e981bf6f654a65eb80a02ecb75a34c661dbb278"
+    },
+    {
+      "actions": [
+        {
+          "action_id": "trace_action_00000001",
+          "action_type": "personal",
+          "event_text": "You took a proper nap.",
+          "label": "Take a Nap",
+          "stat_changes": {
+            "happiness": 2,
+            "stress": -3
+          },
+          "subtype_id": "nap",
+          "time_cost": 2
+        },
+        {
+          "action_id": "trace_action_00000002",
+          "action_type": "spend_time",
+          "label": "Spend time with Charles Babbage",
+          "target_actor_id": "friend",
+          "time_cost": 4
+        }
+      ],
+      "command_id": "trace-request-02",
+      "command_type": "queue_action",
+      "effects": [
+        {
+          "action_id": "trace_action_00000002",
+          "kind": "action_queued"
+        }
+      ],
+      "error_code": null,
+      "next_id": 3,
+      "ok": true,
+      "revision": 2,
+      "save_sha256": "9aceaa4f65f1ba8bb17c2beac60dc90924443a12d6358624c4b1677b7c729d50"
+    },
+    {
+      "actions": [
+        {
+          "action_id": "trace_action_00000001",
+          "action_type": "personal",
+          "event_text": "You took a proper nap.",
+          "label": "Take a Nap",
+          "stat_changes": {
+            "happiness": 2,
+            "stress": -3
+          },
+          "subtype_id": "nap",
+          "time_cost": 2
+        },
+        {
+          "action_id": "trace_action_00000002",
+          "action_type": "spend_time",
+          "label": "Spend time with Charles Babbage",
+          "target_actor_id": "friend",
+          "time_cost": 4
+        }
+      ],
+      "command_id": "trace-request-03",
+      "command_type": "queue_action",
+      "effects": [],
+      "error_code": "action_already_queued",
+      "next_id": 3,
+      "ok": false,
+      "revision": 2,
+      "save_sha256": "9aceaa4f65f1ba8bb17c2beac60dc90924443a12d6358624c4b1677b7c729d50"
+    },
+    {
+      "actions": [
+        {
+          "action_id": "trace_action_00000002",
+          "action_type": "spend_time",
+          "label": "Spend time with Charles Babbage",
+          "target_actor_id": "friend",
+          "time_cost": 4
+        }
+      ],
+      "command_id": "trace-request-04",
+      "command_type": "remove_action",
+      "effects": [
+        {
+          "action_id": "trace_action_00000001",
+          "kind": "action_removed"
+        }
+      ],
+      "error_code": null,
+      "next_id": 3,
+      "ok": true,
+      "revision": 3,
+      "save_sha256": "e7971ebebc5976262ca8a387b5452536f5fd00b04ba341efa1a4a1d2623ce884"
+    },
+    {
+      "actions": [
+        {
+          "action_id": "trace_action_00000002",
+          "action_type": "spend_time",
+          "label": "Spend time with Charles Babbage",
+          "target_actor_id": "friend",
+          "time_cost": 4
+        }
+      ],
+      "command_id": "trace-request-05",
+      "command_type": "queue_action",
+      "effects": [],
+      "error_code": "revision_conflict",
+      "next_id": 3,
+      "ok": false,
+      "revision": 3,
+      "save_sha256": "e7971ebebc5976262ca8a387b5452536f5fd00b04ba341efa1a4a1d2623ce884"
+    },
+    {
+      "actions": [
+        {
+          "action_id": "trace_action_00000002",
+          "action_type": "spend_time",
+          "label": "Spend time with Charles Babbage",
+          "target_actor_id": "friend",
+          "time_cost": 4
+        }
+      ],
+      "command_id": "trace-request-06",
+      "command_type": "remove_action",
+      "effects": [],
+      "error_code": "action_not_found",
+      "next_id": 3,
+      "ok": false,
+      "revision": 3,
+      "save_sha256": "e7971ebebc5976262ca8a387b5452536f5fd00b04ba341efa1a4a1d2623ce884"
+    },
+    {
+      "actions": [
+        {
+          "action_id": "trace_action_00000002",
+          "action_type": "spend_time",
+          "label": "Spend time with Charles Babbage",
+          "target_actor_id": "friend",
+          "time_cost": 4
+        }
+      ],
+      "command_id": "trace-request-07",
+      "command_type": "advance_time",
+      "effects": [],
+      "error_code": "command_not_implemented",
+      "next_id": 3,
+      "ok": false,
+      "revision": 3,
+      "save_sha256": "e7971ebebc5976262ca8a387b5452536f5fd00b04ba341efa1a4a1d2623ce884"
+    },
+    {
+      "actions": [
+        {
+          "action_id": "trace_action_00000002",
+          "action_type": "spend_time",
+          "label": "Spend time with Charles Babbage",
+          "target_actor_id": "friend",
+          "time_cost": 4
+        },
+        {
+          "action_id": "trace_action_00000003",
+          "action_type": "personal",
+          "event_text": "You went for a run.",
+          "label": "Go for a Run",
+          "stat_changes": {
+            "health": 3,
+            "strength": 1
+          },
+          "subtype_id": "run",
+          "time_cost": 3
+        }
+      ],
+      "command_id": "trace-request-08",
+      "command_type": "queue_action",
+      "effects": [
+        {
+          "action_id": "trace_action_00000003",
+          "kind": "action_queued"
+        }
+      ],
+      "error_code": null,
+      "next_id": 4,
+      "ok": true,
+      "revision": 4,
+      "save_sha256": "1f9863daf36c26512b2a2667a713bf3fe0d0429e779ee05626b246acaf376856"
+    }
+  ]
+}

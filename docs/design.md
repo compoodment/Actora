@@ -1,7 +1,7 @@
 ---
 title: Design
 tags: [core, reference, stable]
-updated: 2026-05-11
+updated: 2026-07-18
 ---
 
 # Actora Design
@@ -24,14 +24,14 @@ Each system uses this format:
 
 ### Character Creation & Identity
 **Status:** Implemented (evolving)
-**Current truth:** Identity, Location, Appearance, Mode, Stats/Questionnaire, Traits, Confirm steps. Manual stat sliders or 16-question questionnaire. Culture-aware names. No ethnicity field yet.
+**Current truth:** Identity, Location, Appearance, Mode, Stats/Questionnaire, Traits, Confirm steps. Manual stat sliders or 24-question questionnaire. Culture-aware names. No ethnicity field yet.
 **Intent:** Should feel like genuinely shaping who this person is — not filling out a form. The result should feel like a believable blend of both parents' characteristics, not random.
 - Ethnicity — player picks (single or mixed). Informs parent ethnicity, name generation, cultural context, appearance seeding.
 - Trait and stat inheritance — the questionnaire/manual choices should reflect where you came from.
 - Siblings share family resemblance with natural variation.
 - Parents feel real — consistent appearance, traits, personality visible in your character.
 - Later: parent backstory depth, grandparent lineage, family history context.
-**Open questions:** Trait pool redesign is in progress (see Traits section). Wizard currently shows wrong trait pool and wrong count (3 instead of 4) — fix is a Now backlog item.
+**Open questions:** Ethnicity and inheritance depth remain future work. The wizard and generated humans now use the canonical 12-trait pool with four unique traits.
 
 
 ---
@@ -160,7 +160,7 @@ Toughness cluster (Resilient) — ~3 questions.
 
 ### Traits
 **Status:** Implemented in code (v0.48.2, DEC-022)
-**Current truth:** 12 traits in code (Driven, Chill, Curious, Social, Disciplined, Impulsive, Empathetic, Resilient, Introverted, Extraverted, Restless, Ambitious), pick 4 at manual creation. TRAIT_DEFINITIONS dict with sleep_modifier per trait. Trait-gated events remapped to new pool. Questionnaire still uses old trait names and picks 3 — design interview needed before fixing.
+**Current truth:** 12 traits in code (Driven, Chill, Curious, Social, Disciplined, Impulsive, Empathetic, Resilient, Introverted, Extraverted, Restless, Ambitious), pick 4 through manual or questionnaire creation. Generated parents, newborns, and meeting NPCs also receive 4 unique traits from this pool. `TRAIT_DEFINITIONS` provides the current sleep modifier for each trait; trait-gated events use this canonical vocabulary.
 
 **New trait pool (12 traits, adjective form, pick 4 at creation — interview 2026-04-04):**
 
@@ -496,7 +496,7 @@ Stats and Attributes are intentionally split: Stats are the player-facing moment
 ## Web Shell Direction (`/lab/actora`)
 
 **Status:** Active direction (DEC-035, 2026-05-11)
-**Current truth:** No web implementation exists yet in this repo. Current playable implementation is Python/curses TUI. actora.art currently has a public site/lab structure separately from this game repo.
+**Current truth:** This repository contains the authoritative Python/curses implementation and an early curses-free command/save boundary. A playable `/lab/actora` web presentation exists separately in actora.art, but its copied TypeScript simulation has not yet been replaced by the Python engine.
 
 **Intent:**
 The web shell should make Actora easier to see, play, and iterate on without changing what Actora is. It is a game surface for Actora, not a generic site experiment and not a separate rewrite of the vision.

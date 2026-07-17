@@ -1,8 +1,8 @@
 ---
 title: Backlog
 tags: [planning, tracking, wip]
-updated: 2026-05-11
-through: v0.53.0
+updated: 2026-07-18
+through: v0.56.0
 ---
 
 # Actora Backlog
@@ -13,12 +13,13 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Now
 
-- **`/lab/actora` web shell foundation** — owner-directed active track per DEC-035. First scope: title/start/save-lite entry, web character creation, Life View, Actions, Profile, Relationships/History Browser, death/continuation flow, and simple schema-conscious local persistence if needed for testing. Must preserve current simulation truth and roadmap constraints; do not use the web shell to build later domain systems out of order. *(2026-05-11)*
-- **Profile card dashboard redesign** — remains the intended Profile direction, but implementation is now folded into the web shell track first. Replace v0.54.0 row-based Profile with card-based dashboard per design.md interview (2026-04-19): merged categories, 2D card navigation/highlighted borders, popup drill for most cards, Browser for Relationships. *(2026-04-19, updated 2026-05-11)*
+- **Authoritative headless runtime completion** — extend the v0.56.0 command/save checkpoint with deterministic `create_game`, one-month/multi-month `advance_time`, `resolve_choice`, and `continue_as`. Inject the saved PCG/ID sources through startup, identity, events, family generation, mortality, and continuation without monkeypatching or importing curses. Add native creation/advance golden traces before browser packaging. *(2026-07-18)*
 
 
 ## Next
 
+- **Isolated browser Worker parity spike** — package the native engine only after its command traces are stable; run the exact JSON boundary in an opt-in Worker and prove native/browser save hashes, outputs, and error behavior match. Do not load the runtime on an ordinary `/lab/actora` visit yet. *(2026-07-18)*
+- **New-engine save isolation and web cutover** — use a distinct save namespace, explicit legacy schema-5 migration/recovery, and reversible cutover gates before the copied web simulation is replaced. Preserve the shipped web UX rather than rebuilding it around the runtime. *(2026-07-18)*
 
 ## Later
 
@@ -42,7 +43,7 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 - **Name pool deepening** — regional variation, ethnic/religious diversity, era awareness, family naming conventions *(2026-03-31)*
 - **History tab filtering by actor** — currently shows full universe history across all actors. Should probably filter to records relevant to the currently focused actor, starting from when you took over. Needs a design interview — does the Browser become actor-scoped, or do we add a toggle? *(2026-04-02)*
 - **Simulation depth per actor** — high-detail simulation for all tracked actors every turn is a performance concern at scale. Revisit when actor count grows. Connects to the layered simulation depth principle in identity.md. *(2026-04-02)*
-- **Cancel / reorder queued actions** — Actions screen currently shows queued actions as display-only. Future: allow cancelling or reordering. *(2026-04-04)*
+- **Terminal cancel / reorder queued actions** — the headless contract can remove by durable action ID, but the current terminal Actions screen still shows its legacy queue as display-only. Add terminal cancellation after it adopts dispatcher-owned queues; ordering remains a later interaction. *(2026-04-04, updated 2026-07-18)*
 - **Heartbeat routing split** — optionally split Actora-specific heartbeat beats from general infra/memory hygiene beats. Could use a separate cron for infra checks. Low priority. *(2026-04-04)*
 - **Skip time limit** — cap normal human skip at ~10 years. Contextual extension for passive commitments (jail, coma). Passive simulation still runs during skip. Currently unlimited for development. *(2026-04-04)*
 - **Context-driven mood labels** — current design is fixed label set. Future: labels driven by context (why mood is low matters — "Grieving" vs "Burnout" at same numeric value). Add when event system is rich enough to supply context. *(2026-04-04)*

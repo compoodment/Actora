@@ -35,6 +35,8 @@ TRAIT_DEFINITIONS = {
     "Restless": {"sleep_modifier": -1.0},
     "Ambitious": {"sleep_modifier": 0.0},
 }
+HUMAN_TRAIT_POOL = tuple(TRAIT_DEFINITIONS)
+HUMAN_TRAIT_COUNT = 4
 
 
 def get_monthly_free_hours(actor):

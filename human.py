@@ -1,5 +1,7 @@
 import random # Keep random here for randomize_starting_statistics
 
+from mechanics import HUMAN_TRAIT_COUNT, HUMAN_TRAIT_POOL
+
 
 def _get_relationship_label_from_role(role, linked_actor):
     """Builds one display-ready family relationship label for snapshot rendering."""
@@ -98,8 +100,7 @@ class Human:
         self.appearance["skin_tone"] = random.choice(skin_tones)
         self.sexuality = random.choice(SEXUALITY_OPTIONS)
 
-        trait_pool = ["Curious", "Calm", "Fussy", "Bold", "Shy", "Cheerful", "Stubborn", "Gentle", "Restless", "Alert"]
-        self.traits = random.sample(trait_pool, min(3, len(trait_pool)))
+        self.traits = random.sample(HUMAN_TRAIT_POOL, HUMAN_TRAIT_COUNT)
 
     def auto_resolve_identity(self):
         """Silently resolves unresolved gender/sexuality for non-played or resumed actors."""

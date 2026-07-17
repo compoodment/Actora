@@ -177,6 +177,9 @@ class RelationshipBrowserScreen:
                     f"Social: {summary['relationship_label']}",
                     f"Closeness: {closeness}   Status: {'past' if social_status == 'former' else social_status}",
                 ])
+                family_relationship_label = summary.get("family_relationship_label")
+                if family_relationship_label:
+                    right_lines.append(f"Family: {family_relationship_label}")
             else:
                 right_lines.extend([
                     "",

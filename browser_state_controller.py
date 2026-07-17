@@ -117,9 +117,11 @@ class BrowserStateController:
             app.lineage_selection = max(0, min(app.lineage_selection, len(entries) - 1))
             app.selected_lineage_actor_id = entries[app.lineage_selection]["actor_id"]
 
+        selected_entry = entries[app.lineage_selection]
         browser_state["selected_detail"] = app.world.get_relationship_detail_for(
             focused_actor_id,
             app.selected_lineage_actor_id,
             recent_record_limit=self.lineage_record_limit,
+            selected_entry=selected_entry,
         )
         return browser_state

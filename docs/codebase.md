@@ -1,18 +1,18 @@
 ---
 title: Codebase
 tags: [implementation, reference, stable]
-updated: 2026-04-27
-through: v0.55.0
-verified: 2026-04-27
+updated: 2026-07-18
+through: v0.56.0
+verified: 2026-07-18
 ---
 
 # Actora Codebase
 
 Current repo implementation truth. What the code looks like right now.
-**Last verified against actual code:** 2026-04-27
+**Last verified against actual code:** 2026-07-18
 
-**Version:** 0.55.0 (post-v0.54.1 refactor)
-**Last Updated:** 2026-04-27
+**Version:** 0.56.0
+**Last Updated:** 2026-07-18
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
 It is intended to support safe patching, review, and manual verification, alongside [[controls]] and [[screens]] for interface-specific rules.
@@ -21,29 +21,44 @@ It is intended to support safe patching, review, and manual verification, alongs
 
 - **Language:** Python
 - **Interface:** Terminal with a curses-based startup character creation wizard and a curses TUI shell for ordinary play. Shell v2 (v0.48.0+): 7-row header (custom logo crest + flanking info panels, rows 0-6), body, 2-row footer. Split Life View, dedicated profile screen, tabbed Browser (Relationships tab + History tab), dedicated Actions screen, death/continuation interrupts, skip-time flow, and meeting/social event popups. Shell geometry centralized in `ActoraTUI` class constants: `HEADER_ROWS=7`, `FOOTER_ROWS=2`, `BROWSER_CHROME_ROWS=2` — all body renderers derive `top` and `body_height` from these.
-- **Structure:** Modular architecture with separated simulation, controllers, screens, and view layers. Shell (main.py) is thin orchestration; screen controllers own per-surface input/render; view helpers own pure-data formatting; controllers own interaction logic.
+- **Headless checkpoint:** `actora_core/` is a curses-free native boundary for deterministic sources, strict JSON commands/results, schema-1 saves, validation, serialization, and the first action-queue dispatcher slice. It is not yet the complete gameplay engine and is not connected to a browser Worker.
+- **Structure:** Modular architecture with separated simulation, controllers, screens, view layers, and a provisional headless runtime boundary. Shell (`main.py`) is thin orchestration; screen controllers own per-surface input/render; view helpers own pure-data formatting; controllers own interaction logic.
 
 ## 2. Current File Structure
 
     ./
     ├── main.py                    (871 lines - ActoraTUI shell, startup/entrypoints, screen delegation)
     ├── ui.py                      (168 lines - layout/drawing primitives)
-    ├── mechanics.py               (48 lines - game rule constants: traits, actions, time budget)
+    ├── mechanics.py               (50 lines - game rule constants: traits, actions, time budget)
     ├── wizard.py                  (1267 lines - CreationWizard class, all creation constants and questionnaire)
-    ├── world.py                   (2441 lines - simulation state, links, places, records, social links, mortality, advancement, geography, actions)
+    ├── world.py                   (2521 lines - simulation state, links, places, records, social links, mortality, advancement, geography, actions)
     ├── identity.py                (299 lines - name pools, culture-aware identity generation)
-    ├── human.py                   (298 lines - Human model, lifecycle, spatial, snapshot)
+    ├── human.py                   (299 lines - Human model, lifecycle, spatial, snapshot)
     ├── events.py                  (388 lines - human monthly events, meeting events)
     ├── app_router.py               (74 lines - top-level TUI input/render routing)
     ├── shell_controller.py         (75 lines - global menu/options/quit modal input handling)
     ├── shell_renderer.py           (236 lines - global chrome, footer, and popup rendering)
-    ├── browser_state_controller.py (125 lines - lineage/relationship browser state adaptation)
+    ├── browser_state_controller.py (127 lines - lineage/relationship browser state adaptation)
     ├── choice_controller.py        (180 lines - pending-choice modal input handling)
     ├── continuation_controller.py  (85 lines - death acknowledgement and continuation handoff)
     ├── event_log_controller.py     (116 lines - event-log accumulation and turn merge)
     ├── life_event_controller.py    (89 lines - identity-choice and meeting-event offer logic)
     ├── time_controller.py          (103 lines - time advancement orchestration)
     ├── lint_player_text.py         (89 lines - scans all *.py for internal/dev language)
+    ├── actora_core/                (curses-free command/save runtime boundary)
+    │   ├── __init__.py             (public curses-free package surface)
+    │   ├── errors.py               (contract and invariant errors)
+    │   ├── json_types.py           (strict JSON cloning and integer parsing)
+    │   ├── commands.py             (versioned intent commands)
+    │   ├── contracts.py            (save/result/error envelopes)
+    │   ├── randomness.py           (portable PCG32-v1 source)
+    │   ├── ids.py                  (serializable sequential ID source)
+    │   ├── session.py              (simulation-relevant session state)
+    │   ├── serialization.py        (World/Human save and restore)
+    │   ├── validation.py           (world/save invariants)
+    │   ├── action_queue.py         (canonical queue/remove mutations)
+    │   ├── dispatcher.py           (optimistic command dispatch)
+    │   └── transport.py            (strict canonical JSON)
     ├── views/
     │   ├── __init__.py             (0 lines)
     │   ├── browser.py              (37 lines - lineage/relationship view helpers)
@@ -63,7 +78,7 @@ It is intended to support safe patching, review, and manual verification, alongs
     │   └── skip_time.py            (85 lines - skip-time screen controller/renderer)
     └── docs/
 
-### Import boundary (v0.55.0)
+### Import boundary (v0.56.0)
 
 No circular imports. Allowed import graph:
 
@@ -71,12 +86,12 @@ No circular imports. Allowed import graph:
     mechanics.py               → (standard lib only)
     identity.py                → (standard lib only)
     events.py                  → (standard lib only)
-    human.py                   → (standard lib only)
+    human.py                   → mechanics (standard lib)
     views.shell.py             → (standard lib only)
     views.browser.py           → (standard lib only)
     views.history.py           → ui (standard lib)
     views.profile.py           → views.history (standard lib)
-    world.py                   → human, identity, events (standard lib)
+    world.py                   → human, identity, events, mechanics (standard lib)
     wizard.py                  → human, ui, world (standard lib)
     shell_controller.py        → (standard lib only)
     time_controller.py         → (standard lib only)
@@ -98,12 +113,26 @@ No circular imports. Allowed import graph:
     screens.skip_time.py       → ui (standard lib only)
     main.py                    → all local modules (standard lib)
 
+    actora_core.errors         → (standard lib only)
+    actora_core.json_types     → errors (standard lib)
+    actora_core.randomness     → errors (standard lib)
+    actora_core.ids            → errors, json_types (standard lib)
+    actora_core.commands       → errors, json_types (standard lib)
+    actora_core.session        → errors, json_types, randomness (mechanics only in the TUI adapter)
+    actora_core.contracts      → commands, errors, ids, json_types, randomness, session
+    actora_core.serialization  → contracts, errors, ids, json_types, randomness, session, validation
+    actora_core.validation     → contracts, errors, json_types, mechanics
+    actora_core.action_queue   → errors, ids, json_types, session, mechanics
+    actora_core.dispatcher     → action_queue, commands, contracts, errors, json_types, serialization
+    actora_core.transport      → commands, contracts, errors, json_types
+
 Rules:
 - `wizard.py` must never import from `main.py`.
 - `ui.py` and `mechanics.py` must never import local modules.
 - `views/` must never import from `screens/`, `controllers`, `main.py`, or `world.py`.
 - `screens/` must never import from `main.py` or `world.py`.
 - Controllers must never import from `screens/` or `main.py`.
+- `actora_core` must remain importable without loading `curses`, `main.py`, `wizard.py`, or screen modules. Runtime-only `Human`/`World` imports stay local to restoration.
 - Adding a new file: declare its place in this graph before writing code.
 
 ## 3. Core Objects
@@ -119,6 +148,7 @@ Current fields:
 - `places` (dictionary of world-owned place records)
 - `records` (list of world-owned structured simulation records)
 - `focused_actor_id`
+- `recent_event_ids_by_actor` (per-person, ordered, maximum-three ordinary monthly event IDs)
 
 Current methods:
 
@@ -196,7 +226,7 @@ Current stored fields:
 - `stats` (dictionary containing: `health`, `happiness`, `intelligence`, `strength`, `charisma`, `imagination`, `wisdom`, `discipline`, `willpower`, `looks`, `fertility`, `memory`, `stress`) — 13 stats. `memory` and `stress` use signed range -50 to +50 (0 = baseline) per DEC-028 (v0.50.1). All other stats use 0-100. Memory/Stress display at bottom of secondary stats, visually separated.
 - `money`
 - `appearance` (dictionary containing `eye_color`, `hair_color`, `skin_tone`)
-- `traits` (list of list of 4 personality traits from the 12-trait pool (Driven, Chill, Curious, Social, Disciplined, Impulsive, Empathetic, Resilient, Introverted, Extraverted, Restless, Ambitious). Each trait has mechanical definitions in TRAIT_DEFINITIONS)
+- `traits` (list of 4 unique personality traits from the canonical 12-trait pool: Driven, Chill, Curious, Social, Disciplined, Impulsive, Empathetic, Resilient, Introverted, Extraverted, Restless, Ambitious. Each trait has mechanical definitions in `TRAIT_DEFINITIONS`.)
 - `current_place_id`
 - `residence_place_id`
 - `jurisdiction_place_id`
@@ -305,7 +335,8 @@ Social link behaviors:
 Current social link rendering:
 - Life View left panel shows social links as `name · tier` entries in the Relationships section
 - Relationship Browser (replacing Lineage Browser) shows family + social links with filter sidebar: All / Family / Friends / Past / Living / Dead
-- Actions screen provides "Spend time with friend" social action
+- the Friends filter includes only active links at friend/close-friend closeness; acquaintances remain visible in broader filters
+- Actions still allows spending time with any active social connection so an acquaintance can become a friend; its remaining friend-only copy is a known wording/design mismatch
 
 Current continuity-candidate boundary:
 - `get_continuity_candidates_for(actor_id)` scans current related links, resolves the linked living actors, excludes the actor itself, dedupes candidates, and returns small structured candidate objects
@@ -315,6 +346,7 @@ Current continuity-candidate boundary:
 - current candidate labeling and ordering are deterministic: candidate-defining link context is chosen by a stable link sort key, and final candidate ordering now applies a small closeness priority before (`full_name`, `link_type`, `link_role`, `actor_id`) so siblings rank ahead of less-close linked actors
 - continuity candidate gathering now delegates through the generic world-owned `get_links(...)` seam, so current candidates can come from any stored link type even though startup only seeds family links plus one direct parent-to-parent `association/coparent` pair
 - `handoff_focus_to_continuation(...)` is the current world-owned validation/mutation seam for switching focus after the focused actor is dead
+- a successful handoff is single-use, requires the dead person to remain current focus, and writes one hidden `continuation` structural record carrying both actor IDs
 - `get_lineage_entries_for(actor_id, *, filter_mode="all", search_text="")` and `get_lineage_detail_for(actor_id, linked_actor_id, recent_record_limit=5)` now provide the lineage/archive access seam on top of the current actor/link/record truth without splitting dead actors into a separate physical archive store
 - `get_lineage_browser_data_for(...)` now adds one small world-owned browser payload for the TUI so filtering/search/detail selection do not have to be reconstructed as ad hoc shell string hacks
 - lineage entries now also expose a lightweight `family_branch_label` when it can be derived honestly from current directional family-link roles (`mother` => maternal, `father` => paternal, reverse `child` => descendant); this is intentionally narrow and is not a full genealogy/tree system
@@ -559,6 +591,23 @@ Current event boundary truth:
 
 ## 7. Simulation Boundary
 
+### Headless command/save checkpoint (v0.56.0)
+
+`actora_core` now defines the native boundary that a future terminal adapter and browser Worker can share:
+
+- command contract v1: `create_game`, `queue_action`, `remove_action`, `advance_time`, `resolve_choice`, and `continue_as`
+- save format/schema v1 with exact World/Human/session data, engine provenance, revision, PCG32 state, and sequential ID state
+- caller-owned request IDs that never consume simulation IDs
+- strict JSON parsing with duplicate-key, non-finite, unsafe-integer, unknown-field, and malformed-state rejection
+- optimistic concurrency through `expected_revision`
+- structured results with events, effects, interruption, and error channels
+- complete pending-choice options with stable option IDs
+- byte-preserving failures and one-revision successful queue/remove mutations
+
+Only `queue_action` and `remove_action` execute in v0.56.0. The other command shapes exist so their intent boundary can be reviewed, but return `command_not_implemented`. Existing terminal gameplay still uses its legacy global randomness and controller orchestration. A terminal queue created outside the dispatcher has no durable action ID and therefore cannot be captured as a schema-1 engine save yet.
+
+The schema-1 engine executes only when `engine_kind` is exactly `python-headless`. Foreign kinds may be parsed solely so dispatch can return a structured, byte-preserving mismatch; they are never executed as this engine.
+
 `World.simulate_advance_turn(player_id, months_to_advance)` is the authoritative simulation-step boundary in `world.py`.
 
 A thin module-level `simulate_advance_turn(world, player_id, months_to_advance)` compatibility wrapper still delegates directly to the world-owned method to preserve existing call stability where needed.
@@ -690,9 +739,9 @@ Current event behavior:
 - the `event_log_controller` maintains a shell-owned event log that merges triggered monthly events with newly written relevant `birth` and `death` records
 - the Life View live feed is compact and omits normal date prefixes, but still inserts year headers and skip markers as the run progresses
 - the full-screen `History` browser opened with `H` renders the same accumulated log in detailed form with date prefixes, year separators, and scrolling
-- `family_bootstrap` and `actor_entry` records are filtered from current player-facing event surfaces while remaining preserved in world storage
+- `family_bootstrap`, `actor_entry`, and structural `continuation` records are filtered from current player-facing event surfaces while remaining preserved in world storage
 - `birth` and `death` records carry `★` and `✦` markers in both the live feed and the full history browser
-- a 3-event cooldown prevents the same event from repeating within the most recent three triggered events during one advancement
+- a per-person three-event cooldown persists across separate advancement calls and schema-1 save/restore; repeated IDs are moved to the newest position and family-event IDs do not consume its slots
 - ordinary-play death remains structural rather than event-text-driven; later cause-specific event layers still do not exist
 
 ### Snapshot
@@ -762,7 +811,7 @@ Current event-selection details:
 - family-aware events render living relative context into the selected event text at selection time through `{family_role}` substitution
 - the external structured event contract remains unchanged (`event_id`, `text`, `outcome`, `tags`, `year`, `month`)
 
-Current event pool: 120 grounded human-only events including 20 trait-gated events (2 per personality trait) and 11 family-aware events with dynamic name insertion. Events support optional `required_traits` filtering so trait-gated events only trigger for actors who have the matching personality trait. Event selection also supports family-context input so family-aware events only become eligible when the needed living family roles exist. A 3-event cooldown prevents the same event from triggering within the last 3 triggered events during one advancement.
+Current event pool: 120 grounded human-only events including 20 trait-gated events across 9 of the 12 current traits and 11 family-aware events with dynamic name insertion. Events support optional `required_traits` filtering so trait-gated events only trigger for actors who have the matching personality trait. Event selection also supports family-context input so family-aware events only become eligible when the needed living family roles exist. A per-person three-event cooldown now survives separate advancement calls and schema-1 save/restore; family-event IDs do not consume its slots.
 
 Meeting events: `get_meeting_event_for_player(lifecycle_state)` provides a separate event path for social link creation. When triggered, the player receives a popup choice to introduce themselves or keep to themselves. If the player chooses to meet, `World.generate_meeting_npc(...)` creates a plausible NPC with culture-aware naming, and a social link is established.
 

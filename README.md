@@ -14,6 +14,8 @@ It's not BitLife. It's not a god sim. It's a persistent world where you live thr
 **Pre-Alpha Prototype.** 
 Built in Python using a `curses` terminal UI. It is highly experimental, actively being rewritten, and prone to breaking.
 
+The repository also contains an early curses-free `actora_core` command/save boundary. It currently supports deterministic action queue mutations and strict native save validation; full creation, time advancement, choice resolution, continuation, packaging, and browser execution are still in progress.
+
 ### What actually works right now:
 - **Character Creation:** Questionnaire-based generation or manual stat allocation.
 - **Life Engine:** Event processing, aging, relationships, family dynamics, death, and lineage continuation.
@@ -31,6 +33,12 @@ You'll need Python 3 and a terminal that supports `curses` (Linux/macOS default;
 git clone https://github.com/compoodment/Actora.git
 cd Actora
 python3 main.py
+```
+
+Run the native regression suite with:
+
+```bash
+python3 -m unittest discover -s tests -v
 ```
 
 ---

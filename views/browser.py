@@ -1,6 +1,6 @@
 """Lineage and relationship-browser view helpers."""
 
-HIDDEN_PLAYER_RECORD_TYPES = {"family_bootstrap", "actor_entry"}
+HIDDEN_PLAYER_RECORD_TYPES = {"family_bootstrap", "actor_entry", "continuation"}
 
 
 def build_lineage_row(entry):

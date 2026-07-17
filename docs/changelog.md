@@ -1,10 +1,22 @@
 ---
 title: Changelog
 tags: [implementation, reference, stable]
-updated: 2026-05-11
+updated: 2026-07-18
 ---
 
 # Actora Changelog
+
+## Version 0.56.0 (Minor) - 2026-07-18
+- **Curses-free native core boundary:** Added the `actora_core` package with versioned command, result, save, session, deterministic RNG, deterministic ID, serialization, validation, and strict JSON transport contracts.
+- **Deterministic action queue:** Added intent-only queueing and durable-ID removal. The engine derives action costs, labels, effects, and event text. Successful mutations increment the save revision once; rejected commands preserve save bytes, RNG state, and ID state.
+- **Stable choices:** Replaced positional saved choice side arrays with complete `{option_id, label, value}` options and `selected_option_id`. The terminal shape has an explicit adapter, while legacy queued actions without engine-issued IDs are rejected until terminal dispatch integration.
+- **Adversarial save hardening:** Added exact schema checks, canonical human appearance and four-trait validation, social/action/choice invariants, JavaScript-safe integers, duplicate-key rejection, complete provenance restoration, foreign-engine isolation, and bounded parsing for hostile integer/ID inputs.
+- **Golden native trace:** Added a canonical eight-command action-queue trace plus native round-trip, failure-atomicity, mutation-regression, and curses-free import coverage.
+- **Persistent event cooldown:** Monthly-event cooldown state is now owned by `World`, scoped per focused person, preserved across separate advancement calls and save round-trips, unique, and unaffected by family-event IDs.
+- **Generated human traits:** Parents, newborns, and meeting NPCs now receive four unique traits from the canonical 12-trait pool.
+- **Relationship fixes:** Friends excludes acquaintances, past social ties render as `Past`, and filtered detail preserves the selected social facet while retaining family context.
+- **Continuation records:** A continuation handoff now writes one hidden structural world record, is single-use, requires current focus, and no longer causes duplicate year headers.
+- **Scope boundary:** `create_game`, `advance_time`, `resolve_choice`, and `continue_as` remain intentionally unimplemented in the dispatcher until authoritative gameplay adopts injected RNG/ID sources. No browser runtime is claimed by this release.
 
 ## Version 0.55.1 (Patch) - 2026-05-11
 - **Web shell direction documented:** Added DEC-035 to start `/lab/actora` web shell implementation as an owner-directed parallel presentation track.
