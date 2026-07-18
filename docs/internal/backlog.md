@@ -13,12 +13,8 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Now
 
-- **Isolated browser Worker parity spike** — package the complete native six-command engine; run the exact JSON boundary in an opt-in Worker and prove native/browser save hashes, outputs, and error behavior match. Do not load the runtime on an ordinary `/lab/actora` visit yet. *(2026-07-18)*
-
 
 ## Next
-
-- **New-engine save isolation and web cutover** — use a distinct save namespace, explicit legacy schema-5 migration/recovery, and reversible cutover gates before the copied web simulation is replaced. Preserve the shipped web UX rather than rebuilding it around the runtime. *(2026-07-18)*
 
 ## Later
 

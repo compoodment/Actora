@@ -20,12 +20,14 @@ Owner-directed priority shift (DEC-035): begin a web shell implementation now so
 
 This is a presentation/runtime track, not permission to skip the backbone. The web shell must render and exercise current implemented foundations before adding later domain systems. It may improve visual clarity and coding speed, but it must not become a separate design that bypasses simulation-step ownership, structured outputs, records, links, places, spatial identity, or controlled mutation.
 
-The first web presentation pass now exists. All six deterministic native commands now execute and are locked by native golden traces; the active dependency is packaging that exact boundary and proving parity in an isolated browser Worker before replacing the copied browser simulation. Required order:
+The first native web cutover now exists externally in actora.art. New `/lab/actora` lives package the exact tagged `v0.58.0` six-command boundary into an isolated Pyodide Worker after a nine-case native/browser golden-parity gate. Existing schema-5 TypeScript lives and unfinished drafts remain on their legacy engine; native state uses a separate integrity/recovery namespace and no guessed conversion is attempted.
 
-1. Package the exact native state and command boundary without importing terminal modules.
-2. Prove native/browser save hashes, outputs, and error behavior match in an isolated, opt-in browser Worker before changing the ordinary route.
-3. Introduce an explicitly separate new-engine save namespace and a deliberate legacy migration/recovery path.
-4. Switch `/lab/actora` only after parity is proven and the current web UX remains intact.
+The active dependency is now hardening that boundary before adding another simulation domain:
+
+1. Package web runtimes only from reviewed Actora tags and keep their asset paths immutable.
+2. Preserve the JSON command/save contract as the sole simulation mutation boundary; browser presentation and recovery state must not become a second game authority.
+3. Keep legacy and native saves isolated until an upstream-reviewed importer can write, reread, and validate a complete native save without inventing missing state.
+4. Require parity, save-safety, and rollback gates again before any later tagged runtime replaces the current browser package.
 
 Allowed first web scope:
 - title/start/save-lite entry surface

@@ -21,7 +21,7 @@ It is intended to support safe patching, review, and manual verification, alongs
 
 - **Language:** Python
 - **Interface:** Terminal with a curses-based startup character creation wizard and a curses TUI shell for ordinary play. Shell v2 (v0.48.0+): 7-row header (custom logo crest + flanking info panels, rows 0-6), body, 2-row footer. Split Life View, dedicated profile screen, tabbed Browser (Relationships tab + History tab), dedicated Actions screen, death/continuation interrupts, skip-time flow, and meeting/social event popups. Shell geometry centralized in `ActoraTUI` class constants: `HEADER_ROWS=7`, `FOOTER_ROWS=2`, `BROWSER_CHROME_ROWS=2` — all body renderers derive `top` and `body_height` from these.
-- **Headless checkpoint:** `actora_core/` is the authoritative curses-free native boundary for deterministic sources, strict JSON commands/results, schema-1 saves, validation, serialization, creation, action queues, month advancement, stable-ID choice resolution, and death-continuation handoff. All six commands execute; no browser Worker is connected yet.
+- **Headless checkpoint:** `actora_core/` is the authoritative curses-free native boundary for deterministic sources, strict JSON commands/results, schema-1 saves, validation, serialization, creation, action queues, month advancement, stable-ID choice resolution, and death-continuation handoff. All six commands execute. No browser code lives in this repository; actora.art externally packages tagged `v0.58.0` into an isolated Worker for new `/lab/actora` lives.
 - **Structure:** Modular architecture with separated simulation, controllers, screens, view layers, and the authoritative headless runtime boundary. Shell (`main.py`) is thin orchestration; screen controllers own per-surface input/render; view helpers own pure-data formatting; controllers own interaction logic.
 
 ## 2. Current File Structure
@@ -614,7 +614,7 @@ Current event boundary truth:
 
 ### Headless command/save runtime (v0.58.0)
 
-`actora_core` now defines the native boundary that a future terminal adapter and browser Worker can share:
+`actora_core` defines the native boundary shared by the current external actora.art browser Worker and a future terminal adapter:
 
 - command contract v1: `create_game`, `queue_action`, `remove_action`, `advance_time`, `resolve_choice`, and `continue_as`
 - save format/schema v1 with exact World/Human/session data, engine provenance, revision, PCG32 state, and sequential ID state
@@ -654,7 +654,7 @@ Native continuation:
 - silently auto-resolves identity for adult successors or draws new emergence ages for minors from the save-owned RNG
 - consumes no simulation time or sequential ID
 
-The action-queue, create/advance, and choice/continuation golden traces lock current native behavior. Existing terminal gameplay still uses its controller orchestration and legacy global sources outside the headless dispatcher, although startup construction and history accumulation share curses-free seams. A terminal queue created outside the dispatcher has no durable action ID and therefore cannot be captured as a schema-1 engine save yet. No browser Worker is connected.
+The action-queue, create/advance, and choice/continuation golden traces lock current native behavior. Existing terminal gameplay still uses its controller orchestration and legacy global sources outside the headless dispatcher, although startup construction and history accumulation share curses-free seams. A terminal queue created outside the dispatcher has no durable action ID and therefore cannot be captured as a schema-1 engine save yet. actora.art packages this exact tagged boundary externally; its Worker, Pyodide dependency, web projection, and browser-local save/recovery wrapper do not live in this repository.
 
 The schema-1 engine executes only when `engine_kind` is exactly `python-headless`. Foreign kinds may be parsed solely so dispatch can return a structured, byte-preserving mismatch; they are never executed as this engine.
 

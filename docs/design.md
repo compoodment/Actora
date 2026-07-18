@@ -496,7 +496,7 @@ Stats and Attributes are intentionally split: Stats are the player-facing moment
 ## Web Shell Direction (`/lab/actora`)
 
 **Status:** Active direction (DEC-035, 2026-05-11)
-**Current truth:** This repository contains the authoritative Python/curses implementation and a complete curses-free deterministic six-command runtime covering creation, action queues, advancement, stable-ID choice resolution, and death-continuation handoff. A playable `/lab/actora` web presentation exists separately in actora.art, but its copied TypeScript simulation has not yet been replaced; browser packaging and isolated Worker parity are the next runtime steps.
+**Current truth:** This repository contains the authoritative Python/curses implementation and a complete curses-free deterministic six-command runtime covering creation, action queues, advancement, stable-ID choice resolution, and death-continuation handoff. actora.art now packages the exact tagged `v0.58.0` boundary into a dedicated lazy browser Worker for new `/lab/actora` lives after exact golden parity. The external web layer preserves older TypeScript saves/drafts on their legacy engine and owns only presentation plus isolated local save/recovery concerns; it does not redefine simulation truth.
 
 **Intent:**
 The web shell should make Actora easier to see, play, and iterate on without changing what Actora is. It is a game surface for Actora, not a generic site experiment and not a separate rewrite of the vision.
@@ -520,8 +520,8 @@ Design anchors:
 - Keep Projects page removal separate; current direction only establishes `/lab/actora` as the game surface.
 
 **Open questions:**
-- Exact visual language of the first title/start screen.
-- Whether local saves are pure browser-local first or share actora.art account save infrastructure later.
+- Whether browser-local saves should ever gain an explicit actora.art account-save path.
+- Whether a complete, non-invented legacy importer will become possible as the native schema evolves.
 - How much world/news context appears in the first shell before the News system exists.
 
 ---
