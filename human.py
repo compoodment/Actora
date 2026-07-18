@@ -30,6 +30,43 @@ SEXUALITY_OPTIONS = ["Heterosexual", "Homosexual", "Bisexual", "Asexual", "Panse
 GENDER_IDENTITY_AUTO_OPTIONS = ["Male", "Female", "Non-binary", "Agender", "Genderfluid"]
 
 
+def derive_human_lifecycle_state(
+    birth_year,
+    birth_month,
+    current_year,
+    current_month,
+):
+    """Derives the canonical human age and life stage from two dates."""
+    age_years = current_year - birth_year
+    if current_month < birth_month:
+        age_years -= 1
+    age_years = max(0, age_years)
+
+    total_months_current = (current_year * 12) + current_month
+    total_months_birth = (birth_year * 12) + birth_month
+    age_months = max(0, total_months_current - total_months_birth)
+
+    if age_years < 3:
+        life_stage = "Infant"
+    elif age_years < 10:
+        life_stage = "Child"
+    elif age_years < 18:
+        life_stage = "Teenager"
+    elif age_years < 25:
+        life_stage = "Young Adult"
+    elif age_years < 65:
+        life_stage = "Adult"
+    else:
+        life_stage = "Elder"
+
+    return {
+        "age_years": age_years,
+        "age_months": age_months,
+        "life_stage": life_stage,
+        "life_stage_model": "human_default",
+    }
+
+
 class Human:
     def __init__(self, species, first_name, last_name, sex, gender, birth_year, birth_month=1):
         self.species = species
@@ -120,34 +157,12 @@ class Human:
         Provides a structured dictionary of derived lifecycle state for the human.
         This is the formal access boundary for lifecycle facts.
         """
-        age_years_calc = current_year - self.birth_year
-        if current_month < self.birth_month:
-            age_years_calc -= 1
-        age_years_calc = max(0, age_years_calc)
-
-        total_months_current = (current_year * 12) + current_month
-        total_months_birth = (self.birth_year * 12) + self.birth_month
-        age_months_calc = max(0, total_months_current - total_months_birth)
-
-        if age_years_calc < 3: # 0-2
-            life_stage_calc = "Infant"
-        elif age_years_calc < 10: # 3-9
-            life_stage_calc = "Child"
-        elif age_years_calc < 18: # 10-17
-            life_stage_calc = "Teenager"
-        elif age_years_calc < 25: # 18-24
-            life_stage_calc = "Young Adult"
-        elif age_years_calc < 65: # 25-64
-            life_stage_calc = "Adult"
-        else: # 65+
-            life_stage_calc = "Elder"
-
-        return {
-            "age_years": age_years_calc,
-            "age_months": age_months_calc,
-            "life_stage": life_stage_calc,
-            "life_stage_model": "human_default"
-        }
+        return derive_human_lifecycle_state(
+            self.birth_year,
+            self.birth_month,
+            current_year,
+            current_month,
+        )
 
     def get_age(self, current_year, current_month):
         """Calculates the current age of the human based on year and month."""

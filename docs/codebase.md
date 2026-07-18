@@ -2,7 +2,7 @@
 title: Codebase
 tags: [implementation, reference, stable]
 updated: 2026-07-18
-through: v0.57.0
+through: v0.58.0
 verified: 2026-07-18
 ---
 
@@ -11,7 +11,7 @@ verified: 2026-07-18
 Current repo implementation truth. What the code looks like right now.
 **Last verified against actual code:** 2026-07-18
 
-**Version:** 0.57.0
+**Version:** 0.58.0
 **Last Updated:** 2026-07-18
 
 This document summarizes the currently implemented structure and behavior of the Actora repository.
@@ -21,8 +21,8 @@ It is intended to support safe patching, review, and manual verification, alongs
 
 - **Language:** Python
 - **Interface:** Terminal with a curses-based startup character creation wizard and a curses TUI shell for ordinary play. Shell v2 (v0.48.0+): 7-row header (custom logo crest + flanking info panels, rows 0-6), body, 2-row footer. Split Life View, dedicated profile screen, tabbed Browser (Relationships tab + History tab), dedicated Actions screen, death/continuation interrupts, skip-time flow, and meeting/social event popups. Shell geometry centralized in `ActoraTUI` class constants: `HEADER_ROWS=7`, `FOOTER_ROWS=2`, `BROWSER_CHROME_ROWS=2` — all body renderers derive `top` and `body_height` from these.
-- **Headless checkpoint:** `actora_core/` is a curses-free native boundary for deterministic sources, strict JSON commands/results, schema-1 saves, validation, serialization, creation, action queues, and authoritative month advancement. Choice resolution and continuation remain before browser packaging; no browser Worker is connected yet.
-- **Structure:** Modular architecture with separated simulation, controllers, screens, view layers, and a provisional headless runtime boundary. Shell (`main.py`) is thin orchestration; screen controllers own per-surface input/render; view helpers own pure-data formatting; controllers own interaction logic.
+- **Headless checkpoint:** `actora_core/` is the authoritative curses-free native boundary for deterministic sources, strict JSON commands/results, schema-1 saves, validation, serialization, creation, action queues, month advancement, stable-ID choice resolution, and death-continuation handoff. All six commands execute; no browser Worker is connected yet.
+- **Structure:** Modular architecture with separated simulation, controllers, screens, view layers, and the authoritative headless runtime boundary. Shell (`main.py`) is thin orchestration; screen controllers own per-surface input/render; view helpers own pure-data formatting; controllers own interaction logic.
 
 ## 2. Current File Structure
 
@@ -31,12 +31,12 @@ It is intended to support safe patching, review, and manual verification, alongs
     ├── ui.py                      (168 lines - layout/drawing primitives)
     ├── mechanics.py               (68 lines - game rule constants: traits, actions, time budget, identity choices)
     ├── wizard.py                  (1227 lines - CreationWizard class, creation content and questionnaire)
-    ├── world.py                   (2511 lines - simulation state, links, places, records, social links, mortality, advancement, actions)
+    ├── world.py                   (2583 lines - simulation state, links, places, records, social links, mortality, advancement, actions)
     ├── geography.py               (138 lines - stdlib-only world geography data and lookup map)
     ├── game_setup.py              (252 lines - curses-free startup world construction)
     ├── identity.py                (323 lines - name pools, culture-aware identity generation)
-    ├── human.py                   (301 lines - Human model, lifecycle, spatial, snapshot)
-    ├── events.py                  (408 lines - human monthly events, meeting events)
+    ├── human.py                   (316 lines - Human model, lifecycle, spatial, snapshot)
+    ├── events.py                  (409 lines - human monthly events, meeting events)
     ├── app_router.py               (74 lines - top-level TUI input/render routing)
     ├── shell_controller.py         (75 lines - global menu/options/quit modal input handling)
     ├── shell_renderer.py           (236 lines - global chrome, footer, and popup rendering)
@@ -60,7 +60,9 @@ It is intended to support safe patching, review, and manual verification, alongs
     │   ├── validation.py           (world/save invariants)
     │   ├── action_queue.py         (canonical queue/remove mutations)
     │   ├── history.py              (174 lines - curses-free event-log accumulation)
-    │   ├── advancement.py          (390 lines - headless monthly orchestration)
+    │   ├── advancement.py          (393 lines - headless monthly orchestration)
+    │   ├── choice_resolution.py    (430 lines - headless identity/meeting choice orchestration)
+    │   ├── continuation.py         (149 lines - headless death-continuation orchestration)
     │   ├── dispatcher.py           (optimistic command dispatch)
     │   └── transport.py            (strict canonical JSON)
     ├── views/
@@ -82,7 +84,7 @@ It is intended to support safe patching, review, and manual verification, alongs
     │   └── skip_time.py            (85 lines - skip-time screen controller/renderer)
     └── docs/
 
-### Import boundary (v0.57.0)
+### Import boundary (v0.58.0)
 
 No circular imports. Allowed import graph:
 
@@ -127,11 +129,13 @@ No circular imports. Allowed import graph:
     actora_core.session        → errors, json_types, randomness (mechanics only in the TUI adapter)
     actora_core.contracts      → commands, errors, ids, json_types, randomness, session
     actora_core.serialization  → contracts, errors, ids, json_types, randomness, session, validation
-    actora_core.validation     → contracts, errors, json_types, mechanics
+    actora_core.validation     → commands, contracts, errors, json_types, session, events, human, mechanics
     actora_core.action_queue   → errors, ids, json_types, session, mechanics
     actora_core.history        → (standard lib only)
     actora_core.advancement    → errors, history, ids, json_types, randomness, session, events, mechanics
-    actora_core.dispatcher     → action_queue, advancement, commands, contracts, errors, ids, json_types, randomness, serialization, session, game_setup (runtime)
+    actora_core.choice_resolution → action_queue, advancement, errors, history, ids, json_types, randomness, session, mechanics
+    actora_core.continuation   → errors, history, json_types, randomness, session
+    actora_core.dispatcher     → action_queue, advancement, choice_resolution, commands, continuation, contracts, errors, ids, json_types, randomness, serialization, session, game_setup (runtime)
     actora_core.transport      → commands, contracts, errors, json_types
 
 Rules:
@@ -160,7 +164,7 @@ Current fields:
 
 Current methods:
 
-- `add_actor(actor_id, actor_obj)`
+- `add_actor(actor_id, actor_obj)` (rejects duplicate actor IDs instead of overwriting)
 - `set_focused_actor(actor_id)`
 - `get_focused_actor_id()`
 - `get_focused_actor()`
@@ -198,10 +202,11 @@ Current methods:
 - `get_place_lineage(place_id, include_self=True)`
 - `get_nearest_place_of_kind(place_id, kind, include_self=True)`
 - `apply_outcome(actor_id, outcome)`
+- `resolve_human_identity_choice(actor_id, choice_id, value)`
+- `auto_resolve_human_identity(actor_id, *, random_source=None)`
 - `get_continuity_candidates_for(actor_id)`
 - `get_lineage_browser_data_for(actor_id, *, filter_mode="all", search_text="", recent_record_limit=5)`
 - `build_continuity_state_for(actor_id)`
-- `handoff_focus_to_continuation(from_actor_id, successor_actor_id)`
 - `handoff_focus_to_continuation(...)` - controlled focus-switch after focused actor death
 - `mark_actor_dead(...)` - structural death transition with preserved death record
 - `build_monthly_mortality_profile_for(...)` - extension seam for health/lifestyle mortality tuning
@@ -423,7 +428,7 @@ Basic world place helper contract:
 
 ## Lifecycle System
 
-Lifecycle state is derived, not stored. `Human.get_lifecycle_state(current_year, current_month)` returns a dictionary with `age_years`, `age_months`, `life_stage`, and `life_stage_model`. Life stages progress through: `Infant > Child > Teenager > Young Adult > Adult > Elder`. All lifecycle-dependent systems (events, mortality, identity emergence) consume this derived state rather than raw age fields.
+Lifecycle state is derived, not stored. `derive_human_lifecycle_state(...)` is the pure shared derivation seam, and `Human.get_lifecycle_state(current_year, current_month)` delegates to it. The returned dictionary contains `age_years`, `age_months`, `life_stage`, and `life_stage_model`. Life stages progress through: `Infant > Child > Teenager > Young Adult > Adult > Elder`. All lifecycle-dependent systems (events, mortality, identity emergence, and strict save validation) consume this derived state rather than duplicating raw-age calculations.
 
 ## 5. Derived State
 
@@ -577,7 +582,8 @@ Responsible for:
 ### `human.py`
 Responsible for:
 - `Human` model definition
-- human-derived calculations (including `get_lifecycle_state`)
+- pure human lifecycle derivation through `derive_human_lifecycle_state(...)`
+- human-derived calculations (including `get_lifecycle_state`, which delegates to that shared helper)
 - randomized starting statistics (`self.stats`)
 - stat updates through `modify_stat(...)` (clamped supported stats, unbounded money, explicit `ValueError` on unsupported stat names)
 - narrow structural-state storage (`structural_status`, `death_year`, `death_month`, `death_reason`)
@@ -590,6 +596,7 @@ Responsible for:
 - filtering the current human event pool from derived lifecycle state (`_get_human_eligible_events(...)`)
 - returning complete structured event results through the implementation-facing helper `get_human_monthly_event_from_lifecycle(...)`
 - preserving the existing public compatibility wrapper `get_monthly_event(...)` for the current event contract
+- checking meeting eligibility through `is_meeting_event_lifecycle_eligible(...)`
 - meeting event generation for social link creation (`get_meeting_event_for_player(...)`)
 
 Current event boundary truth:
@@ -605,7 +612,7 @@ Current event boundary truth:
 
 ## 7. Simulation Boundary
 
-### Headless command/save runtime (v0.57.0)
+### Headless command/save runtime (v0.58.0)
 
 `actora_core` now defines the native boundary that a future terminal adapter and browser Worker can share:
 
@@ -614,11 +621,11 @@ Current event boundary truth:
 - caller-owned request IDs that never consume simulation IDs
 - strict JSON parsing with duplicate-key, non-finite, unsafe-integer, unknown-field, and malformed-state rejection
 - optimistic concurrency through `expected_revision`
-- structured results with events, effects, exact tagged interruptions, and error channels
+- strict structured results with exact event envelopes, a closed effect-kind union, exact tagged interruptions, and failures that cannot carry events or effects
 - complete pending-choice options with stable option IDs
 - byte-preserving failures and one-revision successful mutations
 
-`create_game`, `queue_action`, `remove_action`, and `advance_time` execute in v0.57.0. `resolve_choice` and `continue_as` retain validated intent shapes but return `command_not_implemented`.
+All six command-contract operations execute in v0.58.0: `create_game`, `queue_action`, `remove_action`, `advance_time`, `resolve_choice`, and `continue_as`.
 
 Native creation:
 - accepts exactly the current nine-field human creation payload and a lowercase 16-digit hexadecimal seed
@@ -635,7 +642,19 @@ Native advancement:
 - rejects an unrepresentable total-month horizon before mutation, returns an atomic `state_limit` if a safe numeric field would overflow, and records only represented history years rather than expanding empty gaps
 - preserves deterministic output and save bytes across serialization/reload
 
-The action-queue and create/advance golden traces lock current native behavior. Existing terminal gameplay still uses its controller orchestration and legacy global sources outside the headless dispatcher, although startup construction and history accumulation now share curses-free seams. A terminal queue created outside the dispatcher has no durable action ID and therefore cannot be captured as a schema-1 engine save yet. No browser Worker is connected.
+Native choice resolution:
+- accepts only the exact stable option IDs stored in the pending choice; null is accepted only for a skippable choice
+- resolves independently timed gender and sexuality gates, meetings, and action pickers through canonical world/action seams
+- clears pending/resume state atomically and resumes a bounded interrupted skip without adding a second skip marker
+- may return another `choice_required` or `continuation_required` interruption produced by resumed advancement
+
+Native continuation:
+- recomputes living linked candidates at command time and rejects stale or unavailable selections
+- hands focus through `World.handoff_focus_to_continuation(...)`, clears per-life transient state, and appends one life separator while preserving prior saga history
+- silently auto-resolves identity for adult successors or draws new emergence ages for minors from the save-owned RNG
+- consumes no simulation time or sequential ID
+
+The action-queue, create/advance, and choice/continuation golden traces lock current native behavior. Existing terminal gameplay still uses its controller orchestration and legacy global sources outside the headless dispatcher, although startup construction and history accumulation share curses-free seams. A terminal queue created outside the dispatcher has no durable action ID and therefore cannot be captured as a schema-1 engine save yet. No browser Worker is connected.
 
 The schema-1 engine executes only when `engine_kind` is exactly `python-headless`. Foreign kinds may be parsed solely so dispatch can return a structured, byte-preserving mismatch; they are never executed as this engine.
 

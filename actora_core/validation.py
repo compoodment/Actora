@@ -6,17 +6,29 @@ import math
 from collections.abc import Mapping
 from typing import Any
 
+from events import (
+    MEETING_EVENT_POOL,
+    is_meeting_event_lifecycle_eligible,
+)
+from human import derive_human_lifecycle_state
 from mechanics import (
     EXERCISE_SUBTYPES,
+    GENDER_IDENTITY_OPTIONS,
     HANG_OUT_TIME_COST,
     READ_SUBTYPES,
     REST_SUBTYPES,
+    SEXUALITY_OPTION_LABELS,
     TRAIT_DEFINITIONS,
 )
 
+from .commands import MAX_ADVANCE_MONTHS
 from .contracts import SaveEnvelope
 from .errors import InvariantError, InvariantViolation
 from .json_types import MAX_SAFE_INTEGER, MIN_SAFE_INTEGER
+from .session import (
+    GENDER_CHOICE_AGE_RANGE,
+    SEXUALITY_CHOICE_AGE_RANGE,
+)
 
 _HUMAN_STAT_KEYS = {
     "health",
@@ -134,6 +146,28 @@ _NON_TARGET_CHOICE_IDS = {
     "sexuality",
     "meeting_npc",
 }
+_GENDER_CHOICE_COPY = {
+    "title": "A moment of self-reflection",
+    "text": (
+        "As you grow, you find yourself thinking more about who you are."
+    ),
+    "question": "Your gender identity feels like:",
+}
+_SEXUALITY_CHOICE_COPY = {
+    "title": "A new kind of awareness",
+    "text": (
+        "You have started noticing things about yourself you had not "
+        "thought about before."
+    ),
+    "question": "You feel attracted to:",
+}
+_MEETING_CHOICE_COPY = {
+    "title": "Someone new",
+    "question": "Do you want to introduce yourself?",
+}
+_MEETING_CHOICE_TEXTS = {
+    event["text"] for event in MEETING_EVENT_POOL
+}
 
 
 def _is_int(value: object) -> bool:
@@ -192,6 +226,78 @@ def _actor_full_name(actor_data: object) -> str | None:
     return f"{first_name} {last_name}".strip()
 
 
+def _human_lifecycle_state(
+    actor_data: object,
+    current_year: object,
+    current_month: object,
+) -> dict[str, object] | None:
+    """Derives the schema-1 human lifecycle without constructing an actor."""
+    if (
+        not isinstance(actor_data, Mapping)
+        or not _is_int(current_year)
+        or not _is_int(current_month)
+    ):
+        return None
+    birth_year = actor_data.get("birth_year")
+    birth_month = actor_data.get("birth_month")
+    if (
+        not _is_int(birth_year)
+        or not _is_int(birth_month)
+        or not 1 <= birth_month <= 12
+    ):
+        return None
+
+    return derive_human_lifecycle_state(
+        birth_year,
+        birth_month,
+        current_year,
+        current_month,
+    )
+
+
+def _value_choice_options(
+    labeled_values: tuple[tuple[str, str], ...],
+) -> list[dict[str, str]]:
+    return [
+        {
+            "option_id": f"value:{value}",
+            "label": label,
+            "value": value,
+        }
+        for label, value in labeled_values
+    ]
+
+
+def _canonical_life_choice_options(
+    choice_id: object,
+    focused_actor_data: object,
+) -> list[dict[str, str]] | None:
+    """Returns exact mutation-bearing options for engine-authored choices."""
+    if choice_id == "gender_identity":
+        if not isinstance(focused_actor_data, Mapping):
+            return None
+        raw_gender = focused_actor_data.get("gender")
+        if not isinstance(raw_gender, str):
+            return None
+        current_gender = raw_gender or "Other"
+        values = list(GENDER_IDENTITY_OPTIONS)
+        if current_gender not in values:
+            values.append(current_gender)
+        return _value_choice_options(
+            tuple((value, value) for value in values)
+        )
+    if choice_id == "sexuality":
+        return _value_choice_options(SEXUALITY_OPTION_LABELS)
+    if choice_id == "meeting_npc":
+        return _value_choice_options(
+            (
+                ("Introduce yourself", "introduce"),
+                ("Keep to yourself", "keep_to_self"),
+            )
+        )
+    return None
+
+
 def _parse_issued_id(
     identifier: object,
     *,
@@ -213,6 +319,40 @@ def _parse_issued_id(
         return None
     value = int(suffix)
     if value < 1 or identifier != f"{prefix}{value:08d}":
+        return None
+    return value
+
+
+def _parse_any_issued_id(
+    identifier: object,
+    *,
+    namespace: str,
+) -> int | None:
+    """Returns a canonical engine-issued value regardless of its role."""
+    if not isinstance(identifier, str):
+        return None
+    prefix = f"{namespace}_"
+    if not identifier.startswith(prefix):
+        return None
+    role_and_value = identifier[len(prefix):]
+    role, separator, suffix = role_and_value.rpartition("_")
+    if (
+        not separator
+        or not role
+        or any(
+            segment == ""
+            or not segment.isascii()
+            or not segment.isalnum()
+            or segment.lower() != segment
+            for segment in role.split("_")
+        )
+        or not 8 <= len(suffix) <= 16
+        or not suffix.isascii()
+        or not suffix.isdigit()
+    ):
+        return None
+    value = int(suffix)
+    if value < 1 or identifier != f"{prefix}{role}_{value:08d}":
         return None
     return value
 
@@ -854,8 +994,39 @@ def collect_save_invariant_violations(
     violations = list(collect_world_invariant_violations(envelope.world))
     world = envelope.world if isinstance(envelope.world, Mapping) else {}
     actors = world.get("actors")
+    records = world.get("records")
     actor_ids = set(actors) if isinstance(actors, Mapping) else set()
     session = envelope.session
+    issued_sequence_paths: dict[int, str] = {}
+
+    for actor_id in sorted(actor_ids):
+        issued_value = _parse_any_issued_id(
+            actor_id,
+            namespace=envelope.ids.namespace,
+        )
+        if (
+            issued_value is not None
+            and issued_value >= envelope.ids.next_value
+        ):
+            _add(
+                violations,
+                "unissued_actor_id",
+                f"world.actors.{actor_id}",
+                "engine-namespaced actor IDs must have been issued already",
+            )
+        elif issued_value is not None:
+            prior_path = issued_sequence_paths.get(issued_value)
+            if prior_path is not None:
+                _add(
+                    violations,
+                    "reused_issued_id_value",
+                    f"world.actors.{actor_id}",
+                    f"reuses the ID sequence value already held by {prior_path}",
+                )
+            else:
+                issued_sequence_paths[issued_value] = (
+                    f"world.actors.{actor_id}"
+                )
 
     if session.focused_actor_id not in actor_ids:
         _add(
@@ -873,6 +1044,7 @@ def collect_save_invariant_violations(
             "session focus must match world focus",
         )
     current_year = world.get("current_year")
+    current_month = world.get("current_month")
     if _is_int(current_year) and session.last_logged_year > current_year:
         _add(
             violations,
@@ -947,6 +1119,22 @@ def collect_save_invariant_violations(
                     f"{path}.action_id",
                     "must have been issued before ids.next_value",
                 )
+            else:
+                prior_path = issued_sequence_paths.get(issued_value)
+                if prior_path is not None:
+                    _add(
+                        violations,
+                        "reused_issued_id_value",
+                        f"{path}.action_id",
+                        (
+                            "reuses the ID sequence value already held by "
+                            f"{prior_path}"
+                        ),
+                    )
+                else:
+                    issued_sequence_paths[issued_value] = (
+                        f"{path}.action_id"
+                    )
 
         if action_type == "personal":
             unknown_fields = _unknown_fields(action, _PERSONAL_ACTION_FIELDS)
@@ -1078,6 +1266,138 @@ def collect_save_invariant_violations(
         )
 
     pending_choice = session.pending_choice
+    focused_actor_is_alive = _actor_is_alive(focused_actor_data)
+    focused_lifecycle = _human_lifecycle_state(
+        focused_actor_data,
+        current_year,
+        current_month,
+    )
+    focused_age_years = (
+        focused_lifecycle.get("age_years")
+        if focused_lifecycle is not None
+        else None
+    )
+    if not (
+        GENDER_CHOICE_AGE_RANGE[0]
+        <= session.gender_choice_age
+        <= GENDER_CHOICE_AGE_RANGE[1]
+    ):
+        _add(
+            violations,
+            "invalid_gender_choice_age",
+            "session.gender_choice_age",
+            "must be an engine-generated age from "
+            f"{GENDER_CHOICE_AGE_RANGE[0]} through "
+            f"{GENDER_CHOICE_AGE_RANGE[1]}",
+        )
+    if not (
+        SEXUALITY_CHOICE_AGE_RANGE[0]
+        <= session.sexuality_choice_age
+        <= SEXUALITY_CHOICE_AGE_RANGE[1]
+    ):
+        _add(
+            violations,
+            "invalid_sexuality_choice_age",
+            "session.sexuality_choice_age",
+            "must be an engine-generated age from "
+            f"{SEXUALITY_CHOICE_AGE_RANGE[0]} through "
+            f"{SEXUALITY_CHOICE_AGE_RANGE[1]}",
+        )
+    if (
+        session.gender_choice_offered
+        and isinstance(focused_age_years, int)
+        and focused_age_years < session.gender_choice_age
+    ):
+        _add(
+            violations,
+            "premature_gender_choice_state",
+            "session.gender_choice_offered",
+            "cannot be true before the focused life reaches its "
+            "gender choice age",
+        )
+    if (
+        session.sexuality_choice_offered
+        and isinstance(focused_age_years, int)
+        and focused_age_years < session.sexuality_choice_age
+    ):
+        _add(
+            violations,
+            "premature_sexuality_choice_state",
+            "session.sexuality_choice_offered",
+            "cannot be true before the focused life reaches its "
+            "sexuality choice age",
+        )
+    if (
+        session.identity_popup_suppressed_for_resumed_adult
+        and (
+            not isinstance(focused_age_years, int)
+            or focused_age_years < 18
+            or not session.gender_choice_offered
+            or not session.sexuality_choice_offered
+        )
+    ):
+        _add(
+            violations,
+            "invalid_identity_suppression_state",
+            "session.identity_popup_suppressed_for_resumed_adult",
+            "requires an adult focused life with both identity choices resolved",
+        )
+    current_total_months = (
+        current_year * 12 + current_month
+        if _is_int(current_year) and _is_int(current_month)
+        else None
+    )
+    if (
+        isinstance(current_total_months, int)
+        and session.meeting_event_last_total_months > current_total_months
+    ):
+        _add(
+            violations,
+            "future_meeting_cooldown",
+            "session.meeting_event_last_total_months",
+            "cannot be later than the current world month",
+        )
+    if (
+        session.remaining_skip_months > MAX_ADVANCE_MONTHS
+    ):
+        _add(
+            violations,
+            "skip_resume_exceeds_command_limit",
+            "session.remaining_skip_months",
+            f"must not exceed {MAX_ADVANCE_MONTHS}",
+        )
+    if not focused_actor_is_alive and session.active_actions:
+        _add(
+            violations,
+            "dead_focus_has_actions",
+            "session.active_actions",
+            "a dead focused actor cannot retain queued actions",
+        )
+    if not focused_actor_is_alive and pending_choice is not None:
+        _add(
+            violations,
+            "dead_focus_has_choice",
+            "session.pending_choice",
+            "a dead focused actor cannot retain a pending choice",
+        )
+
+    if not focused_actor_is_alive and isinstance(records, list):
+        prior_handoff = any(
+            isinstance(record, Mapping)
+            and record.get("record_type") == "continuation"
+            and isinstance(record.get("metadata"), Mapping)
+            and record["metadata"].get("from_actor_id")
+            == session.focused_actor_id
+            for record in records
+        )
+        if prior_handoff:
+            _add(
+                violations,
+                "completed_continuation_still_focused",
+                "session.focused_actor_id",
+                "a completed continuation cannot retain focus on the dead life",
+            )
+
     if pending_choice is not None:
         unknown_choice_fields = _unknown_fields(
             pending_choice,
@@ -1121,6 +1441,16 @@ def collect_save_invariant_violations(
                 "unsupported_choice_id",
                 "session.pending_choice.choice_id",
                 f"unknown choice '{choice_id}'",
+            )
+        if (
+            session.remaining_skip_months > 0
+            and choice_id not in _NON_TARGET_CHOICE_IDS
+        ):
+            _add(
+                violations,
+                "invalid_choice_skip_resume",
+                "session.remaining_skip_months",
+                "only advancement-origin life choices may resume skipped time",
             )
 
         options = pending_choice.get("options")
@@ -1228,6 +1558,24 @@ def collect_save_invariant_violations(
                 "unexpected_choice_default",
                 "session.pending_choice.default_value",
                 "non-skippable choices must not define a default value",
+            )
+        if (
+            isinstance(choice_id, str)
+            and choice_id
+            in (
+                set(_PERSONAL_CHOICE_ACTION_IDS)
+                | {"select_hang_out_target"}
+            )
+            and (
+                pending_choice.get("skippable") is not True
+                or pending_choice.get("default_value") is not None
+            )
+        ):
+            _add(
+                violations,
+                "noncanonical_action_choice_state",
+                "session.pending_choice",
+                "action pickers must be cancellable with a null default",
             )
 
         option_values: set[str] = set()
@@ -1349,6 +1697,116 @@ def collect_save_invariant_violations(
                     "invalid_choice_option_value",
                     f"{path}.value",
                     "this choice requires a string value",
+                )
+
+        canonical_life_options = _canonical_life_choice_options(
+            choice_id,
+            focused_actor_data,
+        )
+        if (
+            canonical_life_options is not None
+            and list(normalized_options) != canonical_life_options
+        ):
+            _add(
+                violations,
+                "noncanonical_life_choice_options",
+                "session.pending_choice.options",
+                "must match the engine-authored options exactly",
+            )
+
+        if choice_id == "gender_identity":
+            for field_name, expected_value in _GENDER_CHOICE_COPY.items():
+                if pending_choice.get(field_name) != expected_value:
+                    _add(
+                        violations,
+                        "noncanonical_choice_copy",
+                        f"session.pending_choice.{field_name}",
+                        "must match the engine-authored gender choice",
+                    )
+            raw_gender = (
+                focused_actor_data.get("gender")
+                if isinstance(focused_actor_data, Mapping)
+                else None
+            )
+            current_gender = raw_gender or "Other"
+            if (
+                pending_choice.get("skippable") is not True
+                or pending_choice.get("default_value") != current_gender
+                or not session.gender_choice_offered
+                or session.identity_popup_suppressed_for_resumed_adult
+                or not isinstance(focused_age_years, int)
+                or focused_age_years < session.gender_choice_age
+            ):
+                _add(
+                    violations,
+                    "noncanonical_gender_choice_state",
+                    "session.pending_choice",
+                    "must match the current identity-choice gate state",
+                )
+        elif choice_id == "sexuality":
+            for field_name, expected_value in _SEXUALITY_CHOICE_COPY.items():
+                if pending_choice.get(field_name) != expected_value:
+                    _add(
+                        violations,
+                        "noncanonical_choice_copy",
+                        f"session.pending_choice.{field_name}",
+                        "must match the engine-authored sexuality choice",
+                    )
+            if (
+                pending_choice.get("skippable") is not True
+                or pending_choice.get("default_value") is not None
+                or not session.sexuality_choice_offered
+                or session.identity_popup_suppressed_for_resumed_adult
+                or not isinstance(focused_age_years, int)
+                or focused_age_years < session.sexuality_choice_age
+            ):
+                _add(
+                    violations,
+                    "noncanonical_sexuality_choice_state",
+                    "session.pending_choice",
+                    "must match the current identity-choice gate state",
+                )
+        elif choice_id == "meeting_npc":
+            for field_name, expected_value in _MEETING_CHOICE_COPY.items():
+                if pending_choice.get(field_name) != expected_value:
+                    _add(
+                        violations,
+                        "noncanonical_choice_copy",
+                        f"session.pending_choice.{field_name}",
+                        "must match the engine-authored meeting choice",
+                    )
+            identity_choice_due = (
+                isinstance(focused_age_years, int)
+                and (
+                    (
+                        focused_age_years >= session.gender_choice_age
+                        and not session.gender_choice_offered
+                    )
+                    or (
+                        focused_age_years >= session.sexuality_choice_age
+                        and not session.sexuality_choice_offered
+                    )
+                )
+            )
+            if (
+                pending_choice.get("skippable") is not False
+                or "default_value" in pending_choice
+                or pending_choice.get("text")
+                not in _MEETING_CHOICE_TEXTS
+                or not _is_int(current_total_months)
+                or session.meeting_event_last_total_months
+                != current_total_months
+                or focused_lifecycle is None
+                or not is_meeting_event_lifecycle_eligible(
+                    focused_lifecycle
+                )
+                or identity_choice_due
+            ):
+                _add(
+                    violations,
+                    "noncanonical_meeting_choice_state",
+                    "session.pending_choice",
+                    "must match the engine-authored meeting choice state",
                 )
 
     for index, entry in enumerate(session.event_log):

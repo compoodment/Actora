@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from .action_queue import queue_action, remove_action
 from .advancement import advance_time
+from .choice_resolution import resolve_choice
 from .commands import CommandType, GameCommand
+from .continuation import continue_as
 from .contracts import CommandError, CommandResult, SaveEnvelope
 from .errors import (
     CommandRejectedError,
@@ -23,7 +25,7 @@ from .serialization import (
 from .session import GameSession
 
 SUPPORTED_ENGINE_KIND = "python-headless"
-ENGINE_VERSION = "0.57.0"
+ENGINE_VERSION = "0.58.0"
 
 
 def _copy_save(save: SaveEnvelope) -> SaveEnvelope:
@@ -167,6 +169,8 @@ def dispatch_command(
         CommandType.QUEUE_ACTION,
         CommandType.REMOVE_ACTION,
         CommandType.ADVANCE_TIME,
+        CommandType.RESOLVE_CHOICE,
+        CommandType.CONTINUE_AS,
     }:
         return _failure(
             command,
@@ -231,7 +235,7 @@ def dispatch_command(
             )
             events = ()
             interruption = None
-        else:
+        elif command.command_type is CommandType.ADVANCE_TIME:
             months = command.payload["months"]
             if not isinstance(months, int) or isinstance(months, bool):
                 raise ContractValidationError(
@@ -256,6 +260,61 @@ def dispatch_command(
             events = tuple(raw_events)
             effects = tuple(raw_effects)
             interruption = advancement["interruption"]
+        elif command.command_type is CommandType.RESOLVE_CHOICE:
+            choice_id = command.payload["choice_id"]
+            option_id = command.payload["option_id"]
+            if not isinstance(choice_id, str):
+                raise ContractValidationError(
+                    "command.payload.choice_id must be a string"
+                )
+            if option_id is not None and not isinstance(option_id, str):
+                raise ContractValidationError(
+                    "command.payload.option_id must be a string or null"
+                )
+            resolution = resolve_choice(
+                restored.world,
+                restored.session,
+                restored.random_source,
+                restored.id_source,
+                choice_id=choice_id,
+                option_id=option_id,
+            )
+            raw_events = resolution["events"]
+            raw_effects = resolution["effects"]
+            if not isinstance(raw_events, list) or not isinstance(
+                raw_effects,
+                list,
+            ):
+                raise RuntimeError(
+                    "resolve_choice returned an invalid result shape"
+                )
+            events = tuple(raw_events)
+            effects = tuple(raw_effects)
+            interruption = resolution["interruption"]
+        else:
+            successor_actor_id = command.payload["actor_id"]
+            if not isinstance(successor_actor_id, str):
+                raise ContractValidationError(
+                    "command.payload.actor_id must be a string"
+                )
+            continuation = continue_as(
+                restored.world,
+                restored.session,
+                restored.random_source,
+                successor_actor_id=successor_actor_id,
+            )
+            raw_events = continuation["events"]
+            raw_effects = continuation["effects"]
+            if not isinstance(raw_events, list) or not isinstance(
+                raw_effects,
+                list,
+            ):
+                raise RuntimeError(
+                    "continue_as returned an invalid result shape"
+                )
+            events = tuple(raw_events)
+            effects = tuple(raw_effects)
+            interruption = continuation["interruption"]
     except CommandRejectedError as exc:
         return _failure(
             command,

@@ -2,7 +2,7 @@
 title: Backlog
 tags: [planning, tracking, wip]
 updated: 2026-07-18
-through: v0.57.0
+through: v0.58.0
 ---
 
 # Actora Backlog
@@ -13,12 +13,11 @@ Now / Next / Later. No archive. Done = deleted or changelog.
 
 ## Now
 
-- **Authoritative headless runtime completion** — finish `resolve_choice` and `continue_as` on top of the deterministic v0.57.0 creation/advancement boundary. Choice resolution must apply engine-owned identity/meeting effects through stable option IDs, resume saved skip time correctly, and hand death continuation through the world-owned focus seam. Add native golden traces for both commands before browser packaging. *(2026-07-18)*
+- **Isolated browser Worker parity spike** — package the complete native six-command engine; run the exact JSON boundary in an opt-in Worker and prove native/browser save hashes, outputs, and error behavior match. Do not load the runtime on an ordinary `/lab/actora` visit yet. *(2026-07-18)*
 
 
 ## Next
 
-- **Isolated browser Worker parity spike** — package the native engine only after its command traces are stable; run the exact JSON boundary in an opt-in Worker and prove native/browser save hashes, outputs, and error behavior match. Do not load the runtime on an ordinary `/lab/actora` visit yet. *(2026-07-18)*
 - **New-engine save isolation and web cutover** — use a distinct save namespace, explicit legacy schema-5 migration/recovery, and reversible cutover gates before the copied web simulation is replaced. Preserve the shipped web UX rather than rebuilding it around the runtime. *(2026-07-18)*
 
 ## Later

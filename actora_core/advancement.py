@@ -188,6 +188,8 @@ def advance_time(
     random_source: RandomSource,
     id_source: IdSource,
     months_to_advance: int,
+    *,
+    suppress_skip_marker: bool = False,
 ) -> dict[str, object]:
     """Advances through the same ordered native systems without shell state."""
     if session.pending_choice is not None:
@@ -344,6 +346,7 @@ def advance_time(
         aggregated_turn_result,
         months_to_advance,
         new_records,
+        suppress_skip_marker=suppress_skip_marker,
     )
 
     months_advanced = aggregated_turn_result["months_advanced"]

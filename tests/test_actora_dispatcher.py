@@ -53,8 +53,9 @@ def build_dispatch_save(
     engine_kind: str = "python-headless",
     session: GameSession | None = None,
     next_id: int = 1,
+    world=None,
 ) -> SaveEnvelope:
-    world = build_test_world()
+    world = world or build_test_world()
     world.recent_event_ids_by_actor = {
         "player": ["met_friend", "quiet_month"],
     }
@@ -281,7 +282,7 @@ class DispatcherMutationTests(unittest.TestCase):
                 9,
             ),
             command(
-                "request-unimplemented",
+                "request-no-choice",
                 CommandType.RESOLVE_CHOICE,
                 {
                     "choice_id": "gender_identity",
@@ -293,7 +294,7 @@ class DispatcherMutationTests(unittest.TestCase):
         expected_codes = (
             "revision_conflict",
             "unsupported_action",
-            "command_not_implemented",
+            "choice_not_available",
         )
         for request, expected_code in zip(commands, expected_codes):
             result = dispatch_command(save, request)
@@ -452,7 +453,7 @@ class ContractHardeningTests(unittest.TestCase):
         self.assertTrue(result.ok)
         self.assertIsNone(result.error)
         self.assertEqual(result.revision, 1)
-        self.assertEqual(result.save.engine_version, "0.57.0")
+        self.assertEqual(result.save.engine_version, "0.58.0")
         self.assertEqual(
             result.save.session.focused_actor_id,
             "actora_startup_player_00000003",

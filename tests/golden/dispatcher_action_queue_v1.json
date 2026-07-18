@@ -172,7 +172,7 @@
       "command_id": "trace-request-07",
       "command_type": "resolve_choice",
       "effects": [],
-      "error_code": "command_not_implemented",
+      "error_code": "choice_not_available",
       "next_id": 3,
       "ok": false,
       "revision": 3,

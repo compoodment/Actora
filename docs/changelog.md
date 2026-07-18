@@ -6,6 +6,14 @@ updated: 2026-07-18
 
 # Actora Changelog
 
+## Version 0.58.0 (Minor) - 2026-07-18
+- **Native choice resolution:** `resolve_choice` now resolves saved stable-ID gender, sexuality, meeting, and action-picker choices. Identity changes use world-owned mutation seams, introductions consume the save-owned RNG/ID streams, and action selections use the canonical action queue.
+- **Interrupted-skip continuation:** Resolving an advancement-origin choice resumes the saved remaining months without writing a second skip marker and can surface the next choice or focused-life death interruption.
+- **Native life continuation:** `continue_as` recomputes the canonical candidate set, hands focus through the world-owned continuation seam, clears per-life transient state, preserves the saga log with one life separator, and deterministically initializes identity state for the successor.
+- **Strict result and save contracts:** Events now have an exact structured shape, effects use a closed tagged union, and failed results cannot carry events or effects. Saves reject forged or temporally impossible choice state, invalid skip resumes, dead-focus transients, completed handoff reuse, unissued or cross-role-reused engine IDs, noncanonical picker defaults, future meeting cooldowns, and duplicate actor insertion.
+- **Golden and adversarial coverage:** Added a complete choice/continuation dispatcher trace plus stable-ID, replay, source-consumption, resumed-skip, handoff, atomic-failure, hostile-state, and independently ordered identity-gate regressions. The full suite now covers 94 tests.
+- **Scope boundary:** All six native commands now execute. No browser package, Worker parity result, save migration, or `/lab/actora` runtime cutover is claimed by this release.
+
 ## Version 0.57.0 (Minor) - 2026-07-18
 - **Deterministic native creation:** `create_game` now validates the complete intent-only character payload, interprets its 16-digit seed as a hexadecimal integer, constructs the startup family through injected PCG/ID sources, and returns a schema-1 save at revision 1.
 - **Authoritative headless advancement:** `advance_time` now runs native month-by-month simulation, queued social/personal actions, grief, relationship decay, identity emergence, meeting choices, early death interruption, saved history, and remaining-skip state in terminal-compatible order.

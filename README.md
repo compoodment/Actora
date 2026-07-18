@@ -14,7 +14,7 @@ It's not BitLife. It's not a god sim. It's a persistent world where you live thr
 **Pre-Alpha Prototype.** 
 Built in Python using a `curses` terminal UI. It is highly experimental, actively being rewritten, and prone to breaking.
 
-The repository also contains a curses-free deterministic `actora_core` command/save runtime. It supports native character creation, action queue mutations, month advancement, and strict schema-1 save validation; choice resolution, continuation handoff, packaging, and browser execution remain in progress.
+The repository also contains a curses-free deterministic `actora_core` command/save runtime. It executes native character creation, action queue mutations, month advancement, stable-ID choice resolution, and death-continuation handoff under strict schema-1 validation. Browser packaging and Worker parity remain in progress.
 
 ### What actually works right now:
 - **Character Creation:** Questionnaire-based generation or manual stat allocation.

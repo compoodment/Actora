@@ -1,0 +1,286 @@
+{
+  "contract": "dispatcher-choice-continuation-v1",
+  "steps": [
+    {
+      "actor_ids": ["friend", "player"],
+      "command_id": "trace-identity-advance",
+      "command_type": "advance_time",
+      "date": {"month": 8, "year": 3},
+      "effects": [
+        {"kind": "time_advanced", "months_advanced": 1, "months_requested": 3}
+      ],
+      "error_code": null,
+      "events": [
+        {
+          "event_id": "curious_question_spree",
+          "month": 8,
+          "outcome": {"stat_changes": {"charisma": -1, "intelligence": 1}},
+          "tags": ["neutral"],
+          "text": "You asked so many questions today that someone walked away mid-conversation.",
+          "year": 3
+        }
+      ],
+      "focused_actor_id": "player",
+      "focused_identity": {"gender": "Female", "sexuality": null},
+      "ids": {"algorithm": "sequential-v1", "namespace": "trace", "next_value": 1},
+      "interruption": {
+        "choice_id": "gender_identity",
+        "kind": "choice_required",
+        "remaining_months": 2
+      },
+      "ok": true,
+      "pending_choice_id": "gender_identity",
+      "remaining_skip_months": 2,
+      "revision": 1,
+      "rng": {
+        "algorithm": "pcg32-v1",
+        "increment": "000000000000006d",
+        "state": "eb87e28cdb5eacad"
+      },
+      "save_sha256": "fd85d69cf8c15ce0ea49d383347e2352fdd6942fee0fccdcd5dc7c7800cae283"
+    },
+    {
+      "actor_ids": ["friend", "player"],
+      "command_id": "trace-gender-resolve",
+      "command_type": "resolve_choice",
+      "date": {"month": 9, "year": 3},
+      "effects": [
+        {
+          "choice_id": "gender_identity",
+          "kind": "choice_resolved",
+          "option_id": "value:Non-binary"
+        },
+        {"kind": "time_advanced", "months_advanced": 1, "months_requested": 2}
+      ],
+      "error_code": null,
+      "events": [
+        {
+          "event_id": "gender_identity",
+          "month": 8,
+          "tags": ["identity", "choice"],
+          "text": "You now identify as Non-binary.",
+          "year": 3
+        }
+      ],
+      "focused_actor_id": "player",
+      "focused_identity": {"gender": "Non-binary", "sexuality": null},
+      "ids": {"algorithm": "sequential-v1", "namespace": "trace", "next_value": 1},
+      "interruption": {
+        "choice_id": "sexuality",
+        "kind": "choice_required",
+        "remaining_months": 1
+      },
+      "ok": true,
+      "pending_choice_id": "sexuality",
+      "remaining_skip_months": 1,
+      "revision": 2,
+      "rng": {
+        "algorithm": "pcg32-v1",
+        "increment": "000000000000006d",
+        "state": "4bd83fc56126390b"
+      },
+      "save_sha256": "2a5db242cc051f64cb7da53d815f593d7b02622cffc25d36f37348da2e6c799e"
+    },
+    {
+      "actor_ids": ["friend", "player"],
+      "command_id": "trace-sexuality-resolve",
+      "command_type": "resolve_choice",
+      "date": {"month": 10, "year": 3},
+      "effects": [
+        {
+          "choice_id": "sexuality",
+          "kind": "choice_resolved",
+          "option_id": "value:Bisexual"
+        },
+        {"kind": "time_advanced", "months_advanced": 1, "months_requested": 1}
+      ],
+      "error_code": null,
+      "events": [
+        {
+          "event_id": "sexuality",
+          "month": 9,
+          "tags": ["identity", "choice"],
+          "text": "You identify as Bisexual.",
+          "year": 3
+        },
+        {
+          "event_id": "teen_new_style",
+          "month": 10,
+          "outcome": {"stat_changes": {"happiness": 1, "looks": 1}},
+          "tags": ["positive", "teenager"],
+          "text": "You tried a new look and felt unexpectedly confident about it.",
+          "year": 3
+        }
+      ],
+      "focused_actor_id": "player",
+      "focused_identity": {"gender": "Non-binary", "sexuality": "Bisexual"},
+      "ids": {"algorithm": "sequential-v1", "namespace": "trace", "next_value": 1},
+      "interruption": null,
+      "ok": true,
+      "pending_choice_id": null,
+      "remaining_skip_months": 0,
+      "revision": 3,
+      "rng": {
+        "algorithm": "pcg32-v1",
+        "increment": "000000000000006d",
+        "state": "af070e6e970e2d38"
+      },
+      "save_sha256": "db74de9b44bfd52cc5ab8713d7fb20f1981d081c660c8c837c89384c506a9329"
+    },
+    {
+      "actor_ids": ["friend", "player"],
+      "command_id": "trace-meeting-advance",
+      "command_type": "advance_time",
+      "date": {"month": 8, "year": 3},
+      "effects": [
+        {"kind": "time_advanced", "months_advanced": 1, "months_requested": 1}
+      ],
+      "error_code": null,
+      "events": [],
+      "focused_actor_id": "player",
+      "focused_identity": {"gender": "Female", "sexuality": null},
+      "ids": {"algorithm": "sequential-v1", "namespace": "trace", "next_value": 1},
+      "interruption": {
+        "choice_id": "meeting_npc",
+        "kind": "choice_required",
+        "remaining_months": 0
+      },
+      "ok": true,
+      "pending_choice_id": "meeting_npc",
+      "remaining_skip_months": 0,
+      "revision": 1,
+      "rng": {
+        "algorithm": "pcg32-v1",
+        "increment": "000000000000006d",
+        "state": "dd87edcd18f51c02"
+      },
+      "save_sha256": "ebf968e3952751987d53b48534079e6c8405f97cedf1aed1114c715626dd7ef4"
+    },
+    {
+      "actor_ids": ["friend", "player", "trace_npc_00000001"],
+      "command_id": "trace-meeting-resolve",
+      "command_type": "resolve_choice",
+      "date": {"month": 8, "year": 3},
+      "effects": [
+        {
+          "choice_id": "meeting_npc",
+          "kind": "choice_resolved",
+          "option_id": "value:introduce"
+        },
+        {
+          "actor_id": "trace_npc_00000001",
+          "kind": "person_met",
+          "name": "Liam Silva"
+        }
+      ],
+      "error_code": null,
+      "events": [
+        {
+          "event_id": "meeting_npc_introduce",
+          "month": 8,
+          "tags": ["social", "choice"],
+          "text": "You introduced yourself to Liam Silva.",
+          "year": 3
+        }
+      ],
+      "focused_actor_id": "player",
+      "focused_identity": {"gender": "Female", "sexuality": null},
+      "ids": {"algorithm": "sequential-v1", "namespace": "trace", "next_value": 2},
+      "interruption": null,
+      "ok": true,
+      "pending_choice_id": null,
+      "remaining_skip_months": 0,
+      "revision": 2,
+      "rng": {
+        "algorithm": "pcg32-v1",
+        "increment": "000000000000006d",
+        "state": "09c5a142df053ee2"
+      },
+      "save_sha256": "4c555ac1e5f6ff33ac97f217133df8492a7ee28f05ee8a3b78d5689845d53862"
+    },
+    {
+      "actor_ids": ["friend", "player"],
+      "command_id": "trace-death-advance",
+      "command_type": "advance_time",
+      "date": {"month": 8, "year": 3},
+      "effects": [
+        {"kind": "time_advanced", "months_advanced": 1, "months_requested": 5}
+      ],
+      "error_code": null,
+      "events": [],
+      "focused_actor_id": "player",
+      "focused_identity": {"gender": "Female", "sexuality": null},
+      "ids": {"algorithm": "sequential-v1", "namespace": "trace", "next_value": 1},
+      "interruption": {
+        "continuity_state": {
+          "actor_id": "player",
+          "continuity_candidate_ids": ["friend"],
+          "continuity_candidates": [
+            {
+              "actor_id": "friend",
+              "age": 4,
+              "current_place_name": "Test City",
+              "family_branch_label": null,
+              "full_name": "Charles Babbage",
+              "is_alive": true,
+              "life_stage": "Child",
+              "link_role": "friend",
+              "link_type": "social",
+              "relationship_label": "social/friend",
+              "relationship_priority": 9,
+              "structural_status": "active"
+            }
+          ],
+          "focus_actor_death_month": 8,
+          "focus_actor_death_reason": "Old age",
+          "focus_actor_death_year": 3,
+          "focus_actor_name": "Ada Lovelace",
+          "focus_actor_structural_status": "dead",
+          "had_continuity_candidates": true,
+          "is_dead": true,
+          "universe_continues": true
+        },
+        "kind": "continuation_required"
+      },
+      "ok": true,
+      "pending_choice_id": null,
+      "remaining_skip_months": 0,
+      "revision": 1,
+      "rng": {
+        "algorithm": "pcg32-v1",
+        "increment": "000000000000006d",
+        "state": "666a753be6139d85"
+      },
+      "save_sha256": "9a0fae7d528aa2e3f74d23d8a645641254182aefedcaf7f16377b4bbf4b687e9"
+    },
+    {
+      "actor_ids": ["friend", "player"],
+      "command_id": "trace-continue",
+      "command_type": "continue_as",
+      "date": {"month": 8, "year": 3},
+      "effects": [
+        {
+          "focused_actor_id": "friend",
+          "kind": "continued_as",
+          "previous_actor_id": "player"
+        }
+      ],
+      "error_code": null,
+      "events": [],
+      "focused_actor_id": "friend",
+      "focused_identity": {"gender": "Male", "sexuality": null},
+      "ids": {"algorithm": "sequential-v1", "namespace": "trace", "next_value": 1},
+      "interruption": null,
+      "ok": true,
+      "pending_choice_id": null,
+      "remaining_skip_months": 0,
+      "revision": 2,
+      "rng": {
+        "algorithm": "pcg32-v1",
+        "increment": "000000000000006d",
+        "state": "35aa6405c73f65a3"
+      },
+      "save_sha256": "3bb60f786cfa44b10730b894dae2854c81dd5c6954ed100aebf5c733bf7ccfe1"
+    }
+  ]
+}

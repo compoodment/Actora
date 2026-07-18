@@ -143,6 +143,10 @@ class World:
 
     def add_actor(self, actor_id, actor_obj):
         """Adds an actor to the world."""
+        if actor_id in self.actors:
+            raise ValueError(
+                f"add_actor: actor_id '{actor_id}' already exists"
+            )
         self.actors[actor_id] = actor_obj
 
     def update_actor_spatial_identity(
@@ -384,6 +388,74 @@ class World:
         actor.appearance = dict(appearance)
         actor.traits = list(traits)
         actor.money = money
+        return actor
+
+    def resolve_human_identity_choice(self, actor_id, choice_id, value):
+        """Applies one player identity decision through the world boundary."""
+        actor = self.get_actor(actor_id)
+        if actor is None:
+            raise ValueError(
+                "resolve_human_identity_choice: "
+                f"unknown actor_id '{actor_id}'"
+            )
+        if not actor.is_alive():
+            raise ValueError(
+                "resolve_human_identity_choice: "
+                f"actor_id '{actor_id}' is not alive"
+            )
+
+        if choice_id == "gender_identity":
+            if not isinstance(value, str) or not value:
+                raise ValueError(
+                    "resolve_human_identity_choice: "
+                    "gender value must be a non-empty string"
+                )
+            previous_value = actor.gender
+            actor.gender = value
+        elif choice_id == "sexuality":
+            if value is not None and (
+                not isinstance(value, str) or not value
+            ):
+                raise ValueError(
+                    "resolve_human_identity_choice: "
+                    "sexuality value must be null or a non-empty string"
+                )
+            previous_value = actor.sexuality
+            if value is not None:
+                actor.sexuality = value
+        else:
+            raise ValueError(
+                "resolve_human_identity_choice: "
+                f"unsupported choice_id '{choice_id}'"
+            )
+
+        current_value = (
+            actor.gender
+            if choice_id == "gender_identity"
+            else actor.sexuality
+        )
+        return {
+            "actor_id": actor_id,
+            "choice_id": choice_id,
+            "previous_value": previous_value,
+            "current_value": current_value,
+            "changed": current_value != previous_value,
+        }
+
+    def auto_resolve_human_identity(self, actor_id, *, random_source=None):
+        """Silently resolves one resumed human through a world-owned seam."""
+        actor = self.get_actor(actor_id)
+        if actor is None:
+            raise ValueError(
+                "auto_resolve_human_identity: "
+                f"unknown actor_id '{actor_id}'"
+            )
+        if not actor.is_alive():
+            raise ValueError(
+                "auto_resolve_human_identity: "
+                f"actor_id '{actor_id}' is not alive"
+            )
+        actor.auto_resolve_identity(random_source=random_source)
         return actor
 
     def create_human_child_with_parents(

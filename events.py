@@ -376,6 +376,15 @@ MEETING_EVENT_POOL = [
 _MEETING_EVENT_MIN_AGE_MONTHS = 72  # age 6
 
 
+def is_meeting_event_lifecycle_eligible(lifecycle_state: dict) -> bool:
+    """Returns whether a human lifecycle can receive a meeting event."""
+    if lifecycle_state.get("life_stage_model") != "human_default":
+        return False
+    if lifecycle_state.get("age_months", 0) < _MEETING_EVENT_MIN_AGE_MONTHS:
+        return False
+    return lifecycle_state.get("life_stage", "") in ("Child", "Teenager")
+
+
 def get_meeting_event_for_player(
     lifecycle_state: dict,
     *,
@@ -388,15 +397,7 @@ def get_meeting_event_for_player(
     responsibility (ActoraTUI.maybe_offer_meeting_event).
     """
     rng = random if random_source is None else random_source
-    if lifecycle_state.get("life_stage_model") != "human_default":
-        return None
-
-    age_months = lifecycle_state.get("age_months", 0)
-    life_stage = lifecycle_state.get("life_stage", "")
-
-    if age_months < _MEETING_EVENT_MIN_AGE_MONTHS:
-        return None
-    if life_stage not in ("Child", "Teenager"):
+    if not is_meeting_event_lifecycle_eligible(lifecycle_state):
         return None
     if rng.random() >= 0.20:
         return None

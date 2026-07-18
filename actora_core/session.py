@@ -15,6 +15,9 @@ from .json_types import (
 )
 from .randomness import RandomSource
 
+GENDER_CHOICE_AGE_RANGE = (12, 15)
+SEXUALITY_CHOICE_AGE_RANGE = (14, 17)
+
 
 def _clone_object_list(value: object, *, path: str) -> list[dict[str, JSONValue]]:
     if not isinstance(value, list):
@@ -322,8 +325,12 @@ class GameSession:
         """Creates the current shell defaults through injected randomness."""
         return cls(
             focused_actor_id=focused_actor_id,
-            gender_choice_age=random_source.randint(12, 15),
-            sexuality_choice_age=random_source.randint(14, 17),
+            gender_choice_age=random_source.randint(
+                *GENDER_CHOICE_AGE_RANGE
+            ),
+            sexuality_choice_age=random_source.randint(
+                *SEXUALITY_CHOICE_AGE_RANGE
+            ),
         )
 
     @classmethod

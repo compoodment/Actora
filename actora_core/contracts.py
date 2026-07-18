@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 
 from .commands import MAX_ADVANCE_MONTHS, CommandType
@@ -262,6 +263,165 @@ def _clone_object_sequence(
     return tuple(
         clone_json_object(item, path=f"{path}[{index}]")
         for index, item in enumerate(value)
+    )
+
+
+def _validate_event(value: object, *, path: str) -> JSONObject:
+    event = clone_json_object(value, path=path)
+    base_fields = {"event_id", "text", "year", "month", "tags"}
+    _reject_unknown_fields(
+        event,
+        base_fields | {"outcome"},
+        path=path,
+    )
+    if not base_fields.issubset(event):
+        raise ContractValidationError(
+            f"{path} must contain event_id, text, year, month, and tags"
+        )
+    require_nonempty_string(event.get("event_id"), path=f"{path}.event_id")
+    if not isinstance(event.get("text"), str):
+        raise ContractValidationError(f"{path}.text must be a string")
+    require_int(event.get("year"), path=f"{path}.year")
+    require_int(
+        event.get("month"),
+        path=f"{path}.month",
+        minimum=1,
+        maximum=12,
+    )
+    tags = event.get("tags")
+    if not isinstance(tags, list) or any(
+        not isinstance(tag, str) or not tag for tag in tags
+    ):
+        raise ContractValidationError(
+            f"{path}.tags must be an array of non-empty strings"
+        )
+
+    if "outcome" in event:
+        outcome = clone_json_object(
+            event["outcome"],
+            path=f"{path}.outcome",
+        )
+        _reject_unknown_fields(
+            outcome,
+            {"stat_changes"},
+            path=f"{path}.outcome",
+        )
+        if set(outcome) != {"stat_changes"}:
+            raise ContractValidationError(
+                f"{path}.outcome must contain stat_changes"
+            )
+        stat_changes = clone_json_object(
+            outcome["stat_changes"],
+            path=f"{path}.outcome.stat_changes",
+        )
+        for stat_name, change in stat_changes.items():
+            if (
+                not isinstance(stat_name, str)
+                or not stat_name
+                or isinstance(change, bool)
+                or not isinstance(change, (int, float))
+                or not math.isfinite(change)
+            ):
+                raise ContractValidationError(
+                    f"{path}.outcome.stat_changes must map stat names "
+                    "to finite numbers"
+                )
+    return event
+
+
+_EFFECT_FIELDS = {
+    "game_created": {"kind", "focused_actor_id"},
+    "action_queued": {"kind", "action_id"},
+    "action_removed": {"kind", "action_id"},
+    "time_advanced": {
+        "kind",
+        "months_requested",
+        "months_advanced",
+    },
+    "action_resolved": {"kind", "action_id"},
+    "choice_resolved": {
+        "kind",
+        "choice_id",
+        "option_id",
+    },
+    "person_met": {"kind", "actor_id", "name"},
+    "continued_as": {
+        "kind",
+        "previous_actor_id",
+        "focused_actor_id",
+    },
+}
+
+
+def _validate_effect(value: object, *, path: str) -> JSONObject:
+    effect = clone_json_object(value, path=path)
+    kind = require_nonempty_string(
+        effect.get("kind"),
+        path=f"{path}.kind",
+    )
+    expected_fields = _EFFECT_FIELDS.get(kind)
+    if expected_fields is None:
+        raise ContractValidationError(
+            f"Unsupported result effect kind '{kind}'"
+        )
+    _reject_unknown_fields(effect, expected_fields, path=path)
+    if set(effect) != expected_fields:
+        raise ContractValidationError(
+            f"{path} must contain exactly "
+            + ", ".join(sorted(expected_fields))
+        )
+
+    string_fields = expected_fields - {
+        "kind",
+        "months_requested",
+        "months_advanced",
+        "option_id",
+    }
+    for field_name in string_fields:
+        require_nonempty_string(
+            effect.get(field_name),
+            path=f"{path}.{field_name}",
+        )
+    if kind == "time_advanced":
+        requested = require_int(
+            effect.get("months_requested"),
+            path=f"{path}.months_requested",
+            minimum=1,
+            maximum=MAX_ADVANCE_MONTHS,
+        )
+        advanced = require_int(
+            effect.get("months_advanced"),
+            path=f"{path}.months_advanced",
+            minimum=0,
+            maximum=MAX_ADVANCE_MONTHS,
+        )
+        if advanced > requested:
+            raise ContractValidationError(
+                f"{path}.months_advanced must not exceed months_requested"
+            )
+    elif kind == "choice_resolved":
+        option_id = effect.get("option_id")
+        if option_id is not None:
+            require_nonempty_string(
+                option_id,
+                path=f"{path}.option_id",
+            )
+    return effect
+
+
+def _validate_events(value: object) -> tuple[JSONObject, ...]:
+    raw_events = _clone_object_sequence(value, path="result.events")
+    return tuple(
+        _validate_event(event, path=f"result.events[{index}]")
+        for index, event in enumerate(raw_events)
+    )
+
+
+def _validate_effects(value: object) -> tuple[JSONObject, ...]:
+    raw_effects = _clone_object_sequence(value, path="result.effects")
+    return tuple(
+        _validate_effect(effect, path=f"result.effects[{index}]")
+        for index, effect in enumerate(raw_effects)
     )
 
 
@@ -781,15 +941,19 @@ def _assert_interruption_matches_result(
     ok: bool,
     save: SaveEnvelope | None,
 ) -> None:
+    interruption_capable_commands = {
+        CommandType.ADVANCE_TIME,
+        CommandType.RESOLVE_CHOICE,
+    }
     if interruption is None:
         if (
             ok
-            and command_type is CommandType.ADVANCE_TIME
+            and command_type in interruption_capable_commands
             and save is not None
         ):
             if save.session.pending_choice is not None:
                 raise ContractValidationError(
-                    "advance result must surface its saved pending choice"
+                    "command result must surface its saved pending choice"
                 )
             focused_actor = save.world.get("actors", {}).get(
                 save.session.focused_actor_id
@@ -799,16 +963,16 @@ def _assert_interruption_matches_result(
                 and focused_actor.get("structural_status") == "dead"
             ):
                 raise ContractValidationError(
-                    "advance result must surface its dead saved focus"
+                    "command result must surface its dead saved focus"
                 )
         return
     if not ok:
         raise ContractValidationError(
             "failed result must not contain an interruption"
         )
-    if command_type is not CommandType.ADVANCE_TIME:
+    if command_type not in interruption_capable_commands:
         raise ContractValidationError(
-            "only advance_time may return an interruption"
+            "only advance_time or resolve_choice may return an interruption"
         )
     if save is None:
         raise ContractValidationError(
@@ -907,12 +1071,12 @@ class CommandResult:
         object.__setattr__(
             self,
             "events",
-            _clone_object_sequence(self.events, path="result.events"),
+            _validate_events(self.events),
         )
         object.__setattr__(
             self,
             "effects",
-            _clone_object_sequence(self.effects, path="result.effects"),
+            _validate_effects(self.effects),
         )
         if self.interruption is not None:
             object.__setattr__(
@@ -927,6 +1091,10 @@ class CommandResult:
                 raise ContractValidationError("successful result must not contain error")
         elif self.error is None:
             raise ContractValidationError("failed result must contain error")
+        elif self.events or self.effects:
+            raise ContractValidationError(
+                "failed result must not contain events or effects"
+            )
         if self.save is not None and not isinstance(self.save, SaveEnvelope):
             raise ContractValidationError("result.save must be a SaveEnvelope or null")
         if self.error is not None and not isinstance(self.error, CommandError):
@@ -1006,6 +1174,12 @@ class CommandResult:
             if self.interruption is not None
             else None
         )
+        validated_events = _validate_events(self.events)
+        validated_effects = _validate_effects(self.effects)
+        if not self.ok and (validated_events or validated_effects):
+            raise ContractValidationError(
+                "failed result must not contain events or effects"
+            )
         _assert_interruption_matches_result(
             validated_interruption,
             command_type=self.command_type,
@@ -1019,8 +1193,14 @@ class CommandResult:
             "ok": self.ok,
             "revision": self.revision,
             "save": save_data,
-            "events": clone_json(list(self.events), path="result.events"),
-            "effects": clone_json(list(self.effects), path="result.effects"),
+            "events": clone_json(
+                list(validated_events),
+                path="result.events",
+            ),
+            "effects": clone_json(
+                list(validated_effects),
+                path="result.effects",
+            ),
             "interruption": (
                 validated_interruption
                 if validated_interruption is not None

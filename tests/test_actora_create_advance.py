@@ -140,9 +140,6 @@ def _build_family_birth_save(*, next_id: int = 1):
         GameSession(
             focused_actor_id="player",
             last_logged_year=3,
-            gender_choice_offered=True,
-            sexuality_choice_offered=True,
-            meeting_event_last_total_months=9999,
         ),
         SeededRandomSource(91),
         DeterministicIdSource("trace", next_value=next_id),
@@ -424,12 +421,16 @@ class AdvanceTimeDispatcherTests(unittest.TestCase):
     def test_identity_choice_interrupts_and_blocks_until_resolved(
         self,
     ) -> None:
+        world = build_test_world()
+        world.actors["player"].birth_year = -9
+        world.actors["player"].birth_month = 8
         save = build_dispatch_save(
+            world=world,
             session=GameSession(
                 focused_actor_id="player",
                 last_logged_year=3,
-                gender_choice_age=0,
-                sexuality_choice_age=0,
+                gender_choice_age=12,
+                sexuality_choice_age=14,
             )
         )
         result = dispatch_command(
@@ -474,14 +475,15 @@ class AdvanceTimeDispatcherTests(unittest.TestCase):
         self,
     ) -> None:
         world = build_test_world()
-        world.actors["player"].birth_year = -3
+        world.actors["player"].birth_year = -11
+        world.actors["player"].birth_month = 7
         identity_save = build_save_envelope(
             world,
             GameSession(
                 focused_actor_id="player",
                 last_logged_year=3,
-                gender_choice_age=0,
-                sexuality_choice_age=0,
+                gender_choice_age=12,
+                sexuality_choice_age=14,
             ),
             SeededRandomSource(3),
             DeterministicIdSource("trace"),
@@ -493,8 +495,8 @@ class AdvanceTimeDispatcherTests(unittest.TestCase):
                 focused_actor_id="player",
                 last_logged_year=3,
                 gender_choice_offered=True,
-                gender_choice_age=0,
-                sexuality_choice_age=0,
+                gender_choice_age=12,
+                sexuality_choice_age=14,
             ),
             SeededRandomSource(3),
             DeterministicIdSource("trace"),
@@ -574,17 +576,134 @@ class AdvanceTimeDispatcherTests(unittest.TestCase):
             meeting_result.save.rng,
         )
 
+    def test_independent_thresholds_can_offer_sexuality_before_gender(
+        self,
+    ) -> None:
+        created = _create(seed="0000000000000004")
+        self.assertTrue(created.ok)
+        self.assertEqual(created.save.session.gender_choice_age, 15)
+        self.assertEqual(created.save.session.sexuality_choice_age, 14)
+
+        command_index = 0
+
+        def advance_and_decline_meetings(save, months):
+            nonlocal command_index
+            command_index += 1
+            result = dispatch_command(
+                save,
+                command(
+                    f"independent-threshold-advance-{command_index}",
+                    CommandType.ADVANCE_TIME,
+                    {"months": months},
+                    save.revision,
+                ),
+            )
+            self.assertTrue(result.ok)
+            next_save = result.save
+            while (
+                next_save.session.pending_choice is not None
+                and next_save.session.pending_choice["choice_id"]
+                == "meeting_npc"
+            ):
+                command_index += 1
+                result = dispatch_command(
+                    next_save,
+                    command(
+                        f"independent-threshold-meeting-{command_index}",
+                        CommandType.RESOLVE_CHOICE,
+                        {
+                            "choice_id": "meeting_npc",
+                            "option_id": "value:keep_to_self",
+                        },
+                        next_save.revision,
+                    ),
+                )
+                self.assertTrue(result.ok)
+                next_save = result.save
+            return next_save
+
+        save = advance_and_decline_meetings(created.save, 120)
+        self.assertIsNone(save.session.pending_choice)
+        save = advance_and_decline_meetings(save, 48)
+
+        self.assertEqual(
+            save.session.pending_choice["choice_id"],
+            "sexuality",
+        )
+        self.assertFalse(save.session.gender_choice_offered)
+        self.assertTrue(save.session.sexuality_choice_offered)
+        serialized = dumps_save_envelope(save)
+        self.assertEqual(
+            dumps_save_envelope(loads_save_envelope(serialized)),
+            serialized,
+        )
+
+        command_index += 1
+        sexuality = dispatch_command(
+            save,
+            command(
+                f"independent-threshold-sexuality-{command_index}",
+                CommandType.RESOLVE_CHOICE,
+                {
+                    "choice_id": "sexuality",
+                    "option_id": "value:Bisexual",
+                },
+                save.revision,
+            ),
+        )
+        self.assertTrue(sexuality.ok)
+        self.assertFalse(sexuality.save.session.gender_choice_offered)
+        self.assertTrue(sexuality.save.session.sexuality_choice_offered)
+        self.assertEqual(
+            sexuality.save.world["actors"][
+                sexuality.save.session.focused_actor_id
+            ]["sexuality"],
+            "Bisexual",
+        )
+
+        save = advance_and_decline_meetings(sexuality.save, 12)
+        self.assertEqual(
+            save.session.pending_choice["choice_id"],
+            "gender_identity",
+        )
+        command_index += 1
+        gender = dispatch_command(
+            save,
+            command(
+                f"independent-threshold-gender-{command_index}",
+                CommandType.RESOLVE_CHOICE,
+                {
+                    "choice_id": "gender_identity",
+                    "option_id": "value:Non-binary",
+                },
+                save.revision,
+            ),
+        )
+        self.assertTrue(gender.ok)
+        self.assertIsNone(gender.save.session.pending_choice)
+        self.assertTrue(gender.save.session.gender_choice_offered)
+        self.assertTrue(gender.save.session.sexuality_choice_offered)
+        self.assertEqual(
+            gender.save.world["actors"][
+                gender.save.session.focused_actor_id
+            ]["gender"],
+            "Non-binary",
+        )
+        dumps_save_envelope(gender.save)
+
     def test_custom_current_gender_remains_a_valid_headless_default(
         self,
     ) -> None:
         world = build_test_world()
         world.actors["player"].gender = "Demigirl"
+        world.actors["player"].birth_year = -9
+        world.actors["player"].birth_month = 8
         save = build_save_envelope(
             world,
             GameSession(
                 focused_actor_id="player",
                 last_logged_year=3,
-                gender_choice_age=0,
+                gender_choice_age=12,
             ),
             SeededRandomSource(7),
             DeterministicIdSource("trace"),
@@ -616,8 +735,6 @@ class AdvanceTimeDispatcherTests(unittest.TestCase):
         session = GameSession(
             focused_actor_id="player",
             last_logged_year=3,
-            gender_choice_offered=True,
-            sexuality_choice_offered=True,
         )
         save = build_save_envelope(
             world,
@@ -878,7 +995,7 @@ class AdvanceTimeDispatcherTests(unittest.TestCase):
                     last_logged_year=30,
                     gender_choice_offered=True,
                     sexuality_choice_offered=True,
-                    meeting_event_last_total_months=10000,
+                    meeting_event_last_total_months=361,
                 ),
                 SeededRandomSource(seed),
                 DeterministicIdSource("trace"),
@@ -962,13 +1079,17 @@ class AdvanceTimeDispatcherTests(unittest.TestCase):
 
 class InterruptionContractTests(unittest.TestCase):
     def _identity_result(self):
+        world = build_test_world()
+        world.actors["player"].birth_year = -9
+        world.actors["player"].birth_month = 8
         return dispatch_command(
             build_dispatch_save(
+                world=world,
                 session=GameSession(
                     focused_actor_id="player",
                     last_logged_year=3,
-                    gender_choice_age=0,
-                    sexuality_choice_age=0,
+                    gender_choice_age=12,
+                    sexuality_choice_age=14,
                 )
             ),
             command(

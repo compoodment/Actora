@@ -496,7 +496,7 @@ Stats and Attributes are intentionally split: Stats are the player-facing moment
 ## Web Shell Direction (`/lab/actora`)
 
 **Status:** Active direction (DEC-035, 2026-05-11)
-**Current truth:** This repository contains the authoritative Python/curses implementation and a curses-free deterministic command/save boundary with native creation, action queues, and month advancement. Choice resolution and continuation handoff are the remaining native commands. A playable `/lab/actora` web presentation exists separately in actora.art, but its copied TypeScript simulation has not yet been replaced by the Python engine.
+**Current truth:** This repository contains the authoritative Python/curses implementation and a complete curses-free deterministic six-command runtime covering creation, action queues, advancement, stable-ID choice resolution, and death-continuation handoff. A playable `/lab/actora` web presentation exists separately in actora.art, but its copied TypeScript simulation has not yet been replaced; browser packaging and isolated Worker parity are the next runtime steps.
 
 **Intent:**
 The web shell should make Actora easier to see, play, and iterate on without changing what Actora is. It is a game surface for Actora, not a generic site experiment and not a separate rewrite of the vision.

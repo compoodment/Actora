@@ -322,7 +322,7 @@ class SaveRoundtripTests(unittest.TestCase):
                 "choice_id": "select_hang_out_target",
                 "default_value": None,
             },
-            remaining_skip_months=3,
+            remaining_skip_months=0,
             event_log=[
                 {
                     "kind": "event",
@@ -418,14 +418,29 @@ class SaveRoundtripTests(unittest.TestCase):
 
     def test_successful_command_result_roundtrip(self) -> None:
         _, _, _, envelope = self.build_envelope(revision=8)
+        envelope.session.pending_choice = None
         result = CommandResult(
             command_id="save_command_00000003",
-            command_type=CommandType.QUEUE_ACTION,
+            command_type=CommandType.ADVANCE_TIME,
             ok=True,
             revision=8,
             save=envelope,
-            events=({"text": "One month passed.", "year": 3, "month": 8},),
-            effects=({"kind": "calendar_advanced", "months": 1},),
+            events=(
+                {
+                    "event_id": "month_passed",
+                    "text": "One month passed.",
+                    "year": 3,
+                    "month": 8,
+                    "tags": ["time"],
+                },
+            ),
+            effects=(
+                {
+                    "kind": "time_advanced",
+                    "months_requested": 1,
+                    "months_advanced": 1,
+                },
+            ),
         )
         self.assertEqual(
             CommandResult.from_dict(result.to_dict()).to_dict(),
