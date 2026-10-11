@@ -177,7 +177,7 @@ Each doc gets 2-4 tags from this taxonomy.
 
 ## Repo info
 
-- Path: `/home/compadmin/actora`
+- Path: `~/Actora` on the laptop (it was `/home/compadmin/actora` on Coda, retired 2026-10-11)
 - GitHub: `git@github.com:compoodment/Actora.git`
 - Language: Python / curses TUI
 - Playtesting: always use tmux (`tmux new-session -d -s actora-test -x 220 -y 50`)
